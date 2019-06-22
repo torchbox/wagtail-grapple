@@ -7,18 +7,17 @@ from django.contrib.contenttypes.models import ContentType
 from wagtail.core.models import Page as WagtailPage
 from wagtail.documents.models import AbstractDocument
 from wagtail.images.models import AbstractImage
-from wagtail.snippets.models import get_snippet_models, get_snippet_usage_url
+from wagtail.snippets.models import get_snippet_models
 from graphene_django.types import DjangoObjectType
 
 from .registry import registry
-from .models import GraphQLField
 from .types.pages import PageInterface, Page
 from .types.documents import Document
 from .types.images import ImageObjectType
 
 
 def import_apps():
-    """ 
+    """
     Add each django app set in the settings file
     """
     apps = settings.GRAPHQL["apps"].items()
@@ -27,13 +26,15 @@ def import_apps():
 
 
 def add_app(app: str, prefix: str = ""):
-    """ 
+    """
     Iterate through each model in the app and pass it to node type creators.
     """
 
-    # Create a collection of models of standard models (Pages, Images, Documents).
+    # Create a collection of models of standard models (Pages, Images,
+    # Documents).
     models = [
-        mdl.model_class() for mdl in ContentType.objects.filter(app_label=app).all()
+        mdl.model_class()
+        for mdl in ContentType.objects.filter(app_label=app).all()
     ]
 
     # Add snippet models to model collection.
@@ -47,7 +48,7 @@ def add_app(app: str, prefix: str = ""):
 
 
 def register_model(cls: type, type_prefix: str):
-    """ 
+    """
     Pass model to the right node type creator based on it's base class.
     """
 
@@ -66,14 +67,17 @@ def get_fields_and_properties(cls):
     """
     Return all fields and @property methods for a model.
     """
-    fields = [field.name for field in cls._meta.get_fields(include_parents=False)]
+    fields = [
+        field.name for field in cls._meta.get_fields(
+            include_parents=False)]
     properties = []
     try:
         properties = [
             method[0]
-            for method in inspect.getmembers(cls, lambda o: isinstance(o, property))
+            for method in
+            inspect.getmembers(cls, lambda o: isinstance(o, property))
         ]
-    except:
+    except BaseException:
         properties = []
 
     return fields + properties
@@ -86,8 +90,8 @@ def build_node_type(
     base_type: Type[DjangoObjectType] = DjangoObjectType,
 ):
     """
-    Build a graphene node type from a model class and associate with an interface. 
-    If it has custom fields then implmement them.
+    Build a graphene node type from a model class and associate
+    with an interface. If it has custom fields then implmement them.
     """
     type_name = type_prefix + cls.__name__
 
@@ -115,7 +119,8 @@ def build_node_type(
             # Add field to GQL type with correct field-type
             type_meta[field.field_name] = field.field_type
 
-    # Set excluded fields to stop errors cropping up from unsupported field types.
+    # Set excluded fields to stop errors cropping up from unsupported field
+    # types.
     type_meta["Meta"].exclude_fields = exclude_fields
 
     return type(type_name, (base_type,), type_meta)
@@ -123,7 +128,7 @@ def build_node_type(
 
 def register_page_model(cls: Type[WagtailPage], type_prefix: str):
     """
-    Create a graphene node type for models than inherit from Wagtail Page model.
+    Create graphene node type for models than inherit from Wagtail Page model.
     """
 
     # Avoid gql type duplicates
@@ -139,8 +144,9 @@ def register_page_model(cls: Type[WagtailPage], type_prefix: str):
 
 def register_documment_model(cls: Type[AbstractDocument], type_prefix: str):
     """
-    Create a graphene node type for a model than inherits from AbstractDocument.
-    Only one model will actually be generated because a default document model needs to be set in settings.
+    Create graphene node type for a model than inherits from AbstractDocument.
+    Only one model will actually be generated because a default document model
+    needs to be set in settings.
     """
 
     # Avoid gql type duplicates
@@ -157,7 +163,8 @@ def register_documment_model(cls: Type[AbstractDocument], type_prefix: str):
 def register_image_model(cls: Type[AbstractImage], type_prefix: str):
     """
     Create a graphene node type for a model than inherits from AbstractImage.
-    Only one model will actually be generated because a default image model needs to be set in settings.
+    Only one model will actually be generated because a default image model
+    needs to be set in settings.
     """
 
     # Avoid gql type duplicates

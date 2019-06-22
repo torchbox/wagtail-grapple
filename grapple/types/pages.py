@@ -4,7 +4,7 @@ from wagtail.core.models import Page as WagtailPage
 from graphene_django.types import DjangoObjectType
 from graphql.execution.base import ResolveInfo
 from rx.subjects import Subject
-from django.dispatch import Signal, receiver
+from django.dispatch import receiver
 
 from ..signals import preview_update
 from ..registry import registry
@@ -40,7 +40,8 @@ class PageInterface(graphene.Interface):
     @classmethod
     def resolve_type(cls, instance, info: ResolveInfo):
         """
-        If model has a custom Graphene Node type in registry then use it, otherwise use base page type.
+        If model has a custom Graphene Node type in registry then use it,
+        otherwise use base page type.
         """
         mdl = type(instance)
         if mdl in registry.pages:
@@ -94,7 +95,8 @@ class PageInterface(graphene.Interface):
         Resolves a list of nodes pointing to the current page’s ancestors.
         Docs: https://docs.wagtail.io/en/v2.5.1/reference/pages/model_reference.html?highlight=get_ancestors#wagtail.core.models.Page.get_ancestors
         """
-        return resolve_queryset(self.get_ancestors().specific(), info, **kwargs)
+        return resolve_queryset(
+            self.get_ancestors().specific(), info, **kwargs)
 
     def resolve_seo_title(self, info):
         """
@@ -127,7 +129,7 @@ def get_specific_page(id, slug, token):
         if token and page:
             page_type = type(page)
             page = page_type.get_page_from_preview_token(token)
-    except:
+    except BaseException:
         page = None
 
     return page

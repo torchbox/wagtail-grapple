@@ -1,9 +1,7 @@
 import graphene
 import wagtail
-from decimal import *
 from graphene.types import Scalar
 from graphene_django.converter import convert_django_field
-from graphene_django.types import DjangoObjectType
 from wagtail.core.fields import StreamField
 from wagtail.core import blocks
 
@@ -18,7 +16,8 @@ class GenericStreamFieldType(Scalar):
 
 @convert_django_field.register(StreamField)
 def convert_stream_field(field, registry=None):
-    return GenericStreamFieldType(description=field.help_text, required=not field.null)
+    return GenericStreamFieldType(
+        description=field.help_text, required=not field.null)
 
 
 class StreamFieldType(graphene.Interface):
@@ -29,7 +28,8 @@ class StreamFieldType(graphene.Interface):
     @classmethod
     def resolve_type(cls, instance, info):
         """
-        If block has a custom Graphene Node type in registry then use it, otherwise use base block type.
+        If block has a custom Graphene Node type in registry then use it,
+        otherwise use generic block type.
         """
         mdl = type(instance.block)
         if mdl in registry.streamfield_blocks:
@@ -48,7 +48,6 @@ class StreamFieldType(graphene.Interface):
 
 
 def register_streamfield_blocks():
-    from wagtail import documents, images, snippets, embeds
     from .pages import PageInterface
     from .documents import get_document_type
     from .images import get_image_type
@@ -250,33 +249,31 @@ def register_streamfield_blocks():
                 for name, block in self.block.child_blocks.items()
             ]
 
-    registry.streamfield_blocks.update(
-        {
-            "generic-block": StreamFieldBlock,
-            blocks.CharBlock: CharBlock,
-            blocks.TextBlock: TextBlock,
-            blocks.EmailBlock: EmailBlock,
-            blocks.IntegerBlock: IntegerBlock,
-            blocks.FloatBlock: FloatBlock,
-            blocks.DecimalBlock: DecimalBlock,
-            blocks.RegexBlock: RegexBlock,
-            blocks.URLBlock: URLBlock,
-            blocks.BooleanBlock: BooleanBlock,
-            blocks.DateBlock: DateBlock,
-            blocks.TimeBlock: TimeBlock,
-            blocks.DateTimeBlock: DateTimeBlock,
-            blocks.RichTextBlock: RichTextBlock,
-            blocks.RawHTMLBlock: RawHTMLBlock,
-            blocks.BlockQuoteBlock: BlockQuoteBlock,
-            blocks.ChoiceBlock: ChoiceBlock,
-            blocks.PageChooserBlock: PageChooserBlock,
-            wagtail.documents.blocks.DocumentChooserBlock: DocumentChooserBlock,
-            wagtail.images.blocks.ImageChooserBlock: ImageChooserBlock,
-            wagtail.snippets.blocks.SnippetChooserBlock: SnippetChooserBlock,
-            wagtail.embeds.blocks.EmbedBlock: EmbedBlock,
-            blocks.StaticBlock: StaticBlock,
-            blocks.ListBlock: ListBlock,
-            blocks.StreamBlock: StreamBlock,
-            blocks.StructBlock: StructBlock,
-        }
-    )
+    registry.streamfield_blocks.update({
+        "generic-block": StreamFieldBlock,
+        blocks.CharBlock: CharBlock,
+        blocks.TextBlock: TextBlock,
+        blocks.EmailBlock: EmailBlock,
+        blocks.IntegerBlock: IntegerBlock,
+        blocks.FloatBlock: FloatBlock,
+        blocks.DecimalBlock: DecimalBlock,
+        blocks.RegexBlock: RegexBlock,
+        blocks.URLBlock: URLBlock,
+        blocks.BooleanBlock: BooleanBlock,
+        blocks.DateBlock: DateBlock,
+        blocks.TimeBlock: TimeBlock,
+        blocks.DateTimeBlock: DateTimeBlock,
+        blocks.RichTextBlock: RichTextBlock,
+        blocks.RawHTMLBlock: RawHTMLBlock,
+        blocks.BlockQuoteBlock: BlockQuoteBlock,
+        blocks.ChoiceBlock: ChoiceBlock,
+        blocks.PageChooserBlock: PageChooserBlock,
+        wagtail.documents.blocks.DocumentChooserBlock: DocumentChooserBlock,
+        wagtail.images.blocks.ImageChooserBlock: ImageChooserBlock,
+        wagtail.snippets.blocks.SnippetChooserBlock: SnippetChooserBlock,
+        wagtail.embeds.blocks.EmbedBlock: EmbedBlock,
+        blocks.StaticBlock: StaticBlock,
+        blocks.ListBlock: ListBlock,
+        blocks.StreamBlock: StreamBlock,
+        blocks.StructBlock: StructBlock,
+    })

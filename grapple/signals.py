@@ -1,4 +1,3 @@
-import django.dispatch
-from django.dispatch import Signal, receiver
+from django.dispatch import Signal
 
 preview_update = Signal(providing_args=["token"])

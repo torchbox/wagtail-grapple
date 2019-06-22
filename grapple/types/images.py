@@ -9,7 +9,6 @@ from wagtail.images.models import (
     Rendition as WagtailImageRendition,
 )
 from wagtail.images import get_image_model
-from wagtail.images.views.serve import generate_signature
 
 from ..registry import registry
 from ..utils import (
@@ -18,7 +17,7 @@ from ..utils import (
     image_as_base64,
     resolve_queryset,
 )
-from .structures import TagList, QuerySetList
+from .structures import QuerySetList
 
 
 class ImageRenditionObjectType(DjangoObjectType):
@@ -83,7 +82,7 @@ class ImageObjectType(DjangoObjectType):
 
     def resolve_base64(self, info):
         """
-        Intended to be used by Gatsby Image. Return the image as base-encoded string so that it can be pre-rendered 
+        Intended to be used by Gatsby Image. Return the image as base-encoded string so that it can be pre-rendered
         as background image while actual image is downloaded via network.
         """
         return image_as_base64(self.file.url)

@@ -1,11 +1,8 @@
-from django.contrib.contenttypes.models import ContentType
 from wagtail.documents.models import (
     Document as WagtailDocument,
-    AbstractDocument,
     get_document_model,
 )
 from graphene_django.types import DjangoObjectType
-from graphql.execution.base import ResolveInfo
 import graphene
 
 from ..registry import registry

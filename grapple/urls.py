@@ -1,7 +1,5 @@
-from django.http import HttpResponse
-from django.template import RequestContext
 from django.shortcuts import render
-from django.conf.urls import include, url
+from django.conf.urls import url
 from django.views.decorators.csrf import csrf_exempt
 
 from graphene_django.views import GraphQLView
@@ -27,4 +25,7 @@ urlpatterns = [
 ]
 
 # Django Channel (v1.x) routing for subscription support
-channel_routing = [route_class(GraphQLSubscriptionConsumer, path=r"^/subscriptions")]
+channel_routing = [
+    route_class(
+        GraphQLSubscriptionConsumer,
+        path=r"^/subscriptions")]

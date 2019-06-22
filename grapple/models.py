@@ -7,14 +7,14 @@ from django.db import models
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.core.signing import TimestampSigner
-from django.shortcuts import get_object_or_404, render
-from django.http import JsonResponse, HttpResponse
+from django.shortcuts import render
 
 from .registry import registry
 from .signals import preview_update
 from .types.streamfield import StreamFieldType
 
-# Classes used to define what the Django field should look like in the GQL type.
+
+# Classes used to define what the Django field should look like in the GQL type
 class GraphQLField:
     field_name: str
     field_type: str
@@ -82,7 +82,6 @@ class PagePreview(models.Model):
 
 
 # Mixin for pages that want extra Grapple benefits:
-# Inspired from: https://github.com/torchbox/wagtail-torchbox/blob/master/headlesspreview/models.py
 class GrapplePageMixin:
     @classmethod
     def get_preview_signer(cls):
@@ -126,7 +125,8 @@ class GrapplePageMixin:
             original_request=original_request, **meta
         )
         request.GET = request.GET.copy()
-        request.GET["realtime_preview"] = original_request.GET.get("realtime_preview")
+        request.GET["realtime_preview"] = original_request\
+            .GET.get("realtime_preview")
         return request
 
     def serve_preview(self, request, mode_name):
@@ -160,5 +160,5 @@ class GrapplePageMixin:
             return PagePreview.objects.get(
                 content_type=content_type, token=token
             ).as_page()
-        except:
+        except BaseException:
             return

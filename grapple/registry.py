@@ -3,6 +3,7 @@ class RegistryItem(dict):
     def types(self) -> tuple:
         return tuple(self.values())
 
+
 class Registry:
     pages = RegistryItem()
     documents = RegistryItem()
@@ -19,6 +20,7 @@ class Registry:
         models.update(self.snippets)
         models.update(self.streamfield_blocks)
         return models
+
 
 # Singleton Registry
 registry = Registry()

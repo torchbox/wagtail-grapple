@@ -1,5 +1,9 @@
 from django.contrib.contenttypes.models import ContentType
-from wagtail.documents.models import Document as WagtailDocument, AbstractDocument, get_document_model
+from wagtail.documents.models import (
+    Document as WagtailDocument,
+    AbstractDocument,
+    get_document_model,
+)
 from graphene_django.types import DjangoObjectType
 from graphql.execution.base import ResolveInfo
 import graphene
@@ -14,19 +18,20 @@ class Document(DjangoObjectType):
     Base document type used if one isn't generated for the current model.
     All other node types extend this.
     """
+
     class Meta:
         model = WagtailDocument
-        exclude_fields = ('tags', )
+        exclude_fields = ("tags",)
 
     id = graphene.ID()
     title = graphene.String()
     file = graphene.String()
     created_at = graphene.DateTime()
     file_size = graphene.Int()
-    file_hash = graphene.String() 
+    file_hash = graphene.String()
 
 
-def DocumentsQuery(): 
+def DocumentsQuery():
     registry.documents[WagtailDocument] = Document
     mdl = get_document_model()
     model_type = registry.documents[mdl]
@@ -36,9 +41,7 @@ def DocumentsQuery():
 
         # Return all pages, ideally specific.
         def resolve_documents(self, info, **kwargs):
-            return resolve_queryset(
-                mdl.objects.all(), info, **kwargs
-            )
+            return resolve_queryset(mdl.objects.all(), info, **kwargs)
 
     return Mixin
 
@@ -46,4 +49,4 @@ def DocumentsQuery():
 def get_document_type():
     registry.documents[WagtailDocument] = Document
     mdl = get_document_model()
-    return registry.documents[mdl] 
+    return registry.documents[mdl]

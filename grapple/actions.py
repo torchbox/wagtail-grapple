@@ -21,7 +21,7 @@ def import_apps():
     """ 
     Add each django app set in the settings file
     """
-    apps = settings.GRAPHQL['apps'].items()
+    apps = settings.GRAPHQL["apps"].items()
     for name, prefix in apps:
         add_app(name, prefix)
 
@@ -33,15 +33,14 @@ def add_app(app: str, prefix: str = ""):
 
     # Create a collection of models of standard models (Pages, Images, Documents).
     models = [
-        mdl.model_class()
-        for mdl in ContentType.objects.filter(app_label=app).all()
+        mdl.model_class() for mdl in ContentType.objects.filter(app_label=app).all()
     ]
 
     # Add snippet models to model collection.
     for snippet in get_snippet_models():
         if snippet._meta.app_label == app:
             models.append(snippet)
-    
+
     # Create add each model to correct section of registry.
     for model in models:
         register_model(model, prefix)
@@ -61,13 +60,13 @@ def register_model(cls: type, type_prefix: str):
         register_image_model(cls, type_prefix)
     if cls in get_snippet_models():
         register_snippet_model(cls, type_prefix)
-    
+
 
 def get_fields_and_properties(cls):
     """
     Return all fields and @property methods for a model.
     """
-    fields = [ field.name for field in cls._meta.get_fields(include_parents=False) ]
+    fields = [field.name for field in cls._meta.get_fields(include_parents=False)]
     properties = []
     try:
         properties = [
@@ -76,29 +75,35 @@ def get_fields_and_properties(cls):
         ]
     except:
         properties = []
-    
+
     return fields + properties
 
-def build_node_type(cls: type, type_prefix: str, interface: graphene.Interface, base_type: Type[DjangoObjectType] = DjangoObjectType):
+
+def build_node_type(
+    cls: type,
+    type_prefix: str,
+    interface: graphene.Interface,
+    base_type: Type[DjangoObjectType] = DjangoObjectType,
+):
     """
     Build a graphene node type from a model class and associate with an interface. 
     If it has custom fields then implmement them.
     """
     type_name = type_prefix + cls.__name__
-    
+
     # Create a new blank node type
     class Meta:
         model = cls
-        interfaces = (interface, ) if interface is not None else tuple()
+        interfaces = (interface,) if interface is not None else tuple()
         exclude_fields = tuple()
 
-    type_meta = {'Meta': Meta}
+    type_meta = {"Meta": Meta}
 
     # Build a list fields that shouldn't be reflected in GQL type.
     exclude_fields = get_fields_and_properties(cls)
-    
+
     # Add any custom fields to node if they are defined.
-    if hasattr(cls, 'graphql_fields'):
+    if hasattr(cls, "graphql_fields"):
         for field in cls.graphql_fields:
             if callable(field):
                 field = field()
@@ -111,9 +116,9 @@ def build_node_type(cls: type, type_prefix: str, interface: graphene.Interface, 
             type_meta[field.field_name] = field.field_type
 
     # Set excluded fields to stop errors cropping up from unsupported field types.
-    type_meta['Meta'].exclude_fields = exclude_fields
-    
-    return type(type_name, (base_type, ), type_meta)
+    type_meta["Meta"].exclude_fields = exclude_fields
+
+    return type(type_name, (base_type,), type_meta)
 
 
 def register_page_model(cls: Type[WagtailPage], type_prefix: str):
@@ -130,14 +135,14 @@ def register_page_model(cls: Type[WagtailPage], type_prefix: str):
 
     # Add page type to registry.
     registry.pages[cls] = page_node_type
-    
+
 
 def register_documment_model(cls: Type[AbstractDocument], type_prefix: str):
     """
     Create a graphene node type for a model than inherits from AbstractDocument.
     Only one model will actually be generated because a default document model needs to be set in settings.
     """
-    
+
     # Avoid gql type duplicates
     if cls in registry.documents:
         return
@@ -147,14 +152,14 @@ def register_documment_model(cls: Type[AbstractDocument], type_prefix: str):
 
     # Add document type to registry.
     registry.documents[cls] = document_node_type
-    
-    
+
+
 def register_image_model(cls: Type[AbstractImage], type_prefix: str):
     """
     Create a graphene node type for a model than inherits from AbstractImage.
     Only one model will actually be generated because a default image model needs to be set in settings.
     """
-    
+
     # Avoid gql type duplicates
     if cls in registry.images:
         return

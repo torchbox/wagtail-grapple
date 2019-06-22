@@ -11,68 +11,96 @@ from wagtail.snippets.blocks import SnippetChooserBlock
 from wagtail.snippets.edit_handlers import SnippetChooserPanel
 
 from grapple.models import (
-    GraphQLField, 
-    GraphQLString, 
-    GraphQLSnippet, 
+    GraphQLField,
+    GraphQLString,
+    GraphQLSnippet,
     GrapplePageMixin,
-    GraphQLStreamfield, 
+    GraphQLStreamfield,
 )
+
 
 class HomePage(Page):
     pass
 
+
 class BlogPage(GrapplePageMixin, Page):
     author = models.CharField(max_length=255)
     date = models.DateField("Post date")
-    body = StreamField([
-        ('heading', blocks.CharBlock(classname="full title")),
-        ('paraagraph', blocks.RichTextBlock()),
-        ('image', ImageChooserBlock()),
-        ('decimal', blocks.DecimalBlock()),
-        ('date', blocks.DateBlock()),
-        ('datetime', blocks.DateTimeBlock()),
-        ('quote', blocks.BlockQuoteBlock()),
-        ('drink', blocks.ChoiceBlock(choices=[
-            ('tea', 'Tea'),
-            ('coffee', 'Coffee'),
-        ], icon='time')),
-        ('somepage', blocks.PageChooserBlock()),
-        ('static', blocks.StaticBlock(
-            admin_text='Latest posts: no configuration needed.',
-        )),
-        ('person', blocks.StructBlock([
-            ('first_name', blocks.CharBlock()),
-            ('surname', blocks.CharBlock()),
-            ('photo', ImageChooserBlock(required=False)),
-            ('biography', blocks.RichTextBlock()),
-        ], icon='user')),
-        ('video', EmbedBlock()),
-        ('carousel', blocks.StreamBlock(
-            [
-                ('image', ImageChooserBlock()),
-                ('quotation', blocks.StructBlock([
-                    ('text', blocks.TextBlock()),
-                    ('author', blocks.CharBlock()),
-                ])),
-            ],
-            icon='cogs'
-        )),
-        ('doc', DocumentChooserBlock()),
-        ('ingredients_list', blocks.ListBlock(blocks.StructBlock([
-            ('ingredient', blocks.CharBlock()),
-            ('amount', blocks.CharBlock(required=False)),
-        ]))),
-    ])
+    body = StreamField(
+        [
+            ("heading", blocks.CharBlock(classname="full title")),
+            ("paraagraph", blocks.RichTextBlock()),
+            ("image", ImageChooserBlock()),
+            ("decimal", blocks.DecimalBlock()),
+            ("date", blocks.DateBlock()),
+            ("datetime", blocks.DateTimeBlock()),
+            ("quote", blocks.BlockQuoteBlock()),
+            (
+                "drink",
+                blocks.ChoiceBlock(
+                    choices=[("tea", "Tea"), ("coffee", "Coffee")], icon="time"
+                ),
+            ),
+            ("somepage", blocks.PageChooserBlock()),
+            (
+                "static",
+                blocks.StaticBlock(admin_text="Latest posts: no configuration needed."),
+            ),
+            (
+                "person",
+                blocks.StructBlock(
+                    [
+                        ("first_name", blocks.CharBlock()),
+                        ("surname", blocks.CharBlock()),
+                        ("photo", ImageChooserBlock(required=False)),
+                        ("biography", blocks.RichTextBlock()),
+                    ],
+                    icon="user",
+                ),
+            ),
+            ("video", EmbedBlock()),
+            (
+                "carousel",
+                blocks.StreamBlock(
+                    [
+                        ("image", ImageChooserBlock()),
+                        (
+                            "quotation",
+                            blocks.StructBlock(
+                                [
+                                    ("text", blocks.TextBlock()),
+                                    ("author", blocks.CharBlock()),
+                                ]
+                            ),
+                        ),
+                    ],
+                    icon="cogs",
+                ),
+            ),
+            ("doc", DocumentChooserBlock()),
+            (
+                "ingredients_list",
+                blocks.ListBlock(
+                    blocks.StructBlock(
+                        [
+                            ("ingredient", blocks.CharBlock()),
+                            ("amount", blocks.CharBlock(required=False)),
+                        ]
+                    )
+                ),
+            ),
+        ]
+    )
 
     content_panels = Page.content_panels + [
-        FieldPanel('author'),
-        FieldPanel('date'),
-        StreamFieldPanel('body')
+        FieldPanel("author"),
+        FieldPanel("date"),
+        StreamFieldPanel("body"),
     ]
 
     graphql_fields = [
-        GraphQLString('heading'),
-        GraphQLString('date'),
-        GraphQLString('author'),
-        GraphQLStreamfield('body')
+        GraphQLString("heading"),
+        GraphQLString("date"),
+        GraphQLString("author"),
+        GraphQLStreamfield("body"),
     ]

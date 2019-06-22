@@ -33,7 +33,9 @@ class PageInterface(graphene.Interface):
 
     def resolve_content_type(self, info: ResolveInfo):
         self.content_type = ContentType.objects.get_for_model(self)
-        return self.content_type.app_label + '.' + self.content_type.model_class().__name__
+        return (
+            self.content_type.app_label + "." + self.content_type.model_class().__name__
+        )
 
     @classmethod
     def resolve_type(cls, instance, info: ResolveInfo):
@@ -51,18 +53,14 @@ class PageInterface(graphene.Interface):
         Resolves the parent node of current page node.
         Docs: http://docs.wagtail.io/en/v2.5.1/reference/pages/model_reference.html?highlight=get_parent#wagtail.core.models.Page.get_parent
         """
-        return resolve_queryset(
-            self.get_parent().specific(), info, **kwargs
-        )
+        return resolve_queryset(self.get_parent().specific(), info, **kwargs)
 
     def resolve_children(self, info, **kwargs):
         """
         Resolves a list of live children of this page with `show_in_menus` set.
         Docs: http://docs.wagtail.io/en/v2.5.1/reference/pages/queryset_reference.html#examples
         """
-        return resolve_queryset(
-            self.get_children().specific(), info, **kwargs
-        )
+        return resolve_queryset(self.get_children().specific(), info, **kwargs)
 
     def resolve_siblings(self, info, **kwargs):
         """
@@ -81,7 +79,7 @@ class PageInterface(graphene.Interface):
         return resolve_queryset(
             self.get_next_siblings().exclude(pk=self.pk).specific(), info, **kwargs
         )
-    
+
     def resolve_prev_siblings(self, info, **kwargs):
         """
         Resolves a list of direct prev siblings of this page. Similar to `resolve_siblings` with sorting.
@@ -96,10 +94,8 @@ class PageInterface(graphene.Interface):
         Resolves a list of nodes pointing to the current page’s ancestors.
         Docs: https://docs.wagtail.io/en/v2.5.1/reference/pages/model_reference.html?highlight=get_ancestors#wagtail.core.models.Page.get_ancestors
         """
-        return resolve_queryset(
-            self.get_ancestors().specific(), info, **kwargs
-        )
-    
+        return resolve_queryset(self.get_ancestors().specific(), info, **kwargs)
+
     def resolve_seo_title(self, info):
         """
         Get page's SEO title. Fallback to a normal page's title if absent.
@@ -112,9 +108,10 @@ class Page(DjangoObjectType):
     Base page type used if one isn't generated for the current model.
     All other node types extend this.
     """
+
     class Meta:
         model = WagtailPage
-        interfaces = (PageInterface, )
+        interfaces = (PageInterface,)
 
 
 def get_specific_page(id, slug, token):
@@ -122,11 +119,11 @@ def get_specific_page(id, slug, token):
     Get a spcecific page, also get preview if token is passed
     """
     page = None
-    try: 
+    try:
         if id:
             page = WagtailPage.objects.live().public().specific().get(pk=id)
         if slug:
-            page = WagtailPage.objects.live().public().specific().get(slug=slug)    
+            page = WagtailPage.objects.live().public().specific().get(slug=slug)
         if token and page:
             page_type = type(page)
             page = page_type.get_page_from_preview_token(token)
@@ -136,17 +133,17 @@ def get_specific_page(id, slug, token):
     return page
 
 
-def PagesQuery(): 
+def PagesQuery():
     # Add base type to registry
     registry.pages[type(WagtailPage)] = Page
 
     class Mixin:
         pages = QuerySetList(lambda: PageInterface, enable_search=True)
         page = graphene.Field(
-            PageInterface, 
-            id=graphene.Int(), 
+            PageInterface,
+            id=graphene.Int(),
             slug=graphene.String(),
-            token=graphene.String()
+            token=graphene.String(),
         )
 
         # Return all pages, ideally specific.
@@ -158,41 +155,39 @@ def PagesQuery():
         # Return a specific page, identified by ID or Slug.
         def resolve_page(self, info, **kwargs):
             return get_specific_page(
-                id=kwargs.get('id'), 
-                slug= kwargs.get('slug'), 
-                token= kwargs.get('token')
+                id=kwargs.get("id"), slug=kwargs.get("slug"), token=kwargs.get("token")
             )
-        
 
     return Mixin
 
 
 # Subject to sync Django Signals to Observable
 preview_subject = Subject()
+
+
 @receiver(preview_update)
 def on_updated(sender, token, **kwargs):
     preview_subject.on_next(token)
 
+
 # Subscription Mixin
 def PagesSubscription():
-    def preview_observable(id, slug, token):        
-        return preview_subject\
-            .filter(lambda previewToken: previewToken == token)\
-            .map(lambda token: get_specific_page(id, slug, token))
-            
+    def preview_observable(id, slug, token):
+        return preview_subject.filter(lambda previewToken: previewToken == token).map(
+            lambda token: get_specific_page(id, slug, token)
+        )
+
     class Mixin:
         page = graphene.Field(
-            PageInterface, 
-            id=graphene.Int(), 
+            PageInterface,
+            id=graphene.Int(),
             slug=graphene.String(),
-            token=graphene.String()
+            token=graphene.String(),
         )
-        
+
         def resolve_page(self, info, **kwargs):
             return preview_observable(
-                id=kwargs.get('id'), 
-                slug=kwargs.get('slug'), 
-                token=kwargs.get('token')
+                id=kwargs.get("id"), slug=kwargs.get("slug"), token=kwargs.get("token")
             )
 
     return Mixin

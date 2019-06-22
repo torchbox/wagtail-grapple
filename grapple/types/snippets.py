@@ -11,11 +11,11 @@ from .structures import QuerySetList
 
 def SnippetsQuery():
     if registry.snippets:
+
         class Snippet(graphene.Union):
             class Meta:
                 types = registry.snippets.types
-    
-    
+
         class Mixin:
             snippets = graphene.List(Snippet)
             # Return all snippets.
@@ -24,13 +24,14 @@ def SnippetsQuery():
                 for snippet in registry.snippets:
                     for object in snippet._meta.model.objects.all():
                         snippet_objects.append(object)
-                
+
                 return snippet_objects
 
         return Mixin
-    
+
     else:
+
         class Mixin:
             pass
-        
+
         return Mixin

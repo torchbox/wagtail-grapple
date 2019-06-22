@@ -11,15 +11,9 @@ from wagtail.search.backends import get_search_backend
 
 from .registry import registry
 
+
 def resolve_queryset(
-    qs,
-    info,
-    limit=None,
-    offset=None,
-    search_query=None,
-    id=None,
-    order=None,
-    **kwargs
+    qs, info, limit=None, offset=None, search_query=None, id=None, order=None, **kwargs
 ):
     """
     Add limit, offset and search capabilities to the query. This contains
@@ -56,44 +50,44 @@ def resolve_queryset(
         return get_search_backend().search(search_query, qs)
 
     if order is not None:
-        qs = qs.order_by(*map(lambda x: x.strip(), order.split(',')))
+        qs = qs.order_by(*map(lambda x: x.strip(), order.split(",")))
 
     if limit is not None:
         limit = int(limit)
-        qs = qs[offset:limit + offset]
-    
+        qs = qs[offset : limit + offset]
+
     return qs
 
 
-def image_as_base64(image_file, format='png'):
+def image_as_base64(image_file, format="png"):
     """
     :param `image_file` for the complete path of image.
     :param `format` is format for image, eg: `png` or `jpg`.
     """
-    encoded_string = ''
+    encoded_string = ""
     image_file = settings.BASE_DIR + image_file
-    
+
     if not os.path.isfile(image_file):
         return "not an image"
-    
-    with open(image_file, 'rb') as img_f:
+
+    with open(image_file, "rb") as img_f:
         encoded_string = base64.b64encode(img_f.read())
-    
-    return 'data:image/%s;base64,%s' % (format, encoded_string)
+
+    return "data:image/%s;base64,%s" % (format, encoded_string)
 
 
 def convert_image_to_bmp(src: str, dest: str = None) -> str:
     try:
         img = Image.open(src)
         if dest is None:
-            dest = tempfile.NamedTemporaryFile(suffix='.bmp').name
+            dest = tempfile.NamedTemporaryFile(suffix=".bmp").name
         img.save(dest)
         return dest
     except:
         print("Image %s does not exist", src)
 
 
-def trace_bitmap(src: str, dest:str) -> str:
+def trace_bitmap(src: str, dest: str) -> str:
     try:
         # Get two most common colors and convert to hex.
         color_thief = ColorThief(src)
@@ -102,11 +96,15 @@ def trace_bitmap(src: str, dest:str) -> str:
         background = rgb2hex(*palette[1])
 
         # Trace image to svg and fill the back/foreground with the colors from above.
-        result = os.system("potrace --opaque --color={} --fillcolor={} --svg {} -o {}".format(foreground, background, src, dest))
+        result = os.system(
+            "potrace --opaque --color={} --fillcolor={} --svg {} -o {}".format(
+                foreground, background, src, dest
+            )
+        )
         return dest
     except:
         print("Failed to trace bitmap: ", src)
 
 
-def rgb2hex(r,g,b):
-    return "#{:02x}{:02x}{:02x}".format(r,g,b)
+def rgb2hex(r, g, b):
+    return "#{:02x}{:02x}{:02x}".format(r, g, b)

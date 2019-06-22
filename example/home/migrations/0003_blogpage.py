@@ -14,22 +14,128 @@ import wagtail.images.blocks
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('wagtailcore', '0041_group_collection_permissions_verbose_name_plural'),
-        ('home', '0002_create_homepage'),
+        ("wagtailcore", "0041_group_collection_permissions_verbose_name_plural"),
+        ("home", "0002_create_homepage"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='BlogPage',
+            name="BlogPage",
             fields=[
-                ('page_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='wagtailcore.Page')),
-                ('author', models.CharField(max_length=255)),
-                ('date', models.DateField(verbose_name='Post date')),
-                ('body', wagtail.core.fields.StreamField([('heading', wagtail.core.blocks.CharBlock(classname='full title')), ('paraagraph', wagtail.core.blocks.RichTextBlock()), ('image', wagtail.images.blocks.ImageChooserBlock()), ('decimal', wagtail.core.blocks.DecimalBlock()), ('date', wagtail.core.blocks.DateBlock()), ('datetime', wagtail.core.blocks.DateTimeBlock()), ('quote', wagtail.core.blocks.BlockQuoteBlock()), ('drink', wagtail.core.blocks.ChoiceBlock(choices=[('tea', 'Tea'), ('coffee', 'Coffee')], icon='cup')), ('somepage', wagtail.core.blocks.PageChooserBlock()), ('static', wagtail.core.blocks.static_block.StaticBlock(admin_text='Latest posts: no configuration needed.')), ('person', wagtail.core.blocks.StructBlock([('first_name', wagtail.core.blocks.CharBlock()), ('surname', wagtail.core.blocks.CharBlock()), ('photo', wagtail.images.blocks.ImageChooserBlock(required=False)), ('biography', wagtail.core.blocks.RichTextBlock())], icon='user')), ('video', wagtail.embeds.blocks.EmbedBlock()), ('carousel', wagtail.core.blocks.StreamBlock([('image', wagtail.images.blocks.ImageChooserBlock()), ('quotation', wagtail.core.blocks.StructBlock([('text', wagtail.core.blocks.TextBlock()), ('author', wagtail.core.blocks.CharBlock())]))], icon='cogs')), ('doc', wagtail.documents.blocks.DocumentChooserBlock()), ('ingredients_list', wagtail.core.blocks.ListBlock(wagtail.core.blocks.StructBlock([('ingredient', wagtail.core.blocks.CharBlock()), ('amount', wagtail.core.blocks.CharBlock(required=False))])))])),
+                (
+                    "page_ptr",
+                    models.OneToOneField(
+                        auto_created=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        parent_link=True,
+                        primary_key=True,
+                        serialize=False,
+                        to="wagtailcore.Page",
+                    ),
+                ),
+                ("author", models.CharField(max_length=255)),
+                ("date", models.DateField(verbose_name="Post date")),
+                (
+                    "body",
+                    wagtail.core.fields.StreamField(
+                        [
+                            (
+                                "heading",
+                                wagtail.core.blocks.CharBlock(classname="full title"),
+                            ),
+                            ("paraagraph", wagtail.core.blocks.RichTextBlock()),
+                            ("image", wagtail.images.blocks.ImageChooserBlock()),
+                            ("decimal", wagtail.core.blocks.DecimalBlock()),
+                            ("date", wagtail.core.blocks.DateBlock()),
+                            ("datetime", wagtail.core.blocks.DateTimeBlock()),
+                            ("quote", wagtail.core.blocks.BlockQuoteBlock()),
+                            (
+                                "drink",
+                                wagtail.core.blocks.ChoiceBlock(
+                                    choices=[("tea", "Tea"), ("coffee", "Coffee")],
+                                    icon="cup",
+                                ),
+                            ),
+                            ("somepage", wagtail.core.blocks.PageChooserBlock()),
+                            (
+                                "static",
+                                wagtail.core.blocks.static_block.StaticBlock(
+                                    admin_text="Latest posts: no configuration needed."
+                                ),
+                            ),
+                            (
+                                "person",
+                                wagtail.core.blocks.StructBlock(
+                                    [
+                                        ("first_name", wagtail.core.blocks.CharBlock()),
+                                        ("surname", wagtail.core.blocks.CharBlock()),
+                                        (
+                                            "photo",
+                                            wagtail.images.blocks.ImageChooserBlock(
+                                                required=False
+                                            ),
+                                        ),
+                                        (
+                                            "biography",
+                                            wagtail.core.blocks.RichTextBlock(),
+                                        ),
+                                    ],
+                                    icon="user",
+                                ),
+                            ),
+                            ("video", wagtail.embeds.blocks.EmbedBlock()),
+                            (
+                                "carousel",
+                                wagtail.core.blocks.StreamBlock(
+                                    [
+                                        (
+                                            "image",
+                                            wagtail.images.blocks.ImageChooserBlock(),
+                                        ),
+                                        (
+                                            "quotation",
+                                            wagtail.core.blocks.StructBlock(
+                                                [
+                                                    (
+                                                        "text",
+                                                        wagtail.core.blocks.TextBlock(),
+                                                    ),
+                                                    (
+                                                        "author",
+                                                        wagtail.core.blocks.CharBlock(),
+                                                    ),
+                                                ]
+                                            ),
+                                        ),
+                                    ],
+                                    icon="cogs",
+                                ),
+                            ),
+                            ("doc", wagtail.documents.blocks.DocumentChooserBlock()),
+                            (
+                                "ingredients_list",
+                                wagtail.core.blocks.ListBlock(
+                                    wagtail.core.blocks.StructBlock(
+                                        [
+                                            (
+                                                "ingredient",
+                                                wagtail.core.blocks.CharBlock(),
+                                            ),
+                                            (
+                                                "amount",
+                                                wagtail.core.blocks.CharBlock(
+                                                    required=False
+                                                ),
+                                            ),
+                                        ]
+                                    )
+                                ),
+                            ),
+                        ]
+                    ),
+                ),
             ],
-            options={
-                'abstract': False,
-            },
-            bases=(grapple.models.GrapplePageMixin, 'wagtailcore.page'),
-        ),
+            options={"abstract": False},
+            bases=(grapple.models.GrapplePageMixin, "wagtailcore.page"),
+        )
     ]

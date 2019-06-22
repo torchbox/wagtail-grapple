@@ -20,23 +20,18 @@ register_streamfield_blocks()
 """
 Root schema object that graphene is pointed at. It inherits its queries from each of the specific type mixins.
 """
+
+
 class Query(
-    graphene.ObjectType,
-    PagesQuery(),
-    ImagesQuery(),
-    DocumentsQuery(),
-    SnippetsQuery()
-): pass
+    graphene.ObjectType, PagesQuery(), ImagesQuery(), DocumentsQuery(), SnippetsQuery()
+):
+    pass
 
 
-class Subscription(
-    PagesSubscription(),
-    graphene.ObjectType
-): pass
+class Subscription(PagesSubscription(), graphene.ObjectType):
+    pass
 
 
 schema = graphene.Schema(
-    query=Query,
-    types=list(registry.models.values()),
-    subscription=Subscription
+    query=Query, types=list(registry.models.values()), subscription=Subscription
 )

@@ -1,0 +1,19 @@
+Metadata-Version: 2.1
+Name: grapple
+Version: 0.0.3
+Summary: A django app that speeds up and simplifies implementing a GraphQL endoint!
+Home-page: https://github.com/NathHorrigan/grapple
+Author: Nathan Horrigan
+Author-email: NathHorrigan@gmail.com
+License: UNKNOWN
+Description: UNKNOWN
+Keywords: wagtail,django,graphene,graphql
+Platform: UNKNOWN
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Science/Research
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Topic :: Scientific/Engineering
+Requires-Python: >= 2.7
+Description-Content-Type: text/markdown

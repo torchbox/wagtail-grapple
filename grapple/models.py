@@ -125,8 +125,7 @@ class GrapplePageMixin:
             original_request=original_request, **meta
         )
         request.GET = request.GET.copy()
-        request.GET["realtime_preview"] = original_request\
-            .GET.get("realtime_preview")
+        request.GET["realtime_preview"] = original_request.GET.get("realtime_preview")
         return request
 
     def serve_preview(self, request, mode_name):

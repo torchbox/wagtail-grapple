@@ -33,8 +33,7 @@ def add_app(app: str, prefix: str = ""):
     # Create a collection of models of standard models (Pages, Images,
     # Documents).
     models = [
-        mdl.model_class()
-        for mdl in ContentType.objects.filter(app_label=app).all()
+        mdl.model_class() for mdl in ContentType.objects.filter(app_label=app).all()
     ]
 
     # Add snippet models to model collection.
@@ -67,15 +66,12 @@ def get_fields_and_properties(cls):
     """
     Return all fields and @property methods for a model.
     """
-    fields = [
-        field.name for field in cls._meta.get_fields(
-            include_parents=False)]
+    fields = [field.name for field in cls._meta.get_fields(include_parents=False)]
     properties = []
     try:
         properties = [
             method[0]
-            for method in
-            inspect.getmembers(cls, lambda o: isinstance(o, property))
+            for method in inspect.getmembers(cls, lambda o: isinstance(o, property))
         ]
     except BaseException:
         properties = []

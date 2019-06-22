@@ -61,8 +61,7 @@ class QuerySetList(graphene.List):
         # Enable limiting on the queryset.
         if enable_limit is True and "limit" not in kwargs:
             kwargs["limit"] = graphene.Argument(
-                PositiveInt, description=_(
-                    "Limit a number of resulting objects.")
+                PositiveInt, description=_("Limit a number of resulting objects.")
             )
 
         # Enable offset on the queryset.
@@ -84,7 +83,10 @@ class QuerySetList(graphene.List):
         # If type is provided as a lazy value (e.g. using lambda), then
         # the search has to be enabled explicitly.
         if (enable_search is True and not inspect.isclass(of_type)) or (
-            enable_search is True and inspect.isclass(of_type) and class_is_indexed(of_type._meta.model) and "search_query" not in kwargs
+            enable_search is True
+            and inspect.isclass(of_type)
+            and class_is_indexed(of_type._meta.model)
+            and "search_query" not in kwargs
         ):
             kwargs["search_query"] = graphene.Argument(
                 graphene.String,
@@ -92,8 +94,7 @@ class QuerySetList(graphene.List):
             )
 
         if "id" not in kwargs:
-            kwargs["id"] = graphene.Argument(
-                graphene.ID, description=_("Filter by ID"))
+            kwargs["id"] = graphene.Argument(graphene.ID, description=_("Filter by ID"))
 
         super().__init__(of_type, *args, **kwargs)
 

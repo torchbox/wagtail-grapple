@@ -10,8 +10,7 @@ from wagtail.search.backends import get_search_backend
 
 
 def resolve_queryset(
-    qs, info, limit=None, offset=None, search_query=None,
-    id=None, order=None, **kwargs
+    qs, info, limit=None, offset=None, search_query=None, id=None, order=None, **kwargs
 ):
     """
     Add limit, offset and search capabilities to the query. This contains

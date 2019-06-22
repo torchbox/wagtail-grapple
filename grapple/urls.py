@@ -25,7 +25,4 @@ urlpatterns = [
 ]
 
 # Django Channel (v1.x) routing for subscription support
-channel_routing = [
-    route_class(
-        GraphQLSubscriptionConsumer,
-        path=r"^/subscriptions")]
+channel_routing = [route_class(GraphQLSubscriptionConsumer, path=r"^/subscriptions")]

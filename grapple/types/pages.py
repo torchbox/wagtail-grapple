@@ -95,8 +95,7 @@ class PageInterface(graphene.Interface):
         Resolves a list of nodes pointing to the current page’s ancestors.
         Docs: https://docs.wagtail.io/en/v2.5.1/reference/pages/model_reference.html?highlight=get_ancestors#wagtail.core.models.Page.get_ancestors
         """
-        return resolve_queryset(
-            self.get_ancestors().specific(), info, **kwargs)
+        return resolve_queryset(self.get_ancestors().specific(), info, **kwargs)
 
     def resolve_seo_title(self, info):
         """

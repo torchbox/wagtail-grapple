@@ -8,6 +8,7 @@ from wagtail.admin.edit_handlers import FieldPanel, StreamFieldPanel, InlinePane
 from wagtail.images.blocks import ImageChooserBlock
 from wagtail.documents.blocks import DocumentChooserBlock
 from wagtail.embeds.blocks import EmbedBlock
+from wagtail.snippets.models import register_snippet
 from wagtail.snippets.blocks import SnippetChooserBlock
 from wagtail.snippets.edit_handlers import SnippetChooserPanel
 
@@ -28,6 +29,13 @@ class HomePage(Page):
 class BlogPage(GrapplePageMixin, Page):
     author = models.CharField(max_length=255)
     date = models.DateField("Post date")
+    advert = models.ForeignKey(
+        'home.Advert',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='+'
+    )
     body = StreamField(
         [
             ("heading", blocks.CharBlock(classname="full title")),
@@ -99,6 +107,7 @@ class BlogPage(GrapplePageMixin, Page):
         FieldPanel("date"),
         StreamFieldPanel("body"),
         InlinePanel('related_links', label="Related links"),
+        SnippetChooserPanel('advert')
     ]
 
     graphql_fields = [
@@ -106,7 +115,8 @@ class BlogPage(GrapplePageMixin, Page):
         GraphQLString("date"),
         GraphQLString("author"),
         GraphQLStreamfield("body"),
-        GraphQLForeignKey("related_links", "home.blogpagerelatedlink", True)
+        GraphQLForeignKey("related_links", "home.blogpagerelatedlink", True),
+        GraphQLSnippet('advert', 'home.Advert'),
     ]
 
 
@@ -124,3 +134,23 @@ class BlogPageRelatedLink(Orderable):
         GraphQLString('name'),
         GraphQLString('url'),
     ]
+
+
+@register_snippet
+class Advert(models.Model):
+    url = models.URLField(null=True, blank=True)
+    text = models.CharField(max_length=255)
+
+    panels = [
+        FieldPanel('url'),
+        FieldPanel('text'),
+    ]
+
+    graphql_fields = [
+        GraphQLString('url'),
+        GraphQLString('text')
+    ]
+
+    def __str__(self):
+        return self.text
+        

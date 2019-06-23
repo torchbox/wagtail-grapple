@@ -5,6 +5,7 @@ from .types.pages import PagesQuery, PagesSubscription
 from .types.images import ImagesQuery
 from .types.documents import DocumentsQuery
 from .types.snippets import SnippetsQuery
+from .types.settings import SettingsQuery
 from .types.streamfield import register_streamfield_blocks
 from .registry import registry
 
@@ -23,7 +24,12 @@ It inherits its queries from each of the specific type mixins.
 
 
 class Query(
-    graphene.ObjectType, PagesQuery(), ImagesQuery(), DocumentsQuery(), SnippetsQuery()
+    graphene.ObjectType,
+    PagesQuery(),
+    ImagesQuery(),
+    DocumentsQuery(),
+    SnippetsQuery(),
+    SettingsQuery(),
 ):
     pass
 

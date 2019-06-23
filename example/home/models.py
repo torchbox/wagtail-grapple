@@ -3,6 +3,8 @@ from modelcluster.fields import ParentalKey
 
 from wagtail.core.models import Page, Orderable
 from wagtail.core.fields import StreamField
+from wagtail.contrib.settings.models import BaseSetting, register_setting
+
 from wagtail.core import blocks
 from wagtail.admin.edit_handlers import FieldPanel, StreamFieldPanel, InlinePanel
 from wagtail.images.blocks import ImageChooserBlock
@@ -11,6 +13,7 @@ from wagtail.embeds.blocks import EmbedBlock
 from wagtail.snippets.models import register_snippet
 from wagtail.snippets.blocks import SnippetChooserBlock
 from wagtail.snippets.edit_handlers import SnippetChooserPanel
+
 
 from grapple.models import (
     GraphQLField,
@@ -154,3 +157,21 @@ class Advert(models.Model):
     def __str__(self):
         return self.text
         
+
+@register_setting
+class SocialMediaSettings(BaseSetting):
+    facebook = models.URLField(
+        help_text='Your Facebook page URL')
+    instagram = models.CharField(
+        max_length=255, help_text='Your Instagram username, without the @')
+    trip_advisor = models.URLField(
+        help_text='Your Trip Advisor page URL')
+    youtube = models.URLField(
+        help_text='Your YouTube channel or user account URL')
+
+    graphql_fields = [
+        GraphQLString('facebook'),
+        GraphQLString('instagram'),
+        GraphQLString('trip_advisor'),
+        GraphQLString('youtube'),
+    ]

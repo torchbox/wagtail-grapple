@@ -4,11 +4,13 @@ from typing import Type
 from django.db import models
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
+from wagtail.contrib.settings.models import BaseSetting
 from wagtail.core.models import Page as WagtailPage
 from wagtail.documents.models import AbstractDocument
 from wagtail.images.models import AbstractImage
 from wagtail.snippets.models import get_snippet_models
 from graphene_django.types import DjangoObjectType
+
 
 from .registry import registry
 from .types.pages import PageInterface, Page
@@ -58,6 +60,8 @@ def register_model(cls: type, type_prefix: str):
         register_documment_model(cls, type_prefix)
     elif issubclass(cls, AbstractImage):
         register_image_model(cls, type_prefix)
+    elif issubclass(cls, BaseSetting):
+        register_settings_model(cls, type_prefix)
     elif cls in get_snippet_models():
         register_snippet_model(cls, type_prefix)
     else:
@@ -179,6 +183,23 @@ def register_image_model(cls: Type[AbstractImage], type_prefix: str):
     # Add image type to registry.
     if image_node_type:
         registry.images[cls] = image_node_type
+
+
+def register_settings_model(cls: Type[BaseSetting], type_prefix: str):
+    """
+    Create a graphene node type for a settings page.
+    """
+
+    # Avoid gql type duplicates
+    if cls in registry.settings:
+        return
+
+    # Create a GQL type derived from document model.
+    settings_node_type = build_node_type(cls, type_prefix, None)
+
+    # Add image type to registry.
+    if settings_node_type:
+        registry.settings[cls] = settings_node_type
 
 
 def register_snippet_model(cls: Type[models.Model], type_prefix: str):

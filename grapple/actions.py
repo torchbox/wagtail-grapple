@@ -22,7 +22,7 @@ def import_apps():
     """
     Add each django app set in the settings file
     """
-    apps = settings.GRAPHQL["apps"].items()
+    apps = settings.GRAPPLE_APPS.items()
     for name, prefix in apps:
         add_app(name, prefix)
         registry.apps.append(name)

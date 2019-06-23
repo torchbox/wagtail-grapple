@@ -157,14 +157,15 @@ BASE_URL = "http://localhost:8000"
 
 CORS_ORIGIN_ALLOW_ALL = True
 
-WAGTAIL_GRAPHQL_ADD_SEARCH_HIT = True
-
-# GraphQL
+# Grapple Config:
 GRAPHENE = {"SCHEMA": "grapple.schema.schema"}
+GRAPPLE_APPS = {
+        "home": ""
+}
+GRAPPLE_ADD_SEARCH_HIT = True
 
-GRAPHQL = {"apps": {"home": ""}}
-
-PREVIEW_URL = "http://localhost:8001/preview"
+ASGI_APPLICATION = "asgi.channel_layer"
+GRAPPLE_PREVIEW_URL = "http://localhost:8001/preview"
 CHANNELS_WS_PROTOCOLS = ["graphql-ws"]
 CHANNEL_LAYERS = {
     "default": {
@@ -173,5 +174,3 @@ CHANNEL_LAYERS = {
         "ROUTING": "grapple.urls.channel_routing",
     }
 }
-
-ASGI_APPLICATION = "asgi.channel_layer"

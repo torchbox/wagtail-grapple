@@ -132,7 +132,7 @@ class GrapplePageMixin:
 
     @classmethod
     def get_preview_url(cls, token):
-        return f"{settings.PREVIEW_URL}?" + urllib.parse.urlencode(
+        return f"{settings.GRAPPLE_PREVIEW_URL}?" + urllib.parse.urlencode(
             {
                 "content_type": cls._meta.app_label + "." + cls.__name__.lower(),
                 "token": token,

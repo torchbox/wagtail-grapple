@@ -6,7 +6,6 @@ from wagtail.core import hooks
 
 @hooks.register("insert_editor_js")
 def editor_js():
-    print("h,,,")
     js_files = ["js/realtime_preview.js"]
 
     return format_html_join(

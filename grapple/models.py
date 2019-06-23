@@ -40,7 +40,7 @@ def GraphQLString(field_name: str):
 def GraphQLSnippet(field_name: str, snippet_model: str):
     class Mixin(GraphQLField):
         def __init__(self):
-            (app_label, model) = snippet_model.split(".")
+            (app_label, model) = snippet_model.lower().split(".")
             mdl = ContentType.objects.get(app_label=app_label, model=model)
             if mdl:
                 self.field_type = registry.snippets[mdl.model_class()]
@@ -62,7 +62,7 @@ def GraphQLStreamfield(field_name: str):
 def GraphQLForeignKey(field_name: str, content_type: str, is_list: bool = False):
     class Mixin(GraphQLField):
         def __init__(self):
-            app_label, model = content_type.split(".")
+            app_label, model = content_type.lower().split(".")
             mdl = ContentType.objects.get(app_label=app_label, model=model)
             field_type = None
 

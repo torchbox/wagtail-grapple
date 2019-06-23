@@ -6,6 +6,7 @@ from .types.images import ImagesQuery
 from .types.documents import DocumentsQuery
 from .types.snippets import SnippetsQuery
 from .types.settings import SettingsQuery
+from .types.search import SearchQuery
 from .types.streamfield import register_streamfield_blocks
 from .registry import registry
 
@@ -30,6 +31,7 @@ class Query(
     DocumentsQuery(),
     SnippetsQuery(),
     SettingsQuery(),
+    SearchQuery(),
 ):
     pass
 

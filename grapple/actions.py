@@ -25,6 +25,7 @@ def import_apps():
     apps = settings.GRAPHQL["apps"].items()
     for name, prefix in apps:
         add_app(name, prefix)
+        registry.apps.append(name)
 
 
 def add_app(app: str, prefix: str = ""):

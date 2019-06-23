@@ -10,6 +10,7 @@ class Registry:
     images = RegistryItem()
     snippets = RegistryItem()
     streamfield_blocks = RegistryItem()
+    django_models = RegistryItem()
 
     @property
     def models(self) -> dict:
@@ -19,6 +20,7 @@ class Registry:
         models.update(self.images)
         models.update(self.snippets)
         models.update(self.streamfield_blocks)
+        models.update(self.django_models)
         return models
 
 

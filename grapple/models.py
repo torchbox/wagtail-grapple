@@ -25,7 +25,8 @@ class GraphQLField:
             self.field_type = field_type()
         else:
             self.field_type = field_type
-        self.field_type.source = field_name
+        if field_type:
+            self.field_type.source = field_name
 
 
 def GraphQLString(field_name: str):
@@ -54,6 +55,24 @@ def GraphQLStreamfield(field_name: str):
     class Mixin(GraphQLField):
         def __init__(self):
             super().__init__(field_name, graphene.List(StreamFieldType))
+
+    return Mixin
+
+
+def GraphQLForeignKey(field_name: str, content_type: str, is_list: bool = False):
+    class Mixin(GraphQLField):
+        def __init__(self):
+            app_label, model = content_type.split(".")
+            mdl = ContentType.objects.get(app_label=app_label, model=model)
+            field_type = None
+
+            if mdl:
+                field_type = registry.models.get(mdl.model_class())
+
+            if field_type and is_list:
+                field_type = graphene.List(field_type)
+
+            super().__init__(field_name, field_type)
 
     return Mixin
 

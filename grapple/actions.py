@@ -54,12 +54,14 @@ def register_model(cls: type, type_prefix: str):
     # Pass class to correct type creator.
     if issubclass(cls, WagtailPage):
         register_page_model(cls, type_prefix)
-    if issubclass(cls, AbstractDocument):
+    elif issubclass(cls, AbstractDocument):
         register_documment_model(cls, type_prefix)
-    if issubclass(cls, AbstractImage):
+    elif issubclass(cls, AbstractImage):
         register_image_model(cls, type_prefix)
-    if cls in get_snippet_models():
+    elif cls in get_snippet_models():
         register_snippet_model(cls, type_prefix)
+    else:
+        register_django_model(cls, type_prefix)
 
 
 def get_fields_and_properties(cls):
@@ -98,6 +100,7 @@ def build_node_type(
         exclude_fields = tuple()
 
     type_meta = {"Meta": Meta}
+    type_meta.update({"pk": graphene.Int()})
 
     # Build a list fields that shouldn't be reflected in GQL type.
     exclude_fields = get_fields_and_properties(cls)
@@ -113,7 +116,8 @@ def build_node_type(
                 exclude_fields.remove(field.field_name)
 
             # Add field to GQL type with correct field-type
-            type_meta[field.field_name] = field.field_type
+            if field.field_type is not None:
+                type_meta[field.field_name] = field.field_type
 
     # Set excluded fields to stop errors cropping up from unsupported field
     # types.
@@ -135,7 +139,8 @@ def register_page_model(cls: Type[WagtailPage], type_prefix: str):
     page_node_type = build_node_type(cls, type_prefix, PageInterface, Page)
 
     # Add page type to registry.
-    registry.pages[cls] = page_node_type
+    if page_node_type:
+        registry.pages[cls] = page_node_type
 
 
 def register_documment_model(cls: Type[AbstractDocument], type_prefix: str):
@@ -153,7 +158,8 @@ def register_documment_model(cls: Type[AbstractDocument], type_prefix: str):
     document_node_type = build_node_type(cls, type_prefix, None, Document)
 
     # Add document type to registry.
-    registry.documents[cls] = document_node_type
+    if document_node_type:
+        registry.documents[cls] = document_node_type
 
 
 def register_image_model(cls: Type[AbstractImage], type_prefix: str):
@@ -171,7 +177,8 @@ def register_image_model(cls: Type[AbstractImage], type_prefix: str):
     image_node_type = build_node_type(cls, type_prefix, None, ImageObjectType)
 
     # Add image type to registry.
-    registry.images[cls] = image_node_type
+    if image_node_type:
+        registry.images[cls] = image_node_type
 
 
 def register_snippet_model(cls: Type[models.Model], type_prefix: str):
@@ -186,4 +193,22 @@ def register_snippet_model(cls: Type[models.Model], type_prefix: str):
     # Create a GQL type that implements Snippet Interface
     snippet_node_type = build_node_type(cls, type_prefix, None)
 
-    registry.snippets[cls] = snippet_node_type
+    if snippet_node_type:
+        registry.snippets[cls] = snippet_node_type
+
+
+def register_django_model(cls: Type[models.Model], type_prefix: str):
+    """
+    Create a graphene type for (non-specific) django model.
+    Used for Orderables and other foreign keys.
+    """
+
+    # Avoid gql type duplicates
+    if cls in registry.django_models:
+        return
+
+    # Create a GQL type that implements Snippet Interface
+    django_node_type = build_node_type(cls, type_prefix, None)
+
+    if django_node_type:
+        registry.django_models[cls] = django_node_type

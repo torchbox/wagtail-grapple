@@ -51,7 +51,7 @@ def resolve_queryset(
 
     if limit is not None:
         limit = int(limit)
-        qs = qs[offset: limit + offset]
+        qs = qs[offset : limit + offset]
 
     return qs
 

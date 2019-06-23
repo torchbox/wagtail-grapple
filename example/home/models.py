@@ -1,9 +1,10 @@
 from django.db import models
+from modelcluster.fields import ParentalKey
 
-from wagtail.core.models import Page
+from wagtail.core.models import Page, Orderable
 from wagtail.core.fields import StreamField
 from wagtail.core import blocks
-from wagtail.admin.edit_handlers import FieldPanel, StreamFieldPanel
+from wagtail.admin.edit_handlers import FieldPanel, StreamFieldPanel, InlinePanel
 from wagtail.images.blocks import ImageChooserBlock
 from wagtail.documents.blocks import DocumentChooserBlock
 from wagtail.embeds.blocks import EmbedBlock
@@ -16,6 +17,7 @@ from grapple.models import (
     GraphQLSnippet,
     GrapplePageMixin,
     GraphQLStreamfield,
+    GraphQLForeignKey,
 )
 
 
@@ -96,6 +98,7 @@ class BlogPage(GrapplePageMixin, Page):
         FieldPanel("author"),
         FieldPanel("date"),
         StreamFieldPanel("body"),
+        InlinePanel('related_links', label="Related links"),
     ]
 
     graphql_fields = [
@@ -103,4 +106,21 @@ class BlogPage(GrapplePageMixin, Page):
         GraphQLString("date"),
         GraphQLString("author"),
         GraphQLStreamfield("body"),
+        GraphQLForeignKey("related_links", "home.blogpagerelatedlink", True)
+    ]
+
+
+class BlogPageRelatedLink(Orderable):
+    page = ParentalKey(BlogPage, on_delete=models.CASCADE, related_name='related_links')
+    name = models.CharField(max_length=255)
+    url = models.URLField()
+
+    panels = [
+        FieldPanel('name'),
+        FieldPanel('url'),
+    ]
+
+    graphql_fields = [
+        GraphQLString('name'),
+        GraphQLString('url'),
     ]

@@ -43,7 +43,7 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-[![Product Name Screen Shot][product-screenshot]](https://example.com)
+![GraphQL Preview Demo](docs/demo.gif)
 
 There is a range of GraphQL packages for Python and sepcifically Django. 
 However, Getting these packages to work out of the box with an existing infrastructure 

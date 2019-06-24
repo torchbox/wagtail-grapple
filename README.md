@@ -141,7 +141,13 @@ Done! Now you can proceed onto configuring your models to generate GraphQL types
 
 Here is a GraphQL model configuration for the default page from the wagtail docs:
 ```
-class BlogPage(GrapplePageMixin, Page):
+...
+from grapple.models import (
+    GraphQLString,
+    GraphQLStreamfield,
+)
+
+class BlogPage(Page):
     author = models.CharField(max_length=255)
     date = models.DateField("Post date")
     body = StreamField(

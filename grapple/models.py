@@ -37,6 +37,38 @@ def GraphQLString(field_name: str):
     return Mixin
 
 
+def GraphQLFloat(field_name: str):
+    class Mixin(GraphQLField):
+        def __init__(self):
+            super().__init__(field_name, graphene.Float)
+
+    return Mixin
+
+
+def GraphQLInt(field_name: str):
+    class Mixin(GraphQLField):
+        def __init__(self):
+            super().__init__(field_name, graphene.Int)
+
+    return Mixin
+
+
+def GraphQLBoolean(field_name: str):
+    class Mixin(GraphQLField):
+        def __init__(self):
+            super().__init__(field_name, graphene.Boolean)
+
+    return Mixin
+
+
+def GraphQLBool(field_name: str):
+    class Mixin(GraphQLField):
+        def __init__(self):
+            super().__init__(field_name, graphene.Boolean)
+
+    return Mixin
+
+
 def GraphQLSnippet(field_name: str, snippet_model: str):
     class Mixin(GraphQLField):
         def __init__(self):

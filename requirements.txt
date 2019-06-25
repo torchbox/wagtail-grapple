@@ -5,3 +5,4 @@ colorthief
 channels==1.1.8
 asgi_redis
 graphql_ws
+wagtail_headless_preview==0.0.4

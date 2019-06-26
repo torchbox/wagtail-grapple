@@ -105,7 +105,7 @@ def build_node_type(
         exclude_fields = tuple()
 
     type_meta = {"Meta": Meta}
-    type_meta.update({"pk": graphene.Int()})
+    type_meta.update({"id": graphene.ID()})
 
     # Build a list fields that shouldn't be reflected in GQL type.
     exclude_fields = get_fields_and_properties(cls)

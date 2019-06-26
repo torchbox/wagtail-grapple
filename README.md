@@ -14,7 +14,7 @@
     <a href="https://github.com/NathHorrigan/wagtail-grapple"><strong>Explore the docs »</strong></a>
     <br />
     <br />
-    <a href="https://github.com/NathHorrigan/wagtail-grapple">View Demo</a>
+    <a href="https://github.com/NathHorrigan/wagtail-grapple#about-the-project">View Demo</a>
     ·
     <a href="https://github.com/NathHorrigan/wagtail-grapple/issues">Report Bug</a>
     ·
@@ -36,7 +36,7 @@
 * [Contributing](#contributing)
 * [License](#license)
 * [Contact](#contact)
-* [Acknowledgements](#acknowledgements)
+* [Acknowledgements](#inspired-by)
 
 
 
@@ -134,8 +134,8 @@ urlpatterns = [
 
 <br/>
 Done! Now you can proceed onto configuring your models to generate GraphQL types that adopt their stucture :tada:
-
-
+_Your graphql endpoint is available at http://localhost:8000/graphql/_
+<br/>
 <!-- USAGE EXAMPLES -->
 ## Usage
 

@@ -52,4 +52,3 @@ Features
 
    getting-started/index
    general-usage/index
-   

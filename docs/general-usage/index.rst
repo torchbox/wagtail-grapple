@@ -1,5 +1,8 @@
+General Usage
+=============
+
 .. toctree::
     :maxdepth: 1
 
-    preview
     types
+    preview

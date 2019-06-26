@@ -115,7 +115,8 @@ class Page(DjangoObjectType):
         interfaces = (PageInterface,)
 
 
-def get_specific_page(id, slug, token):
+def get_specific_page(id, slug, token, content_type = None):
+    from ..models import PagePreview
     """
     Get a spcecific page, also get preview if token is passed
     """
@@ -128,6 +129,12 @@ def get_specific_page(id, slug, token):
         if token and page:
             page_type = type(page)
             page = page_type.get_page_from_preview_token(token)
+        if token and content_type:
+            app_label, model = content_type.lower().split(".")
+            mdl = ContentType.objects.get(app_label=app_label, model=model)
+            page = mdl.model_class().get_page_from_preview_token(token)
+
+        
     except BaseException:
         page = None
 
@@ -145,6 +152,7 @@ def PagesQuery():
             id=graphene.Int(),
             slug=graphene.String(),
             token=graphene.String(),
+            content_type=graphene.String()
         )
 
         # Return all pages, ideally specific.
@@ -156,7 +164,10 @@ def PagesQuery():
         # Return a specific page, identified by ID or Slug.
         def resolve_page(self, info, **kwargs):
             return get_specific_page(
-                id=kwargs.get("id"), slug=kwargs.get("slug"), token=kwargs.get("token")
+                id=kwargs.get("id"), 
+                slug=kwargs.get("slug"),
+                token=kwargs.get("token"),
+                content_type=kwargs.get("content_type"),
             )
 
     return Mixin
@@ -173,9 +184,9 @@ def on_updated(sender, token, **kwargs):
 
 # Subscription Mixin
 def PagesSubscription():
-    def preview_observable(id, slug, token):
+    def preview_observable(id, slug, token, content_type):
         return preview_subject.filter(lambda previewToken: previewToken == token).map(
-            lambda token: get_specific_page(id, slug, token)
+            lambda token: get_specific_page(id, slug, token, content_type)
         )
 
     class Mixin:
@@ -184,11 +195,15 @@ def PagesSubscription():
             id=graphene.Int(),
             slug=graphene.String(),
             token=graphene.String(),
+            content_type=graphene.String()
         )
 
         def resolve_page(self, info, **kwargs):
             return preview_observable(
-                id=kwargs.get("id"), slug=kwargs.get("slug"), token=kwargs.get("token")
+                id=kwargs.get("id"), 
+                slug=kwargs.get("slug"), 
+                token=kwargs.get("token"),
+                content_type=kwargs.get("content_type")
             )
 
     return Mixin

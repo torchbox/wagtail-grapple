@@ -11,7 +11,6 @@ from django.shortcuts import render
 
 from .registry import registry
 from .signals import preview_update
-from .types.streamfield import StreamFieldType
 
 
 # Classes used to define what the Django field should look like in the GQL type
@@ -61,14 +60,6 @@ def GraphQLBoolean(field_name: str):
     return Mixin
 
 
-def GraphQLBool(field_name: str):
-    class Mixin(GraphQLField):
-        def __init__(self):
-            super().__init__(field_name, graphene.Boolean)
-
-    return Mixin
-
-
 def GraphQLSnippet(field_name: str, snippet_model: str):
     class Mixin(GraphQLField):
         def __init__(self):
@@ -84,11 +75,29 @@ def GraphQLSnippet(field_name: str, snippet_model: str):
 
 
 def GraphQLStreamfield(field_name: str):
+    from .types.streamfield import StreamFieldType
+    
     class Mixin(GraphQLField):
         def __init__(self):
             super().__init__(field_name, graphene.List(StreamFieldType))
 
     return Mixin
+
+
+def GraphQLImage(field_name: str):
+    from wagtail.images import get_image_model_string
+    
+    return GraphQLForeignKey(field_name, get_image_model_string())
+
+
+def GraphQLDocument(field_name: str):
+    from django.conf import settings
+
+    document_type = 'wagtaildocs.Document'
+    if hasattr(settings, "WAGTAILDOCS_DOCUMENT_MODEL"):
+        document_type = settings['WAGTAILDOCS_DOCUMENT_MODEL']
+
+    return GraphQLForeignKey(field_name, document_type)
 
 
 def GraphQLForeignKey(field_name: str, content_type: str, is_list: bool = False):

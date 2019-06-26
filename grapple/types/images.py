@@ -8,7 +8,6 @@ from wagtail.images.models import (
     Image as WagtailImage,
     Rendition as WagtailImageRendition,
 )
-from wagtail.images import get_image_model
 
 from ..registry import registry
 from ..utils import (
@@ -104,6 +103,7 @@ class ImageObjectType(DjangoObjectType):
 
 
 def ImagesQuery():
+    from wagtail.images import get_image_model
     registry.images[WagtailImage] = ImageObjectType
     mdl = get_image_model()
     model_type = registry.images[mdl]
@@ -119,6 +119,7 @@ def ImagesQuery():
 
 
 def get_image_type():
+    from wagtail.images import get_image_model
     registry.images[WagtailImage] = ImageObjectType
     mdl = get_image_model()
     return registry.images[mdl]

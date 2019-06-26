@@ -1,7 +1,7 @@
 import os
 import base64
 import tempfile
-from PIL import Image
+from PIL import Image, ImageFilter
 from colorthief import ColorThief
 from django.conf import settings
 from wagtail.search.index import class_is_indexed
@@ -76,11 +76,13 @@ def image_as_base64(image_file, format="png"):
 def convert_image_to_bmp(src: str, dest: str = None) -> str:
     try:
         img = Image.open(src)
+        img = img.filter(ImageFilter.BLUR)
         if dest is None:
             dest = tempfile.NamedTemporaryFile(suffix=".bmp").name
         img.save(dest)
         return dest
-    except BaseException:
+    except BaseException as e:
+        print(e)
         print("Image %s does not exist", src)
 
 

@@ -27,6 +27,7 @@ class StreamFieldType(graphene.Interface):
     id = graphene.String()
     block_type = graphene.String()
     field = graphene.String()
+    raw_value = graphene.String()
 
     @classmethod
     def resolve_type(cls, instance, info):
@@ -48,6 +49,9 @@ class StreamFieldType(graphene.Interface):
 
     def resolve_field(self, info, **kwargs):
         return self.block.name
+
+    def resolve_raw_value(self, info, **kwargs):
+        return self.value
 
 
 def register_streamfield_blocks():

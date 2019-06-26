@@ -13,7 +13,8 @@ from wagtail.embeds.blocks import EmbedBlock
 from wagtail.snippets.models import register_snippet
 from wagtail.snippets.blocks import SnippetChooserBlock
 from wagtail.snippets.edit_handlers import SnippetChooserPanel
-
+from wagtail.images.edit_handlers import ImageChooserPanel
+from wagtail.documents.edit_handlers import DocumentChooserPanel
 
 from grapple.models import (
     GraphQLField,
@@ -22,6 +23,8 @@ from grapple.models import (
     GrapplePageMixin,
     GraphQLStreamfield,
     GraphQLForeignKey,
+    GraphQLImage,
+    GraphQLDocument,
 )
 
 
@@ -34,6 +37,20 @@ class BlogPage(GrapplePageMixin, Page):
     date = models.DateField("Post date")
     advert = models.ForeignKey(
         'home.Advert',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='+'
+    )
+    cover = models.ForeignKey(
+        'wagtailimages.Image',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='+'
+    )
+    book_file = models.ForeignKey(
+        'wagtaildocs.Document',
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
@@ -108,9 +125,11 @@ class BlogPage(GrapplePageMixin, Page):
     content_panels = Page.content_panels + [
         FieldPanel("author"),
         FieldPanel("date"),
+        ImageChooserPanel('cover'),
         StreamFieldPanel("body"),
         InlinePanel('related_links', label="Related links"),
-        SnippetChooserPanel('advert')
+        SnippetChooserPanel('advert'),
+        DocumentChooserPanel('book_file'),
     ]
 
     graphql_fields = [
@@ -120,6 +139,8 @@ class BlogPage(GrapplePageMixin, Page):
         GraphQLStreamfield("body"),
         GraphQLForeignKey("related_links", "home.blogpagerelatedlink", True),
         GraphQLSnippet('advert', 'home.Advert'),
+        GraphQLImage('cover'),
+        GraphQLDocument('book_file'),
     ]
 
 

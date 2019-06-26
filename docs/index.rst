@@ -37,14 +37,19 @@ Features
 
 
 * **Getting Started**
+
   * :doc:`getting-started/installation`
   * :doc:`getting-started/examples`
 
 
 * **General Usage**
+
   * :doc:`general-usage/types`
   * :doc:`general-usage/preview`
 
+
+Contents
+^^^^^^^^
 
 .. toctree::
    :maxdepth: 2

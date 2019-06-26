@@ -14,7 +14,7 @@ from graphene_django.types import DjangoObjectType
 
 from .registry import registry
 from .types.pages import PageInterface, Page
-from .types.documents import Document
+from .types.documents import DocumentObjectType
 from .types.images import ImageObjectType
 
 
@@ -160,7 +160,7 @@ def register_documment_model(cls: Type[AbstractDocument], type_prefix: str):
         return
 
     # Create a GQL type derived from document model.
-    document_node_type = build_node_type(cls, type_prefix, None, Document)
+    document_node_type = build_node_type(cls, type_prefix, None, DocumentObjectType)
 
     # Add document type to registry.
     if document_node_type:

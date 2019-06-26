@@ -4,5 +4,6 @@ General Usage
 .. toctree::
     :maxdepth: 1
 
-    types
+    model-types
+    graphql-types
     preview

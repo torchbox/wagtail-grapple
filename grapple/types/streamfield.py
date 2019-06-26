@@ -12,7 +12,7 @@ from wagtail.core import blocks
 from ..registry import registry
 
 
-class GenericStreamFieldType(Scalar):
+class GenericStreamFieldInterface(Scalar):
     @staticmethod
     def serialize(stream_value):
         return stream_value.stream_data
@@ -20,10 +20,10 @@ class GenericStreamFieldType(Scalar):
 
 @convert_django_field.register(StreamField)
 def convert_stream_field(field, registry=None):
-    return GenericStreamFieldType(description=field.help_text, required=not field.null)
+    return GenericStreamFieldInterface(description=field.help_text, required=not field.null)
 
 
-class StreamFieldType(graphene.Interface):
+class StreamFieldInterface(graphene.Interface):
     id = graphene.String()
     block_type = graphene.String()
     field = graphene.String()
@@ -63,67 +63,67 @@ def register_streamfield_blocks():
         value = graphene.String()
 
         class Meta:
-            interfaces = (StreamFieldType,)
+            interfaces = (StreamFieldInterface,)
 
     class CharBlock(graphene.ObjectType):
         value = graphene.String()
 
         class Meta:
-            interfaces = (StreamFieldType,)
+            interfaces = (StreamFieldInterface,)
 
     class TextBlock(graphene.ObjectType):
         value = graphene.String()
 
         class Meta:
-            interfaces = (StreamFieldType,)
+            interfaces = (StreamFieldInterface,)
 
     class EmailBlock(graphene.ObjectType):
         value = graphene.String()
 
         class Meta:
-            interfaces = (StreamFieldType,)
+            interfaces = (StreamFieldInterface,)
 
     class IntegerBlock(graphene.ObjectType):
         value = graphene.Int()
 
         class Meta:
-            interfaces = (StreamFieldType,)
+            interfaces = (StreamFieldInterface,)
 
     class FloatBlock(graphene.ObjectType):
         value = graphene.Float()
 
         class Meta:
-            interfaces = (StreamFieldType,)
+            interfaces = (StreamFieldInterface,)
 
     class DecimalBlock(graphene.ObjectType):
         value = graphene.Float()
 
         class Meta:
-            interfaces = (StreamFieldType,)
+            interfaces = (StreamFieldInterface,)
 
     class RegexBlock(graphene.ObjectType):
         value = graphene.String()
 
         class Meta:
-            interfaces = (StreamFieldType,)
+            interfaces = (StreamFieldInterface,)
 
     class URLBlock(graphene.ObjectType):
         value = graphene.String()
 
         class Meta:
-            interfaces = (StreamFieldType,)
+            interfaces = (StreamFieldInterface,)
 
     class BooleanBlock(graphene.ObjectType):
         value = graphene.Boolean()
 
         class Meta:
-            interfaces = (StreamFieldType,)
+            interfaces = (StreamFieldInterface,)
 
     class DateBlock(graphene.ObjectType):
         value = graphene.String(format=graphene.String())
 
         class Meta:
-            interfaces = (StreamFieldType,)
+            interfaces = (StreamFieldInterface,)
 
         def resolve_value(self, info, **kwargs):
             format = kwargs.get("format")
@@ -133,42 +133,54 @@ def register_streamfield_blocks():
 
     class DateTimeBlock(DateBlock):
         class Meta:
-            interfaces = (StreamFieldType,)
+            interfaces = (StreamFieldInterface,)
 
     class TimeBlock(DateBlock):
         class Meta:
-            interfaces = (StreamFieldType,)
+            interfaces = (StreamFieldInterface,)
 
     class RichTextBlock(graphene.ObjectType):
         value = graphene.String()
 
         class Meta:
-            interfaces = (StreamFieldType,)
+            interfaces = (StreamFieldInterface,)
 
     class RawHTMLBlock(graphene.ObjectType):
         value = graphene.String()
 
         class Meta:
-            interfaces = (StreamFieldType,)
+            interfaces = (StreamFieldInterface,)
 
     class BlockQuoteBlock(graphene.ObjectType):
         value = graphene.String()
 
         class Meta:
-            interfaces = (StreamFieldType,)
+            interfaces = (StreamFieldInterface,)
+
+    class ChoiceOption(graphene.ObjectType):
+        key = graphene.String()
+        value = graphene.String()
 
     class ChoiceBlock(graphene.ObjectType):
         value = graphene.String()
+        choices = graphene.List(ChoiceOption)
 
         class Meta:
-            interfaces = (StreamFieldType,)
+            interfaces = (StreamFieldInterface,)
+
+        def resolve_choices(self, info, **kwargs):
+            choices = []            
+            for key, value in self.block._constructor_kwargs['choices']:
+                choice = ChoiceOption(key, value)
+                choices.append(choice)
+            return choices
 
     class EmbedBlock(graphene.ObjectType):
         value = graphene.String()
         url = graphene.String()
 
         class Meta:
-            interfaces = (StreamFieldType,)
+            interfaces = (StreamFieldInterface,)
 
         def resolve_url(self, info, **kwargs):
             return self.value.url
@@ -177,13 +189,13 @@ def register_streamfield_blocks():
         value = graphene.String()
 
         class Meta:
-            interfaces = (StreamFieldType,)
+            interfaces = (StreamFieldInterface,)
 
     class PageChooserBlock(graphene.ObjectType):
         page = graphene.Field(PageInterface)
 
         class Meta:
-            interfaces = (StreamFieldType,)
+            interfaces = (StreamFieldInterface,)
 
         def resolve_page(self, info, **kwargs):
             return self.value
@@ -192,7 +204,7 @@ def register_streamfield_blocks():
         document = graphene.Field(get_document_type())
 
         class Meta:
-            interfaces = (StreamFieldType,)
+            interfaces = (StreamFieldInterface,)
 
         def resolve_document(self, info, **kwargs):
             return self.value
@@ -201,7 +213,7 @@ def register_streamfield_blocks():
         image = graphene.Field(get_image_type())
 
         class Meta:
-            interfaces = (StreamFieldType,)
+            interfaces = (StreamFieldInterface,)
 
         def resolve_image(self, info, **kwargs):
             return self.value
@@ -210,16 +222,16 @@ def register_streamfield_blocks():
         snippet = graphene.String()
 
         class Meta:
-            interfaces = (StreamFieldType,)
+            interfaces = (StreamFieldInterface,)
 
         def resolve_snippet(self, info, **kwargs):
             return self.value
 
     class ListBlock(graphene.ObjectType):
         class Meta:
-            interfaces = (StreamFieldType,)
+            interfaces = (StreamFieldInterface,)
 
-        items = graphene.Field(StreamFieldType)
+        items = graphene.Field(StreamFieldInterface)
 
         def resolve_items(self, info, **kwargs):
             return self
@@ -234,9 +246,9 @@ def register_streamfield_blocks():
 
     class StreamBlock(graphene.ObjectType):
         class Meta:
-            interfaces = (StreamFieldType,)
+            interfaces = (StreamFieldInterface,)
 
-        items = graphene.List(StreamFieldType)
+        items = graphene.List(StreamFieldInterface)
 
         def resolve_items(self, info, **kwargs):
             return [
@@ -246,9 +258,9 @@ def register_streamfield_blocks():
 
     class StructBlock(graphene.ObjectType):
         class Meta:
-            interfaces = (StreamFieldType,)
+            interfaces = (StreamFieldInterface,)
 
-        items = graphene.List(StreamFieldType)
+        items = graphene.List(StreamFieldInterface)
 
         def resolve_items(self, info, **kwargs):
             return [

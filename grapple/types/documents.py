@@ -7,7 +7,7 @@ from ..utils import resolve_queryset
 from .structures import QuerySetList
 
 
-class Document(DjangoObjectType):
+class DocumentObjectType(DjangoObjectType):
     """
     Base document type used if one isn't generated for the current model.
     All other node types extend this.
@@ -26,7 +26,7 @@ class Document(DjangoObjectType):
 
 
 def DocumentsQuery():
-    registry.documents[WagtailDocument] = Document
+    registry.documents[WagtailDocument] = DocumentObjectType
     mdl = get_document_model()
     model_type = registry.documents[mdl]
 
@@ -41,6 +41,6 @@ def DocumentsQuery():
 
 
 def get_document_type():
-    registry.documents[WagtailDocument] = Document
+    registry.documents[WagtailDocument] = DocumentObjectType
     mdl = get_document_model()
     return registry.documents[mdl]

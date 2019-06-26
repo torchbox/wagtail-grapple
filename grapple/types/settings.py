@@ -5,13 +5,13 @@ from ..registry import registry
 def SettingsQuery():
     if registry.settings:
 
-        class Setting(graphene.Union):
+        class SettingsObjectType(graphene.Union):
             class Meta:
                 types = registry.settings.types
 
         class Mixin:
-            setting = graphene.Field(Setting, name=graphene.String())
-            settings = graphene.List(Setting)
+            setting = graphene.Field(SettingsObjectType, name=graphene.String())
+            settings = graphene.List(SettingsObjectType)
 
             # Return just one setting base on name param.
             def resolve_setting(self, info, **kwargs):

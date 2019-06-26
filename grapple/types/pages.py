@@ -133,7 +133,6 @@ def get_specific_page(id, slug, token, content_type = None):
             app_label, model = content_type.lower().split(".")
             mdl = ContentType.objects.get(app_label=app_label, model=model)
             page = mdl.model_class().get_page_from_preview_token(token)
-
         
     except BaseException:
         page = None

@@ -44,7 +44,8 @@ Features
 
 * **General Usage**
 
-  * :doc:`general-usage/types`
+  * :doc:`general-usage/model-types`
+  * :doc:`general-usage/graphql-types`
   * :doc:`general-usage/preview`
 
 

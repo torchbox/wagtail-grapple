@@ -75,11 +75,11 @@ def GraphQLSnippet(field_name: str, snippet_model: str):
 
 
 def GraphQLStreamfield(field_name: str):
-    from .types.streamfield import StreamFieldType
+    from .types.streamfield import StreamFieldInterface
     
     class Mixin(GraphQLField):
         def __init__(self):
-            super().__init__(field_name, graphene.List(StreamFieldType))
+            super().__init__(field_name, graphene.List(StreamFieldInterface))
 
     return Mixin
 

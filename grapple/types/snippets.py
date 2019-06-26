@@ -5,12 +5,12 @@ from ..registry import registry
 def SnippetsQuery():
     if registry.snippets:
 
-        class Snippet(graphene.Union):
+        class SnippetObjectType(graphene.Union):
             class Meta:
                 types = registry.snippets.types
 
         class Mixin:
-            snippets = graphene.List(Snippet)
+            snippets = graphene.List(SnippetObjectType)
             # Return all snippets.
 
             def resolve_snippets(self, info, **kwargs):

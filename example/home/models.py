@@ -15,6 +15,7 @@ from wagtail.snippets.blocks import SnippetChooserBlock
 from wagtail.snippets.edit_handlers import SnippetChooserPanel
 from wagtail.images.edit_handlers import ImageChooserPanel
 from wagtail.documents.edit_handlers import DocumentChooserPanel
+from wagtailmedia.edit_handlers import MediaChooserPanel
 
 from grapple.models import (
     GraphQLField,
@@ -25,6 +26,7 @@ from grapple.models import (
     GraphQLForeignKey,
     GraphQLImage,
     GraphQLDocument,
+    GraphQLMedia,
 )
 
 
@@ -56,6 +58,13 @@ class BlogPage(GrapplePageMixin, Page):
         on_delete=models.SET_NULL,
         related_name='+'
     )
+    featured_media = models.ForeignKey(
+        'wagtailmedia.Media',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='+'
+    )
     body = StreamField(
         [
             ("heading", blocks.CharBlock(classname="full title")),
@@ -64,61 +73,6 @@ class BlogPage(GrapplePageMixin, Page):
             ("decimal", blocks.DecimalBlock()),
             ("date", blocks.DateBlock()),
             ("datetime", blocks.DateTimeBlock()),
-            ("quote", blocks.BlockQuoteBlock()),
-            (
-                "drink",
-                blocks.ChoiceBlock(
-                    choices=[("tea", "Tea"), ("coffee", "Coffee")], icon="time"
-                ),
-            ),
-            ("somepage", blocks.PageChooserBlock()),
-            (
-                "static",
-                blocks.StaticBlock(admin_text="Latest posts: no configuration needed."),
-            ),
-            (
-                "person",
-                blocks.StructBlock(
-                    [
-                        ("first_name", blocks.CharBlock()),
-                        ("surname", blocks.CharBlock()),
-                        ("photo", ImageChooserBlock(required=False)),
-                        ("biography", blocks.RichTextBlock()),
-                    ],
-                    icon="user",
-                ),
-            ),
-            ("video", EmbedBlock()),
-            (
-                "carousel",
-                blocks.StreamBlock(
-                    [
-                        ("image", ImageChooserBlock()),
-                        (
-                            "quotation",
-                            blocks.StructBlock(
-                                [
-                                    ("text", blocks.TextBlock()),
-                                    ("author", blocks.CharBlock()),
-                                ]
-                            ),
-                        ),
-                    ],
-                    icon="cogs",
-                ),
-            ),
-            ("doc", DocumentChooserBlock()),
-            (
-                "ingredients_list",
-                blocks.ListBlock(
-                    blocks.StructBlock(
-                        [
-                            ("ingredient", blocks.CharBlock()),
-                            ("amount", blocks.CharBlock(required=False)),
-                        ]
-                    )
-                ),
-            ),
         ]
     )
 
@@ -130,6 +84,7 @@ class BlogPage(GrapplePageMixin, Page):
         InlinePanel('related_links', label="Related links"),
         SnippetChooserPanel('advert'),
         DocumentChooserPanel('book_file'),
+        MediaChooserPanel('featured_media'),
     ]
 
     graphql_fields = [
@@ -141,6 +96,7 @@ class BlogPage(GrapplePageMixin, Page):
         GraphQLSnippet('advert', 'home.Advert'),
         GraphQLImage('cover'),
         GraphQLDocument('book_file'),
+        GraphQLMedia('featured_media'),
     ]
 
 

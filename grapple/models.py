@@ -114,6 +114,15 @@ def GraphQLForeignKey(field_name: str, content_type: str, is_list: bool = False)
     return Mixin
 
 
+def GraphQLMedia(field_name: str):
+    from .types.media import MediaObjectType
+
+    class Mixin(GraphQLField):
+        def __init__(self):
+            super().__init__(field_name, MediaObjectType)
+    return Mixin
+
+
 class PagePreview(models.Model):
     token = models.CharField(max_length=255, unique=True)
     content_type = models.ForeignKey(

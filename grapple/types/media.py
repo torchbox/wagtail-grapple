@@ -1,11 +1,12 @@
 import graphene
 from graphene_django import DjangoObjectType
-from ..registry import registry
 from wagtailmedia.models import Media
-
+from django.conf import settings
 
 class MediaObjectType(DjangoObjectType):
-    value = graphene.String()
-    
     class Meta:
         model = Media
+        exclude_fields=('tags',)
+
+    def resolve_file(self, info, **kwargs):
+        return settings.BASE_URL + self.file.url

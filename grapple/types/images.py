@@ -43,8 +43,10 @@ class ImageObjectType(DjangoObjectType):
         bgcolor=graphene.String(),
         jpegquality=graphene.Int(),
     )
-    traced_SVG = graphene.String()
+    traced_SVG = graphene.String(name='tracedSVG')
     base64 = graphene.String()
+    aspect_ratio = graphene.Float()
+    sizes = graphene.String()
 
     class Meta:
         model = WagtailImage
@@ -100,6 +102,15 @@ class ImageObjectType(DjangoObjectType):
 
         with open(svg_trace_image, "r") as svgFile:
             return "data:image/svg+xml," + urllib.parse.quote(svgFile.read())
+
+    def resolve_aspect_ratio(self, info, **kwargs):
+        """
+        Calculate aspect ratio for Gatsby Image.
+        """
+        return self.width / self.height
+
+    def resolve_sizes(self, info):
+        return "(max-width: {}px) 100vw, {}px".format(self.width, self.width)
 
 
 def ImagesQuery():

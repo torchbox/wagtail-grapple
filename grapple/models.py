@@ -29,34 +29,30 @@ class GraphQLField:
 
 
 def GraphQLString(field_name: str):
-    class Mixin(GraphQLField):
-        def __init__(self):
-            super().__init__(field_name, graphene.String)
-
+    def Mixin():
+        return GraphQLField(field_name, graphene.String)
+        
     return Mixin
 
 
 def GraphQLFloat(field_name: str):
-    class Mixin(GraphQLField):
-        def __init__(self):
-            super().__init__(field_name, graphene.Float)
-
+    def Mixin():
+        return GraphQLField(field_name, graphene.Float)
+        
     return Mixin
 
 
 def GraphQLInt(field_name: str):
-    class Mixin(GraphQLField):
-        def __init__(self):
-            super().__init__(field_name, graphene.Int)
-
+    def Mixin():
+        return GraphQLField(field_name, graphene.Int)
+        
     return Mixin
 
 
 def GraphQLBoolean(field_name: str):
-    class Mixin(GraphQLField):
-        def __init__(self):
-            super().__init__(field_name, graphene.Boolean)
-
+    def Mixin():
+        return GraphQLField(field_name, graphene.Boolean)
+        
     return Mixin
 
 
@@ -76,18 +72,18 @@ def GraphQLSnippet(field_name: str, snippet_model: str):
 
 def GraphQLStreamfield(field_name: str):
     from .types.streamfield import StreamFieldInterface
+    def Mixin():
+        return GraphQLField(field_name, graphene.List(StreamFieldInterface))
     
-    class Mixin(GraphQLField):
-        def __init__(self):
-            super().__init__(field_name, graphene.List(StreamFieldInterface))
-
     return Mixin
 
 
 def GraphQLImage(field_name: str):
-    from wagtail.images import get_image_model_string
-    
-    return GraphQLForeignKey(field_name, get_image_model_string())
+    def Mixin():
+        from .types.images import get_image_type, ImageObjectType
+        return GraphQLField(field_name, graphene.Field(ImageObjectType))
+
+    return Mixin
 
 
 def GraphQLDocument(field_name: str):
@@ -206,7 +202,9 @@ class GrapplePageMixin:
             "grapple/preview.html",
             {"preview_url": self.get_preview_url(page_preview.token)},
         )
-        response.set_cookie(key="used-token", value=page_preview.token)
+        
+        # Set cookie that auto-expires after 5mins
+        response.set_cookie(key="used-token", value=page_preview.token, max_age=300)
         return response
 
     @classmethod

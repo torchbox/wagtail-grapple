@@ -15,6 +15,7 @@ from .structures import QuerySetList
 class PageInterface(graphene.Interface):
     id = graphene.ID()
     url = graphene.String()
+    url_path = graphene.String()
     slug = graphene.String()
     depth = graphene.Int()
     page_type = graphene.String()

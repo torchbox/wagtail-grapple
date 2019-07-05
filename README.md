@@ -1,8 +1,8 @@
 <!-- PROJECT LOGO -->
 <br />
 <p align="center">
-  <a href="https://github.com/NathHorrigan/wagtail-grapple">
-    <img src="https://github.com/othneildrew/Best-README-Template/raw/master/logo.png" alt="Logo" width="80" height="80">
+  <a href="https://github.com/torchbox/wagtail-grapple">
+    <img src="https://github.com/torchbox/wagtail-grapple/raw/master/.github/wagtail-grapple.svg" alt="A red g with a grapple hook" width="80" height="80">
   </a>
 
   <h3 align="center">Wagtail Grapple</h3>

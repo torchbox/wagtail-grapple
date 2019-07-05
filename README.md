@@ -91,9 +91,9 @@ wagtail >= 2.5, <2.6
 
 <br />
 
-Add the following to the `installed_apps` list in your wagtail settings file:
+Add the following to the `installed_apps` list in your Wagtail settings file:
 
-```
+```python
 installed_apps = [
     ...
     "grapple",
@@ -105,9 +105,9 @@ installed_apps = [
 
 <br />
 
-Add the following to the bottom of the same settings file where each key is the app you want to this library to scan and the value is the prefix you want to give to GraphQL types (you can usually leave this blank):
+Add the following to the bottom of the same settings file, where each key is the app you want to this library to scan and the value is the prefix you want to give to GraphQL types (you can usually leave this blank):
 
-```
+```python
 # Grapple Config:
 GRAPHENE = {"SCHEMA": "grapple.schema.schema"}
 GRAPPLE_APPS = {
@@ -117,9 +117,9 @@ GRAPPLE_APPS = {
 
 <br />
 
-Add the GraphQL urls to your `urls.py`:
+Add the GraphQL URLs to your `urls.py`:
 
-```
+```python
 from grapple import urls as grapple_urls
 ...
 urlpatterns = [
@@ -136,8 +136,8 @@ _Your graphql endpoint is available at http://localhost:8000/graphql/_
 
 ## Usage
 
-Here is a GraphQL model configuration for the default page from the wagtail docs:
-```
+Here is a GraphQL model configuration for the default page from the Wagtail docs:
+```python
 ...
 from grapple.models import (
     GraphQLString,

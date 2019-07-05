@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://github.com/torchbox/wagtail-grapple">
-    <img src="https://github.com/torchbox/wagtail-grapple/raw/master/.github/wagtail-grapple.svg" alt="A red g with a grapple hook" width="80" height="80">
+    <img src="https://github.com/torchbox/wagtail-grapple/raw/master/.github/wagtail-grapple.svg?sanitize=true" alt="A red g with a grapple hook" width="80" height="80">
   </a>
 
   <h3 align="center">Wagtail Grapple</h3>

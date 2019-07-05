@@ -6,7 +6,7 @@
   <h3 align="center">Wagtail Grapple</h3>
 
   <p align="center">
-    A library to easily build GraphQL endpoints so you can grapple your wagtail data from anywhere!
+    A library to build GraphQL endpoints easily so you can grapple your Wagtail data from anywhere!
     <br />
     <br/>
     <a href="https://wagtail-grapple.readthedocs.io/en/latest/"><strong>Explore the docs »</strong></a>
@@ -43,14 +43,14 @@
 
 ![GraphQL Preview Demo](docs/demo.gif)
 
-There is a range of GraphQL packages for Python and sepcifically Django. 
-However, Getting these packages to work out of the box with an existing infrastructure 
+There is a range of GraphQL packages for Python and specifically Django. 
+However, getting these packages to work out of the box with an existing infrastructure 
 without errors isn't as easy to come by.
 
 The purpose of Grapple is to be able to build GraphQL endpoints on a model by model
 basis as quickly as possible. The setup and configuration have been designed 
 to be as simple but also provide the best features;
-No complex serliazers need to be written just add a `graphql_fields` list 
+No complex serializers need to be written - just add a `graphql_fields` list 
 to your model and away you go (although if you want to go deeper you can!).
 
 #### Features:
@@ -76,7 +76,6 @@ We also use Django Channels and the Potrace image library.
 * [Potrace](https://github.com/skyrpex/potrace)
 
 
-<!-- GETTING STARTED -->
 ## Getting Started
 
 Getting Grapple installed is designed to be as simple as possible!
@@ -134,7 +133,7 @@ urlpatterns = [
 Done! Now you can proceed onto configuring your models to generate GraphQL types that adopt their stucture :tada:
 _Your graphql endpoint is available at http://localhost:8000/graphql/_
 <br/>
-<!-- USAGE EXAMPLES -->
+
 ## Usage
 
 Here is a GraphQL model configuration for the default page from the wagtail docs:
@@ -175,7 +174,6 @@ _For more examples, please refer to the [Documentation](https://wagtail-grapple.
 
 
 
-<!-- CONTRIBUTING -->
 ## Contributing
 
 Contributions are what make the open source community such an amazing place to be learn, inspire, and create. Any contributions you make are **greatly appreciated**.
@@ -188,14 +186,12 @@ Contributions are what make the open source community such an amazing place to b
 
 
 
-<!-- LICENSE -->
 ## License
 
 Distributed under the MIT License. See `LICENSE` for more information.
 
 
 
-<!-- CONTACT -->
 ## Contact
 
 Nathan Horrigan 
@@ -203,7 +199,6 @@ Nathan Horrigan
 - NathHorrigan@gmail.com
 
 Project Link: [https://github.com/torchbox/wagtail-grapple](https://github.com/torchbox/wagtail-grapple)
-
 
 
 <!-- ACKNOWLEDGEMENTS -->

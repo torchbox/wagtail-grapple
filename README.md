@@ -1,5 +1,3 @@
-<!-- PROJECT LOGO -->
-<br />
 <p align="center">
   <a href="https://github.com/torchbox/wagtail-grapple">
     <img src="https://github.com/torchbox/wagtail-grapple/raw/master/.github/wagtail-grapple.svg" alt="A red g with a grapple hook" width="80" height="80">
@@ -14,11 +12,11 @@
     <a href="https://wagtail-grapple.readthedocs.io/en/latest/"><strong>Explore the docs »</strong></a>
     <br />
     <br />
-    <a href="https://github.com/NathHorrigan/wagtail-grapple#about-the-project">View Demo</a>
+    <a href="https://github.com/torchbox/wagtail-grapple#about-the-project">View Demo</a>
     ·
-    <a href="https://github.com/NathHorrigan/wagtail-grapple/issues">Report Bug</a>
+    <a href="https://github.com/torchbox/wagtail-grapple/issues">Report Bug</a>
     ·
-    <a href="https://github.com/NathHorrigan/wagtail-grapple/issues">Request Feature</a>
+    <a href="https://github.com/torchbox/wagtail-grapple/issues">Request Feature</a>
   </p>
 </p>
 
@@ -173,7 +171,7 @@ class BlogPage(Page):
     ]
 ```
 
-_For more examples, please refer to the [Documentation](https://example.com)_
+_For more examples, please refer to the [Documentation](https://wagtail-grapple.readthedocs.io/en/latest/)_
 
 
 
@@ -204,7 +202,7 @@ Nathan Horrigan
 - [@NathHorrigan](https://github.com/NathHorrigan) 
 - NathHorrigan@gmail.com
 
-Project Link: [https://github.com/NathHorrigan/wagtail-grapple](https://github.com/NathHorrigan/wagtail-grapple)
+Project Link: [https://github.com/torchbox/wagtail-grapple](https://github.com/torchbox/wagtail-grapple)
 
 
 

@@ -1,8 +1,9 @@
 Headless Preview
 ================
 
-Grapple also provides support for Headless Preview. This means you can pass a 
-unique 'preview token' to the GraphQL endpoint and preview a page as you update
+Grapple also provides support for headless previews using the `Wagtail Headless Preview
+<https://github.com/torchbox/wagtail-headless-preview>`_ package.
+This means you can pass a unique 'preview token' to the GraphQL endpoint and preview a page as you update
 it in the admin (in real-time!).
 
 Grapple's Headless Preview is built-on GraphQL Subscriptions which means
@@ -27,7 +28,7 @@ your installed apps in your settings should look like so:
     ]
 
 
-Add the following Django Channels configurarion to your settings. This tells 
+Add the following Django Channels configuration to your settings. This tells
 Django Channels that you want to add a channel layer that points to Grapple
 and you want to use the 'in-memory' backend. You will want to research different
 Channel backends to see which one works best for your production enviroment:
@@ -50,7 +51,11 @@ user clicks the 'Preview' button:
 
 ::
 
-    GRAPPLE_PREVIEW_URL = "http://localhost:8001/preview"
+    HEADLESS_PREVIEW_CLIENT_URLS = {
+        "default": "http://localhost:8001/preview",
+    }
+
+    HEADLESS_PREVIEW_LIVE = True
 
 Two HTTP params are also passed to this url:
  - content_type: The content type string of the Model you're viewing.
@@ -59,14 +64,14 @@ Two HTTP params are also passed to this url:
 
 
 
-You're next step is to subclass any Page models you want headless preview on with
-`grapple.models.GrapplePageMixin` to  override the original Wagtail previewing methods:
+Your next step is to subclass any Page models you want headless preview on with
+`wagtail_headless_preview.models.HeadlessPreviewMixin` to override the original Wagtail preview methods:
 
 ::
 
-    from grapple.models import GrapplePageMixin
+    from wagtail_headless_preview.models import HeadlessPreviewMixin
 
-    class BlogPage(GrapplePageMixin, Page):
+    class HeadlessPreviewMixin(GrapplePageMixin, Page):
         author = models.CharField(max_length=255)
         date = models.DateField("Post date")
         advert = models.ForeignKey(
@@ -78,14 +83,14 @@ You're next step is to subclass any Page models you want headless preview on wit
         )
 
 
-You're Done! Below is the how to use guide.
+And you are done!
 
 
 How to use
 ^^^^^^^^^^
 
 Now when you click the 'Preview' button in Wagtail you will be redirected to 
-your `GRAPPLE_PREVIEW_URL`. You can either load the preview token through
+your defined `HEADLESS_PREVIEW_CLIENT_URLS`. You can either load the preview token through
 the HTTP params or through the ``used-token`` cookie which has been set in 
 both the Admin and the redirected page.
 

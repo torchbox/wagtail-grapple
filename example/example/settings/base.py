@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "corsheaders",
+    "wagtail_headless_preview",
     # GRAPPLE SPECIFIC MODULES
     "grapple",
     "graphene_django",
@@ -168,8 +169,12 @@ GRAPPLE_APPS = {
 }
 GRAPPLE_ADD_SEARCH_HIT = True
 
+HEADLESS_PREVIEW_CLIENT_URLS = {
+    "default": "http://localhost:8001/preview",
+}
+HEADLESS_PREVIEW_LIVE = True
+
 ASGI_APPLICATION = "asgi.channel_layer"
-GRAPPLE_PREVIEW_URL = "http://localhost:8001/preview"
 CHANNELS_WS_PROTOCOLS = ["graphql-ws"]
 CHANNEL_LAYERS = {
     "default": {

@@ -55,18 +55,19 @@ def register_model(cls: type, type_prefix: str):
     """
 
     # Pass class to correct type creator.
-    if issubclass(cls, WagtailPage):
-        register_page_model(cls, type_prefix)
-    elif issubclass(cls, AbstractDocument):
-        register_documment_model(cls, type_prefix)
-    elif issubclass(cls, AbstractImage):
-        register_image_model(cls, type_prefix)
-    elif issubclass(cls, BaseSetting):
-        register_settings_model(cls, type_prefix)
-    elif cls in get_snippet_models():
-        register_snippet_model(cls, type_prefix)
-    else:
-        register_django_model(cls, type_prefix)
+    if cls is not None:
+        if issubclass(cls, WagtailPage):
+            register_page_model(cls, type_prefix)
+        elif issubclass(cls, AbstractDocument):
+            register_documment_model(cls, type_prefix)
+        elif issubclass(cls, AbstractImage):
+            register_image_model(cls, type_prefix)
+        elif issubclass(cls, BaseSetting):
+            register_settings_model(cls, type_prefix)
+        elif cls in get_snippet_models():
+            register_snippet_model(cls, type_prefix)
+        else:
+            register_django_model(cls, type_prefix)
 
 
 def get_fields_and_properties(cls):

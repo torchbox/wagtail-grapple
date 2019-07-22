@@ -1,8 +1,9 @@
 Django>=2.2,<2.3
-wagtail>=2.5,<2.6
+wagtail>=2.5,<2.7
 graphene-django>=2.2.0
 colorthief
 channels==1.1.8
 asgi_redis
 graphql_ws
 wagtailmedia
+graphql-core==2.2.1

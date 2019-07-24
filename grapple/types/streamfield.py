@@ -74,19 +74,6 @@ class StructBlockItem:
             self.block = block
             self.value = value
 
-class StreamBlock(graphene.ObjectType):
-    class Meta:
-        interfaces = (StreamFieldInterface,)
-
-    value = GenericScalar()
-    items = graphene.List(StreamFieldInterface)
-
-    def resolve_items(self, info, **kwargs):
-        return [
-            StructBlockItem(name, block)
-            for name, block in self.block.child_blocks.items()
-        ]
-
 class StructBlock(graphene.ObjectType):
     class Meta:
         interfaces = (StreamFieldInterface,)
@@ -99,6 +86,38 @@ class StructBlock(graphene.ObjectType):
             StructBlockItem(name, self.block.child_blocks[name], value)
             for name, value in self.value.items()
         ]
+
+    def resolve_value(self, info, **kwargs):
+        def serialize_obj(obj):
+            rtn_obj = {}
+
+            for field in obj:
+                value = obj[field]
+                if hasattr(value, 'stream_data'):
+                    rtn_obj[field] = list(
+                        map(
+                            lambda data: serialize_obj(data['value']), 
+                            value.stream_data
+                        )
+                    )
+                else:
+                    rtn_obj[field] = value
+            
+            return rtn_obj
+
+        return serialize_obj(self.value)
+
+
+class StreamBlock(StructBlock):
+    class Meta:
+        interfaces = (StreamFieldInterface,)
+    
+    def resolve_items(self, info, **kwargs):
+        return [
+            StructBlockItem(name, block)
+            for name, block in self.block.child_blocks.items()
+        ]
+
 
 class StreamFieldBlock(graphene.ObjectType):
         value = graphene.String()

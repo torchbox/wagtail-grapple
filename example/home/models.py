@@ -28,6 +28,7 @@ from grapple.models import (
     GraphQLDocument,
     GraphQLMedia,
 )
+from home.blocks import StreamFieldBlock
 
 
 class HomePage(Page):
@@ -65,16 +66,7 @@ class BlogPage(GrapplePageMixin, Page):
         on_delete=models.SET_NULL,
         related_name='+'
     )
-    body = StreamField(
-        [
-            ("heading", blocks.CharBlock(classname="full title")),
-            ("paraagraph", blocks.RichTextBlock()),
-            ("image", ImageChooserBlock()),
-            ("decimal", blocks.DecimalBlock()),
-            ("date", blocks.DateBlock()),
-            ("datetime", blocks.DateTimeBlock()),
-        ]
-    )
+    body = StreamField(StreamFieldBlock())
 
     content_panels = Page.content_panels + [
         FieldPanel("author"),

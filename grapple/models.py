@@ -71,17 +71,19 @@ def GraphQLSnippet(field_name: str, snippet_model: str):
 
 
 def GraphQLStreamfield(field_name: str):
-    from .types.streamfield import StreamFieldInterface
     def Mixin():
+        from .types.streamfield import StreamFieldInterface
+
         return GraphQLField(field_name, graphene.List(StreamFieldInterface))
-    
+
     return Mixin
 
 
 def GraphQLImage(field_name: str):
     def Mixin():
         from .types.images import get_image_type, ImageObjectType
-        return GraphQLField(field_name, graphene.Field(ImageObjectType))
+
+        return GraphQLField(field_name, graphene.Field(get_image_type()))
 
     return Mixin
 
@@ -89,9 +91,9 @@ def GraphQLImage(field_name: str):
 def GraphQLDocument(field_name: str):
     from django.conf import settings
 
-    document_type = 'wagtaildocs.Document'
+    document_type = "wagtaildocs.Document"
     if hasattr(settings, "WAGTAILDOCS_DOCUMENT_MODEL"):
-        document_type = settings['WAGTAILDOCS_DOCUMENT_MODEL']
+        document_type = settings["WAGTAILDOCS_DOCUMENT_MODEL"]
 
     return GraphQLForeignKey(field_name, document_type)
 

@@ -9,4 +9,6 @@ class MediaObjectType(DjangoObjectType):
         exclude_fields=('tags',)
 
     def resolve_file(self, info, **kwargs):
-        return settings.BASE_URL + self.file.url
+        if (self.file.url[0] == '/'):
+            return settings.BASE_URL + self.file.url
+        return self.file.url

@@ -66,7 +66,9 @@ class ImageObjectType(DjangoObjectType):
         """
         Get url of the original uploaded image.
         """
-        return settings.BASE_URL + self.file.url
+        if (self.file.url[0] == '/'):
+            return settings.BASE_URL + self.file.url
+        return self.file.url
 
     def resolve_src_set(self, info, sizes, **kwargs):
         """

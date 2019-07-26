@@ -4,7 +4,7 @@ import decimal
 import wagtail_factories
 from home.blocks import ImageGalleryImages, ImageGalleryImage
 from home.factories import BlogPageFactory, ImageGalleryImageFactory
-from wagtail.core.blocks import StreamValue
+from wagtail.core.blocks import StreamValue, StructValue, BoundBlock
 from wagtail.core.rich_text import RichText
 
 from .test_grapple import BaseGrappleTest
@@ -13,6 +13,7 @@ from .test_grapple import BaseGrappleTest
 class BlogTest(BaseGrappleTest):
     def setUp(self):
         super().setUp()
+
         self.blog_page = BlogPageFactory(
             body=[
                 ("heading", "Test heading 1"),
@@ -25,14 +26,20 @@ class BlogTest(BaseGrappleTest):
                 ("gallery", {
                     "title": "Gallery title",
                     "images": StreamValue(
-                        stream_block=ImageGalleryImages,
+                        stream_block=ImageGalleryImages(),
                         stream_data=[
                             (
-                                'image',
-                                wagtail_factories.ImageFactory(),
+                                "image", {
+                                    "image": wagtail_factories.ImageChooserBlockFactory(),
+                                },
+                            ),
+                            (
+                                "image", {
+                                    "image": wagtail_factories.ImageChooserBlockFactory(),
+                                },
                             ),
                         ],
-                    )
+                    ),
                 }),
             ],
         )

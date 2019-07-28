@@ -7,3 +7,4 @@ asgi_redis
 graphql_ws
 wagtailmedia
 graphql-core==2.2.1
+scour==0.37

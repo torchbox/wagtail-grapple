@@ -76,7 +76,7 @@ def image_as_base64(image_file, format="png"):
 def convert_image_to_bmp(src: str, dest: str = None) -> str:
     try:
         img = Image.open(src)
-        img = img.filter(ImageFilter.BLUR)
+        img.thumbnail((1200, 800), Image.ANTIALIAS)
         if dest is None:
             dest = tempfile.NamedTemporaryFile(suffix=".bmp").name
         img.save(dest)
@@ -91,14 +91,27 @@ def trace_bitmap(src: str, dest: str) -> str:
         # Get two most common colors and convert to hex.
         color_thief = ColorThief(src)
         palette = color_thief.get_palette(color_count=2)
-        foreground = rgb2hex(*palette[0])
-        background = rgb2hex(*palette[1])
+        background = rgb2hex(*palette[0])
+        foreground = rgb2hex(*palette[1])
 
         # Trace image to svg and fill the back/foreground with the colors from
         # above.
+        greyscale_file = tempfile.NamedTemporaryFile(suffix=".bmp").name
+        vector_file = tempfile.NamedTemporaryFile(suffix=".svg").name
         os.system(
-            "potrace --opaque --color={} --fillcolor={} --svg {} -o {}".format(
-                foreground, background, src, dest
+            "mkbitmap -g {} -o {}".format(
+                src, greyscale_file
+            )
+        )
+        os.system(
+            "potrace --invert --color={} --fillcolor={} --opaque -O 0.5 -t 1500 --svg {} -o {}".format(
+                foreground, background, greyscale_file, vector_file
+            )
+        )
+        os.system(
+            "scour -i {} -o {} --enable-viewboxing --enable-id-stripping \
+                --enable-comment-stripping --shorten-ids --indent=none".format(
+                vector_file, dest
             )
         )
         return dest

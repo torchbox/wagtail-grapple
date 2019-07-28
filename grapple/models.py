@@ -31,28 +31,28 @@ class GraphQLField:
 def GraphQLString(field_name: str):
     def Mixin():
         return GraphQLField(field_name, graphene.String)
-        
+
     return Mixin
 
 
 def GraphQLFloat(field_name: str):
     def Mixin():
         return GraphQLField(field_name, graphene.Float)
-        
+
     return Mixin
 
 
 def GraphQLInt(field_name: str):
     def Mixin():
         return GraphQLField(field_name, graphene.Int)
-        
+
     return Mixin
 
 
 def GraphQLBoolean(field_name: str):
     def Mixin():
         return GraphQLField(field_name, graphene.Boolean)
-        
+
     return Mixin
 
 
@@ -119,6 +119,7 @@ def GraphQLForeignKey(field_name: str, content_type: str, is_list: bool = False)
 def GraphQLMedia(field_name: str):
     def Mixin():
         from .types.media import MediaObjectType
+
         return GraphQLField(field_name, MediaObjectType)
 
     return Mixin
@@ -212,9 +213,9 @@ class GrapplePageMixin:
             "grapple/preview.html",
             {"preview_url": self.get_preview_url(page_preview.token)},
         )
-        
+
         # Set cookie that auto-expires after 5mins
-        response.set_cookie(key="used-token", value=page_preview.token, max_age=300)
+        response.set_cookie(key="used-token", value=page_preview.token)
         return response
 
     @classmethod

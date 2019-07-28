@@ -98,15 +98,18 @@ def GraphQLDocument(field_name: str):
     return GraphQLForeignKey(field_name, document_type)
 
 
-def GraphQLForeignKey(field_name: str, content_type: str, is_list: bool = False):
+def GraphQLForeignKey(field_name, content_type, is_list = False):
     class Mixin(GraphQLField):
         def __init__(self):
-            app_label, model = content_type.lower().split(".")
-            mdl = ContentType.objects.get(app_label=app_label, model=model)
             field_type = None
 
-            if mdl:
-                field_type = registry.models.get(mdl.model_class())
+            if isinstance(content_type, str):
+                app_label, model = content_type.lower().split(".")
+                mdl = ContentType.objects.get(app_label=app_label, model=model)
+                if mdl:
+                    field_type = registry.models.get(mdl.model_class())
+            else:
+                field_type = registry.models.get(content_type)
 
             if field_type and is_list:
                 field_type = graphene.List(field_type)

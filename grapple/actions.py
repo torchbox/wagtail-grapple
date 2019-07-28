@@ -30,8 +30,6 @@ def import_apps():
         add_app(name, prefix)
         registry.apps.append(name)
 
-    print("foo!")
-
     for streamfield_type in streamfield_types:
         node_type = build_streamfield_type(
             streamfield_type["cls"],

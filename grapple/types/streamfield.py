@@ -109,30 +109,31 @@ class StructBlock(graphene.ObjectType):
     class Meta:
         interfaces = (StreamFieldInterface,)
 
-    items = graphene.List(StreamFieldInterface)
-    def resolve_items(self, info, **kwargs):
-        items = []
+    blocks = graphene.List(StreamFieldInterface)
+    def resolve_blocks(self, info, **kwargs):
+        stream_blocks = []
         for name, value in self.value.items():
             block = self.block.child_blocks[name]
-            value = block.to_python(value)
+            if not issubclass(type(block), blocks.StreamBlock):
+                value = block.to_python(value)
 
-            items.append(StructBlockItem(name, block, value))
-        return items
+            stream_blocks.append(StructBlockItem(name, block, value))
+        return stream_blocks
 
 
 class StreamBlock(StructBlock):
     class Meta:
         interfaces = (StreamFieldInterface,)
 
-    def resolve_items(self, info, **kwargs):
-        items = []
+    def resolve_blocks(self, info, **kwargs):
+        stream_blocks = []
         for field in self.value.stream_data:
             block = self.value.stream_block.child_blocks[field["type"]]
             if not issubclass(type(block), blocks.StructBlock):
                 value = block.to_python(field["value"])
 
-            items.append(StructBlockItem(field["type"], block, field["value"]))
-        return items
+            stream_blocks.append(StructBlockItem(field["type"], block, field["value"]))
+        return stream_blocks
 
 
 class StreamFieldBlock(graphene.ObjectType):

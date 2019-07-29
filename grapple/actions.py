@@ -306,19 +306,3 @@ def register_django_model(cls: Type[models.Model], type_prefix: str):
 
     if django_node_type:
         registry.django_models[cls] = django_node_type
-
-
-def register_streamfield_model(cls: Type[BaseBlock], type_prefix: str):
-    """
-    Create a graphene type for a streamfield block. Based on the nearest inherited
-    block.
-    """
-    print(cls)
-
-    # if cls in registry.streamfield_blocks:
-    #     return
-
-    # block_node_type = build_node_type(cls, type_prefix, None)
-
-    # if block_node_type:
-    #     registry.streamfield_blocks[cls] = block_node_type

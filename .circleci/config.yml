@@ -26,12 +26,17 @@ jobs:
             - v1-dependencies-{{ checksum "requirements.txt" }}
             # fallback to using the latest cache if no exact match is found
             - v1-dependencies-
+      
+      - run:
+          name: install Git LFS
+          command: |
+          curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash
+          sudo apt-get install git-lfs
+          git lfs install
 
       - run:
           name: install dependencies
           command: |
-            sudo apt-get install git-lfs
-            git lfs install
             cd example
             python3 -m venv venv
             . venv/bin/activate

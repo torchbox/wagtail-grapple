@@ -146,10 +146,17 @@ def build_node_type(
 
     return type(type_name, (base_type,), type_meta)
 
+def convert_to_underscore(name):
+    import re
+    s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
+    return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
+
 def streamfield_resolver(self, instance, info, **kwargs):
-    block = instance.block.child_blocks[info.field_name]
-    value = instance.value[info.field_name]
-    
+    field_name = convert_to_underscore(info.field_name)
+    print(field_name)
+    block = instance.block.child_blocks[field_name]
+    value = instance.value[field_name]
+
     if issubclass(type(block), ImageChooserBlock) and isinstance(value, int):
         return block.to_python(value)
 

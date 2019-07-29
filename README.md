@@ -184,6 +184,12 @@ Contributions are what make the open source community such an amazing place to b
 4. Push to the Branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
+### Local development
+
+ - In the python environment of your choice, navigate to `/examples`
+ - Run `pip install -r requirements.txt`
+ - Delete the `db.sqlite3` file and run `./manage.py migrate`
+ - Run server `./manage.py runserver`
 
 
 ## License

@@ -102,7 +102,7 @@ def GraphQLForeignKey(field_name, content_type, is_list = False):
     class Mixin(GraphQLField):
         def __init__(self):
             field_type = None
-
+            
             if isinstance(content_type, str):
                 app_label, model = content_type.lower().split(".")
                 mdl = ContentType.objects.get(app_label=app_label, model=model)
@@ -113,6 +113,8 @@ def GraphQLForeignKey(field_name, content_type, is_list = False):
 
             if field_type and is_list:
                 field_type = graphene.List(field_type)
+            elif field_type:
+                field_type = graphene.Field(field_type)
 
             super().__init__(field_name, field_type)
 

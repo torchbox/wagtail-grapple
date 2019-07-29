@@ -116,7 +116,7 @@ class StructBlock(graphene.ObjectType):
             block = self.block.child_blocks[name]
             if not issubclass(type(block), blocks.StreamBlock):
                 value = block.to_python(value)
-
+            
             stream_blocks.append(StructBlockItem(name, block, value))
         return stream_blocks
 
@@ -131,7 +131,7 @@ class StreamBlock(StructBlock):
             block = self.value.stream_block.child_blocks[field["type"]]
             if not issubclass(type(block), blocks.StructBlock):
                 value = block.to_python(field["value"])
-
+            
             stream_blocks.append(StructBlockItem(field["type"], block, field["value"]))
         return stream_blocks
 
@@ -278,7 +278,9 @@ class EmbedBlock(graphene.ObjectType):
         interfaces = (StreamFieldInterface,)
 
     def resolve_url(self, info, **kwargs):
-        return self.value.url
+        if hasattr(self, 'value'):
+            return self.value.url
+        return self.url
 
 
 class StaticBlock(graphene.ObjectType):

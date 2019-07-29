@@ -146,10 +146,16 @@ def build_node_type(
 
     return type(type_name, (base_type,), type_meta)
 
+def convert_to_underscore(name):
+    import re
+    s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
+    return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
+
 def streamfield_resolver(self, instance, info, **kwargs):
-    block = instance.block.child_blocks[info.field_name]
-    value = instance.value[info.field_name]
-    
+    field_name = convert_to_underscore(info.field_name)
+    block = instance.block.child_blocks[field_name]
+    value = instance.value[field_name]
+
     if issubclass(type(block), ImageChooserBlock) and isinstance(value, int):
         return block.to_python(value)
 
@@ -300,19 +306,3 @@ def register_django_model(cls: Type[models.Model], type_prefix: str):
 
     if django_node_type:
         registry.django_models[cls] = django_node_type
-
-
-def register_streamfield_model(cls: Type[BaseBlock], type_prefix: str):
-    """
-    Create a graphene type for a streamfield block. Based on the nearest inherited
-    block.
-    """
-    print(cls)
-
-    # if cls in registry.streamfield_blocks:
-    #     return
-
-    # block_node_type = build_node_type(cls, type_prefix, None)
-
-    # if block_node_type:
-    #     registry.streamfield_blocks[cls] = block_node_type

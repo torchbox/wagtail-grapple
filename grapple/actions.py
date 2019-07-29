@@ -7,7 +7,7 @@ from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from wagtail.contrib.settings.models import BaseSetting
 from wagtail.core.models import Page as WagtailPage
-from wagtail.core.blocks import BaseBlock
+from wagtail.core.blocks import BaseBlock, RichTextBlock
 from wagtail.documents.models import AbstractDocument
 from wagtail.images.models import AbstractImage
 from wagtail.images.blocks import ImageChooserBlock
@@ -149,8 +149,10 @@ def build_node_type(
 def streamfield_resolver(self, instance, info, **kwargs):
     block = instance.block.child_blocks[info.field_name]
     value = instance.value[info.field_name]
-    if not issubclass(type(block), ImageChooserBlock):
+    
+    if issubclass(type(block), ImageChooserBlock) and isinstance(value, int):
         return block.to_python(value)
+
     return value
 
 def build_streamfield_type(

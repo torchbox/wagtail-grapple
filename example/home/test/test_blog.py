@@ -1,21 +1,19 @@
 import datetime
 import decimal
 
-from django.conf import settings
-
 import wagtail_factories
-from home.blocks import ImageGalleryImage, ImageGalleryImages
-from home.factories import BlogPageFactory, ImageGalleryImageFactory
+from django.conf import settings
 from wagtail.core.blocks import BoundBlock, StreamValue, StructValue
 from wagtail.core.rich_text import RichText
 
-from .test_grapple import BaseGrappleTest
+from example.tests.test_grapple import BaseGrappleTest
+from home.blocks import ImageGalleryImage, ImageGalleryImages
+from home.factories import BlogPageFactory, ImageGalleryImageFactory
 
 
 class BlogTest(BaseGrappleTest):
     def setUp(self):
         super().setUp()
-
         self.blog_page = BlogPageFactory(
             body=[
                 ("heading", "Test heading 1"),
@@ -180,7 +178,7 @@ class BlogTest(BaseGrappleTest):
     def test_blog_body_datetimeblock(self):
         block_type = 'DateTimeBlock'
         query_blocks = self.get_blocks_from_body(block_type)
-    
+
         # Check output.
         count = 0
         for block in self.blog_page.body:

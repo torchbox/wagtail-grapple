@@ -9,7 +9,6 @@ jobs:
       # specify the version you desire here
       # use `-browsers` prefix for selenium tests, e.g. `3.6.1-browsers`
       - image: circleci/python:3.6.1
-        command: apt-get install git-lfs && lfs install
 
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
@@ -31,6 +30,8 @@ jobs:
       - run:
           name: install dependencies
           command: |
+            sudo apt-get install git-lfs
+            git lfs install
             cd example
             python3 -m venv venv
             . venv/bin/activate

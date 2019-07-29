@@ -1,11 +1,17 @@
-from grapple.helpers import register_streamfield_block
 from wagtail.core import blocks
 from wagtail.images.blocks import ImageChooserBlock
+
+from grapple.helpers import register_streamfield_block
+from grapple.models import GraphQLForeignKey, GraphQLImage, GraphQLString
 
 
 @register_streamfield_block
 class ImageGalleryImage(blocks.StructBlock):
     image = ImageChooserBlock()
+
+    graphql_fields = [
+        GraphQLImage('image'),
+    ]
 
 
 @register_streamfield_block
@@ -23,6 +29,11 @@ class ImageGalleryImages(blocks.StreamBlock):
 class ImageGalleryBlock(blocks.StructBlock):
     title = blocks.CharBlock(classname="full title")
     images = ImageGalleryImages()
+
+    graphql_fields = [
+        GraphQLString('title'),
+        GraphQLForeignKey('images', ImageGalleryImage, is_list=True),
+    ]
 
 
 class StreamFieldBlock(blocks.StreamBlock):

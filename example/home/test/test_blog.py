@@ -198,7 +198,15 @@ class BlogTest(BaseGrappleTest):
         block_type = 'ImageGalleryBlock'
         query_blocks = self.get_blocks_from_body(
             block_type,
-            block_query='value',
+            block_query='''
+            title
+            images {
+                image {
+                  id
+                  src
+                }
+            }
+            ''',
         )
     
         # Check output.
@@ -206,11 +214,15 @@ class BlogTest(BaseGrappleTest):
         for block in self.blog_page.body:
             if type(block.block).__name__ == block_type:
                 # Test the values
-                self.assertEquals(query_blocks[count]['value']['title'], str(block.value['title']))
-                for key, image in enumerate(query_blocks[count]['value']['images']):
+                self.assertEquals(query_blocks[count]['title'], str(block.value['title']))
+                for key, image in enumerate(query_blocks[count]['images']):
                     self.assertEquals(
-                        image['image'],
-                        block.value['images'][key].value['image'].id,
+                        image['image']['id'],
+                        str(block.value['images'][key].value['image'].id),
+                    )
+                    self.assertEquals(
+                        image['image']['src'],
+                        settings.BASE_URL + str(block.value['images'][key].value['image'].file.url),
                     )
                 # Increment the count
                 count += 1

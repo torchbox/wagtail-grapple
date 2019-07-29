@@ -1,13 +1,16 @@
 import graphene
 import inspect
 from typing import Type
+from types import MethodType
 from django.db import models
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from wagtail.contrib.settings.models import BaseSetting
 from wagtail.core.models import Page as WagtailPage
+from wagtail.core.blocks import BaseBlock, RichTextBlock
 from wagtail.documents.models import AbstractDocument
 from wagtail.images.models import AbstractImage
+from wagtail.images.blocks import ImageChooserBlock
 from wagtail.snippets.models import get_snippet_models
 from graphene_django.types import DjangoObjectType
 
@@ -16,6 +19,7 @@ from .registry import registry
 from .types.pages import PageInterface, Page
 from .types.documents import DocumentObjectType
 from .types.images import ImageObjectType
+from .helpers import streamfield_types
 
 
 def import_apps():
@@ -27,14 +31,23 @@ def import_apps():
         add_app(name, prefix)
         registry.apps.append(name)
 
+    for streamfield_type in streamfield_types:
+        node_type = build_streamfield_type(
+            streamfield_type["cls"],
+            streamfield_type["type_prefix"],
+            streamfield_type["interface"],
+            streamfield_type["base_type"],
+        )
+
+        registry.streamfield_blocks[streamfield_type["cls"]] = node_type
+
 
 def add_app(app: str, prefix: str = ""):
     """
     Iterate through each model in the app and pass it to node type creators.
     """
 
-    # Create a collection of models of standard models (Pages, Images,
-    # Documents).
+    # Create a collection of models of standard models (Pages, Images, Documents).
     models = [
         mdl.model_class() for mdl in ContentType.objects.filter(app_label=app).all()
     ]
@@ -66,6 +79,8 @@ def register_model(cls: type, type_prefix: str):
             register_settings_model(cls, type_prefix)
         elif cls in get_snippet_models():
             register_snippet_model(cls, type_prefix)
+        elif issubclass(cls, BaseBlock):
+            register_streamfield_model(cls, type_prefix)
         else:
             register_django_model(cls, type_prefix)
 
@@ -130,6 +145,56 @@ def build_node_type(
     type_meta["Meta"].exclude_fields = exclude_fields
 
     return type(type_name, (base_type,), type_meta)
+
+def streamfield_resolver(self, instance, info, **kwargs):
+    block = instance.block.child_blocks[info.field_name]
+    value = instance.value[info.field_name]
+    
+    if issubclass(type(block), ImageChooserBlock) and isinstance(value, int):
+        return block.to_python(value)
+
+    return value
+
+def build_streamfield_type(
+    cls: type,
+    type_prefix: str,
+    interface: graphene.Interface,
+    base_type=graphene.ObjectType,
+):
+    """
+    Build a graphql type for a StreamBlock or StructBlock class
+    If it has custom fields then implement them.
+    """
+    # Create a new blank node type
+    class Meta:
+        interfaces = (interface,) if interface is not None else tuple()
+
+    methods = {}
+    type_name = type_prefix + cls.__name__
+    type_meta = {"Meta": Meta}
+    type_meta.update({"id": graphene.String()})
+
+    # Add any custom fields to node if they are defined.
+    if hasattr(cls, "graphql_fields"):
+        for field in cls.graphql_fields:
+            if callable(field):
+                field = field()
+
+            # Add support for `graphql_fields`
+            methods["resolve_" + field.field_name] = streamfield_resolver
+
+            # Add field to GQL type with correct field-type
+            if field.field_type is not None:
+                type_meta[field.field_name] = field.field_type
+
+    # Set excluded fields to stop errors cropping up from unsupported field
+    # types.
+    graphql_node = type(type_name, (base_type,), type_meta)
+
+    for name, method in methods.items():
+        setattr(graphql_node, name, MethodType(method, graphql_node))
+
+    return graphql_node
 
 
 def register_page_model(cls: Type[WagtailPage], type_prefix: str):
@@ -235,3 +300,19 @@ def register_django_model(cls: Type[models.Model], type_prefix: str):
 
     if django_node_type:
         registry.django_models[cls] = django_node_type
+
+
+def register_streamfield_model(cls: Type[BaseBlock], type_prefix: str):
+    """
+    Create a graphene type for a streamfield block. Based on the nearest inherited
+    block.
+    """
+    print(cls)
+
+    # if cls in registry.streamfield_blocks:
+    #     return
+
+    # block_node_type = build_node_type(cls, type_prefix, None)
+
+    # if block_node_type:
+    #     registry.streamfield_blocks[cls] = block_node_type

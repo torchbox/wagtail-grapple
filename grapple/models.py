@@ -31,28 +31,28 @@ class GraphQLField:
 def GraphQLString(field_name: str):
     def Mixin():
         return GraphQLField(field_name, graphene.String)
-        
+
     return Mixin
 
 
 def GraphQLFloat(field_name: str):
     def Mixin():
         return GraphQLField(field_name, graphene.Float)
-        
+
     return Mixin
 
 
 def GraphQLInt(field_name: str):
     def Mixin():
         return GraphQLField(field_name, graphene.Int)
-        
+
     return Mixin
 
 
 def GraphQLBoolean(field_name: str):
     def Mixin():
         return GraphQLField(field_name, graphene.Boolean)
-        
+
     return Mixin
 
 
@@ -98,15 +98,18 @@ def GraphQLDocument(field_name: str):
     return GraphQLForeignKey(field_name, document_type)
 
 
-def GraphQLForeignKey(field_name: str, content_type: str, is_list: bool = False):
+def GraphQLForeignKey(field_name, content_type, is_list = False):
     class Mixin(GraphQLField):
         def __init__(self):
-            app_label, model = content_type.lower().split(".")
-            mdl = ContentType.objects.get(app_label=app_label, model=model)
             field_type = None
 
-            if mdl:
-                field_type = registry.models.get(mdl.model_class())
+            if isinstance(content_type, str):
+                app_label, model = content_type.lower().split(".")
+                mdl = ContentType.objects.get(app_label=app_label, model=model)
+                if mdl:
+                    field_type = registry.models.get(mdl.model_class())
+            else:
+                field_type = registry.models.get(content_type)
 
             if field_type and is_list:
                 field_type = graphene.List(field_type)
@@ -119,6 +122,7 @@ def GraphQLForeignKey(field_name: str, content_type: str, is_list: bool = False)
 def GraphQLMedia(field_name: str):
     def Mixin():
         from .types.media import MediaObjectType
+
         return GraphQLField(field_name, MediaObjectType)
 
     return Mixin
@@ -212,9 +216,9 @@ class GrapplePageMixin:
             "grapple/preview.html",
             {"preview_url": self.get_preview_url(page_preview.token)},
         )
-        
+
         # Set cookie that auto-expires after 5mins
-        response.set_cookie(key="used-token", value=page_preview.token, max_age=300)
+        response.set_cookie(key="used-token", value=page_preview.token)
         return response
 
     @classmethod

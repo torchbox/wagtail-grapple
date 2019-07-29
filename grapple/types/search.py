@@ -18,7 +18,7 @@ def SearchQuery():
 
             # Return just one setting base on name param.
             def resolve_search(self, info, **kwargs):
-                query = kwargs.get('query')
+                query = kwargs.get("query")
                 if query:
                     s = get_search_backend()
                     results = []
@@ -33,6 +33,7 @@ def SearchQuery():
         return Mixin
 
     else:
+
         class Mixin:
             pass
 

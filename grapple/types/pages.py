@@ -116,8 +116,9 @@ class Page(DjangoObjectType):
         interfaces = (PageInterface,)
 
 
-def get_specific_page(id, slug, token, content_type = None):
+def get_specific_page(id, slug, token, content_type=None):
     from ..models import PagePreview
+
     """
     Get a spcecific page, also get preview if token is passed
     """
@@ -134,7 +135,7 @@ def get_specific_page(id, slug, token, content_type = None):
             app_label, model = content_type.lower().split(".")
             mdl = ContentType.objects.get(app_label=app_label, model=model)
             page = mdl.model_class().get_page_from_preview_token(token)
-        
+
     except BaseException:
         page = None
 
@@ -152,7 +153,7 @@ def PagesQuery():
             id=graphene.Int(),
             slug=graphene.String(),
             token=graphene.String(),
-            content_type=graphene.String()
+            content_type=graphene.String(),
         )
 
         # Return all pages, ideally specific.
@@ -164,7 +165,7 @@ def PagesQuery():
         # Return a specific page, identified by ID or Slug.
         def resolve_page(self, info, **kwargs):
             return get_specific_page(
-                id=kwargs.get("id"), 
+                id=kwargs.get("id"),
                 slug=kwargs.get("slug"),
                 token=kwargs.get("token"),
                 content_type=kwargs.get("content_type"),
@@ -195,15 +196,15 @@ def PagesSubscription():
             id=graphene.Int(),
             slug=graphene.String(),
             token=graphene.String(),
-            content_type=graphene.String()
+            content_type=graphene.String(),
         )
 
         def resolve_page(self, info, **kwargs):
             return preview_observable(
-                id=kwargs.get("id"), 
-                slug=kwargs.get("slug"), 
+                id=kwargs.get("id"),
+                slug=kwargs.get("slug"),
                 token=kwargs.get("token"),
-                content_type=kwargs.get("content_type")
+                content_type=kwargs.get("content_type"),
             )
 
     return Mixin

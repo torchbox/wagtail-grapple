@@ -177,14 +177,18 @@ class BlogTest(BaseGrappleTest):
 
     def test_blog_body_datetimeblock(self):
         block_type = 'DateTimeBlock'
-        query_blocks = self.get_blocks_from_body(block_type)
+        date_format_string = "%Y-%m-%d %H:%M:%S"
+        query_blocks = self.get_blocks_from_body(
+            block_type,
+            block_query=f'value(format: "{date_format_string}")'
+        )
 
         # Check output.
         count = 0
         for block in self.blog_page.body:
             if type(block.block).__name__ == block_type:
                 # Test the values
-                self.assertEquals(query_blocks[count]['rawValue'], str(block.value))
+                self.assertEquals(query_blocks[count]['value'], block.value.strftime(date_format_string))
                 # Increment the count
                 count += 1
         # Check that we test all blocks that were returned.

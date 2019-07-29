@@ -10,6 +10,7 @@ from wagtail.core.models import Page as WagtailPage
 from wagtail.core.blocks import BaseBlock
 from wagtail.documents.models import AbstractDocument
 from wagtail.images.models import AbstractImage
+from wagtail.images.blocks import ImageChooserBlock
 from wagtail.snippets.models import get_snippet_models
 from graphene_django.types import DjangoObjectType
 
@@ -145,12 +146,12 @@ def build_node_type(
 
     return type(type_name, (base_type,), type_meta)
 
-
 def streamfield_resolver(self, instance, info, **kwargs):
     block = instance.block.child_blocks[info.field_name]
     value = instance.value[info.field_name]
-    return block.to_python(value)
-
+    if not issubclass(type(block), ImageChooserBlock):
+        return block.to_python(value)
+    return value
 
 def build_streamfield_type(
     cls: type,

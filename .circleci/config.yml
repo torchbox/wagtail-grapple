@@ -50,6 +50,7 @@ jobs:
           command: |
             cd example
             . venv/bin/activate
+            python manage.py migrate
             python manage.py test
 
       - store_artifacts:

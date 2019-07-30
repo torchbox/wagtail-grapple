@@ -15,6 +15,17 @@ class Registry:
     settings = RegistryItem()
 
     @property
+    def search_models(self) -> dict:
+        models: dict = {}
+        models.update(self.pages)
+        models.update(self.documents)
+        models.update(self.images)
+        models.update(self.snippets)
+        models.update(self.django_models)
+        models.update(self.settings)
+        return models
+
+    @property
     def models(self) -> dict:
         models: dict = {}
         models.update(self.pages)

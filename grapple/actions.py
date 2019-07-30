@@ -18,6 +18,7 @@ from graphene_django.types import DjangoObjectType
 from .registry import registry
 from .types.pages import PageInterface, Page
 from .types.documents import DocumentObjectType
+from .types.streamfield import generate_streamfield_union
 from .types.images import ImageObjectType
 from .helpers import streamfield_types
 
@@ -32,11 +33,17 @@ def import_apps():
         registry.apps.append(name)
 
     for streamfield_type in streamfield_types:
+        cls = streamfield_type["cls"]
+        base_type = streamfield_type["base_type"]
+
+        if hasattr(cls, 'graphql_types'):
+            base_type = generate_streamfield_union(cls.graphql_types)
+
         node_type = build_streamfield_type(
-            streamfield_type["cls"],
+            cls,
             streamfield_type["type_prefix"],
             streamfield_type["interface"],
-            streamfield_type["base_type"],
+            base_type,
         )
 
         registry.streamfield_blocks[streamfield_type["cls"]] = node_type
@@ -173,7 +180,14 @@ def build_streamfield_type(
     """
     # Create a new blank node type
     class Meta:
-        interfaces = (interface,) if interface is not None else tuple()
+        if hasattr(cls, 'graphql_types'):
+            types = [
+                registry.streamfield_blocks.get(block)
+                for block in cls.graphql_types
+            ]
+        else:
+            interfaces = (interface,) if interface is not None else tuple()
+        
 
     methods = {}
     type_name = type_prefix + cls.__name__

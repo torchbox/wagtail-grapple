@@ -65,6 +65,25 @@ class StreamFieldInterface(graphene.Interface):
         return self.value
 
 
+def generate_streamfield_union(graphql_types):
+    class StreamfieldUnion(graphene.Union):
+        class Meta:
+            types = graphql_types
+
+        @classmethod
+        def resolve_type(cls, instance, info):
+            """
+            If block has a custom Graphene Node type in registry then use it,
+            otherwise use generic block type.
+            """
+            mdl = type(instance.block)
+            if mdl in registry.streamfield_blocks:
+                return registry.streamfield_blocks[mdl]
+
+            return registry.streamfield_blocks["generic-block"]
+
+    return StreamfieldUnion
+
 class StructBlockItem:
     id = None
     block = None

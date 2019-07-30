@@ -1,14 +1,15 @@
 import graphene
 from graphql.validation.rules import NoUnusedFragments, specified_rules
 
-from .types.pages import PagesQuery, PagesSubscription
-from .types.images import ImagesQuery
-from .types.documents import DocumentsQuery
-from .types.snippets import SnippetsQuery
-from .types.settings import SettingsQuery
-from .types.search import SearchQuery
+from .actions import import_apps
 from .registry import registry
-
+from .types.documents import DocumentsQuery
+from .types.images import ImagesQuery
+from .types.pages import PagesQuery, PagesSubscription
+from .types.search import SearchQuery
+from .types.settings import SettingsQuery
+from .types.snippets import SnippetsQuery
+from .types.streamfield import register_streamfield_blocks
 
 """
 Root schema object that graphene is pointed at.
@@ -47,3 +48,10 @@ class Subscription(PagesSubscription(), graphene.ObjectType):
 schema = graphene.Schema(
     query=Query, types=list(registry.models.values()), subscription=Subscription
 )
+
+"""	
+Import all the django apps defined in django settings then process each model	
+in these apps and create graphql node types from them.	
+"""	
+import_apps()	
+register_streamfield_blocks()

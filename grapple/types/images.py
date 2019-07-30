@@ -1,4 +1,5 @@
 import os
+import codecs
 import urllib.parse
 import graphene
 

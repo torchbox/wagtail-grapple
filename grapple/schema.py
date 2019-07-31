@@ -11,6 +11,14 @@ from .types.settings import SettingsQuery
 from .types.snippets import SnippetsQuery
 from .types.streamfield import register_streamfield_blocks
 
+"""	
+Import all the django apps defined in django settings then process each model	
+in these apps and create graphql node types from them.	
+"""	
+import_apps()	
+register_streamfield_blocks()
+
+
 """
 Root schema object that graphene is pointed at.
 It inherits its queries from each of the specific type mixins.
@@ -48,10 +56,3 @@ class Subscription(PagesSubscription(), graphene.ObjectType):
 schema = graphene.Schema(
     query=Query, types=list(registry.models.values()), subscription=Subscription
 )
-
-"""	
-Import all the django apps defined in django settings then process each model	
-in these apps and create graphql node types from them.	
-"""	
-import_apps()	
-register_streamfield_blocks()

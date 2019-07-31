@@ -28,7 +28,7 @@ class GrappleTest(TestCase):
         executed = self.client.execute(query)
 
         self.assertEquals(type(executed['data']), OrderedDict)
-        self.assertEquals(type(executed['data']['pages']), OrderedDict)
+        self.assertEquals(type(executed['data']['pages']), list)
 
         pages = Page.objects.all()
 

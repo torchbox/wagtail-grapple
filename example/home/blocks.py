@@ -4,6 +4,8 @@ from wagtail.images.blocks import ImageChooserBlock
 from grapple.helpers import register_streamfield_block
 from grapple.models import GraphQLForeignKey, GraphQLImage, GraphQLString
 
+from wagtail.images.blocks import ImageChooserBlock
+
 
 @register_streamfield_block
 class ImageGalleryImage(blocks.StructBlock):

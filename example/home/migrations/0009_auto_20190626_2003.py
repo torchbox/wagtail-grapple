@@ -10,19 +10,34 @@ import wagtail.images.blocks
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('wagtailmedia', '0003_copy_media_permissions_to_collections'),
-        ('home', '0008_blogpage_book_file'),
+        ("wagtailmedia", "0003_copy_media_permissions_to_collections"),
+        ("home", "0008_blogpage_book_file"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='blogpage',
-            name='featured_media',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to='wagtailmedia.Media'),
+            model_name="blogpage",
+            name="featured_media",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="+",
+                to="wagtailmedia.Media",
+            ),
         ),
         migrations.AlterField(
-            model_name='blogpage',
-            name='body',
-            field=wagtail.core.fields.StreamField([('heading', wagtail.core.blocks.CharBlock(classname='full title')), ('paraagraph', wagtail.core.blocks.RichTextBlock()), ('image', wagtail.images.blocks.ImageChooserBlock()), ('decimal', wagtail.core.blocks.DecimalBlock()), ('date', wagtail.core.blocks.DateBlock()), ('datetime', wagtail.core.blocks.DateTimeBlock())]),
+            model_name="blogpage",
+            name="body",
+            field=wagtail.core.fields.StreamField(
+                [
+                    ("heading", wagtail.core.blocks.CharBlock(classname="full title")),
+                    ("paraagraph", wagtail.core.blocks.RichTextBlock()),
+                    ("image", wagtail.images.blocks.ImageChooserBlock()),
+                    ("decimal", wagtail.core.blocks.DecimalBlock()),
+                    ("date", wagtail.core.blocks.DateBlock()),
+                    ("datetime", wagtail.core.blocks.DateTimeBlock()),
+                ]
+            ),
         ),
     ]

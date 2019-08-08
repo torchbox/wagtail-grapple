@@ -8,7 +8,7 @@ from graphene.test import Client
 
 from wagtail.core.models import Page
 
-SCHEMA = locate(settings.GRAPHENE['SCHEMA'])
+SCHEMA = locate(settings.GRAPHENE["SCHEMA"])
 
 
 class BaseGrappleTest(TestCase):
@@ -18,13 +18,13 @@ class BaseGrappleTest(TestCase):
 
 class PagesTest(BaseGrappleTest):
     def test_pages(self):
-        query = '''
+        query = """
         {
             pages {
                 title
             }
         }
-        '''
+        """
 
         executed = self.client.execute(query)
 
@@ -34,4 +34,4 @@ class PagesTest(BaseGrappleTest):
 
         pages = Page.objects.all()
 
-        self.assertEquals(len(executed['data']['pages']), pages.count())
+        self.assertEquals(len(executed["data"]["pages"]), pages.count())

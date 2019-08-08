@@ -2,8 +2,7 @@ import datetime
 
 import factory
 import wagtail_factories
-from home.blocks import (ImageGalleryBlock, ImageGalleryImage,
-                         ImageGalleryImages)
+from home.blocks import ImageGalleryBlock, ImageGalleryImage, ImageGalleryImages
 from home.models import BlogPage
 from wagtail.core import blocks
 
@@ -52,6 +51,8 @@ class ImageGalleryBlockFactory(wagtail_factories.StructBlockFactory):
 
     class Meta:
         model = ImageGalleryBlock
+
+
 # END: Block Factories
 
 
@@ -59,16 +60,20 @@ class ImageGalleryBlockFactory(wagtail_factories.StructBlockFactory):
 class BlogPageFactory(wagtail_factories.PageFactory):
     author = factory.Sequence(lambda n: f"Author Name{n}")
     date = datetime.date.today()
-    body = wagtail_factories.StreamFieldFactory({
-        "heading": wagtail_factories.CharBlockFactory,
-        "paragraph": RichTextBlockFactory,
-        "image": wagtail_factories.ImageChooserBlockFactory,
-        "decimal": DecimalBlockFactory,
-        "date": DateBlockFactory,
-        "datetime": DateTimeBlockFactory,
-        "gallery": ImageGalleryBlockFactory,
-    })
+    body = wagtail_factories.StreamFieldFactory(
+        {
+            "heading": wagtail_factories.CharBlockFactory,
+            "paragraph": RichTextBlockFactory,
+            "image": wagtail_factories.ImageChooserBlockFactory,
+            "decimal": DecimalBlockFactory,
+            "date": DateBlockFactory,
+            "datetime": DateTimeBlockFactory,
+            "gallery": ImageGalleryBlockFactory,
+        }
+    )
 
     class Meta:
         model = BlogPage
+
+
 # END: Page Factories

@@ -23,29 +23,34 @@ class BlogTest(BaseGrappleTest):
                 ("decimal", decimal.Decimal(1.2)),
                 ("date", datetime.date.today()),
                 ("datetime", datetime.datetime.now()),
-                ("gallery", {
-                    "title": "Gallery title",
-                    "images": StreamValue(
-                        stream_block=ImageGalleryImages(),
-                        stream_data=[
-                            (
-                                "image", {
-                                    "image": wagtail_factories.ImageChooserBlockFactory(),
-                                },
-                            ),
-                            (
-                                "image", {
-                                    "image": wagtail_factories.ImageChooserBlockFactory(),
-                                },
-                            ),
-                        ],
-                    ),
-                }),
-            ],
+                (
+                    "gallery",
+                    {
+                        "title": "Gallery title",
+                        "images": StreamValue(
+                            stream_block=ImageGalleryImages(),
+                            stream_data=[
+                                (
+                                    "image",
+                                    {
+                                        "image": wagtail_factories.ImageChooserBlockFactory()
+                                    },
+                                ),
+                                (
+                                    "image",
+                                    {
+                                        "image": wagtail_factories.ImageChooserBlockFactory()
+                                    },
+                                ),
+                            ],
+                        ),
+                    },
+                ),
+            ]
         )
 
     def test_blog_page(self):
-        query = '''
+        query = """
         {
             page(id:%s) {
                 ... on BlogPage {
@@ -53,17 +58,16 @@ class BlogTest(BaseGrappleTest):
                 }
             }
         }
-        ''' % (self.blog_page.id)
+        """ % (
+            self.blog_page.id
+        )
         executed = self.client.execute(query)
 
         # Check title.
-        self.assertEquals(
-            executed['data']['page']['title'],
-            self.blog_page.title,
-        )
+        self.assertEquals(executed["data"]["page"]["title"], self.blog_page.title)
 
-    def get_blocks_from_body(self, block_type, block_query='rawValue'):
-        query = '''
+    def get_blocks_from_body(self, block_type, block_query="rawValue"):
+        query = """
         {
             page(id:%s) {
                 ... on BlogPage {
@@ -76,68 +80,73 @@ class BlogTest(BaseGrappleTest):
                 }
             }
         }
-        ''' % (self.blog_page.id, block_type, block_query)
+        """ % (
+            self.blog_page.id,
+            block_type,
+            block_query,
+        )
         executed = self.client.execute(query)
 
         blocks = []
-        for block in executed['data']['page']['body']:
-            if block['blockType'] == block_type:
+        for block in executed["data"]["page"]["body"]:
+            if block["blockType"] == block_type:
                 blocks.append(block)
         return blocks
 
     def test_blog_body_charblock(self):
-        block_type = 'CharBlock'
+        block_type = "CharBlock"
         query_blocks = self.get_blocks_from_body(block_type)
-    
+
         # Check output.
         count = 0
         for block in self.blog_page.body:
             if type(block.block).__name__ == block_type:
                 # Test the values
-                self.assertEquals(query_blocks[count]['rawValue'], block.value)
+                self.assertEquals(query_blocks[count]["rawValue"], block.value)
                 # Increment the count
                 count += 1
         # Check that we test all blocks that were returned.
         self.assertEquals(len(query_blocks), count)
 
     def test_blog_body_richtextblock(self):
-        block_type = 'RichTextBlock'
+        block_type = "RichTextBlock"
         query_blocks = self.get_blocks_from_body(block_type)
-    
+
         # Check output.
         count = 0
         for block in self.blog_page.body:
             if type(block.block).__name__ == block_type:
                 # Test the values
-                self.assertEquals(query_blocks[count]['rawValue'], block.value.__html__())
+                self.assertEquals(
+                    query_blocks[count]["rawValue"], block.value.__html__()
+                )
                 # Increment the count
                 count += 1
         # Check that we test all blocks that were returned.
         self.assertEquals(len(query_blocks), count)
 
     def test_blog_body_imagechooserblock(self):
-        block_type = 'ImageChooserBlock'
+        block_type = "ImageChooserBlock"
         query_blocks = self.get_blocks_from_body(
             block_type,
-            block_query='''
+            block_query="""
             image {
                 id
                 src
             }
-            ''',
+            """,
         )
-    
+
         # Check output.
         count = 0
         for block in self.blog_page.body:
             if type(block.block).__name__ == block_type:
                 # Test the values
                 self.assertEquals(
-                    query_blocks[count]['image']['id'],
-                    str(block.value.id),
+                    query_blocks[count]["image"]["id"], str(block.value.id)
                 )
                 self.assertEquals(
-                    query_blocks[count]['image']['src'],
+                    query_blocks[count]["image"]["src"],
                     settings.BASE_URL + block.value.file.url,
                 )
                 # Increment the count
@@ -146,41 +155,40 @@ class BlogTest(BaseGrappleTest):
         self.assertEquals(len(query_blocks), count)
 
     def test_blog_body_decimalblock(self):
-        block_type = 'DecimalBlock'
+        block_type = "DecimalBlock"
         query_blocks = self.get_blocks_from_body(block_type)
-    
+
         # Check output.
         count = 0
         for block in self.blog_page.body:
             if type(block.block).__name__ == block_type:
                 # Test the values
-                self.assertEquals(query_blocks[count]['rawValue'], str(block.value))
+                self.assertEquals(query_blocks[count]["rawValue"], str(block.value))
                 # Increment the count
                 count += 1
         # Check that we test all blocks that were returned.
         self.assertEquals(len(query_blocks), count)
 
     def test_blog_body_dateblock(self):
-        block_type = 'DateBlock'
+        block_type = "DateBlock"
         query_blocks = self.get_blocks_from_body(block_type)
-    
+
         # Check output.
         count = 0
         for block in self.blog_page.body:
             if type(block.block).__name__ == block_type:
                 # Test the values
-                self.assertEquals(query_blocks[count]['rawValue'], str(block.value))
+                self.assertEquals(query_blocks[count]["rawValue"], str(block.value))
                 # Increment the count
                 count += 1
         # Check that we test all blocks that were returned.
         self.assertEquals(len(query_blocks), count)
 
     def test_blog_body_datetimeblock(self):
-        block_type = 'DateTimeBlock'
+        block_type = "DateTimeBlock"
         date_format_string = "%Y-%m-%d %H:%M:%S"
         query_blocks = self.get_blocks_from_body(
-            block_type,
-            block_query=f'value(format: "{date_format_string}")'
+            block_type, block_query=f'value(format: "{date_format_string}")'
         )
 
         # Check output.
@@ -188,17 +196,20 @@ class BlogTest(BaseGrappleTest):
         for block in self.blog_page.body:
             if type(block.block).__name__ == block_type:
                 # Test the values
-                self.assertEquals(query_blocks[count]['value'], block.value.strftime(date_format_string))
+                self.assertEquals(
+                    query_blocks[count]["value"],
+                    block.value.strftime(date_format_string),
+                )
                 # Increment the count
                 count += 1
         # Check that we test all blocks that were returned.
         self.assertEquals(len(query_blocks), count)
 
     def test_blog_body_imagegalleryblock(self):
-        block_type = 'ImageGalleryBlock'
+        block_type = "ImageGalleryBlock"
         query_blocks = self.get_blocks_from_body(
             block_type,
-            block_query='''
+            block_query="""
             title
             images {
                 image {
@@ -206,23 +217,26 @@ class BlogTest(BaseGrappleTest):
                   src
                 }
             }
-            ''',
+            """,
         )
-    
+
         # Check output.
         count = 0
         for block in self.blog_page.body:
             if type(block.block).__name__ == block_type:
                 # Test the values
-                self.assertEquals(query_blocks[count]['title'], str(block.value['title']))
-                for key, image in enumerate(query_blocks[count]['images']):
+                self.assertEquals(
+                    query_blocks[count]["title"], str(block.value["title"])
+                )
+                for key, image in enumerate(query_blocks[count]["images"]):
                     self.assertEquals(
-                        image['image']['id'],
-                        str(block.value['images'][key].value['image'].id),
+                        image["image"]["id"],
+                        str(block.value["images"][key].value["image"].id),
                     )
                     self.assertEquals(
-                        image['image']['src'],
-                        settings.BASE_URL + str(block.value['images'][key].value['image'].file.url),
+                        image["image"]["src"],
+                        settings.BASE_URL
+                        + str(block.value["images"][key].value["image"].file.url),
                     )
                 # Increment the count
                 count += 1

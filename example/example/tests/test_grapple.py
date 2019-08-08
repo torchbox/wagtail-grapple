@@ -28,9 +28,9 @@ class PagesTest(BaseGrappleTest):
 
         executed = self.client.execute(query)
 
-        self.assertEquals(type(executed['data']), OrderedDict)
-        self.assertEquals(type(executed['data']['pages']), list)
-        self.assertEquals(type(executed['data']['pages'][0]), OrderedDict)
+        self.assertEquals(type(executed["data"]), OrderedDict)
+        self.assertEquals(type(executed["data"]["pages"]), list)
+        self.assertEquals(type(executed["data"]["pages"][0]), OrderedDict)
 
         pages = Page.objects.all()
 

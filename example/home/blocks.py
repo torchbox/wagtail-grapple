@@ -11,9 +11,7 @@ from wagtail.images.blocks import ImageChooserBlock
 class ImageGalleryImage(blocks.StructBlock):
     image = ImageChooserBlock()
 
-    graphql_fields = [
-        GraphQLImage('image'),
-    ]
+    graphql_fields = [GraphQLImage("image")]
 
 
 @register_streamfield_block
@@ -33,8 +31,8 @@ class ImageGalleryBlock(blocks.StructBlock):
     images = ImageGalleryImages()
 
     graphql_fields = [
-        GraphQLString('title'),
-        GraphQLForeignKey('images', ImageGalleryImage, is_list=True),
+        GraphQLString("title"),
+        GraphQLForeignKey("images", ImageGalleryImage, is_list=True),
     ]
 
 

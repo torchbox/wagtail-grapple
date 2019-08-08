@@ -98,11 +98,7 @@ def trace_bitmap(src: str, dest: str) -> str:
         # above.
         greyscale_file = tempfile.NamedTemporaryFile(suffix=".bmp").name
         vector_file = tempfile.NamedTemporaryFile(suffix=".svg").name
-        os.system(
-            "mkbitmap -g {} -o {}".format(
-                src, greyscale_file
-            )
-        )
+        os.system("mkbitmap -g {} -o {}".format(src, greyscale_file))
         os.system(
             "potrace --invert --color={} --fillcolor={} --opaque -O 0.5 -t 1500 --svg {} -o {}".format(
                 foreground, background, greyscale_file, vector_file

@@ -2,6 +2,8 @@ from wagtail.core import blocks
 
 
 from wagtail.images.blocks import ImageChooserBlock
+
+
 class ImageGalleryImage(blocks.StructBlock):
     image = ImageChooserBlock()
 

@@ -39,44 +39,44 @@ class BlogPage(GrapplePageMixin, Page):
     author = models.CharField(max_length=255)
     date = models.DateField("Post date")
     advert = models.ForeignKey(
-        'home.Advert',
+        "home.Advert",
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
-        related_name='+'
+        related_name="+",
     )
     cover = models.ForeignKey(
-        'wagtailimages.Image',
+        "wagtailimages.Image",
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
-        related_name='+'
+        related_name="+",
     )
     book_file = models.ForeignKey(
-        'wagtaildocs.Document',
+        "wagtaildocs.Document",
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
-        related_name='+'
+        related_name="+",
     )
     featured_media = models.ForeignKey(
-        'wagtailmedia.Media',
+        "wagtailmedia.Media",
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
-        related_name='+'
+        related_name="+",
     )
     body = StreamField(StreamFieldBlock())
 
     content_panels = Page.content_panels + [
         FieldPanel("author"),
         FieldPanel("date"),
-        ImageChooserPanel('cover'),
+        ImageChooserPanel("cover"),
         StreamFieldPanel("body"),
-        InlinePanel('related_links', label="Related links"),
-        SnippetChooserPanel('advert'),
-        DocumentChooserPanel('book_file'),
-        MediaChooserPanel('featured_media'),
+        InlinePanel("related_links", label="Related links"),
+        SnippetChooserPanel("advert"),
+        DocumentChooserPanel("book_file"),
+        MediaChooserPanel("featured_media"),
     ]
 
     graphql_fields = [
@@ -85,27 +85,21 @@ class BlogPage(GrapplePageMixin, Page):
         GraphQLString("author"),
         GraphQLStreamfield("body"),
         GraphQLForeignKey("related_links", "home.blogpagerelatedlink", True),
-        GraphQLSnippet('advert', 'home.Advert'),
-        GraphQLImage('cover'),
-        GraphQLDocument('book_file'),
-        GraphQLMedia('featured_media'),
+        GraphQLSnippet("advert", "home.Advert"),
+        GraphQLImage("cover"),
+        GraphQLDocument("book_file"),
+        GraphQLMedia("featured_media"),
     ]
 
 
 class BlogPageRelatedLink(Orderable):
-    page = ParentalKey(BlogPage, on_delete=models.CASCADE, related_name='related_links')
+    page = ParentalKey(BlogPage, on_delete=models.CASCADE, related_name="related_links")
     name = models.CharField(max_length=255)
     url = models.URLField()
 
-    panels = [
-        FieldPanel('name'),
-        FieldPanel('url'),
-    ]
+    panels = [FieldPanel("name"), FieldPanel("url")]
 
-    graphql_fields = [
-        GraphQLString('name'),
-        GraphQLString('url'),
-    ]
+    graphql_fields = [GraphQLString("name"), GraphQLString("url")]
 
 
 @register_snippet
@@ -113,34 +107,26 @@ class Advert(models.Model):
     url = models.URLField(null=True, blank=True)
     text = models.CharField(max_length=255)
 
-    panels = [
-        FieldPanel('url'),
-        FieldPanel('text'),
-    ]
+    panels = [FieldPanel("url"), FieldPanel("text")]
 
-    graphql_fields = [
-        GraphQLString('url'),
-        GraphQLString('text')
-    ]
+    graphql_fields = [GraphQLString("url"), GraphQLString("text")]
 
     def __str__(self):
         return self.text
-        
+
 
 @register_setting
 class SocialMediaSettings(BaseSetting):
-    facebook = models.URLField(
-        help_text='Your Facebook page URL')
+    facebook = models.URLField(help_text="Your Facebook page URL")
     instagram = models.CharField(
-        max_length=255, help_text='Your Instagram username, without the @')
-    trip_advisor = models.URLField(
-        help_text='Your Trip Advisor page URL')
-    youtube = models.URLField(
-        help_text='Your YouTube channel or user account URL')
+        max_length=255, help_text="Your Instagram username, without the @"
+    )
+    trip_advisor = models.URLField(help_text="Your Trip Advisor page URL")
+    youtube = models.URLField(help_text="Your YouTube channel or user account URL")
 
     graphql_fields = [
-        GraphQLString('facebook'),
-        GraphQLString('instagram'),
-        GraphQLString('trip_advisor'),
-        GraphQLString('youtube'),
+        GraphQLString("facebook"),
+        GraphQLString("instagram"),
+        GraphQLString("trip_advisor"),
+        GraphQLString("youtube"),
     ]

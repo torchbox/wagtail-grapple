@@ -6,22 +6,34 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('home', '0004_auto_20190623_0932'),
-    ]
+    dependencies = [("home", "0004_auto_20190623_0932")]
 
     operations = [
         migrations.CreateModel(
-            name='Advert',
+            name="Advert",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('url', models.URLField(blank=True, null=True)),
-                ('text', models.CharField(max_length=255)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("url", models.URLField(blank=True, null=True)),
+                ("text", models.CharField(max_length=255)),
             ],
         ),
         migrations.AddField(
-            model_name='blogpage',
-            name='advert',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to='home.Advert'),
+            model_name="blogpage",
+            name="advert",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="+",
+                to="home.Advert",
+            ),
         ),
     ]

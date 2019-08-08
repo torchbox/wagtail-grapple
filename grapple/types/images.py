@@ -1,4 +1,5 @@
 import os
+import codecs
 import urllib.parse
 import graphene
 
@@ -96,7 +97,7 @@ class ImageObjectType(DjangoObjectType):
         as background image while actual image is downloaded via network.
         """
         svg_trace_image = (
-            settings.BASE_DIR + os.path.splitext(self.file.url)[0] + "-traced.svgz"
+            settings.BASE_DIR + os.path.splitext(self.file.url)[0] + "-traced.svg"
         )
         if not os.path.isfile(svg_trace_image):
             temp_image = convert_image_to_bmp(self.file.path)

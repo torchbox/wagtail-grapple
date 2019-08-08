@@ -57,3 +57,11 @@ jobs:
       - store_artifacts:
           path: test-reports
           destination: test-reports
+
+# Define the workflows
+workflows:
+  version: 2
+  standard:
+    jobs:
+      - black
+      - build

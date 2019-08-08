@@ -36,7 +36,7 @@ def import_apps():
         cls = streamfield_type["cls"]
         base_type = streamfield_type["base_type"]
 
-        if hasattr(cls, 'graphql_types'):
+        if hasattr(cls, "graphql_types"):
             base_type = generate_streamfield_union(cls.graphql_types)
 
         node_type = build_streamfield_type(
@@ -153,10 +153,13 @@ def build_node_type(
 
     return type(type_name, (base_type,), type_meta)
 
+
 def convert_to_underscore(name):
     import re
-    s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
-    return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
+
+    s1 = re.sub("(.)([A-Z][a-z]+)", r"\1_\2", name)
+    return re.sub("([a-z0-9])([A-Z])", r"\1_\2", s1).lower()
+
 
 def streamfield_resolver(self, instance, info, **kwargs):
     field_name = convert_to_underscore(info.field_name)
@@ -167,6 +170,7 @@ def streamfield_resolver(self, instance, info, **kwargs):
         return block.to_python(value)
 
     return value
+
 
 def build_streamfield_type(
     cls: type,
@@ -180,14 +184,12 @@ def build_streamfield_type(
     """
     # Create a new blank node type
     class Meta:
-        if hasattr(cls, 'graphql_types'):
+        if hasattr(cls, "graphql_types"):
             types = [
-                registry.streamfield_blocks.get(block)
-                for block in cls.graphql_types
+                registry.streamfield_blocks.get(block) for block in cls.graphql_types
             ]
         else:
             interfaces = (interface,) if interface is not None else tuple()
-        
 
     methods = {}
     type_name = type_prefix + cls.__name__

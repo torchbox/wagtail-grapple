@@ -84,6 +84,7 @@ def generate_streamfield_union(graphql_types):
 
     return StreamfieldUnion
 
+
 class StructBlockItem:
     id = None
     block = None
@@ -129,13 +130,14 @@ class StructBlock(graphene.ObjectType):
         interfaces = (StreamFieldInterface,)
 
     blocks = graphene.List(StreamFieldInterface)
+
     def resolve_blocks(self, info, **kwargs):
         stream_blocks = []
         for name, value in self.value.items():
             block = self.block.child_blocks[name]
             if not issubclass(type(block), blocks.StreamBlock):
                 value = block.to_python(value)
-            
+
             stream_blocks.append(StructBlockItem(name, block, value))
         return stream_blocks
 
@@ -150,7 +152,7 @@ class StreamBlock(StructBlock):
             block = self.value.stream_block.child_blocks[field["type"]]
             if not issubclass(type(block), blocks.StructBlock):
                 value = block.to_python(field["value"])
-            
+
             stream_blocks.append(StructBlockItem(field["type"], block, field["value"]))
         return stream_blocks
 
@@ -297,7 +299,7 @@ class EmbedBlock(graphene.ObjectType):
         interfaces = (StreamFieldInterface,)
 
     def resolve_url(self, info, **kwargs):
-        if hasattr(self, 'value'):
+        if hasattr(self, "value"):
             return self.value.url
         return self.url
 

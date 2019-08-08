@@ -67,7 +67,7 @@ class ImageObjectType(DjangoObjectType):
         """
         Get url of the original uploaded image.
         """
-        if (self.file.url[0] == '/'):
+        if self.file.url[0] == "/":
             return settings.BASE_URL + self.file.url
         return self.file.url
 
@@ -102,8 +102,10 @@ class ImageObjectType(DjangoObjectType):
         if not os.path.isfile(svg_trace_image):
             temp_image = convert_image_to_bmp(self.file.path)
             trace_bitmap(temp_image, svg_trace_image)
-        
-        with codecs.open(svg_trace_image, 'r', encoding='utf-8', errors='ignore') as svgFile:
+
+        with codecs.open(
+            svg_trace_image, "r", encoding="utf-8", errors="ignore"
+        ) as svgFile:
             file = "data:image/svg+xml," + urllib.parse.quote(svgFile.read())
 
         return file

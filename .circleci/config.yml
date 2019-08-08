@@ -14,7 +14,7 @@ jobs:
       - checkout
       - run:
           name: Install Black
-          command: pip install black
+          command: sudo pip install black
       - run:
           name: Check files are formatted with Black.
           command: black ./

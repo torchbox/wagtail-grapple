@@ -1,11 +1,13 @@
 from django.db import models
 
-from wagtail.images.models import AbstractImage, AbstractRendition
+from wagtail.images.models import Image, AbstractImage, AbstractRendition
 
-from grapple.models import GraphQLString
+from grapple.models import GraphQLString, GraphQLInt, GraphQLImage
 
 
 class CustomImage(AbstractImage):
+    admin_form_fields = Image.admin_form_fields
+
     def custom_image_property():
         return 'Image Model!'
 
@@ -27,4 +29,10 @@ class CustomImageRendition(AbstractRendition):
 
     graphql_fields = (
         GraphQLString("custom_rendition_property"),
+        GraphQLString("id"),
+        GraphQLString("url"),
+        GraphQLString("width"),
+        GraphQLString("height"),
+        GraphQLImage("image"),
+        GraphQLString("file")
     )   

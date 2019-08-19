@@ -63,7 +63,7 @@ class ImageRenditionObjectType(DjangoObjectType, BaseImageObjectType):
 
 def get_rendition_type():
     rendition_mdl = get_image_model().renditions.rel.related_model
-    rendition_type = registry.models.get(rendition_mdl, ImageRenditionObjectType)
+    rendition_type = registry.images.get(rendition_mdl, ImageRenditionObjectType)
     return rendition_type
 
 
@@ -91,8 +91,9 @@ class ImageObjectType(DjangoObjectType, BaseImageObjectType):
         """
         filters = "|".join([f"{key}-{val}" for key, val in kwargs.items()])
         img = self.get_rendition(filters)
+        rendition_type = get_rendition_type()
 
-        return ImageRenditionObjectType(
+        return rendition_type(
             id=img.id,
             url=img.url,
             width=img.width,

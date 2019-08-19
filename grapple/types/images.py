@@ -24,6 +24,8 @@ def get_image_url(cls):
 
 
 class BaseImageObjectType(graphene.ObjectType):
+    width = graphene.Int()
+    height = graphene.Int()
     src = graphene.String()
     aspect_ratio = graphene.Float()
     sizes = graphene.String()
@@ -51,8 +53,6 @@ class BaseImageObjectType(graphene.ObjectType):
 class ImageRenditionObjectType(DjangoObjectType, BaseImageObjectType):
     id = graphene.ID()
     url = graphene.String()
-    width = graphene.Int()
-    height = graphene.Int()
 
     class Meta:
         model = WagtailImageRendition
@@ -109,14 +109,23 @@ class ImageObjectType(DjangoObjectType, BaseImageObjectType):
         """
         Generate src set of renditions.
         """
-        rendition_list = [
-            ImageObjectType.resolve_rendition(self, info, width=width)
-            for width in sizes
-        ]
+        try:
+            if self.file.name is not None:
+                rendition_list = [
+                    ImageObjectType.resolve_rendition(self, info, width=width)
+                    for width in sizes
+                ]
 
-        return ", ".join(
-            [f"{settings.BASE_URL + img.url} {img.width}w" for img in rendition_list]
-        )
+                return ", ".join(
+                    [
+                        f"{settings.BASE_URL + img.url} {img.width}w"
+                        for img in rendition_list
+                    ]
+                )
+        except:
+            pass
+
+        return ""
 
 
 def get_image_type():

@@ -130,9 +130,14 @@ def ImagesQuery():
 
     class Mixin:
         images = QuerySetList(mdl_type, enable_search=True)
+        image_type = graphene.String()
 
         # Return all pages, ideally specific.
         def resolve_images(self, info, **kwargs):
             return resolve_queryset(mdl.objects.all(), info, **kwargs)
+
+        # Give name of the image type, used to generate mixins
+        def resolve_image_type(self, info, **kwargs):
+            return get_image_type()
 
     return Mixin

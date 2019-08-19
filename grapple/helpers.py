@@ -29,3 +29,8 @@ def register_streamfield_block(cls):
     )
 
     return cls
+
+
+def register_graphql_schema(schema_cls):
+    registry.schema.append(schema_cls)
+    return schema_cls

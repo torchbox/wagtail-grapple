@@ -1,29 +1,6 @@
 import graphene
 from graphql.validation.rules import NoUnusedFragments, specified_rules
 
-from .actions import import_apps
-from .registry import registry
-from .types.documents import DocumentsQuery
-from .types.images import ImagesQuery
-from .types.pages import PagesQuery, PagesSubscription
-from .types.search import SearchQuery
-from .types.settings import SettingsQuery
-from .types.snippets import SnippetsQuery
-from .types.streamfield import register_streamfield_blocks
-
-"""	
-Import all the django apps defined in django settings then process each model	
-in these apps and create graphql node types from them.	
-"""
-import_apps()
-register_streamfield_blocks()
-
-
-"""
-Root schema object that graphene is pointed at.
-It inherits its queries from each of the specific type mixins.
-"""
-
 # HACK: Remove NoUnusedFragments validator
 # Due to the way previews work on the frontend, we need to pass all
 # fragments into the query even if they're not used.
@@ -37,22 +14,47 @@ It inherits its queries from each of the specific type mixins.
 specified_rules[:] = [rule for rule in specified_rules if rule is not NoUnusedFragments]
 
 
-class Query(
-    graphene.ObjectType,
-    PagesQuery(),
-    ImagesQuery(),
-    DocumentsQuery(),
-    SnippetsQuery(),
-    SettingsQuery(),
-    SearchQuery(),
-):
-    pass
+def create_schema():
+    """
+    Root schema object that graphene is pointed at.
+    It inherits its queries from each of the specific type mixins.
+    """
+
+    from .actions import import_apps
+    from .registry import registry
+    from .types.documents import DocumentsQuery
+    from .types.images import ImagesQuery
+    from .types.pages import PagesQuery, PagesSubscription
+    from .types.search import SearchQuery
+    from .types.settings import SettingsQuery
+    from .types.snippets import SnippetsQuery
+    from .types.streamfield import register_streamfield_blocks
+
+    """	
+    Import all the django apps defined in django settings then process each model	
+    in these apps and create graphql node types from them.	
+    """
+    import_apps()
+    register_streamfield_blocks()
+
+    class Query(
+        graphene.ObjectType,
+        PagesQuery(),
+        ImagesQuery(),
+        DocumentsQuery(),
+        SnippetsQuery(),
+        SettingsQuery(),
+        SearchQuery(),
+        *registry.schema,
+    ):
+        pass
+
+    class Subscription(PagesSubscription(), graphene.ObjectType):
+        pass
+
+    return graphene.Schema(
+        query=Query, types=list(registry.models.values()), subscription=Subscription
+    )
 
 
-class Subscription(PagesSubscription(), graphene.ObjectType):
-    pass
-
-
-schema = graphene.Schema(
-    query=Query, types=list(registry.models.values()), subscription=Subscription
-)
+schema = create_schema()

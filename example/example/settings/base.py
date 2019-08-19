@@ -25,6 +25,7 @@ BASE_DIR = os.path.dirname(PROJECT_DIR)
 
 INSTALLED_APPS = [
     "home",
+    "images",
     "search",
     "wagtail.contrib.forms",
     "wagtail.contrib.redirects",
@@ -151,6 +152,7 @@ MEDIA_URL = "/media/"
 # Wagtail settings
 
 WAGTAIL_SITE_NAME = "example"
+WAGTAILIMAGES_IMAGE_MODEL = "images.CustomImage"
 
 # Base URL to use when referring to full URLs within the Wagtail admin backend -
 # e.g. in notification emails. Don't include '/admin' or a trailing slash
@@ -160,7 +162,10 @@ CORS_ORIGIN_ALLOW_ALL = True
 
 # Grapple Config:
 GRAPHENE = {"SCHEMA": "grapple.schema.schema"}
-GRAPPLE_APPS = {"home": ""}
+GRAPPLE_APPS = {
+    "images": "",
+    "home": "",
+}
 GRAPPLE_ADD_SEARCH_HIT = True
 
 ASGI_APPLICATION = "asgi.channel_layer"

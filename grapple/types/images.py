@@ -5,6 +5,7 @@ import graphene
 
 from django.conf import settings
 from graphene_django import DjangoObjectType
+from wagtail.images import get_image_model
 from wagtail.images.models import (
     Image as WagtailImage,
     Rendition as WagtailImageRendition,
@@ -58,10 +59,14 @@ class ImageRenditionObjectType(DjangoObjectType, BaseImageObjectType):
     def resolve_image(self, info, **kwargs):
         return self.image
 
+def get_rendition_type():
+    rendition_mdl = get_image_model().renditions.rel.related_model
+    rendition_type = registry.models.get(rendition_mdl, ImageRenditionObjectType)
+    return rendition_type
 
 class ImageObjectType(DjangoObjectType, BaseImageObjectType):
     rendition = graphene.Field(
-        ImageRenditionObjectType,
+        lambda: get_rendition_type(),
         max=graphene.String(),
         min=graphene.String(),
         width=graphene.Int(),
@@ -107,25 +112,19 @@ class ImageObjectType(DjangoObjectType, BaseImageObjectType):
             [f"{settings.BASE_URL + img.url} {img.width}w" for img in rendition_list]
         )
 
-def ImagesQuery():
-    from wagtail.images import get_image_model
-
-    registry.images[WagtailImage] = ImageObjectType
+def get_image_type():
     mdl = get_image_model()
-    model_type = registry.images[mdl]
+    return registry.images.get(mdl, ImageObjectType)
 
+def ImagesQuery():
+    mdl = get_image_model()
+    mdl_type = get_image_type()
+    
     class Mixin:
-        images = QuerySetList(model_type, enable_search=True)
+        images = QuerySetList(mdl_type, enable_search=True)
 
         # Return all pages, ideally specific.
         def resolve_images(self, info, **kwargs):
             return resolve_queryset(mdl.objects.all(), info, **kwargs)
 
     return Mixin
-
-def get_image_type():
-    from wagtail.images import get_image_model
-
-    registry.images[WagtailImage] = ImageObjectType
-    mdl = get_image_model()
-    return registry.images[mdl]

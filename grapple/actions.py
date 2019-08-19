@@ -112,7 +112,9 @@ def get_fields_and_properties(cls):
 def model_resolver(field_source):
     def mixin(self, instance, info, **kwargs):
         return getattr(instance, field_source)
+
     return mixin
+
 
 def build_node_type(
     cls: type,
@@ -153,8 +155,10 @@ def build_node_type(
             if field.field_type is not None:
                 type_meta[field.field_name] = field.field_type
 
-            if hasattr(field, 'field_source'):
-                methods["resolve_" + field.field_name] = model_resolver(field.field_source)
+            if hasattr(field, "field_source"):
+                methods["resolve_" + field.field_name] = model_resolver(
+                    field.field_source
+                )
 
     # Set excluded fields to stop errors cropping up from unsupported field
     # types.

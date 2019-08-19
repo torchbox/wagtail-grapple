@@ -17,10 +17,11 @@ from .structures import QuerySetList
 
 
 def get_image_url(cls):
-    if hasattr(cls, 'url'):
+    if hasattr(cls, "url"):
         return cls.url
 
     return cls.file.url
+
 
 class BaseImageObjectType(graphene.ObjectType):
     src = graphene.String()
@@ -33,7 +34,7 @@ class BaseImageObjectType(graphene.ObjectType):
         """
         url = get_image_url(self)
 
-        if (url[0] == '/'):
+        if url[0] == "/":
             return settings.BASE_URL + url
         return url
 
@@ -59,10 +60,12 @@ class ImageRenditionObjectType(DjangoObjectType, BaseImageObjectType):
     def resolve_image(self, info, **kwargs):
         return self.image
 
+
 def get_rendition_type():
     rendition_mdl = get_image_model().renditions.rel.related_model
     rendition_type = registry.models.get(rendition_mdl, ImageRenditionObjectType)
     return rendition_type
+
 
 class ImageObjectType(DjangoObjectType, BaseImageObjectType):
     rendition = graphene.Field(
@@ -78,7 +81,6 @@ class ImageObjectType(DjangoObjectType, BaseImageObjectType):
     )
     src_set = graphene.String(sizes=graphene.List(graphene.Int))
 
-
     class Meta:
         model = WagtailImage
         exclude_fields = ("tags",)
@@ -91,12 +93,12 @@ class ImageObjectType(DjangoObjectType, BaseImageObjectType):
         img = self.get_rendition(filters)
 
         return ImageRenditionObjectType(
-            id=img.id, 
-            url=img.url, 
-            width=img.width, 
+            id=img.id,
+            url=img.url,
+            width=img.width,
             height=img.height,
             file=img.file,
-            image=self
+            image=self,
         )
 
     def resolve_src_set(self, info, sizes, **kwargs):
@@ -112,14 +114,16 @@ class ImageObjectType(DjangoObjectType, BaseImageObjectType):
             [f"{settings.BASE_URL + img.url} {img.width}w" for img in rendition_list]
         )
 
+
 def get_image_type():
     mdl = get_image_model()
     return registry.images.get(mdl, ImageObjectType)
 
+
 def ImagesQuery():
     mdl = get_image_model()
     mdl_type = get_image_type()
-    
+
     class Mixin:
         images = QuerySetList(mdl_type, enable_search=True)
 

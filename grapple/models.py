@@ -27,7 +27,7 @@ class GraphQLField:
             self.field_type = field_type
         if field_type:
             self.field_type.source = field_name
-        self.field_source = kwargs.get('source', field_name)
+        self.field_source = kwargs.get("source", field_name)
 
 
 def GraphQLString(field_name: str, **kwargs):

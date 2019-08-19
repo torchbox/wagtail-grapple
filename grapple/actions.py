@@ -9,7 +9,7 @@ from wagtail.contrib.settings.models import BaseSetting
 from wagtail.core.models import Page as WagtailPage
 from wagtail.core.blocks import BaseBlock, RichTextBlock
 from wagtail.documents.models import AbstractDocument
-from wagtail.images.models import AbstractImage
+from wagtail.images.models import AbstractImage, AbstractRendition
 from wagtail.images.blocks import ImageChooserBlock
 from wagtail.snippets.models import get_snippet_models
 from graphene_django.types import DjangoObjectType
@@ -82,12 +82,12 @@ def register_model(cls: type, type_prefix: str):
             register_documment_model(cls, type_prefix)
         elif issubclass(cls, AbstractImage):
             register_image_model(cls, type_prefix)
+        elif issubclass(cls, AbstractRendition):
+            register_image_model(cls, type_prefix)
         elif issubclass(cls, BaseSetting):
             register_settings_model(cls, type_prefix)
         elif cls in get_snippet_models():
             register_snippet_model(cls, type_prefix)
-        elif issubclass(cls, BaseBlock):
-            register_streamfield_model(cls, type_prefix)
         else:
             register_django_model(cls, type_prefix)
 
@@ -283,8 +283,27 @@ def register_image_model(cls: Type[AbstractImage], type_prefix: str):
     if cls in registry.images:
         return
 
-    # Create a GQL type derived from document model.
+    # Create a GQL type derived from image model.
     image_node_type = build_node_type(cls, type_prefix, None, ImageObjectType)
+
+    # Add image type to registry.
+    if image_node_type:
+        registry.images[cls] = image_node_type
+
+
+def register_image_rendition_model(cls: Type[AbstractRendition], type_prefix: str):
+    """
+    Create a graphene node type for a model than inherits from AbstractImage.
+    Only one model will actually be generated because a default image model
+    needs to be set in settings.
+    """
+
+    # Avoid gql type duplicates
+    if cls in registry.images:
+        return
+
+    # Create a GQL type derived from image rendition model.
+    image_node_type = build_node_type(cls, type_prefix, None, AbstractRendition)
 
     # Add image type to registry.
     if image_node_type:

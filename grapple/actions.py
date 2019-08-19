@@ -109,6 +109,13 @@ def get_fields_and_properties(cls):
     return fields + properties
 
 
+def model_resolver(field_source):
+    def mixin(self, instance, info, **kwargs):
+        return getattr(instance, field_source)
+
+    return mixin
+
+
 def build_node_type(
     cls: type,
     type_prefix: str,
@@ -127,6 +134,7 @@ def build_node_type(
         interfaces = (interface,) if interface is not None else tuple()
         exclude_fields = tuple()
 
+    methods = {}
     type_meta = {"Meta": Meta}
     type_meta.update({"id": graphene.ID()})
 
@@ -147,11 +155,20 @@ def build_node_type(
             if field.field_type is not None:
                 type_meta[field.field_name] = field.field_type
 
+            if hasattr(field, "field_source"):
+                methods["resolve_" + field.field_name] = model_resolver(
+                    field.field_source
+                )
+
     # Set excluded fields to stop errors cropping up from unsupported field
     # types.
     type_meta["Meta"].exclude_fields = exclude_fields
+    graphql_node = type(type_name, (base_type,), type_meta)
 
-    return type(type_name, (base_type,), type_meta)
+    for name, method in methods.items():
+        setattr(graphql_node, name, MethodType(method, graphql_node))
+
+    return graphql_node
 
 
 def convert_to_underscore(name):

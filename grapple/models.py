@@ -17,8 +17,9 @@ from .signals import preview_update
 class GraphQLField:
     field_name: str
     field_type: str
+    field_source: str
 
-    def __init__(self, field_name: str, field_type: type = None):
+    def __init__(self, field_name: str, field_type: type = None, **kwargs):
         self.field_name = field_name
         if callable(field_type):
             self.field_type = field_type()
@@ -26,11 +27,12 @@ class GraphQLField:
             self.field_type = field_type
         if field_type:
             self.field_type.source = field_name
+        self.field_source = kwargs.get("source", field_name)
 
 
-def GraphQLString(field_name: str):
+def GraphQLString(field_name: str, **kwargs):
     def Mixin():
-        return GraphQLField(field_name, graphene.String)
+        return GraphQLField(field_name, graphene.String, **kwargs)
 
     return Mixin
 

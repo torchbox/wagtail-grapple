@@ -24,6 +24,8 @@ def get_image_url(cls):
 
 
 class BaseImageObjectType(graphene.ObjectType):
+    width = graphene.Int()
+    height = graphene.Int()
     src = graphene.String()
     aspect_ratio = graphene.Float()
     sizes = graphene.String()
@@ -51,8 +53,6 @@ class BaseImageObjectType(graphene.ObjectType):
 class ImageRenditionObjectType(DjangoObjectType, BaseImageObjectType):
     id = graphene.ID()
     url = graphene.String()
-    width = graphene.Int()
-    height = graphene.Int()
 
     class Meta:
         model = WagtailImageRendition

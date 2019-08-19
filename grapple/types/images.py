@@ -91,8 +91,9 @@ class ImageObjectType(DjangoObjectType, BaseImageObjectType):
         """
         filters = "|".join([f"{key}-{val}" for key, val in kwargs.items()])
         img = self.get_rendition(filters)
+        rendition_type = get_rendition_type()
 
-        return ImageRenditionObjectType(
+        return rendition_type(
             id=img.id,
             url=img.url,
             width=img.width,

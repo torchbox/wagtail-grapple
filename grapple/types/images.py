@@ -109,14 +109,20 @@ class ImageObjectType(DjangoObjectType, BaseImageObjectType):
         """
         Generate src set of renditions.
         """
-        rendition_list = [
-            ImageObjectType.resolve_rendition(self, info, width=width)
-            for width in sizes
-        ]
+        try:
+            if self.file.name is not None:
+                rendition_list = [
+                    ImageObjectType.resolve_rendition(self, info, width=width)
+                    for width in sizes
+                ]
 
-        return ", ".join(
-            [f"{settings.BASE_URL + img.url} {img.width}w" for img in rendition_list]
-        )
+                return ", ".join(
+                    [f"{settings.BASE_URL + img.url} {img.width}w" for img in rendition_list]
+                )
+        except:
+            pass
+        
+        return ""
 
 
 def get_image_type():

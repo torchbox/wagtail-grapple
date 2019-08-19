@@ -14,6 +14,9 @@ class Registry:
     django_models = RegistryItem()
     settings = RegistryItem()
 
+    # Internal use only, do not add to .models method
+    schema = []
+
     @property
     def search_models(self) -> dict:
         models: dict = {}

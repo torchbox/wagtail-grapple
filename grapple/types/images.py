@@ -117,11 +117,14 @@ class ImageObjectType(DjangoObjectType, BaseImageObjectType):
                 ]
 
                 return ", ".join(
-                    [f"{settings.BASE_URL + img.url} {img.width}w" for img in rendition_list]
+                    [
+                        f"{settings.BASE_URL + img.url} {img.width}w"
+                        for img in rendition_list
+                    ]
                 )
         except:
             pass
-        
+
         return ""
 
 

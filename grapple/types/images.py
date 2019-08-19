@@ -63,7 +63,7 @@ class ImageRenditionObjectType(DjangoObjectType, BaseImageObjectType):
 
 def get_rendition_type():
     rendition_mdl = get_image_model().renditions.rel.related_model
-    rendition_type = registry.models.get(rendition_mdl, ImageRenditionObjectType)
+    rendition_type = registry.images.get(rendition_mdl, ImageRenditionObjectType)
     return rendition_type
 
 

@@ -17,10 +17,15 @@ from .structures import QuerySetList
 
 
 def get_image_url(cls):
+    url = ""
     if hasattr(cls, "url"):
-        return cls.url
+        url = cls.url
+    else:
+        url = cls.file.url
 
-    return cls.file.url
+    if url[0] == "/":
+        return settings.BASE_URL + url
+    return url
 
 
 class BaseImageObjectType(graphene.ObjectType):
@@ -34,11 +39,7 @@ class BaseImageObjectType(graphene.ObjectType):
         """
         Get url of the original uploaded image.
         """
-        url = get_image_url(self)
-
-        if url[0] == "/":
-            return settings.BASE_URL + url
-        return url
+        return get_image_url(self)
 
     def resolve_aspect_ratio(self, info, **kwargs):
         """
@@ -117,10 +118,7 @@ class ImageObjectType(DjangoObjectType, BaseImageObjectType):
                 ]
 
                 return ", ".join(
-                    [
-                        f"{settings.BASE_URL + img.url} {img.width}w"
-                        for img in rendition_list
-                    ]
+                    [f"{get_image_url(img)} {img.width}w" for img in rendition_list]
                 )
         except:
             pass

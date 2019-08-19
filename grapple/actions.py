@@ -275,7 +275,7 @@ def register_documment_model(cls: Type[AbstractDocument], type_prefix: str):
 def register_image_model(cls: Type[AbstractImage], type_prefix: str):
     """
     Create a graphene node type for a model than inherits from AbstractImage.
-    Only one model will actually be generated because a default image model
+    Only one type will actually be generated because a default image model
     needs to be set in settings.
     """
 
@@ -293,8 +293,8 @@ def register_image_model(cls: Type[AbstractImage], type_prefix: str):
 
 def register_image_rendition_model(cls: Type[AbstractRendition], type_prefix: str):
     """
-    Create a graphene node type for a model than inherits from AbstractImage.
-    Only one model will actually be generated because a default image model
+    Create a graphene node type for a model than inherits from AbstractImageRendition.
+    Only one type will actually be generated because a default image model
     needs to be set in settings.
     """
 

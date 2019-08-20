@@ -71,7 +71,7 @@ Your next step is to subclass any Page models you want headless preview on with
 
     from wagtail_headless_preview.models import HeadlessPreviewMixin
 
-    class HeadlessPreviewMixin(GrapplePageMixin, Page):
+    class BlogPage(HeadlessPreviewMixin, Page):
         author = models.CharField(max_length=255)
         date = models.DateField("Post date")
         advert = models.ForeignKey(

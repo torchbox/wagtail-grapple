@@ -1,16 +1,8 @@
 import graphene
-import datetime
-import urllib
-import json
 
-from django.db import models
-from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
-from django.core.signing import TimestampSigner
-from django.shortcuts import render
 
 from .registry import registry
-from .signals import preview_update
 
 
 # Classes used to define what the Django field should look like in the GQL type

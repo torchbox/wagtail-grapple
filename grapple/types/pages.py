@@ -1,12 +1,12 @@
 import graphene
 from django.contrib.contenttypes.models import ContentType
 from wagtail.core.models import Page as WagtailPage
+from wagtail_headless_preview.signals import preview_update
 from graphene_django.types import DjangoObjectType
 from graphql.execution.base import ResolveInfo
 from rx.subjects import Subject
 from django.dispatch import receiver
 
-from ..signals import preview_update
 from ..registry import registry
 from ..utils import resolve_queryset
 from .structures import QuerySetList

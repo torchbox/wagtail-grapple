@@ -117,8 +117,6 @@ class Page(DjangoObjectType):
 
 
 def get_specific_page(id, slug, token, content_type=None):
-    from ..models import PagePreview
-
     """
     Get a spcecific page, also get preview if token is passed
     """

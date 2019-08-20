@@ -6,5 +6,3 @@ black==19.3b0
 
 # Your app in editable mode.
 -e ../
-
-django-cors-headers

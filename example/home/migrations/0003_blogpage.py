@@ -2,13 +2,13 @@
 
 from django.db import migrations, models
 import django.db.models.deletion
-import grapple.models
 import wagtail.core.blocks
 import wagtail.core.blocks.static_block
 import wagtail.core.fields
 import wagtail.documents.blocks
 import wagtail.embeds.blocks
 import wagtail.images.blocks
+import wagtail_headless_preview.models
 
 
 class Migration(migrations.Migration):
@@ -136,6 +136,6 @@ class Migration(migrations.Migration):
                 ),
             ],
             options={"abstract": False},
-            bases=(grapple.models.GrapplePageMixin, "wagtailcore.page"),
+            bases=(wagtail_headless_preview.models.HeadlessPreviewMixin, "wagtailcore.page"),
         )
     ]

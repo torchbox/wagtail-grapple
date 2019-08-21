@@ -9,11 +9,9 @@ class CustomImage(AbstractImage):
     admin_form_fields = Image.admin_form_fields
 
     def custom_image_property():
-        return 'Image Model!'
+        return "Image Model!"
 
-    graphql_fields = (
-        GraphQLString("custom_image_property"),
-    )
+    graphql_fields = (GraphQLString("custom_image_property"),)
 
 
 class CustomImageRendition(AbstractRendition):
@@ -25,7 +23,7 @@ class CustomImageRendition(AbstractRendition):
         unique_together = (("image", "filter_spec", "focal_point_key"),)
 
     def custom_rendition_property():
-        return 'Rendition Model!'
+        return "Rendition Model!"
 
     graphql_fields = (
         GraphQLString("custom_rendition_property"),
@@ -34,5 +32,5 @@ class CustomImageRendition(AbstractRendition):
         GraphQLString("width"),
         GraphQLString("height"),
         GraphQLImage("image"),
-        GraphQLString("file")
-    )   
+        GraphQLString("file"),
+    )

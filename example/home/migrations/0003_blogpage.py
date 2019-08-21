@@ -136,6 +136,9 @@ class Migration(migrations.Migration):
                 ),
             ],
             options={"abstract": False},
-            bases=(wagtail_headless_preview.models.HeadlessPreviewMixin, "wagtailcore.page"),
+            bases=(
+                wagtail_headless_preview.models.HeadlessPreviewMixin,
+                "wagtailcore.page",
+            ),
         )
     ]

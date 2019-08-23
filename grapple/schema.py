@@ -29,6 +29,7 @@ def create_schema():
     from .types.settings import SettingsQuery
     from .types.snippets import SnippetsQuery
     from .types.streamfield import register_streamfield_blocks
+    from .types.redirects import RedirectsQuery
 
     """	
     Import all the django apps defined in django settings then process each model	
@@ -45,6 +46,7 @@ def create_schema():
         SnippetsQuery(),
         SettingsQuery(),
         SearchQuery(),
+        RedirectsQuery,
         *registry.schema,
     ):
         pass

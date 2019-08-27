@@ -3,7 +3,7 @@
     <img src="https://github.com/torchbox/wagtail-grapple/raw/master/.github/wagtail-grapple.svg?sanitize=true" alt="A red g with a grapple hook" width="80" height="80">
   </a>
 
-  <h3 align="center">Wagtail Grapple <a href="https://pypi.org/project/wagtail-grapple/"><img src="https://img.shields.io/pypi/v/wagtail-grapple.svg"></a></h3>
+  <h3 align="center">Wagtail Grapple <a href="https://pypi.org/project/wagtail-grapple/"><img src="https://img.shields.io/pypi/v/wagtail-grapple.svg"></a> <a href="https://github.com/psf/black"><img src="https://img.shields.io/badge/code%20style-black-000000.svg"></a></h3>
 
   <p align="center">
     A library to build GraphQL endpoints easily so you can grapple your Wagtail data from anywhere!

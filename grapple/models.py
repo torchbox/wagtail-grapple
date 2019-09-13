@@ -1,5 +1,5 @@
 import graphene
-
+from django.apps import apps
 from django.contrib.contenttypes.models import ContentType
 
 from .registry import registry
@@ -29,23 +29,23 @@ def GraphQLString(field_name: str, **kwargs):
     return Mixin
 
 
-def GraphQLFloat(field_name: str):
+def GraphQLFloat(field_name: str, **kwargs):
     def Mixin():
-        return GraphQLField(field_name, graphene.Float)
+        return GraphQLField(field_name, graphene.Float, **kwargs)
 
     return Mixin
 
 
-def GraphQLInt(field_name: str):
+def GraphQLInt(field_name: str, **kwargs):
     def Mixin():
-        return GraphQLField(field_name, graphene.Int)
+        return GraphQLField(field_name, graphene.Int, **kwargs)
 
     return Mixin
 
 
-def GraphQLBoolean(field_name: str):
+def GraphQLBoolean(field_name: str, **kwargs):
     def Mixin():
-        return GraphQLField(field_name, graphene.Boolean)
+        return GraphQLField(field_name, graphene.Boolean, **kwargs)
 
     return Mixin
 
@@ -74,64 +74,61 @@ def GraphQLSnippet(
     return Mixin
 
 
-def GraphQLStreamfield(field_name: str):
+def GraphQLStreamfield(field_name: str, **kwargs):
     def Mixin():
         from .types.streamfield import StreamFieldInterface
 
-        return GraphQLField(field_name, graphene.List(StreamFieldInterface))
+        return GraphQLField(field_name, graphene.List(StreamFieldInterface), **kwargs)
 
     return Mixin
 
 
-def GraphQLImage(field_name: str):
+def GraphQLImage(field_name: str, **kwargs):
     def Mixin():
         from .types.images import get_image_type, ImageObjectType
 
-        return GraphQLField(field_name, graphene.Field(lambda: get_image_type()))
+        return GraphQLField(field_name, graphene.Field(lambda: get_image_type()), **kwargs)
 
     return Mixin
 
 
-def GraphQLDocument(field_name: str):
+def GraphQLDocument(field_name: str, **kwargs):
     from django.conf import settings
 
     document_type = "wagtaildocs.Document"
     if hasattr(settings, "WAGTAILDOCS_DOCUMENT_MODEL"):
         document_type = settings["WAGTAILDOCS_DOCUMENT_MODEL"]
 
-    return GraphQLForeignKey(field_name, document_type)
+    return GraphQLForeignKey(field_name, document_type, **kwargs)
 
 
-def GraphQLForeignKey(field_name, content_type, is_list=False):
-    class Mixin(GraphQLField):
-        def __init__(self):
-            from django.apps import apps
+def GraphQLForeignKey(field_name, content_type, is_list=False, **kwargs):
+    def Mixin():
+        field_type = None
 
-            field_type = None
+        if isinstance(content_type, str):
+            app_label, model = content_type.lower().split(".")
+            mdl = apps.get_model(app_label, model)
+            if mdl:
+                field_type = lambda: registry.models.get(mdl)
+        else:
+            field_type = lambda: registry.models.get(content_type)
 
-            if isinstance(content_type, str):
-                app_label, model = content_type.lower().split(".")
-                mdl = apps.get_model(app_label, model)
-                if mdl:
-                    field_type = lambda: registry.models.get(mdl)
-            else:
-                field_type = lambda: registry.models.get(content_type)
+        if field_type and is_list:
+            field_type = graphene.List(field_type)
+        elif field_type:
+            field_type = graphene.Field(field_type)
 
-            if field_type and is_list:
-                field_type = graphene.List(field_type)
-            elif field_type:
-                field_type = graphene.Field(field_type)
-
-            super().__init__(field_name, field_type)
-
+        return GraphQLField(field_name, field_type, **kwargs)
+        
     return Mixin
 
 
-def GraphQLMedia(field_name: str):
+def GraphQLMedia(field_name: str, **kwargs):
     def Mixin():
         from .types.media import MediaObjectType
 
-        return GraphQLField(field_name, MediaObjectType)
+        return GraphQLField(field_name, MediaObjectType, **kwargs)
 
     return Mixin
 
@@ -145,8 +142,8 @@ def GraphQLPage(field_name: str):
     return Mixin
 
 
-def GraphQLCollection(field_name: str, grapple_type):
+def GraphQLCollection(field_name: str, grapple_type, **kwargs):
     def Mixin():
-        return GraphQLField(field_name, graphene.List(grapple_type))
+        return GraphQLField(field_name, graphene.List(grapple_type), **kwargs)
 
     return Mixin

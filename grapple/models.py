@@ -143,3 +143,10 @@ def GraphQLPage(field_name: str):
         return GraphQLField(field_name, PageInterface)
     
     return Mixin
+
+
+def GraphQLCollection(field_name: str, grapple_type):
+    def Mixin():
+        return GraphQLField(field_name, graphene.List(grapple_type))
+
+    return Mixin

@@ -60,9 +60,10 @@ def GraphQLSnippet(
         mdl = apps.get_model(app_label, model)
 
         if mdl:
-            field_type = registry.snippets[mdl]
+            field_type = lambda: registry.snippets[mdl]
         else:
             field_type = graphene.String
+
         if field_type and is_list:
             field_type = graphene.List(field_type)
         elif field_type:
@@ -104,15 +105,17 @@ def GraphQLDocument(field_name: str):
 def GraphQLForeignKey(field_name, content_type, is_list=False):
     class Mixin(GraphQLField):
         def __init__(self):
+            from django.apps import apps
+
             field_type = None
 
             if isinstance(content_type, str):
                 app_label, model = content_type.lower().split(".")
-                mdl = ContentType.objects.get(app_label=app_label, model=model)
+                mdl = apps.get_model(app_label, model)
                 if mdl:
-                    field_type = registry.models.get(mdl.model_class())
+                    field_type = lambda: registry.models.get(mdl)
             else:
-                field_type = registry.models.get(content_type)
+                field_type = lambda: registry.models.get(content_type)
 
             if field_type and is_list:
                 field_type = graphene.List(field_type)

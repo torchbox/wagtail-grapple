@@ -80,6 +80,10 @@ class BlogPage(HeadlessPreviewMixin, Page):
         MediaChooserPanel("featured_media"),
     ]
 
+    @property
+    def copy(self):
+        return self
+
     graphql_fields = [
         GraphQLString("heading"),
         GraphQLString("date"),
@@ -90,6 +94,7 @@ class BlogPage(HeadlessPreviewMixin, Page):
         GraphQLImage("cover"),
         GraphQLDocument("book_file"),
         GraphQLMedia("featured_media"),
+        GraphQLForeignKey('copy', 'home.BlogPage')
     ]
 
 

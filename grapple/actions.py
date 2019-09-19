@@ -122,6 +122,11 @@ def model_resolver(field_source):
     return mixin
 
 
+# Create a tempory model and tempory node that will be replaced later on.
+class StudModel(models.Model):
+    pass
+
+
 def build_node_type(
     cls: type,
     type_prefix: str,
@@ -133,10 +138,6 @@ def build_node_type(
     with an interface. If it has custom fields then implmement them.
     """
     type_name = type_prefix + cls.__name__
-
-    # Create a tempory model and tempory node that will be replaced later on.
-    class StudModel(models.Model):
-        pass
 
     class StudMeta:
         model = StudModel

@@ -87,6 +87,10 @@ class BlogTest(BaseGrappleTest):
         )
         executed = self.client.execute(query)
 
+        # Print the error response
+        if not executed.get('data'):
+            print(executed)
+
         blocks = []
         for block in executed["data"]["page"]["body"]:
             if block["blockType"] == block_type:

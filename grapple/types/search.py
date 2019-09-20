@@ -7,11 +7,11 @@ from ..registry import registry
 
 
 def SearchQuery():
-    if registry.search_models:
+    if registry.class_models:
 
         class Search(graphene.Union):
             class Meta:
-                types = tuple(registry.search_models.values())
+                types = tuple(registry.class_models.values())
 
         class Mixin:
             search = graphene.List(Search, query=graphene.String())

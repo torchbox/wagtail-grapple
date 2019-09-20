@@ -50,16 +50,26 @@ def GraphQLBoolean(field_name: str):
     return Mixin
 
 
-def GraphQLSnippet(field_name: str, snippet_model: str):
-    class Mixin(GraphQLField):
-        def __init__(self):
-            (app_label, model) = snippet_model.lower().split(".")
-            mdl = ContentType.objects.get(app_label=app_label, model=model)
-            if mdl:
-                self.field_type = registry.snippets[mdl.model_class()]
-            else:
-                self.field_type = graphene.String
-            self.field_name = field_name
+def GraphQLSnippet(
+    field_name: str, snippet_model: str, is_list: bool = False, **kwargs
+):
+    def Mixin():
+        from django.apps import apps
+
+        (app_label, model) = snippet_model.lower().split(".")
+        mdl = apps.get_model(app_label, model)
+
+        if mdl:
+            field_type = lambda: registry.snippets[mdl]
+        else:
+            field_type = graphene.String
+
+        if field_type and is_list:
+            field_type = graphene.List(field_type)
+        elif field_type:
+            field_type = graphene.Field(field_type)
+
+        return GraphQLField(field_name, field_type, **kwargs)
 
     return Mixin
 
@@ -77,7 +87,7 @@ def GraphQLImage(field_name: str):
     def Mixin():
         from .types.images import get_image_type, ImageObjectType
 
-        return GraphQLField(field_name, graphene.Field(get_image_type()))
+        return GraphQLField(field_name, graphene.Field(lambda: get_image_type()))
 
     return Mixin
 
@@ -95,15 +105,17 @@ def GraphQLDocument(field_name: str):
 def GraphQLForeignKey(field_name, content_type, is_list=False):
     class Mixin(GraphQLField):
         def __init__(self):
+            from django.apps import apps
+
             field_type = None
 
             if isinstance(content_type, str):
                 app_label, model = content_type.lower().split(".")
-                mdl = ContentType.objects.get(app_label=app_label, model=model)
+                mdl = apps.get_model(app_label, model)
                 if mdl:
-                    field_type = registry.models.get(mdl.model_class())
+                    field_type = lambda: registry.models.get(mdl)
             else:
-                field_type = registry.models.get(content_type)
+                field_type = lambda: registry.models.get(content_type)
 
             if field_type and is_list:
                 field_type = graphene.List(field_type)

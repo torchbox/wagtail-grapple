@@ -5,12 +5,6 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('grapple', '0001_initial'),
-    ]
+    dependencies = [("grapple", "0001_initial")]
 
-    operations = [
-        migrations.DeleteModel(
-            name='PagePreview',
-        ),
-    ]
+    operations = [migrations.DeleteModel(name="PagePreview")]

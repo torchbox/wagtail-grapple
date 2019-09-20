@@ -136,7 +136,8 @@ def build_node_type(
 
     # Create a tempory model and tempory node that will be replaced later on.
     class StudModel(models.Model):
-        pass
+        class Meta:
+            managed = False
 
     class StudMeta:
         model = StudModel

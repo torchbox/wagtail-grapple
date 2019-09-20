@@ -134,3 +134,12 @@ def GraphQLMedia(field_name: str):
         return GraphQLField(field_name, MediaObjectType)
 
     return Mixin
+
+
+def GraphQLPage(field_name: str):
+    def Mixin():
+        from .types.pages import PageInterface
+
+        return GraphQLField(field_name, PageInterface)
+    
+    return Mixin

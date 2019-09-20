@@ -87,7 +87,7 @@ def GraphQLImage(field_name: str):
     def Mixin():
         from .types.images import get_image_type, ImageObjectType
 
-        return GraphQLField(field_name, graphene.Field(get_image_type()))
+        return GraphQLField(field_name, graphene.Field(lambda: get_image_type()))
 
     return Mixin
 

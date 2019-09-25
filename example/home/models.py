@@ -90,7 +90,6 @@ class BlogPage(HeadlessPreviewMixin, Page):
         GraphQLString("date"),
         GraphQLString("author"),
         GraphQLStreamfield("body"),
-        # GraphQLForeignKey("related_links", "home.blogpagerelatedlink", is_list=True),
         GraphQLCollection(
             GraphQLForeignKey,
             "related_links",

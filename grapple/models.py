@@ -12,14 +12,16 @@ class GraphQLField:
     field_source: str
 
     def __init__(self, field_name: str, field_type: type = None, **kwargs):
+        # Initiate and get specific field info.
         self.field_name = field_name
-        if callable(field_type):
-            self.field_type = field_type()
-        else:
-            self.field_type = field_type
-        if field_type:
-            self.field_type.source = field_name
+        self.field_type = field_type
         self.field_source = kwargs.get("source", field_name)
+
+        # Legacy collection API (Allow lists):
+        self.extract_key = kwargs.get("key", None)
+        is_list = kwargs.get("is_list", False)
+        if is_list:
+            self.field_type = graphene.List(field_type)
 
 
 def GraphQLString(field_name: str, **kwargs):
@@ -66,8 +68,22 @@ def GraphQLSnippet(
 
         if field_type and is_list:
             field_type = graphene.List(field_type)
-        elif field_type:
-            field_type = graphene.Field(field_type)
+
+        return GraphQLField(field_name, field_type, **kwargs)
+
+    return Mixin
+
+
+def GraphQLForeignKey(field_name, content_type, is_list=False, **kwargs):
+    def Mixin():
+        field_type = None
+        if isinstance(content_type, str):
+            app_label, model = content_type.lower().split(".")
+            mdl = apps.get_model(app_label, model)
+            if mdl:
+                field_type = lambda: registry.models.get(mdl)
+        else:
+            field_type = lambda: registry.models.get(content_type)
 
         return GraphQLField(field_name, field_type, **kwargs)
 
@@ -87,7 +103,7 @@ def GraphQLImage(field_name: str, **kwargs):
     def Mixin():
         from .types.images import get_image_type, ImageObjectType
 
-        return GraphQLField(field_name, graphene.Field(lambda: get_image_type()), **kwargs)
+        return GraphQLField(field_name, graphene.Field(get_image_type), **kwargs)
 
     return Mixin
 
@@ -100,28 +116,6 @@ def GraphQLDocument(field_name: str, **kwargs):
         document_type = settings["WAGTAILDOCS_DOCUMENT_MODEL"]
 
     return GraphQLForeignKey(field_name, document_type, **kwargs)
-
-
-def GraphQLForeignKey(field_name, content_type, is_list=False, **kwargs):
-    def Mixin():
-        field_type = None
-
-        if isinstance(content_type, str):
-            app_label, model = content_type.lower().split(".")
-            mdl = apps.get_model(app_label, model)
-            if mdl:
-                field_type = lambda: registry.models.get(mdl)
-        else:
-            field_type = lambda: registry.models.get(content_type)
-
-        if field_type and is_list:
-            field_type = graphene.List(field_type)
-        elif field_type:
-            field_type = graphene.Field(field_type)
-
-        return GraphQLField(field_name, field_type, **kwargs)
-        
-    return Mixin
 
 
 def GraphQLMedia(field_name: str, **kwargs):
@@ -138,12 +132,34 @@ def GraphQLPage(field_name: str):
         from .types.pages import PageInterface
 
         return GraphQLField(field_name, PageInterface)
-    
+
     return Mixin
 
 
-def GraphQLCollection(field_name: str, grapple_type, **kwargs):
+def GraphQLCollection(nested_type, *args, **kwargs):
     def Mixin():
-        return GraphQLField(field_name, graphene.List(grapple_type), **kwargs)
+        from .types.structures import QuerySetList
+
+        # Check if using nested field extracion:
+        source = kwargs.get("source", None)
+        if source and "." in source:
+            source, key = source.split(".")
+            if key:
+                kwargs["source"] = source
+                kwargs["key"] = key
+
+        # Create the nested type and wrap it in some list field.
+        graphql_type = nested_type(*args, **kwargs)
+        collection_type = graphene.List
+
+        # Add queryset filtering when necessary.
+        if (
+            kwargs.get("is_queryset", False)
+            or nested_type == GraphQLForeignKey
+            or nested_type == GraphQLSnippet
+        ):
+            collection_type = QuerySetList
+
+        return graphql_type, collection_type
 
     return Mixin

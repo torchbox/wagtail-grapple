@@ -49,6 +49,7 @@ def resolve_queryset(
     if order is not None:
         qs = qs.order_by(*map(lambda x: x.strip(), order.split(",")))
 
+    qs = qs.all()
     if limit is not None:
         limit = int(limit)
         qs = qs[offset : limit + offset]

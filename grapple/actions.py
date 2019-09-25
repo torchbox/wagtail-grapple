@@ -115,9 +115,47 @@ def get_fields_and_properties(cls):
     return fields + properties
 
 
-def model_resolver(field_source):
+def get_field_type(field):
+    # If a tuple is returned then obj[1] wraps obj[0]
+    field_wrapper = None
+    if isinstance(field, tuple):
+        field, field_wrapper = field
+        if callable(field):
+            field = field()
+
+    field_type = field.field_type
+    if field_type is not None:
+        if field_wrapper:
+            return field, field_wrapper(field_type)
+        else:
+            if callable(field_type):
+                field_type = field_type()
+            return field, field_type
+
+
+def model_resolver(field):
     def mixin(self, instance, info, **kwargs):
-        return getattr(instance, field_source)
+        from .utils import resolve_queryset
+
+        cls_field = getattr(instance, field.field_source)
+
+        # If queryset then call .all() method
+        if hasattr(cls_field, "all"):
+            # Shortcut to extract one nested field from an list of objects
+            if field.extract_key:
+                return [getattr(cls, field.extract_key) for cls in cls_field.all()]
+
+            # Check if any queryset params:
+            if not kwargs:
+                return cls_field.all()
+            return resolve_queryset(cls_field, info, **kwargs)
+
+        # If method then call and return result
+        if callable(cls_field):
+            return cls_field()
+
+        # If none of those then just return field
+        return cls_field
 
     return mixin
 
@@ -135,15 +173,15 @@ def build_node_type(
     type_name = type_prefix + cls.__name__
 
     # Create a tempory model and tempory node that will be replaced later on.
-    class StudModel(models.Model):
+    class StubModel(models.Model):
         class Meta:
             managed = False
 
-    class StudMeta:
-        model = StudModel
+    class StubMeta:
+        model = StubModel
 
     type_meta = {
-        "Meta": StudMeta,
+        "Meta": StubMeta,
         "type": lambda: {
             "cls": cls,
             "lazy": True,
@@ -153,7 +191,7 @@ def build_node_type(
         },
     }
 
-    return type("Stud" + type_name, (DjangoObjectType,), type_meta)
+    return type("Stub" + type_name, (DjangoObjectType,), type_meta)
 
 
 def load_type_fields():
@@ -173,7 +211,6 @@ def load_type_fields():
                 class Meta:
                     model = cls
                     interfaces = (interface,) if interface is not None else tuple()
-                    exclude_fields = tuple()
 
                 type_meta = {"Meta": Meta, "id": graphene.ID(), "name": type_name}
                 exclude_fields = get_fields_and_properties(cls)
@@ -186,18 +223,15 @@ def load_type_fields():
                             field = field()
 
                         # Add field to GQL type with correct field-type
-                        if field.field_type is not None:
-                            type_meta[field.field_name] = field.field_type
+                        field, field_type = get_field_type(field)
+                        type_meta[field.field_name] = field_type
 
                         # Remove field from excluded list
                         if field.field_name in exclude_fields:
                             exclude_fields.remove(field.field_name)
 
                         # Add a custom resolver for each field
-                        if hasattr(field, "field_source"):
-                            methods["resolve_" + field.field_name] = model_resolver(
-                                field.field_source
-                            )
+                        methods["resolve_" + field.field_name] = model_resolver(field)
 
                 # Replace stud node with real thing
                 type_meta["Meta"].exclude_fields = exclude_fields
@@ -250,8 +284,7 @@ def build_streamfield_type(
 
     methods = {}
     type_name = type_prefix + cls.__name__
-    type_meta = {"Meta": Meta}
-    type_meta.update({"id": graphene.String()})
+    type_meta = {"Meta": Meta, "id": graphene.String()}
 
     # Add any custom fields to node if they are defined.
     if hasattr(cls, "graphql_fields"):
@@ -259,15 +292,16 @@ def build_streamfield_type(
             if callable(field):
                 field = field()
 
+            # Get correct types from field
+            field, field_type = get_field_type(field)
+
             # Add support for `graphql_fields`
             methods["resolve_" + field.field_name] = streamfield_resolver
 
             # Add field to GQL type with correct field-type
-            if field.field_type is not None:
-                type_meta[field.field_name] = field.field_type
+            type_meta[field.field_name] = field_type
 
-    # Set excluded fields to stop errors cropping up from unsupported field
-    # types.
+    # Set excluded fields to stop errors cropping up from unsupported field types.
     graphql_node = type(type_name, (base_type,), type_meta)
 
     for name, method in methods.items():

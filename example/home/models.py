@@ -28,6 +28,7 @@ from grapple.models import (
     GraphQLImage,
     GraphQLDocument,
     GraphQLMedia,
+    GraphQLCollection
 )
 from home.blocks import StreamFieldBlock
 
@@ -89,7 +90,17 @@ class BlogPage(HeadlessPreviewMixin, Page):
         GraphQLString("date"),
         GraphQLString("author"),
         GraphQLStreamfield("body"),
-        GraphQLForeignKey("related_links", "home.blogpagerelatedlink", True),
+        # GraphQLForeignKey("related_links", "home.blogpagerelatedlink", is_list=True),
+        GraphQLCollection(
+            GraphQLForeignKey,
+            "related_links",
+            "home.blogpagerelatedlink"
+        ),
+        GraphQLCollection(
+            GraphQLString,
+            "related_urls",
+            source="related_links.name"
+        ),
         GraphQLSnippet("advert", "home.Advert"),
         GraphQLImage("cover"),
         GraphQLDocument("book_file"),

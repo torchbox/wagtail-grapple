@@ -45,6 +45,67 @@ GraphQLString
         }
 
 
+GraphQLCollection
+-------------
+.. module:: grapple.models
+.. class:: GraphQLCollection(nested_type, *args, **kwargs)
+
+    A field type that wraps another model type in a list, Most likely to be used when referencing ForeignKey lists (like when using Orderables).
+
+    .. attribute:: nested_type
+
+        Pass another Grapple model type such as `GraphQLString` or `GraphQLForeignKey`.
+
+    .. attribute:: *args
+
+        Any args that you want to pass on to the nested type, you will always be passing `field_name` here for example.
+
+    .. attribute:: **kwargs
+
+        Any keyword args that you want to pass on to the nested type. 
+        
+        One keyword argument that is more powerful with Collections is the `source` argument. With ``GraphQLCollection``, 
+        you can pass a source string that is multiple layers deep and Grapple will handle the querying for you through
+        multiple models (example below).
+
+    In your models.py:
+    ::
+
+        from grapple.types import GraphQLString
+
+        class BlogPage(Page):
+            author = models.CharField(max_length=255)
+            
+            graphql_fields = [
+                # Basic reference to Orderable model
+                GraphQLCollection(
+                    GraphQLForeignKey,
+                    "related_links",
+                    "home.blogpagerelatedlink"
+                ),
+
+                # Will return an array of just the url from each link
+                GraphQLCollection(
+                    GraphQLString,
+                    "related_urls",
+                    source="related_links.url"
+                ),
+            ]
+
+
+    Example query:
+    ::
+    
+        {
+            page(slug: "example-blog-page") {
+                relatedUrls
+                relatedLinks {
+                    name
+                }
+            }
+        }
+
+
 GraphQLInt
 ----------
 .. module:: grapple.models
@@ -170,8 +231,10 @@ GraphQLForeignKey
         String which defines the location of the snippet model you are referencing.
 
     .. attribute:: GraphQLString.is_list
-
+    
         Define whether this field should be a list (for example when using ``Orderable``).
+
+        .. warning:: ``is_list`` is now deprecated, please use ``GraphQLCollection`` field.
 
     ::
 

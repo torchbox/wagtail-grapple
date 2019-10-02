@@ -143,7 +143,7 @@ def GraphQLCollection(nested_type, *args, **kwargs):
         # Check if using nested field extracion:
         source = kwargs.get("source", None)
         if source and "." in source:
-            source, key = source.split(".")
+            source, *key = source.split(".")
             if key:
                 kwargs["source"] = source
                 kwargs["key"] = key

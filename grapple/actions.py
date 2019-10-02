@@ -2,7 +2,10 @@ import graphene
 import inspect
 from typing import Type
 from types import MethodType
+from collections.abc import Iterable
+
 from django.db import models
+from django.db.models.query import QuerySet
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from wagtail.contrib.settings.models import BaseSetting
@@ -140,10 +143,34 @@ def model_resolver(field):
         cls_field = getattr(instance, field.field_source)
 
         # If queryset then call .all() method
-        if hasattr(cls_field, "all"):
+        if issubclass(type(cls_field), models.Manager):
             # Shortcut to extract one nested field from an list of objects
+            def get_nested_field(cls, extract_key):
+                # If last value in list then return that from the class.
+                if len(extract_key) == 1:
+                    return getattr(cls, extract_key[0])
+
+                # Get data from nested field
+                field = getattr(cls, extract_key[0])
+                if field is None:
+                    return None
+                if issubclass(type(field), models.Manager):
+                    field = field.all()
+
+                # If field data is a list then iterate over it
+                if isinstance(field, Iterable):
+                    return [
+                        get_nested_field(nested_cls, extract_key[1:])
+                        for nested_cls in field
+                    ]
+
+                # If single value then return it.
+                return get_nested_field(field, extract_key[1:])
+
             if field.extract_key:
-                return [getattr(cls, field.extract_key) for cls in cls_field.all()]
+                return [
+                    get_nested_field(cls, field.extract_key) for cls in cls_field.all()
+                ]
 
             # Check if any queryset params:
             if not kwargs:

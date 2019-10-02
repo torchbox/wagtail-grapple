@@ -38,7 +38,6 @@ class HomePage(Page):
 
 
 class BlogPage(HeadlessPreviewMixin, Page):
-    author = models.CharField(max_length=255)
     date = models.DateField("Post date")
     advert = models.ForeignKey(
         "home.Advert",
@@ -71,11 +70,11 @@ class BlogPage(HeadlessPreviewMixin, Page):
     body = StreamField(StreamFieldBlock())
 
     content_panels = Page.content_panels + [
-        FieldPanel("author"),
         FieldPanel("date"),
         ImageChooserPanel("cover"),
         StreamFieldPanel("body"),
         InlinePanel("related_links", label="Related links"),
+        InlinePanel("authors", label="Authors"),
         SnippetChooserPanel("advert"),
         DocumentChooserPanel("book_file"),
         MediaChooserPanel("featured_media"),
@@ -88,7 +87,6 @@ class BlogPage(HeadlessPreviewMixin, Page):
     graphql_fields = [
         GraphQLString("heading"),
         GraphQLString("date"),
-        GraphQLString("author"),
         GraphQLStreamfield("body"),
         GraphQLCollection(
             GraphQLForeignKey,
@@ -98,7 +96,12 @@ class BlogPage(HeadlessPreviewMixin, Page):
         GraphQLCollection(
             GraphQLString,
             "related_urls",
-            source="related_links.name"
+            source="related_links.url"
+        ),
+        GraphQLCollection(
+            GraphQLString,
+            "authors",
+            source="authors.person.name"
         ),
         GraphQLSnippet("advert", "home.Advert"),
         GraphQLImage("cover"),
@@ -116,6 +119,41 @@ class BlogPageRelatedLink(Orderable):
     panels = [FieldPanel("name"), FieldPanel("url")]
 
     graphql_fields = [GraphQLString("name"), GraphQLString("url")]
+
+
+@register_snippet
+class Person(models.Model):
+    name = models.CharField(max_length=255)
+    job = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.name
+
+    panels = [FieldPanel("name"), FieldPanel("job")]
+
+    graphql_fields = [
+        GraphQLString("name"),
+        GraphQLString("job"),
+    ]
+
+
+class Author(Orderable):
+    page = ParentalKey(BlogPage, on_delete=models.CASCADE, related_name="authors")
+    role = models.CharField(max_length=255)
+    person = models.ForeignKey(
+        Person,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="+",
+    )
+
+    panels = [FieldPanel("role"), SnippetChooserPanel("person")]
+
+    graphql_fields = [
+        GraphQLString("role"),
+        GraphQLForeignKey("person", Person)
+    ]
 
 
 @register_snippet
@@ -138,7 +176,8 @@ class SocialMediaSettings(BaseSetting):
         max_length=255, help_text="Your Instagram username, without the @"
     )
     trip_advisor = models.URLField(help_text="Your Trip Advisor page URL")
-    youtube = models.URLField(help_text="Your YouTube channel or user account URL")
+    youtube = models.URLField(
+        help_text="Your YouTube channel or user account URL")
 
     graphql_fields = [
         GraphQLString("facebook"),

@@ -8,12 +8,13 @@ from wagtail.core.rich_text import RichText
 
 from example.tests.test_grapple import BaseGrappleTest
 from home.blocks import ImageGalleryImage, ImageGalleryImages
-from home.factories import BlogPageFactory, ImageGalleryImageFactory
+from home.factories import BlogPageFactory, BlogPageRelatedLinkFactory, ImageGalleryImageFactory
 
 
 class BlogTest(BaseGrappleTest):
     def setUp(self):
         super().setUp()
+        # Create Blog
         self.blog_page = BlogPageFactory(
             body=[
                 ("heading", "Test heading 1"),
@@ -246,3 +247,47 @@ class BlogTest(BaseGrappleTest):
                 count += 1
         # Check that we test all blocks that were returned.
         self.assertEquals(len(query_blocks), count)
+
+
+    # Next 2 tests are used to test the Collection API, both ForeignKey and nested field extraction.
+    def test_blog_page_related_links(self):
+        query = """
+        {
+            page(id:%s) {
+                ... on BlogPage {
+                    relatedLinks {
+                        url
+                    }
+                }
+            }
+        }
+        """ % (
+            self.blog_page.id
+        )
+        executed = self.client.execute(query)
+
+        links = executed["data"]["page"]["relatedLinks"]
+        self.assertEqual(len(links), 5)
+        for link in links:
+            url = link.get('url', None)
+            self.assertTrue(isinstance(url, str))
+
+
+    def test_blog_page_related_urls(self):
+        query = """
+        {
+            page(id:%s) {
+                ... on BlogPage {
+                    relatedUrls
+                }
+            }
+        }
+        """ % (
+            self.blog_page.id
+        )
+        executed = self.client.execute(query)
+
+        links = executed["data"]["page"]['relatedUrls']
+        self.assertEqual(len(links), 5)
+        for url in links:
+            self.assertTrue(isinstance(url, str))

@@ -131,7 +131,7 @@ def GraphQLPage(field_name: str):
     def Mixin():
         from .types.pages import PageInterface
 
-        return GraphQLField(field_name, PageInterface)
+        return GraphQLField(field_name, graphene.Field(PageInterface))
 
     return Mixin
 

@@ -136,7 +136,7 @@ def GraphQLPage(field_name: str):
     return Mixin
 
 
-def GraphQLCollection(nested_type, *args, **kwargs):
+def GraphQLCollection(nested_type, field_name, *args, **kwargs):
     def Mixin():
         from .types.structures import QuerySetList
 
@@ -149,7 +149,7 @@ def GraphQLCollection(nested_type, *args, **kwargs):
                 kwargs["key"] = key
 
         # Create the nested type and wrap it in some list field.
-        graphql_type = nested_type(*args, **kwargs)
+        graphql_type = nested_type(field_name, *args, **kwargs)
         collection_type = graphene.List
 
         # Add queryset filtering when necessary.

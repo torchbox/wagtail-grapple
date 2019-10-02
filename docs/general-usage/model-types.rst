@@ -50,22 +50,26 @@ GraphQLCollection
 .. module:: grapple.models
 .. class:: GraphQLCollection(nested_type, *args, **kwargs)
 
-    A field type that wraps another model type in a list, Most likely to be used when referencing ForeignKey lists (like when using Orderables).
+    A field type that wraps another model type in a list. Best suited for referencing Orderables (i.e. ForeignKey lists).
 
     .. attribute:: nested_type
 
-        Pass another Grapple model type such as `GraphQLString` or `GraphQLForeignKey`.
+        A Grapple model type such as `GraphQLString` or `GraphQLForeignKey`.
+
+    .. attribute:: field_name
+
+        The name of the class property used in your model definition.
 
     .. attribute:: *args
 
-        Any args that you want to pass on to the nested type, you will always be passing `field_name` here for example.
+        Any positional arguments that you want to pass on to the nested type.
 
     .. attribute:: **kwargs
 
         Any keyword args that you want to pass on to the nested type. 
         
         One keyword argument that is more powerful with Collections is the `source` argument. With ``GraphQLCollection``, 
-        you can pass a source string that is multiple layers deep and Grapple will handle the querying for you through
+        You can pass a source string that is multiple layers deep and Grapple will handle the querying for you through
         multiple models (example below).
 
     In your models.py:

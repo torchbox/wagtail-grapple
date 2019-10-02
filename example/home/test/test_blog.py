@@ -269,9 +269,8 @@ class BlogTest(BaseGrappleTest):
         links = executed["data"]["page"]["relatedLinks"]
         for link in links:
             url = link.get('url', None)
-            if not url or not isinstance(url, str):
-                print(executed["data"]["page"])
-                raise TypeError("url field of 'relatedLinks' is not a string.")
+            self.assertIsNotNone(url)
+            self.assertTrue(url, str)
 
 
     def test_blog_page_related_urls(self):
@@ -290,6 +289,5 @@ class BlogTest(BaseGrappleTest):
 
         links = executed["data"]["page"]['relatedUrls']
         for url in links:
-            if not url or not isinstance(url, str):
-                print(executed["data"]["page"])
-                raise TypeError("field 'relatedUrls' does not return an array of strings.")
+            self.assertIsNotNone(url)
+            self.assertTrue(url, str)

@@ -267,6 +267,7 @@ class BlogTest(BaseGrappleTest):
         executed = self.client.execute(query)
 
         links = executed["data"]["page"]["relatedLinks"]
+        self.assertEqual(len(links), 5)
         for link in links:
             url = link.get('url', None)
             self.assertIsNotNone(url)
@@ -288,6 +289,7 @@ class BlogTest(BaseGrappleTest):
         executed = self.client.execute(query)
 
         links = executed["data"]["page"]['relatedUrls']
+        self.assertEqual(len(links), 5)
         for url in links:
             self.assertIsNotNone(url)
             self.assertTrue(url, str)

@@ -270,8 +270,7 @@ class BlogTest(BaseGrappleTest):
         self.assertEqual(len(links), 5)
         for link in links:
             url = link.get('url', None)
-            self.assertIsNotNone(url)
-            self.assertTrue(url, str)
+            self.assertTrue(isinstance(url, str))
 
 
     def test_blog_page_related_urls(self):
@@ -291,5 +290,4 @@ class BlogTest(BaseGrappleTest):
         links = executed["data"]["page"]['relatedUrls']
         self.assertEqual(len(links), 5)
         for url in links:
-            self.assertIsNotNone(url)
-            self.assertTrue(url, str)
+            self.assertTrue(isinstance(url, str))

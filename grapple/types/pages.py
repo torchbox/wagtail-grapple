@@ -24,6 +24,7 @@ class PageInterface(graphene.Interface):
     seo_description = graphene.String()
     show_in_menus = graphene.Boolean()
     content_type = graphene.String()
+    last_published_at = graphene.DateTime()
     parent = graphene.Field(lambda: PageInterface)
     children = QuerySetList(lambda: PageInterface, enable_search=True)
     siblings = QuerySetList(lambda: PageInterface, enable_search=True)

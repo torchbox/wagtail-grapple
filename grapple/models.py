@@ -103,7 +103,7 @@ def GraphQLImage(field_name: str, **kwargs):
     def Mixin():
         from .types.images import get_image_type, ImageObjectType
 
-        return GraphQLField(field_name, graphene.Field(get_image_type), **kwargs)
+        return GraphQLField(field_name, get_image_type, **kwargs)
 
     return Mixin
 
@@ -131,7 +131,7 @@ def GraphQLPage(field_name: str):
     def Mixin():
         from .types.pages import PageInterface
 
-        return GraphQLField(field_name, graphene.Field(PageInterface))
+        return GraphQLField(field_name, PageInterface)
 
     return Mixin
 

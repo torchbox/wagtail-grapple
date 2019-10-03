@@ -131,9 +131,7 @@ def get_field_type(field):
         if field_wrapper:
             return field, field_wrapper(field_type)
         else:
-            if callable(field_type):
-                field_type = field_type()
-            return field, field_type
+            return field, graphene.Field(field_type)
 
 
 def model_resolver(field):

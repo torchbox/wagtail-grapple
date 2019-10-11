@@ -32,6 +32,7 @@
   * [Installation](#installation)
 * [Usage](#usage)
 * [Contributing](#contributing)
+* [Compatibility](#compatibility)
 * [License](#license)
 * [Contact](#contact)
 * [Acknowledgements](#inspired-by)
@@ -43,14 +44,14 @@
 
 ![GraphQL Preview Demo](docs/demo.gif)
 
-There is a range of GraphQL packages for Python and specifically Django. 
-However, getting these packages to work out of the box with an existing infrastructure 
+There is a range of GraphQL packages for Python and specifically Django.
+However, getting these packages to work out of the box with an existing infrastructure
 without errors isn't as easy to come by.
 
 The purpose of Grapple is to be able to build GraphQL endpoints on a model by model
-basis as quickly as possible. The setup and configuration have been designed 
+basis as quickly as possible. The setup and configuration have been designed
 to be as simple but also provide the best features;
-No complex serializers need to be written - just add a `graphql_fields` list 
+No complex serializers need to be written - just add a `graphql_fields` list
 to your model and away you go (although if you want to go deeper you can!).
 
 #### Features:
@@ -192,6 +193,14 @@ Contributions are what make the open source community such an amazing place to b
  - Run server `./manage.py runserver`
 
 
+## Compatibility
+
+Wagtail Grapple supports:
+
+- Django 2.2.x
+- Python 3.6 and 3.7
+- Wagtail >= 2.5
+
 ## License
 
 Distributed under the MIT License. See `LICENSE` for more information.
@@ -200,8 +209,8 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 ## Contact
 
-Nathan Horrigan 
-- [@NathHorrigan](https://github.com/NathHorrigan) 
+Nathan Horrigan
+- [@NathHorrigan](https://github.com/NathHorrigan)
 - NathHorrigan@gmail.com
 
 Project Link: [https://github.com/torchbox/wagtail-grapple](https://github.com/torchbox/wagtail-grapple)

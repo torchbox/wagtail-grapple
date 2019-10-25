@@ -164,8 +164,11 @@ def GraphQLCollection(nested_type, field_name, *args, **kwargs):
 
     return Mixin
 
+
 def GraphQLEmbed(field_name: str):
     def Mixin():
         from .types.streamfield import EmbedBlock
 
         return GraphQLField(field_name, EmbedBlock)
+    
+    return Mixin

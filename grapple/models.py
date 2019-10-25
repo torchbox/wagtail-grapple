@@ -170,5 +170,5 @@ def GraphQLEmbed(field_name: str):
         from .types.streamfield import EmbedBlock
 
         return GraphQLField(field_name, EmbedBlock)
-    
+
     return Mixin

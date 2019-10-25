@@ -2,9 +2,10 @@ from wagtail.core import blocks
 from wagtail.images.blocks import ImageChooserBlock
 
 from grapple.helpers import register_streamfield_block
-from grapple.models import GraphQLForeignKey, GraphQLImage, GraphQLString, GraphQLCollection
+from grapple.models import GraphQLForeignKey, GraphQLImage, GraphQLString, GraphQLCollection, GraphQLEmbed
 
 from wagtail.images.blocks import ImageChooserBlock
+from wagtail.embeds.blocks import EmbedBlock
 
 
 @register_streamfield_block
@@ -43,6 +44,14 @@ class ImageGalleryBlock(blocks.StructBlock):
         )
     ]
 
+@register_streamfield_block
+class VideoBlock(blocks.StructBlock):
+    youtube_link = EmbedBlock(required=False)
+
+    graphql_fields = [
+        GraphQLEmbed('youtube_link')
+    ]
+
 
 class StreamFieldBlock(blocks.StreamBlock):
     heading = blocks.CharBlock(classname="full title")
@@ -52,3 +61,4 @@ class StreamFieldBlock(blocks.StreamBlock):
     date = blocks.DateBlock()
     datetime = blocks.DateTimeBlock()
     gallery = ImageGalleryBlock()
+    video = VideoBlock()

@@ -5,9 +5,10 @@ import wagtail_factories
 from django.conf import settings
 from wagtail.core.blocks import BoundBlock, StreamValue, StructValue
 from wagtail.core.rich_text import RichText
+from wagtail.embeds.blocks import EmbedValue
 
 from example.tests.test_grapple import BaseGrappleTest
-from home.blocks import ImageGalleryImage, ImageGalleryImages
+from home.blocks import ImageGalleryImage, ImageGalleryImages, VideoBlock
 from home.factories import BlogPageFactory, BlogPageRelatedLinkFactory, ImageGalleryImageFactory
 
 
@@ -45,6 +46,12 @@ class BlogTest(BaseGrappleTest):
                                 ),
                             ],
                         ),
+                    },
+                ),
+                (
+                    "video",
+                    {
+                        "youtube_link": EmbedValue("https://youtube.com/")
                     },
                 ),
             ]
@@ -248,6 +255,35 @@ class BlogTest(BaseGrappleTest):
         # Check that we test all blocks that were returned.
         self.assertEquals(len(query_blocks), count)
 
+
+    def test_blog_embed(self):
+        query = """
+        {
+            page(id:%s) {
+                ... on BlogPage {
+                    body {
+                        blockType
+                        ...on VideoBlock {
+                            youtubeLink {
+                                url
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        """ % (
+            self.blog_page.id
+        )
+        executed = self.client.execute(query)
+        body = executed["data"]["page"]["body"]
+
+        for block in body:
+            if block["blockType"] == 'VideoBlock':
+                self.assertTrue(isinstance(block["youtubeLink"]["url"], str))
+                return
+
+        self.fail("VideoBlock type not instantiated in Streamfield")
 
     # Next 2 tests are used to test the Collection API, both ForeignKey and nested field extraction.
     def test_blog_page_related_links(self):

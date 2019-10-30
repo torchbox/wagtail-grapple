@@ -3,7 +3,7 @@ import datetime
 import factory
 import wagtail_factories
 from home.blocks import ImageGalleryBlock, ImageGalleryImage, ImageGalleryImages
-from home.models import BlogPage, BlogPageRelatedLink
+from home.models import BlogPage, BlogPageRelatedLink, AuthorPage
 from wagtail.core import blocks
 
 
@@ -57,13 +57,14 @@ class BlogPageRelatedLinkFactory(factory.DjangoModelFactory):
     class Meta:
         model = BlogPageRelatedLink
 
-    page = factory.SubFactory('home.factories.BlogPageFactory')
+    page = factory.SubFactory("home.factories.BlogPageFactory")
     name = factory.Sequence(lambda n: f"Person {n}")
     url = factory.Sequence(lambda n: f"Url {n}")
 
 
 class BlogPageFactory(wagtail_factories.PageFactory):
     date = datetime.date.today()
+    author = factory.SubFactory("home.factories.AuthorPageFactory")
     body = wagtail_factories.StreamFieldFactory(
         {
             "heading": wagtail_factories.CharBlockFactory,
@@ -79,9 +80,15 @@ class BlogPageFactory(wagtail_factories.PageFactory):
     class Meta:
         model = BlogPage
 
-
     @factory.post_generation
     def create_links(self, create, extracted, **kwargs):
         if create:
             # Create Blog Links
             BlogPageRelatedLinkFactory.create_batch(5, page=self)
+
+
+class AuthorPageFactory(wagtail_factories.PageFactory):
+    name = factory.Sequence(lambda n: f"Person {n}")
+
+    class Meta:
+        model = AuthorPage

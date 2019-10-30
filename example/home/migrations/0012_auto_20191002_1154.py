@@ -10,40 +10,113 @@ import wagtail.images.blocks
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('home', '0011_auto_20190819_1332'),
-    ]
+    dependencies = [("home", "0011_auto_20190819_1332")]
 
     operations = [
         migrations.CreateModel(
-            name='Person',
+            name="Person",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=255)),
-                ('job', models.CharField(max_length=255)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=255)),
+                ("job", models.CharField(max_length=255)),
             ],
         ),
-        migrations.RemoveField(
-            model_name='blogpage',
-            name='author',
-        ),
+        migrations.RemoveField(model_name="blogpage", name="author"),
         migrations.AlterField(
-            model_name='blogpage',
-            name='body',
-            field=wagtail.core.fields.StreamField([('heading', wagtail.core.blocks.CharBlock(classname='full title')), ('paragraph', wagtail.core.blocks.RichTextBlock()), ('image', wagtail.images.blocks.ImageChooserBlock()), ('decimal', wagtail.core.blocks.DecimalBlock()), ('date', wagtail.core.blocks.DateBlock()), ('datetime', wagtail.core.blocks.DateTimeBlock()), ('gallery', wagtail.core.blocks.StructBlock([('title', wagtail.core.blocks.CharBlock(classname='full title')), ('images', wagtail.core.blocks.StreamBlock([('image', wagtail.core.blocks.StructBlock([('caption', wagtail.core.blocks.CharBlock(classname='full title')), ('image', wagtail.images.blocks.ImageChooserBlock())]))]))]))]),
+            model_name="blogpage",
+            name="body",
+            field=wagtail.core.fields.StreamField(
+                [
+                    ("heading", wagtail.core.blocks.CharBlock(classname="full title")),
+                    ("paragraph", wagtail.core.blocks.RichTextBlock()),
+                    ("image", wagtail.images.blocks.ImageChooserBlock()),
+                    ("decimal", wagtail.core.blocks.DecimalBlock()),
+                    ("date", wagtail.core.blocks.DateBlock()),
+                    ("datetime", wagtail.core.blocks.DateTimeBlock()),
+                    (
+                        "gallery",
+                        wagtail.core.blocks.StructBlock(
+                            [
+                                (
+                                    "title",
+                                    wagtail.core.blocks.CharBlock(
+                                        classname="full title"
+                                    ),
+                                ),
+                                (
+                                    "images",
+                                    wagtail.core.blocks.StreamBlock(
+                                        [
+                                            (
+                                                "image",
+                                                wagtail.core.blocks.StructBlock(
+                                                    [
+                                                        (
+                                                            "caption",
+                                                            wagtail.core.blocks.CharBlock(
+                                                                classname="full title"
+                                                            ),
+                                                        ),
+                                                        (
+                                                            "image",
+                                                            wagtail.images.blocks.ImageChooserBlock(),
+                                                        ),
+                                                    ]
+                                                ),
+                                            )
+                                        ]
+                                    ),
+                                ),
+                            ]
+                        ),
+                    ),
+                ]
+            ),
         ),
         migrations.CreateModel(
-            name='Author',
+            name="Author",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('sort_order', models.IntegerField(blank=True, editable=False, null=True)),
-                ('role', models.CharField(max_length=255)),
-                ('page', modelcluster.fields.ParentalKey(on_delete=django.db.models.deletion.CASCADE, related_name='authors', to='home.BlogPage')),
-                ('person', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to='home.Person')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "sort_order",
+                    models.IntegerField(blank=True, editable=False, null=True),
+                ),
+                ("role", models.CharField(max_length=255)),
+                (
+                    "page",
+                    modelcluster.fields.ParentalKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="authors",
+                        to="home.BlogPage",
+                    ),
+                ),
+                (
+                    "person",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="+",
+                        to="home.Person",
+                    ),
+                ),
             ],
-            options={
-                'ordering': ['sort_order'],
-                'abstract': False,
-            },
+            options={"ordering": ["sort_order"], "abstract": False},
         ),
     ]

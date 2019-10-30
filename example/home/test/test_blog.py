@@ -5,10 +5,16 @@ import wagtail_factories
 from django.conf import settings
 from wagtail.core.blocks import BoundBlock, StreamValue, StructValue
 from wagtail.core.rich_text import RichText
+from wagtail.embeds.blocks import EmbedValue
 
 from example.tests.test_grapple import BaseGrappleTest
-from home.blocks import ImageGalleryImage, ImageGalleryImages
-from home.factories import BlogPageFactory, BlogPageRelatedLinkFactory, ImageGalleryImageFactory
+from home.blocks import ImageGalleryImage, ImageGalleryImages, VideoBlock
+from home.factories import (
+    BlogPageFactory,
+    BlogPageRelatedLinkFactory,
+    ImageGalleryImageFactory,
+    AuthorPageFactory
+)
 
 
 class BlogTest(BaseGrappleTest):
@@ -47,6 +53,7 @@ class BlogTest(BaseGrappleTest):
                         ),
                     },
                 ),
+                ("video", {"youtube_link": EmbedValue("https://youtube.com/")}),
             ]
         )
 
@@ -66,6 +73,26 @@ class BlogTest(BaseGrappleTest):
 
         # Check title.
         self.assertEquals(executed["data"]["page"]["title"], self.blog_page.title)
+
+    def test_related_author_page(self):
+        query = """
+        {
+            page(id:%s) {
+                ... on BlogPage {
+                    author {
+                        ... on AuthorPage {
+                            name
+                        }
+                    }
+                }
+            }
+        }
+        """ % (
+            self.blog_page.id
+        )
+        executed = self.client.execute(query)
+        page = executed["data"]["page"]["author"]
+        self.assertTrue(isinstance(page["name"], str) and page["name"] == self.blog_page.author.name)
 
     def get_blocks_from_body(self, block_type, block_query="rawValue"):
         query = """
@@ -89,7 +116,7 @@ class BlogTest(BaseGrappleTest):
         executed = self.client.execute(query)
 
         # Print the error response
-        if not executed.get('data'):
+        if not executed.get("data"):
             print(executed)
 
         blocks = []
@@ -248,6 +275,34 @@ class BlogTest(BaseGrappleTest):
         # Check that we test all blocks that were returned.
         self.assertEquals(len(query_blocks), count)
 
+    def test_blog_embed(self):
+        query = """
+        {
+            page(id:%s) {
+                ... on BlogPage {
+                    body {
+                        blockType
+                        ...on VideoBlock {
+                            youtubeLink {
+                                url
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        """ % (
+            self.blog_page.id
+        )
+        executed = self.client.execute(query)
+        body = executed["data"]["page"]["body"]
+
+        for block in body:
+            if block["blockType"] == "VideoBlock":
+                self.assertTrue(isinstance(block["youtubeLink"]["url"], str))
+                return
+
+        self.fail("VideoBlock type not instantiated in Streamfield")
 
     # Next 2 tests are used to test the Collection API, both ForeignKey and nested field extraction.
     def test_blog_page_related_links(self):
@@ -269,9 +324,8 @@ class BlogTest(BaseGrappleTest):
         links = executed["data"]["page"]["relatedLinks"]
         self.assertEqual(len(links), 5)
         for link in links:
-            url = link.get('url', None)
+            url = link.get("url", None)
             self.assertTrue(isinstance(url, str))
-
 
     def test_blog_page_related_urls(self):
         query = """
@@ -287,7 +341,7 @@ class BlogTest(BaseGrappleTest):
         )
         executed = self.client.execute(query)
 
-        links = executed["data"]["page"]['relatedUrls']
+        links = executed["data"]["page"]["relatedUrls"]
         self.assertEqual(len(links), 5)
         for url in links:
             self.assertTrue(isinstance(url, str))

@@ -103,7 +103,7 @@ def GraphQLImage(field_name: str, **kwargs):
     def Mixin():
         from .types.images import get_image_type, ImageObjectType
 
-        return GraphQLField(field_name, graphene.Field(get_image_type), **kwargs)
+        return GraphQLField(field_name, get_image_type, **kwargs)
 
     return Mixin
 
@@ -127,11 +127,11 @@ def GraphQLMedia(field_name: str, **kwargs):
     return Mixin
 
 
-def GraphQLPage(field_name: str):
+def GraphQLPage(field_name: str, **kwargs):
     def Mixin():
         from .types.pages import PageInterface
 
-        return GraphQLField(field_name, graphene.Field(PageInterface))
+        return GraphQLField(field_name, PageInterface, **kwargs)
 
     return Mixin
 
@@ -161,5 +161,14 @@ def GraphQLCollection(nested_type, field_name, *args, **kwargs):
             collection_type = QuerySetList
 
         return graphql_type, collection_type
+
+    return Mixin
+
+
+def GraphQLEmbed(field_name: str):
+    def Mixin():
+        from .types.streamfield import EmbedBlock
+
+        return GraphQLField(field_name, EmbedBlock)
 
     return Mixin

@@ -39,13 +39,14 @@ class StreamFieldInterface(graphene.Interface):
         If block has a custom Graphene Node type in registry then use it,
         otherwise use generic block type.
         """
-        mdl = type(instance.block)
-        if mdl in registry.streamfield_blocks:
-            return registry.streamfield_blocks[mdl]
+        if hasattr(instance, "block"):
+            mdl = type(instance.block)
+            if mdl in registry.streamfield_blocks:
+                return registry.streamfield_blocks[mdl]
 
-        for block_class in inspect.getmro(mdl):
-            if block_class in registry.streamfield_blocks:
-                return registry.streamfield_blocks[block_class]
+            for block_class in inspect.getmro(mdl):
+                if block_class in registry.streamfield_blocks:
+                    return registry.streamfield_blocks[block_class]
 
         return registry.streamfield_blocks["generic-block"]
 

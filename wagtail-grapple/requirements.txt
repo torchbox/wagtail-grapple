@@ -1,3 +1,5 @@
+# Test requirements.
+black==19.3b0
 Django>=2.2,<2.3
 wagtail>=2.5,<2.7
 graphene-django>=2.2.0

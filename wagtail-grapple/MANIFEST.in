@@ -1,5 +1,6 @@
 include LICENSE *.rst *.txt *.md
 
+recursive-include grapple *
 recursive-include grapple/templates *
 recursive-include grapple/static *
 

@@ -33,7 +33,7 @@ jobs:
       - run:
           name: install dependencies
           command: |
-            cd example
+            cd wagtail-grapple
             python3 -m venv venv
             . venv/bin/activate
             pip install -r requirements.txt
@@ -49,7 +49,7 @@ jobs:
       - run:
           name: run tests
           command: |
-            cd example
+            cd wagtail-grapple
             . venv/bin/activate
             rm db.sqlite3	
             python manage.py migrate

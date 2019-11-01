@@ -10,7 +10,7 @@ with open(path.join(this_directory, "../README.md"), encoding="utf-8") as f:
 
 setup(
     name="wagtail-grapple",
-    version="0.4.2",
+    version="0.4.4",
     packages=find_packages(include=["grapple"], exclude=["tests*"]),
     include_package_data=True,
     description="A django app that speeds up and simplifies implementing a GraphQL endoint!",
@@ -23,7 +23,9 @@ setup(
     install_requires=[
         "wagtail>=2.5, <2.7",
         "Django>=2.2, <2.3",
-        "graphene-django>=2.2.0" "graphql-core==2.2.1" "colorthief",
+        "graphene-django>=2.2.0",
+        "graphql-core==2.2.1",
+        "colorthief",
         "channels==1.1.8",
         "asgi_redis",
         "graphql_ws",

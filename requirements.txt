@@ -1,5 +1,5 @@
 Django>=2.2,<2.3
-wagtail>=2.5,<2.7
+wagtail>=2.5,<2.8
 graphene-django>=2.2.0
 colorthief
 channels==1.1.8

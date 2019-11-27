@@ -84,7 +84,7 @@ Getting Grapple installed is designed to be as simple as possible!
 ### Prerequisites
 ```
 Django  >= 2.2, <2.3
-wagtail >= 2.5, <2.7
+wagtail >= 2.5, <2.8
 ```
 
 ### Installation

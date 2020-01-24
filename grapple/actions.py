@@ -177,7 +177,7 @@ def model_resolver(field):
 
         # If method then call and return result
         if callable(cls_field):
-            return cls_field()
+            return cls_field(info, **kwargs)
 
         # If none of those then just return field
         return cls_field

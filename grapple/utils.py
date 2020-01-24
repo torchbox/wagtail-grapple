@@ -34,6 +34,8 @@ def resolve_queryset(
 
     if id is not None:
         qs = qs.filter(pk=id)
+    else:
+        qs = qs.all()
 
     if id is None and search_query:
         # Check if the queryset is searchable using Wagtail search.

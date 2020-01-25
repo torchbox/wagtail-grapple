@@ -6,6 +6,7 @@ from graphene_django.types import DjangoObjectType
 from graphql.execution.base import ResolveInfo
 from rx.subjects import Subject
 from django.dispatch import receiver
+from silk.profiling.profiler import silk_profile
 
 from ..registry import registry
 from ..utils import resolve_queryset
@@ -202,6 +203,7 @@ def PagesSubscription():
             content_type=graphene.String(),
         )
 
+        @silk_profile(name='resolve_page')
         def resolve_page(self, info, **kwargs):
             return preview_observable(
                 id=kwargs.get("id"),

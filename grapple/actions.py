@@ -16,7 +16,7 @@ from wagtail.images.models import AbstractImage, AbstractRendition
 from wagtail.images.blocks import ImageChooserBlock
 from wagtail.snippets.models import get_snippet_models
 from graphene_django.types import DjangoObjectType
-
+from silk.profiling.profiler import silk_profile
 
 from .registry import registry
 from .types.pages import PageInterface, Page
@@ -133,7 +133,7 @@ def get_field_type(field):
         else:
             return field, graphene.Field(field_type)
 
-
+@silk_profile(name='model_resolver')
 def model_resolver(field):
     def mixin(self, instance, info, **kwargs):
         from .utils import resolve_queryset
@@ -277,6 +277,7 @@ def convert_to_underscore(name):
     return re.sub("([a-z0-9])([A-Z])", r"\1_\2", s1).lower()
 
 
+@silk_profile(name='streamfield_resolver')
 def streamfield_resolver(self, instance, info, **kwargs):
     value = None
     if hasattr(instance, "block"):

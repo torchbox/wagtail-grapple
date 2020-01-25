@@ -13,7 +13,9 @@ from graphql.validation.rules import NoUnusedFragments, specified_rules
 
 specified_rules[:] = [rule for rule in specified_rules if rule is not NoUnusedFragments]
 
+from silk.profiling.profiler import silk_profile
 
+@silk_profile(name='Create Schema')
 def create_schema():
     """
     Root schema object that graphene is pointed at.

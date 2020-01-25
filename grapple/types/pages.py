@@ -161,12 +161,14 @@ def PagesQuery():
         )
 
         # Return all pages, ideally specific.
+        @silk_profile(name='resolve_page')
         def resolve_pages(self, info, **kwargs):
             return resolve_queryset(
                 WagtailPage.objects.live().public().specific(), info, **kwargs
             )
 
         # Return a specific page, identified by ID or Slug.
+        @silk_profile(name='resolve_page')
         def resolve_page(self, info, **kwargs):
             return get_specific_page(
                 id=kwargs.get("id"),
@@ -203,7 +205,6 @@ def PagesSubscription():
             content_type=graphene.String(),
         )
 
-        @silk_profile(name='resolve_page')
         def resolve_page(self, info, **kwargs):
             return preview_observable(
                 id=kwargs.get("id"),

@@ -12,3 +12,4 @@ wagtail-factories==2.0.0
 django-cors-headers==3.0.2
 scour==0.37
 wagtail-headless-preview==0.1.4
+django-silk

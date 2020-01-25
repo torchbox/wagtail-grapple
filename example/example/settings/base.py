@@ -54,9 +54,11 @@ INSTALLED_APPS = [
     "grapple",
     "graphene_django",
     "channels",
+    "silk",
 ]
 
 MIDDLEWARE = [
+    'silk.middleware.SilkyMiddleware',
     "corsheaders.middleware.CorsMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -178,3 +180,6 @@ CHANNEL_LAYERS = {
         "ROUTING": "grapple.urls.channel_routing",
     }
 }
+
+SILKY_PYTHON_PROFILER = True
+SILKY_PYTHON_PROFILER_BINARY = True

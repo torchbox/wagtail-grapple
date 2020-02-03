@@ -1,4 +1,4 @@
-import channels_graphql_ws
+# import channels_graphql_ws
 import graphene
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
@@ -179,48 +179,48 @@ def PagesQuery():
     return Mixin
 
 
-@receiver(preview_update)
-def on_updated(sender, token, **kwargs):
-    OnPreviewUpdate.broadcast(payload=token)
+# @receiver(preview_update)
+# def on_updated(sender, token, **kwargs):
+#     OnPreviewUpdate.broadcast(payload=token)
 
 
-class OnPreviewUpdate(Subscription):
-    page = graphene.Field(PageInterface)
+# class OnPreviewUpdate(Subscription):
+#     page = graphene.Field(PageInterface)
 
-    class Arguments:
-        id = graphene.ID()
-        token = graphene.String()
-        slug = graphene.String()
-        content_type = graphene.String()
+#     class Arguments:
+#         id = graphene.ID()
+#         token = graphene.String()
+#         slug = graphene.String()
+#         content_type = graphene.String()
 
-    @staticmethod
-    def subscribe(*args, **kwargs):
-        pass
+#     @staticmethod
+#     def subscribe(*args, **kwargs):
+#         pass
 
-    @staticmethod
-    def publish(pushed_token, info, token, **kwargs):
-        if pushed_token == token:
-            return OnPreviewUpdate(
-                page=get_specific_page(
-                    kwargs.get("id"),
-                    kwargs.get("slug"),
-                    token,
-                    kwargs.get("content_type"),
-                )
-            )
+#     @staticmethod
+#     def publish(pushed_token, info, token, **kwargs):
+#         if pushed_token == token:
+#             return OnPreviewUpdate(
+#                 page=get_specific_page(
+#                     kwargs.get("id"),
+#                     kwargs.get("slug"),
+#                     token,
+#                     kwargs.get("content_type"),
+#                 )
+#             )
 
-        return OnPreviewUpdate(page=None)
+#         return OnPreviewUpdate(page=None)
 
 
-def PagesSubscription():
-    # Monkeypatch headless preview url for debugging:
-    if not getattr(settings, "HEADLESS_PREVIEW_CLIENT_URLS", None):
-        settings.HEADLESS_PREVIEW_LIVE = True
-        settings.HEADLESS_PREVIEW_CLIENT_URLS = {
-            "default": "http://localhost:8000/playground"
-        }
+# def PagesSubscription():
+#     # Monkeypatch headless preview url for debugging:
+#     if not getattr(settings, "HEADLESS_PREVIEW_CLIENT_URLS", None):
+#         settings.HEADLESS_PREVIEW_LIVE = True
+#         settings.HEADLESS_PREVIEW_CLIENT_URLS = {
+#             "default": "http://localhost:8000/playground"
+#         }
 
-    class Mixin:
-        on_preview_update = OnPreviewUpdate.Field()
+#     class Mixin:
+#         on_preview_update = OnPreviewUpdate.Field()
 
-    return Mixin
+#     return Mixin

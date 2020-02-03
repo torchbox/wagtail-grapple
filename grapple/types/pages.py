@@ -5,7 +5,7 @@ from django.contrib.contenttypes.models import ContentType
 from wagtail.core.models import Page as WagtailPage
 from wagtail_headless_preview.signals import preview_update
 from graphene_django.types import DjangoObjectType
-from channels_graphql_ws import Subscription
+# from channels_graphql_ws import Subscription
 from graphql.execution.base import ResolveInfo
 from rx.subjects import Subject
 from django.dispatch import receiver

@@ -1,6 +1,7 @@
 import os
 import base64
 import tempfile
+import graphene_django_optimizer as gql_optimizer
 from PIL import Image, ImageFilter
 from colorthief import ColorThief
 from django.conf import settings
@@ -31,6 +32,7 @@ def resolve_queryset(
     :type order: str
     """
     offset = int(offset or 0)
+    qs = gql_optimizer(qs, info)
 
     if id is not None:
         qs = qs.filter(pk=id)

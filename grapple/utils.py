@@ -10,7 +10,14 @@ from wagtail.search.backends import get_search_backend
 
 
 def resolve_queryset(
-    qs, info, limit=None, offset=None, search_query=None, id=None, order=None, **kwargs
+    model,
+    info,
+    id=None,
+    limit=None,
+    offset=None,
+    search_query=None,
+    order=None,
+    **kwargs
 ):
     """
     Add limit, offset and search capabilities to the query. This contains
@@ -30,12 +37,12 @@ def resolve_queryset(
     :param order: Use Django ordering format to order the query set.
     :type order: str
     """
-    offset = int(offset or 0)
+    # Per-request caching mechanism
+    model_loader = info.context.model_loader(model)
 
+    # Load one object by id
     if id is not None:
-        qs = qs.filter(pk=id)
-    else:
-        qs = qs.all()
+        return model_loader.load(id, info)
 
     if id is None and search_query:
         # Check if the queryset is searchable using Wagtail search.
@@ -48,12 +55,30 @@ def resolve_queryset(
 
         return get_search_backend().search(search_query, qs)
 
-    if order is not None:
-        qs = qs.order_by(*map(lambda x: x.strip(), order.split(",")))
+    # mdl.objects.all as a promise
+    limit = int(limit or 0)
+    offset = int(offset or 0)
+    qs = model_loader.load_all(info)
 
-    if limit is not None:
-        limit = int(limit)
-        qs = qs[offset : limit + offset]
+    # Filter the list of promises
+    if limit or offset:
+
+        def filter_qs(qs):
+            if offset > 0:
+                if limit:
+                    return qs[offset : limit + offset]
+                return qs[offset:]
+            return qs
+
+        qs = qs.then(filter_qs)
+
+    # Order the list of promises
+    if order:
+
+        def order_qs(qs):
+            return qs.order_by(*map(lambda x: x.strip(), order.split(",")))
+
+        qs = qs.then(order_qs)
 
     return qs
 

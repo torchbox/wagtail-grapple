@@ -1,28 +1,23 @@
 from django.shortcuts import render
+from django.conf import settings
 from django.conf.urls import url
 from django.views.decorators.csrf import csrf_exempt
-
 from graphene_django.views import GraphQLView
-from channels.routing import route_class
-from graphql_ws.django_channels import GraphQLSubscriptionConsumer
+from .views import GrappleView
 
 
-def graphiql(request):
+def playground(request):
+    URL = settings.BASE_URL.split("//")[1]
     graphiql_settings = {
-        "GRAPHIQL_VERSION": "0.11.10",
-        "SUBSCRIPTIONS_TRANSPORT_VERSION": "0.7.0",
-        "subscriptionsEndpoint": "ws://localhost:8000/subscriptions",
-        "endpointURL": "/graphql",
+        "endpoint": "http://" + URL + "/graphql",
+        "subscriptionsEndpoint": "ws://" + URL + "/graphql",
     }
 
-    return render(request, "grapple/graphiql.html", graphiql_settings)
+    return render(request, "grapple/playground.html", graphiql_settings)
 
 
 # Traditional URL routing
 urlpatterns = [
-    url(r"^graphql", csrf_exempt(GraphQLView.as_view(graphiql=True))),
-    url(r"^graphiql", graphiql),
+    url(r"^graphql", csrf_exempt(GrappleView.as_view(graphiql=True))),
+    url(r"^playground", playground),
 ]
-
-# Django Channel (v1.x) routing for subscription support
-channel_routing = [route_class(GraphQLSubscriptionConsumer, path=r"^/subscriptions")]

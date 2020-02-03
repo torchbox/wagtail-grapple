@@ -15,6 +15,7 @@ import os
 
 PROJECT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BASE_DIR = os.path.dirname(PROJECT_DIR)
+SECRET_KEY = ""
 
 
 # Quick-start development settings - unsuitable for production
@@ -158,7 +159,7 @@ WAGTAILIMAGES_IMAGE_MODEL = "images.CustomImage"
 # Base URL to use when referring to full URLs within the Wagtail admin backend -
 # e.g. in notification emails. Don't include '/admin' or a trailing slash
 BASE_URL = "http://localhost:8000"
-
+APPEND_SLASH = False
 CORS_ORIGIN_ALLOW_ALL = True
 
 # Grapple Config:
@@ -166,15 +167,5 @@ GRAPHENE = {"SCHEMA": "grapple.schema.schema"}
 GRAPPLE_APPS = {"images": "", "home": ""}
 GRAPPLE_ADD_SEARCH_HIT = True
 
-HEADLESS_PREVIEW_CLIENT_URLS = {"default": "http://localhost:8001/preview"}
-HEADLESS_PREVIEW_LIVE = True
-
-ASGI_APPLICATION = "asgi.channel_layer"
-CHANNELS_WS_PROTOCOLS = ["graphql-ws"]
-CHANNEL_LAYERS = {
-    "default": {
-        # "BACKEND": "asgi_redis.RedisChannelLayer",
-        "BACKEND": "asgiref.inmemory.ChannelLayer",
-        "ROUTING": "grapple.urls.channel_routing",
-    }
-}
+ASGI_APPLICATION = "example.routing.application"
+CHANNEL_LAYERS = {"default": {"BACKEND": "channels.layers.InMemoryChannelLayer"}}

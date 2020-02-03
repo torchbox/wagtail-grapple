@@ -17,7 +17,6 @@ from wagtail.images.blocks import ImageChooserBlock
 from wagtail.snippets.models import get_snippet_models
 from graphene_django.types import DjangoObjectType
 
-
 from .registry import registry
 from .types.pages import PageInterface, Page
 from .types.documents import DocumentObjectType

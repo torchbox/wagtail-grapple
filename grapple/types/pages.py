@@ -1,8 +1,11 @@
+import channels_graphql_ws
 import graphene
+from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from wagtail.core.models import Page as WagtailPage
 from wagtail_headless_preview.signals import preview_update
 from graphene_django.types import DjangoObjectType
+from channels_graphql_ws import Subscription
 from graphql.execution.base import ResolveInfo
 from rx.subjects import Subject
 from django.dispatch import receiver
@@ -117,7 +120,7 @@ class Page(DjangoObjectType):
         interfaces = (PageInterface,)
 
 
-def get_specific_page(id, slug, token, content_type=None):
+def get_specific_page(id=None, slug=None, token=None, content_type=None):
     """
     Get a spcecific page, also get preview if token is passed
     """
@@ -161,53 +164,63 @@ def PagesQuery():
 
         # Return all pages, ideally specific.
         def resolve_pages(self, info, **kwargs):
-            return resolve_queryset(
-                WagtailPage.objects.live().public().specific(), info, **kwargs
-            )
+            return resolve_queryset(WagtailPage, info, **kwargs)
 
         # Return a specific page, identified by ID or Slug.
         def resolve_page(self, info, **kwargs):
-            return get_specific_page(
-                id=kwargs.get("id"),
-                slug=kwargs.get("slug"),
-                token=kwargs.get("token"),
-                content_type=kwargs.get("content_type"),
-            )
+            return resolve_queryset(WagtailPage, info, **kwargs)
+            # return get_specific_page(
+            #     id=kwargs.get("id"),
+            #     slug=kwargs.get("slug"),
+            #     token=kwargs.get("token"),
+            #     content_type=kwargs.get("content_type"),
+            # )
 
     return Mixin
 
 
-# Subject to sync Django Signals to Observable
-preview_subject = Subject()
-
-
 @receiver(preview_update)
 def on_updated(sender, token, **kwargs):
-    preview_subject.on_next(token)
+    OnPreviewUpdate.broadcast(payload=token)
 
 
-# Subscription Mixin
+class OnPreviewUpdate(Subscription):
+    page = graphene.Field(PageInterface)
+
+    class Arguments:
+        id = graphene.ID()
+        token = graphene.String()
+        slug = graphene.String()
+        content_type = graphene.String()
+
+    @staticmethod
+    def subscribe(*args, **kwargs):
+        pass
+
+    @staticmethod
+    def publish(pushed_token, info, token, **kwargs):
+        if pushed_token == token:
+            return OnPreviewUpdate(
+                page=get_specific_page(
+                    kwargs.get("id"),
+                    kwargs.get("slug"),
+                    token,
+                    kwargs.get("content_type"),
+                )
+            )
+
+        return OnPreviewUpdate(page=None)
+
+
 def PagesSubscription():
-    def preview_observable(id, slug, token, content_type):
-        return preview_subject.filter(lambda previewToken: previewToken == token).map(
-            lambda token: get_specific_page(id, slug, token, content_type)
-        )
+    # Monkeypatch headless preview url for debugging:
+    if not getattr(settings, "HEADLESS_PREVIEW_CLIENT_URLS", None):
+        settings.HEADLESS_PREVIEW_LIVE = True
+        settings.HEADLESS_PREVIEW_CLIENT_URLS = {
+            "default": "http://localhost:8000/playground"
+        }
 
     class Mixin:
-        page = graphene.Field(
-            PageInterface,
-            id=graphene.Int(),
-            slug=graphene.String(),
-            token=graphene.String(),
-            content_type=graphene.String(),
-        )
-
-        def resolve_page(self, info, **kwargs):
-            return preview_observable(
-                id=kwargs.get("id"),
-                slug=kwargs.get("slug"),
-                token=kwargs.get("token"),
-                content_type=kwargs.get("content_type"),
-            )
+        on_preview_update = OnPreviewUpdate.Field()
 
     return Mixin

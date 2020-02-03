@@ -1,4 +1,5 @@
 import graphene
+import channels_graphql_ws
 from graphql.validation.rules import NoUnusedFragments, specified_rules
 
 # HACK: Remove NoUnusedFragments validator

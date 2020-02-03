@@ -7,18 +7,22 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-        ('grapple', '0002_delete_pagepreview'),
-    ]
+    dependencies = [("grapple", "0002_delete_pagepreview")]
 
     operations = [
         migrations.CreateModel(
-            name='StubModel',
+            name="StubModel",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                )
             ],
-            options={
-                'managed': False,
-            },
-        ),
+            options={"managed": False},
+        )
     ]

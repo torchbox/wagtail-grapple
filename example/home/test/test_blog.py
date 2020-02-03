@@ -13,7 +13,7 @@ from home.factories import (
     BlogPageFactory,
     BlogPageRelatedLinkFactory,
     ImageGalleryImageFactory,
-    AuthorPageFactory
+    AuthorPageFactory,
 )
 
 
@@ -92,7 +92,9 @@ class BlogTest(BaseGrappleTest):
         )
         executed = self.client.execute(query)
         page = executed["data"]["page"]["author"]
-        self.assertTrue(isinstance(page["name"], str) and page["name"] == self.blog_page.author.name)
+        self.assertTrue(
+            isinstance(page["name"], str) and page["name"] == self.blog_page.author.name
+        )
 
     def get_blocks_from_body(self, block_type, block_query="rawValue"):
         query = """

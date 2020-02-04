@@ -35,7 +35,7 @@ def resolve_queryset(
     qs = gql_optimizer.query(qs, info)
 
     if id is not None:
-        qs = qs.filter(pk=id)
+        qs = qs.get(pk=id)
     else:
         qs = qs.all()
 

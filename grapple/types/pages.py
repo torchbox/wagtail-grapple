@@ -117,14 +117,14 @@ class Page(DjangoObjectType):
         interfaces = (PageInterface,)
 
 
-def get_specific_page(id, slug, token, content_type=None):
+def get_specific_page(id, slug, token, content_type=None, info=None):
     """
     Get a spcecific page, also get preview if token is passed
     """
     page = None
     try:
         if id:
-            page = WagtailPage.objects.live().public().specific().get(pk=id)
+            page = resolve_queryset(WagtailPage.objects.live().public().specific(), info, id=id)
         elif slug:
             page = WagtailPage.objects.live().public().specific().get(slug=slug)
 
@@ -133,12 +133,14 @@ def get_specific_page(id, slug, token, content_type=None):
                 page_type = type(page)
                 if hasattr(page_type, "get_page_from_preview_token"):
                     page = page_type.get_page_from_preview_token(token)
+
             elif content_type:
                 app_label, model = content_type.lower().split(".")
                 mdl = ContentType.objects.get(app_label=app_label, model=model)
                 cls = mdl.model_class()
                 if hasattr(cls, "get_page_from_preview_token"):
                     page = cls.get_page_from_preview_token(token)
+
     except BaseException:
         page = None
 
@@ -172,6 +174,7 @@ def PagesQuery():
                 slug=kwargs.get("slug"),
                 token=kwargs.get("token"),
                 content_type=kwargs.get("content_type"),
+                info=info
             )
 
     return Mixin
@@ -190,7 +193,7 @@ def on_updated(sender, token, **kwargs):
 def PagesSubscription():
     def preview_observable(id, slug, token, content_type):
         return preview_subject.filter(lambda previewToken: previewToken == token).map(
-            lambda token: get_specific_page(id, slug, token, content_type)
+            lambda token: get_specific_page(id, slug, token, content_type, info)
         )
 
     class Mixin:
@@ -208,6 +211,7 @@ def PagesSubscription():
                 slug=kwargs.get("slug"),
                 token=kwargs.get("token"),
                 content_type=kwargs.get("content_type"),
+                info=info
             )
 
     return Mixin

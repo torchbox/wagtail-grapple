@@ -32,11 +32,13 @@ def resolve_queryset(
     :type order: str
     """
     offset = int(offset or 0)
+    qs = gql_optimizer.query(qs, info)
+    print(debug)
 
     if id is not None:
-        qs = gql_optimizer.query(qs.get(pk=id), info)
+        qs = qs.get(pk=id)
     else:
-        qs = gql_optimizer.query(qs.all(), info)
+        qs = qs.all()
 
     if id is None and search_query:
         # Check if the queryset is searchable using Wagtail search.

@@ -33,7 +33,7 @@ def resolve_queryset(
     """
     offset = int(offset or 0)
     qs = gql_optimizer.query(qs, info)
-    print(debug)
+    print(qs.query)
 
     if id is not None:
         qs = qs.get(pk=id)

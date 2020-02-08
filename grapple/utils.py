@@ -32,8 +32,7 @@ def resolve_queryset(
     :type order: str
     """
     offset = int(offset or 0)
-    qs = gql_optimizer.query(qs, info)
-    print(qs.query)
+    qs = gql_optimizer.query(qs, info, disable_abort_only=True)
 
     if id is not None:
         qs = qs.get(pk=id)

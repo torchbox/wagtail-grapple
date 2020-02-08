@@ -124,7 +124,9 @@ def get_specific_page(id, slug, token, content_type=None, info=None):
     page = None
     try:
         if id:
-            page = resolve_queryset(WagtailPage.objects.live().public().specific(), info, id=id)
+            page = resolve_queryset(
+                WagtailPage.objects.live().public().specific(), info, id=id
+            )
         elif slug:
             page = WagtailPage.objects.live().public().specific().get(slug=slug)
 
@@ -174,7 +176,7 @@ def PagesQuery():
                 slug=kwargs.get("slug"),
                 token=kwargs.get("token"),
                 content_type=kwargs.get("content_type"),
-                info=info
+                info=info,
             )
 
     return Mixin
@@ -211,7 +213,7 @@ def PagesSubscription():
                 slug=kwargs.get("slug"),
                 token=kwargs.get("token"),
                 content_type=kwargs.get("content_type"),
-                info=info
+                info=info,
             )
 
     return Mixin

@@ -62,31 +62,36 @@ def specific_iterator(qs, defer=True):
         # look up model class for this content type, falling back on the original
         # model (i.e. Page) if the more specific one is missing
         specific_model = content_types[content_type].model_class() or qs.model
+
+        # Get deffered fields
+        qs_fields, was_deffering = qs.query.deferred_loading
+        specific_model_fields, _ = generate_defered_fields(
+            specific_model, qs_fields
+        )
+
+        # If no fields of this model requested then don't query specific
+        if not specific_model_fields:
+            pages_by_type[content_type] = None
+            continue
+
+        # Query pages and apply .defer or .only
         pages = specific_model.objects.filter(pk__in=pks)
 
-        # Preload fields in specific models
-        if defer:
-            # Get deffered fields
-            qs_fields, was_deffering = qs.query.deferred_loading
-            specific_model_fields, _ = generate_defered_fields(
-                specific_model, qs_fields
-            )
+        # TODO: Hack to fix streamfield
+        specific_model_fields.append('body')
 
-            # If using .defer or .only
-            print(specific_model_fields)
-            if was_deffering:
-                pages = pages.defer(*specific_model_fields)
-            else:
-                pages = pages.only(*specific_model_fields)
+        if was_deffering:
+            pages = pages.defer(*specific_model_fields)
+        else:
+            pages = pages.only(*specific_model_fields)
 
         # Replace specific models in same sort order
         pages_by_type[content_type] = {page.pk: page for page in pages}
 
-    print("TEST SPECIFIC")
-
     # Yield all of the pages (specific + generic), in the order they occurred in the original query.
     for pk, content_type in pks_and_types:
-        yield pages_by_type[content_type][pk]
+        if pages_by_type[content_type]:
+            yield pages_by_type[content_type][pk]
 
 
 class DeferredSpecificIterable(BaseIterable):

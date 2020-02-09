@@ -79,7 +79,8 @@ def specific_iterator(qs, defer=True):
 
         # TODO: Hack to fix streamfield
         specific_model_fields.append('body')
-
+        print(qs_fields)
+        print(specific_model_fields)
         if was_deffering:
             pages = pages.defer(*specific_model_fields)
         else:

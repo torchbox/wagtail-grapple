@@ -6,14 +6,14 @@ from django.db.models.query import BaseIterable
 
 def specific(self, *args, **kwargs):
     """
-        This efficiently gets all the specific pages for the queryset, using
-        the minimum number of queries.
+    This efficiently gets all the specific pages for the queryset, using
+    the minimum number of queries.
 
-        When the "defer" keyword argument is set to True, only the basic page
-        fields will be loaded and all specific fields will be deferred. It
-        will still generate a query for each page type though (this may be
-        improved to generate only a single query in a future release).
-        """
+    When the "defer" keyword argument is set to True, only the basic page
+    fields will be loaded and all specific fields will be deferred. It
+    will still generate a query for each page type though (this may be
+    improved to generate only a single query in a future release).
+    """
     clone = self._clone()
     clone._iterable_class = DeferredSpecificIterable
     return clone
@@ -41,7 +41,7 @@ def generate_defered_fields(model, fields):
 
 
 # Custom version of code from https://github.com/wagtail/wagtail/blob/master/wagtail/core/query.py#L363
-def specific_iterator(qs, defer=False):
+def specific_iterator(qs, defer=True):
     """
     This efficiently iterates all the specific pages in a queryset, using
     the minimum number of queries.
@@ -80,6 +80,8 @@ def specific_iterator(qs, defer=False):
 
         # Replace specific models in same sort order
         pages_by_type[content_type] = {page.pk: page for page in pages}
+
+    print("TEST SPECIFIC")
 
     # Yield all of the pages (specific + generic), in the order they occurred in the original query.
     for pk, content_type in pks_and_types:

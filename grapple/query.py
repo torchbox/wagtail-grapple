@@ -73,6 +73,7 @@ def specific_iterator(qs, defer=True):
             )
 
             # If using .defer or .only
+            print(specific_model_fields)
             if was_deffering:
                 pages = pages.defer(*specific_model_fields)
             else:

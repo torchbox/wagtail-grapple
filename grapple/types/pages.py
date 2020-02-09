@@ -166,7 +166,7 @@ def PagesQuery():
         # Return all pages, ideally specific.
         def resolve_pages(self, info, **kwargs):
             return resolve_queryset(
-                WagtailPage.objects.live().public().specific(), info, **kwargs
+                WagtailPage.objects.live().public().specific(defer=True), info, **kwargs
             )
 
         # Return a specific page, identified by ID or Slug.

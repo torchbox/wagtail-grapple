@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 
+DEBUG = True
 PROJECT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BASE_DIR = os.path.dirname(PROJECT_DIR)
 
@@ -54,9 +55,11 @@ INSTALLED_APPS = [
     "grapple",
     "graphene_django",
     "channels",
+    "django_extensions",
 ]
 
 MIDDLEWARE = [
+    "qinspect.middleware.QueryInspectMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -65,7 +68,6 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "django.middleware.security.SecurityMiddleware",
-    "wagtail.core.middleware.SiteMiddleware",
     "wagtail.contrib.redirects.middleware.RedirectMiddleware",
 ]
 
@@ -169,12 +171,6 @@ GRAPPLE_ADD_SEARCH_HIT = True
 HEADLESS_PREVIEW_CLIENT_URLS = {"default": "http://localhost:8001/preview"}
 HEADLESS_PREVIEW_LIVE = True
 
-ASGI_APPLICATION = "asgi.channel_layer"
-CHANNELS_WS_PROTOCOLS = ["graphql-ws"]
-CHANNEL_LAYERS = {
-    "default": {
-        # "BACKEND": "asgi_redis.RedisChannelLayer",
-        "BACKEND": "asgiref.inmemory.ChannelLayer",
-        "ROUTING": "grapple.urls.channel_routing",
-    }
-}
+# Query Optimisation helpers
+SHELL_PLUS_PRINT_SQL = True
+RUNSERVER_PLUS_PRINT_SQL_TRUNCATE = 100000

@@ -62,11 +62,14 @@ def specific_iterator(qs, defer=True):
         # look up model class for this content type, falling back on the original
         # model (i.e. Page) if the more specific one is missing
         specific_model = content_types[content_type].model_class() or qs.model
+        specific_model_name = specific_model.__name__.lower()
 
-        # Get deffered fields
-        qs_fields, was_deffering = qs.query.deferred_loading
+        # Get deffered fields (.only/.deffer)
+        only_fields, _ = qs.query.deferred_loading
+        select_related_fields = qs.query.select_related_types.get(specific_model_name, [])
+        prefetch_related_fields = qs.query.prefetch_related_types.get(specific_model_name, [])
         specific_model_fields, _ = generate_defered_fields(
-            specific_model, qs_fields
+            specific_model, only_fields
         )
 
         # If no fields of this model requested then don't query specific
@@ -74,17 +77,14 @@ def specific_iterator(qs, defer=True):
             pages_by_type[content_type] = None
             continue
 
-        # Query pages and apply .defer or .only
+        # Query pages
         pages = specific_model.objects.filter(pk__in=pks)
-
-        # TODO: Hack to fix streamfield
-        specific_model_fields.append('body')
-        print(qs_fields)
-        print(specific_model_fields)
-        if was_deffering:
-            pages = pages.defer(*specific_model_fields)
-        else:
-            pages = pages.only(*specific_model_fields)
+        # Defer all fields apart from those required
+        pages = pages.only(*specific_model_fields)
+        # Apply select_related fields (passed down from optimizer.py)
+        pages = pages.select_related(*select_related_fields)
+        # Apply prefetch_related fields (passed down from optimizer.py)
+        pages = pages.prefetch_related(*prefetch_related_fields)
 
         # Replace specific models in same sort order
         pages_by_type[content_type] = {page.pk: page for page in pages}

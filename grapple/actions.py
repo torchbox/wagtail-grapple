@@ -240,6 +240,9 @@ def load_type_fields():
                 type_meta = {"Meta": Meta, "id": graphene.ID(), "name": type_name}
                 exclude_fields = get_fields_and_properties(cls)
 
+                # Attach grapple field map to model class for future query optimisation
+                cls._grapple_field_map = {}
+
                 # Add any custom fields to node if they are defined.
                 methods = {}
                 if hasattr(cls, "graphql_fields"):
@@ -250,6 +253,7 @@ def load_type_fields():
                         # Add field to GQL type with correct field-type
                         field, field_type = get_field_type(field)
                         type_meta[field.field_name] = field_type
+                        cls._grapple_field_map[field.field_name] = field.field_source
 
                         # Remove field from excluded list
                         if field.field_name in exclude_fields:

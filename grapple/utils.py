@@ -9,6 +9,7 @@ from wagtail.search.index import class_is_indexed
 from wagtail.search.models import Query
 from wagtail.search.backends import get_search_backend
 
+from .db.optimizer import QueryOptimzer
 
 def resolve_queryset(
     qs, info, limit=None, offset=None, search_query=None, id=None, order=None, **kwargs
@@ -32,7 +33,7 @@ def resolve_queryset(
     :type order: str
     """
     offset = int(offset or 0)
-    qs = gql_optimizer.query(qs, info, disable_abort_only=True)
+    qs = QueryOptimzer.query(qs, info)
 
     if id is not None:
         qs = qs.get(pk=id)

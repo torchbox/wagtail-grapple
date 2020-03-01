@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     "graphene_django",
     "channels",
     "django_extensions",
+    "wagtailvideos",
 ]
 
 MIDDLEWARE = [

@@ -66,11 +66,16 @@ def specific_iterator(qs, defer=True):
 
         # Get deffered fields (.only/.deffer)
         only_fields, _ = qs.query.deferred_loading
-        select_related_fields = qs.query.select_related_types.get(specific_model_name, [])
-        prefetch_related_fields = qs.query.prefetch_related_types.get(specific_model_name, [])
+        only_fields_specific = getattr(qs.query, 'only_field_types', {}).get(specific_model_name, [])
+        select_related_fields = getattr(qs.query, 'select_related_types', {}).get(specific_model_name, [])
+        prefetch_related_fields = getattr(qs.query, 'prefetch_related_types', {}).get(specific_model_name, [])
         specific_model_fields, _ = generate_defered_fields(
             specific_model, only_fields
         )
+
+        # print("Only fields: ", only_fields_specific)
+        # print("Select Related fields: ", select_related_fields)
+        # print("Prefetch Related fields: ", prefetch_related_fields)
 
         # If no fields of this model requested then don't query specific
         if not specific_model_fields:
@@ -80,7 +85,7 @@ def specific_iterator(qs, defer=True):
         # Query pages
         pages = specific_model.objects.filter(pk__in=pks)
         # Defer all fields apart from those required
-        pages = pages.only(*specific_model_fields)
+        pages = pages.only(*specific_model_fields, *only_fields_specific)
         # Apply select_related fields (passed down from optimizer.py)
         pages = pages.select_related(*select_related_fields)
         # Apply prefetch_related fields (passed down from optimizer.py)

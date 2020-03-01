@@ -1,10 +1,9 @@
 import re
 from collections.abc import Iterable
 from django.db.models.query_utils import DeferredAttribute
-from django.db.models.fields.related_descriptors import ReverseOneToOneDescriptor
+from django.db.models.fields.related_descriptors import ReverseOneToOneDescriptor, ReverseManyToOneDescriptor, ForwardManyToOneDescriptor, ForwardOneToOneDescriptor, ReverseOneToOneDescriptor
 from graphene.types.definitions import GrapheneInterfaceType
 from graphql.language.ast import Field, InlineFragment, FragmentSpread, InterfaceTypeDefinition
-from pprint import pprint
 
 from modelcluster.fields import ParentalKey
 from django.db.models.fields.related import ForeignKey
@@ -25,6 +24,7 @@ class QueryOptimzer:
         self.select_related_fields = []
         self.prefetch_related_fields = []
         # Future Optimisation maps
+        self.only_field_types = {}
         self.select_related_types = {}
         self.prefetch_related_types = {}
 
@@ -66,38 +66,75 @@ class QueryOptimzer:
                 self.select_field(nested_field, field_name, field_name_prefix)
                 continue
 
+    def match_relation_type(self, cls, *relation_types):
+        for relation_type in relation_types:
+            if issubclass(cls, relation_type):
+                return True
+            if isinstance(cls, relation_type):
+                return True
+
     def select_field(self, field, field_name, field_name_prefix = None):
-        field_type = type(field)
-        is_nested_field = len(field_name.split('__')) > 1
+        model = self.model_type_map.get(field_name_prefix, None)
+        # If link to another model is here then try and parse nested fields
+        if isinstance(field, ReverseOneToOneDescriptor):
+            # Recursion to load nested fields to support specific pages
+            nested_field_name = field_name.split("__")[0]
+            nested_field = getattr(model, nested_field_name, None)
+            if hasattr(nested_field, 'field'):
+                return self.select_field(nested_field.field, nested_field_name, field_name_prefix)
+            else:
+                self.only_fields.append(nested_field_name)
+                return
 
-        # Simple Attribute: slug, blogpage__slug
-        if not is_nested_field:
+        if not field.is_relation:
             self.only_fields.append(field_name)
-            return
+            if model:
+                # Cache selection for future optimisation (query.py)
+                existing_fields = self.only_field_types.get(field_name_prefix, [])
+                self.only_field_types[field_name_prefix] = [field_name, *existing_fields]
 
-        if isinstance(field, ForeignKey):
-            self.select_related_fields.append(field_name)
-
-        # if isinstance(field, ParentalKey):
-        #     self.prefetch_related_fields.append(field_name)
-
-        # One to One Foreign Keys
-        if field_type == ReverseOneToOneDescriptor:
-            # Check if nested field is a model type
-            model = self.model_type_map.get(field_name_prefix, None)
-            root_field_name = field_name.split("__")[0]
-            root_field = getattr(model, root_field_name, None).field
-
-            if isinstance(root_field, ParentalKey):
+        elif field.one_to_many or field.many_to_many or isinstance(field, ParentalKey):
+            if model:
                 # Cache selection for future optimisation (query.py)
                 existing_fields = self.prefetch_related_types.get(field_name_prefix, [])
-                self.prefetch_related_types[field_name_prefix] = [root_field_name, *existing_fields]
+                self.prefetch_related_types[field_name_prefix] = [field_name, *existing_fields]
+            else:
+                self.prefetch_related_fields.append(field_name)
 
-            elif isinstance(root_field, ForeignKey):
+        elif field.many_to_one or field.one_to_one:
+            if model:
                 # Cache selection for future optimisation (query.py)
                 existing_fields = self.select_related_types.get(field_name_prefix, [])
-                self.select_related_types[field_name_prefix] = [root_field_name, *existing_fields]
-                self.only_fields.append(root_field_name)
+                self.select_related_types[field_name_prefix] = [field_name, *existing_fields]
+            else:
+                self.only_fields.append(field_name)
+                self.select_related_fields.append(field_name)
+
+
+
+
+        # One to One Foreign Keys
+        # if field_type == ReverseOneToOneDescriptor:
+        #     # Check if nested field is a model type
+        #     model = self.model_type_map.get(field_name_prefix, None)
+            # root_field_name = field_name.split("__")[0]
+            # root_field = getattr(model, root_field_name, None).field
+
+            # if not hasattr(root_field, 'related_accessor_class'):
+            #     # Cache selection for future optimisation (query.py)
+            #     existing_fields = self.only_field_types.get(field_name_prefix, [])
+            #     self.only_field_types[field_name_prefix] = [root_field_name, *existing_fields]
+
+            # elif root_field.one_to_many or root_field.many_to_many or isinstance(root_field, ParentalKey):
+            #     # Cache selection for future optimisation (query.py)
+            #     existing_fields = self.prefetch_related_types.get(field_name_prefix, [])
+            #     self.prefetch_related_types[field_name_prefix] = [root_field_name, *existing_fields]
+
+            # elif root_field.many_to_one or root_field.one_to_one:
+            #     # Cache selection for future optimisation (query.py)
+            #     existing_fields = self.select_related_types.get(field_name_prefix, [])
+            #     self.select_related_types[field_name_prefix] = [root_field_name, *existing_fields]
+            #     self.only_fields.append(root_field_name)
 
 
     # Apply order fields to querysets
@@ -107,8 +144,10 @@ class QueryOptimzer:
         self.qs = self.qs.prefetch_related(*self.prefetch_related_fields)
 
         # Add custom lists to query for use in Specific page optimizer.
+        setattr(self.qs.query, 'only_field_types', self.only_field_types)
         setattr(self.qs.query, 'select_related_types', self.select_related_types)
         setattr(self.qs.query, 'prefetch_related_types', self.prefetch_related_types)
+
 
 class AstExplorer:
     schema = None
@@ -184,7 +223,7 @@ class AstExplorer:
 
         # Record what Django model this correlates to
         type_prefix = gql_type_name.lower()
-        self.model_type_map[type_prefix] = gql_type.graphene_type._meta.model
+        self.model_type_map[type_prefix] = getattr(gql_type.graphene_type._meta, 'model', None)
 
         # Function to add the typename to fieldnames
         def prefix_type(field):

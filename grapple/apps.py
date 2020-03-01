@@ -20,6 +20,13 @@ class Grapple(AppConfig):
     def preload_tasks(self):
         # Monkeypatch Wagtails' PageQueryset .specific method to an more optimized one
         from wagtail.core.query import PageQuerySet
-        from .query import specific
+        from .query import specific as specific_defer
 
-        PageQuerySet.specific = specific
+        # TODO: Hack to only use custom code when deffering fields
+        specific = PageQuerySet.specific
+        def resolve_specific(self, defer=False):
+            if defer:
+                return specific_defer(self)
+            return specific(self)
+
+        PageQuerySet.specific = resolve_specific

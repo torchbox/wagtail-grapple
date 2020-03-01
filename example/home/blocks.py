@@ -44,11 +44,11 @@ class ImageGalleryBlock(blocks.StructBlock):
     ]
 
 
-@register_streamfield_block
-class VideoBlock(blocks.StructBlock):
-    youtube_link = EmbedBlock(required=False)
+# @register_streamfield_block
+# class VideoBlock(blocks.StructBlock):
+#     youtube_link = EmbedBlock(required=False)
 
-    graphql_fields = [GraphQLEmbed("youtube_link")]
+#     graphql_fields = [GraphQLEmbed("youtube_link")]
 
 
 class StreamFieldBlock(blocks.StreamBlock):
@@ -59,4 +59,4 @@ class StreamFieldBlock(blocks.StreamBlock):
     date = blocks.DateBlock()
     datetime = blocks.DateTimeBlock()
     gallery = ImageGalleryBlock()
-    video = VideoBlock()
+    # video = VideoBlock()

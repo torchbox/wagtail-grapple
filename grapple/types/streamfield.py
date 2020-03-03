@@ -320,13 +320,19 @@ class StaticBlock(graphene.ObjectType):
 
 
 class ListBlock(graphene.ObjectType):
+    items = graphene.List(StreamFieldInterface)
+
     class Meta:
         interfaces = (StreamFieldInterface,)
 
-    items = graphene.Field(StreamFieldInterface)
-
     def resolve_items(self, info, **kwargs):
-        return self
+        # Get the nested StreamBlock type
+        block_type = self.block.child_block
+        # Return a list of GraphQL types from the list of valuess
+        return [
+            StructBlockItem(self.id, block_type, item)
+            for item in self.value
+        ]
 
 
 registry.streamfield_blocks.update(

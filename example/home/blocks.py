@@ -60,3 +60,4 @@ class StreamFieldBlock(blocks.StreamBlock):
     datetime = blocks.DateTimeBlock()
     gallery = ImageGalleryBlock()
     video = VideoBlock()
+    objectives = blocks.ListBlock(blocks.CharBlock())

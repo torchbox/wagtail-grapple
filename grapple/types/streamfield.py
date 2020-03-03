@@ -329,10 +329,7 @@ class ListBlock(graphene.ObjectType):
         # Get the nested StreamBlock type
         block_type = self.block.child_block
         # Return a list of GraphQL types from the list of valuess
-        return [
-            StructBlockItem(self.id, block_type, item)
-            for item in self.value
-        ]
+        return [StructBlockItem(self.id, block_type, item) for item in self.value]
 
 
 registry.streamfield_blocks.update(

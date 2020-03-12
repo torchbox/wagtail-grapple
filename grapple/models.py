@@ -11,11 +11,17 @@ class GraphQLField:
     field_type: str
     field_source: str
 
-    def __init__(self, field_name: str, field_type: type = None, **kwargs):
+    def __init__(
+        self, field_name: str, field_type: type = None, required=None, **kwargs
+    ):
         # Initiate and get specific field info.
         self.field_name = field_name
         self.field_type = field_type
         self.field_source = kwargs.get("source", field_name)
+
+        # Add support for NonNull/required fields
+        if required:
+            self.field_type = graphene.NonNull(field_type)
 
         # Legacy collection API (Allow lists):
         self.extract_key = kwargs.get("key", None)
@@ -136,7 +142,15 @@ def GraphQLPage(field_name: str, **kwargs):
     return Mixin
 
 
-def GraphQLCollection(nested_type, field_name, *args, **kwargs):
+def GraphQLCollection(
+    nested_type,
+    field_name,
+    *args,
+    is_queryset=False,
+    required=False,
+    item_required=False,
+    **kwargs
+):
     def Mixin():
         from .types.structures import QuerySetList
 
@@ -149,18 +163,25 @@ def GraphQLCollection(nested_type, field_name, *args, **kwargs):
                 kwargs["key"] = key
 
         # Create the nested type and wrap it in some list field.
-        graphql_type = nested_type(field_name, *args, **kwargs)
+        graphql_type = nested_type(field_name, *args, required=item_required, **kwargs)
         collection_type = graphene.List
 
         # Add queryset filtering when necessary.
         if (
-            kwargs.get("is_queryset", False)
+            is_queryset
             or nested_type == GraphQLForeignKey
             or nested_type == GraphQLSnippet
         ):
             collection_type = QuerySetList
 
-        return graphql_type, collection_type
+        # Add support for NonNull/required to wrapper field
+        required_collection_type = None
+        if required:
+            required_collection_type = lambda nested_type: graphene.NonNull(
+                collection_type(nested_type)
+            )
+
+        return graphql_type, required_collection_type or collection_type
 
     return Mixin
 

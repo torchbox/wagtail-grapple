@@ -157,7 +157,7 @@ class Page(DjangoObjectType):
         interfaces = (PageInterface,)
 
 
-def get_specific_page(id, slug, url, token, content_type=None, site=None):
+def get_specific_page(id=None, slug=None, url=None, token=None, content_type=None, site=None):
     """
     Get a specific page, given a page_id, slug or preview if a preview token is passed
     """
@@ -173,10 +173,9 @@ def get_specific_page(id, slug, url, token, content_type=None, site=None):
         elif slug:
             page = qs.get(slug=slug)
         elif url:
-            for matching_page in qs.filter(url_path__contains=url):
-                if matching_page.url.strip("/") == url.strip("/"):
-                    page = matching_page
-                    break
+            qs = qs.filter(url_path__contains=url.lstrip("/"))
+            if qs.exists():
+                page = qs.first()
 
         # If token provided then get draft/preview
         if token:
@@ -256,18 +255,20 @@ if has_channels:
 
     # Subscription Mixin
     def PagesSubscription():
-        def preview_observable(id, slug, token, content_type):
+        def preview_observable(id, slug, url, token, content_type, site):
             return preview_subject.filter(
                 lambda previewToken: previewToken == token
-            ).map(lambda token: get_specific_page(id, slug, token, content_type))
+            ).map(lambda token: get_specific_page(id, slug, url, token, content_type, site))
 
         class Mixin:
             page = graphene.Field(
                 PageInterface,
                 id=graphene.Int(),
                 slug=graphene.String(),
+                url=graphene.String(),
                 token=graphene.String(),
                 content_type=graphene.String(),
+                in_site=graphene.Boolean(),
             )
 
             def resolve_page(self, info, **kwargs):
@@ -276,6 +277,9 @@ if has_channels:
                     slug=kwargs.get("slug"),
                     token=kwargs.get("token"),
                     content_type=kwargs.get("content_type"),
+                    site=Site.find_for_request(info.context)
+                    if kwargs.get("in_site", False)
+                    else None,
                 )
 
         return Mixin

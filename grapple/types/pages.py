@@ -157,7 +157,7 @@ class Page(DjangoObjectType):
         interfaces = (PageInterface,)
 
 
-def get_specific_page(id, slug, token, content_type=None, site=None):
+def get_specific_page(id, slug, url, token, content_type=None, site=None):
     """
     Get a specific page, given a page_id, slug or preview if a preview token is passed
     """
@@ -172,12 +172,19 @@ def get_specific_page(id, slug, token, content_type=None, site=None):
             page = qs.get(pk=id)
         elif slug:
             page = qs.get(slug=slug)
+        elif url:
+            for matching_page in qs.filter(url_path__contains=url):
+                if matching_page.url.strip("/") == url.strip("/"):
+                    page = matching_page
+                    break
 
+        # If token provided then get draft/preview
         if token:
             if page:
                 page_type = type(page)
                 if hasattr(page_type, "get_page_from_preview_token"):
                     page = page_type.get_page_from_preview_token(token)
+
             elif content_type:
                 app_label, model = content_type.lower().split(".")
                 mdl = ContentType.objects.get(app_label=app_label, model=model)
@@ -205,6 +212,7 @@ def PagesQuery():
             PageInterface,
             id=graphene.Int(),
             slug=graphene.String(),
+            url=graphene.String(),
             token=graphene.String(),
             content_type=graphene.String(),
             in_site=graphene.Boolean(),
@@ -225,6 +233,7 @@ def PagesQuery():
             return get_specific_page(
                 id=kwargs.get("id"),
                 slug=kwargs.get("slug"),
+                url=kwargs.get("url"),
                 token=kwargs.get("token"),
                 content_type=kwargs.get("content_type"),
                 site=Site.find_for_request(info.context)

@@ -3,7 +3,7 @@ GraphQL Types
 
 Each of the field types in last chapter correspond to an outputted GraphQL
 (or more specifically Graphene) type. Many are self-explanatory such as
-``GraphQLString`` or ``GraphQLFloat`` but some have a sub-selection which we
+``GraphQLString`` or ``GraphQLFloat``, but some have a sub-selection which we
 detail below.
 
 An existing understanding of GraphQL types will help here.
@@ -77,9 +77,10 @@ The singular ``page`` field accepts the following arguments:
 
 ::
 
-    id: Int                       # Can be used on it's own
-    slug: String                  # Can be used on it's own
-    contentType: String           # Can be used on it's own
+    id: Int
+    url: String
+    slug: String
+    contentType: String
     token: String                 # Must be used with one of the others
     inSite: Boolean               # Can be used on it's own
 

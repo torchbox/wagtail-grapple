@@ -152,10 +152,13 @@ class StreamBlock(StructBlock):
         stream_blocks = []
         for field in self.value.stream_data:
             block = self.value.stream_block.child_blocks[field["type"]]
-            if not issubclass(type(block), blocks.StructBlock):
+            value = field['value']
+            if issubclass(type(block), wagtail.images.blocks.ImageChooserBlock):
+                value = block.to_python(value)
+            elif not issubclass(type(block), blocks.StructBlock):
                 value = block.to_python(field["value"])
 
-            stream_blocks.append(StructBlockItem(field["type"], block, field["value"]))
+            stream_blocks.append(StructBlockItem(field["type"], block, value))
         return stream_blocks
 
 

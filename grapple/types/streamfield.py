@@ -155,16 +155,28 @@ class StreamBlock(StructBlock):
 
     def resolve_blocks(self, info, **kwargs):
         stream_blocks = []
-        for field in self.value.stream_data:
-            block = self.value.stream_block.child_blocks[field["type"]]
+
+        if issubclass(type(self.value), wagtail.core.blocks.stream_block.StreamValue):
+          # self: StreamChild, block: StreamBlock, value: StreamValue
+          stream_data = self.value.stream_data
+          child_blocks = self.value.stream_block.child_blocks
+        else:
+          # This occurs when StreamBlock is child of StructBlock
+          # self: StructBlockItem, block: StreamBlock, value: list
+          stream_data = self.value
+          child_blocks = self.block.child_blocks
+
+        for field in stream_data:
+            block = child_blocks[field["type"]]
             value = field['value']
             if (
               issubclass(type(block), wagtail.core.blocks.ChooserBlock)
               or not issubclass(type(block), blocks.StructBlock)
             ):
-                value = block.to_python(value)
+              value = block.to_python(value)
 
             stream_blocks.append(StructBlockItem(field["type"], block, value))
+
         return stream_blocks
 
 

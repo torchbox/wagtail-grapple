@@ -137,7 +137,10 @@ class StructBlock(graphene.ObjectType):
         stream_blocks = []
         for name, value in self.value.items():
             block = self.block.child_blocks[name]
-            if issubclass(type(block), blocks.ChooserBlock):
+            if (
+              issubclass(type(block), wagtail.core.blocks.ChooserBlock)
+              and hasattr(value, 'id')
+            ):
                 value = block.to_python(value.id)
             elif not issubclass(type(block), blocks.StreamBlock):
                 value = block.to_python(value)

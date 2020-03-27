@@ -1,7 +1,6 @@
 import os
 import base64
 import tempfile
-import graphene_django_optimizer as gql_optimizer
 from PIL import Image, ImageFilter
 from django.conf import settings
 from wagtail.search.index import class_is_indexed

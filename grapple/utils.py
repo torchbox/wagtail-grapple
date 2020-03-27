@@ -1,15 +1,18 @@
 import os
 import base64
 import tempfile
+import graphene_django_optimizer as gql_optimizer
 from PIL import Image, ImageFilter
 from django.conf import settings
 from wagtail.search.index import class_is_indexed
 from wagtail.search.models import Query
 from wagtail.search.backends import get_search_backend
 
+from .db.optimizer import QueryOptimzer
+
 
 def resolve_queryset(
-    qs, info, limit=None, offset=None, search_query=None, id=None, order=None, **kwargs
+    qs, info, id=None, limit=None, offset=None, search_query=None, order=None, **kwargs
 ):
     """
     Add limit, offset and search capabilities to the query. This contains
@@ -30,9 +33,10 @@ def resolve_queryset(
     :type order: str
     """
     offset = int(offset or 0)
+    qs = QueryOptimzer.query(qs, info)
 
     if id is not None:
-        qs = qs.filter(pk=id)
+        qs = qs.get(id=id)
     else:
         qs = qs.all()
 

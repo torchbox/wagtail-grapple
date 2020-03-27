@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 from django.db import models
 from modelcluster.fields import ParentalKey
 
@@ -6,6 +7,7 @@ from wagtail.core.fields import StreamField
 from wagtail.contrib.settings.models import BaseSetting, register_setting
 
 from wagtail.core import blocks
+from wagtail.core.fields import RichTextField, StreamField
 from wagtail.admin.edit_handlers import FieldPanel, StreamFieldPanel, InlinePanel
 from wagtail.images.blocks import ImageChooserBlock
 from wagtail.documents.blocks import DocumentChooserBlock

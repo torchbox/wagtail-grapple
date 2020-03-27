@@ -9,6 +9,7 @@ from django.dispatch import receiver
 
 from ..registry import registry
 from ..utils import resolve_queryset
+from ..db.optimizer import QueryOptimzer
 from .structures import QuerySetList
 
 
@@ -117,30 +118,43 @@ class Page(DjangoObjectType):
         interfaces = (PageInterface,)
 
 
-def get_specific_page(id, slug, token, content_type=None):
+def get_specific_page(id, slug, url, token, content_type=None, info=None):
     """
     Get a spcecific page, also get preview if token is passed
     """
     page = None
-    try:
-        if id:
-            page = WagtailPage.objects.live().public().specific().get(pk=id)
-        elif slug:
-            page = WagtailPage.objects.live().public().specific().get(slug=slug)
+    # try:
+    # Generate queryset based on given key & Optimise query based on request AST
+    pages = WagtailPage.objects.live().public()
+    pages = QueryOptimzer.query(pages, info)
+    if id:
+        page = pages.get(id=id)
+    elif slug:
+        page = pages.get(slug=slug)
+    elif url:
+        for matching_page in pages.filter(url_path__contains=url):
+            if matching_page.url == url:
+                page = matching_page
+                break
 
-        if token:
-            if page:
-                page_type = type(page)
-                if hasattr(page_type, "get_page_from_preview_token"):
-                    page = page_type.get_page_from_preview_token(token)
-            elif content_type:
-                app_label, model = content_type.lower().split(".")
-                mdl = ContentType.objects.get(app_label=app_label, model=model)
-                cls = mdl.model_class()
-                if hasattr(cls, "get_page_from_preview_token"):
-                    page = cls.get_page_from_preview_token(token)
-    except BaseException:
-        page = None
+    if page:
+        page = page.specific
+
+    if token:
+        if page:
+            page_type = type(page)
+            if hasattr(page_type, "get_page_from_preview_token"):
+                page = page_type.get_page_from_preview_token(token)
+
+        elif content_type:
+            app_label, model = content_type.lower().split(".")
+            mdl = ContentType.objects.get(app_label=app_label, model=model)
+            cls = mdl.model_class()
+            if hasattr(cls, "get_page_from_preview_token"):
+                page = cls.get_page_from_preview_token(token)
+
+    # except BaseException:
+    #     page = None
 
     return page
 
@@ -155,6 +169,7 @@ def PagesQuery():
             PageInterface,
             id=graphene.Int(),
             slug=graphene.String(),
+            url=graphene.String(),
             token=graphene.String(),
             content_type=graphene.String(),
         )
@@ -162,7 +177,7 @@ def PagesQuery():
         # Return all pages, ideally specific.
         def resolve_pages(self, info, **kwargs):
             return resolve_queryset(
-                WagtailPage.objects.live().public().specific(), info, **kwargs
+                WagtailPage.objects.live().public().specific(defer=True), info, **kwargs
             )
 
         # Return a specific page, identified by ID or Slug.
@@ -170,8 +185,10 @@ def PagesQuery():
             return get_specific_page(
                 id=kwargs.get("id"),
                 slug=kwargs.get("slug"),
+                url=kwargs.get("url"),
                 token=kwargs.get("token"),
                 content_type=kwargs.get("content_type"),
+                info=info,
             )
 
     return Mixin
@@ -190,7 +207,7 @@ def on_updated(sender, token, **kwargs):
 def PagesSubscription():
     def preview_observable(id, slug, token, content_type):
         return preview_subject.filter(lambda previewToken: previewToken == token).map(
-            lambda token: get_specific_page(id, slug, token, content_type)
+            lambda token: get_specific_page(id, slug, token, content_type, info)
         )
 
     class Mixin:
@@ -208,6 +225,7 @@ def PagesSubscription():
                 slug=kwargs.get("slug"),
                 token=kwargs.get("token"),
                 content_type=kwargs.get("content_type"),
+                info=info,
             )
 
     return Mixin

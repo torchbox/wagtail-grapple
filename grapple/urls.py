@@ -7,6 +7,7 @@ from graphene_django.views import GraphQLView
 from channels.routing import route_class
 from graphql_ws.django_channels import GraphQLSubscriptionConsumer
 
+
 def graphiql(request):
     graphiql_settings = {
         "GRAPHIQL_VERSION": "0.11.10",
@@ -19,9 +20,11 @@ def graphiql(request):
 
 
 # Traditional URL routing
-SHOULD_EXPOSE_GRAPHIQL = settings.DEBUG or getattr(settings, 'GRAPPLE_EXPOSE_GRAPHIQL', False)
+SHOULD_EXPOSE_GRAPHIQL = settings.DEBUG or getattr(
+    settings, "GRAPPLE_EXPOSE_GRAPHIQL", False
+)
 urlpatterns = [
-    url(r"^graphql", csrf_exempt(GraphQLView.as_view(graphiql=SHOULD_EXPOSE_GRAPHIQL))),
+    url(r"^graphql", csrf_exempt(GraphQLView.as_view(graphiql=SHOULD_EXPOSE_GRAPHIQL)))
 ]
 
 if SHOULD_EXPOSE_GRAPHIQL:

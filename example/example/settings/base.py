@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     "grapple",
     "graphene_django",
     "channels",
+    "django_extensions",
 ]
 
 MIDDLEWARE = [
@@ -178,3 +179,7 @@ CHANNEL_LAYERS = {
         "ROUTING": "grapple.urls.channel_routing",
     }
 }
+
+# Query Optimisation helpers
+SHELL_PLUS_PRINT_SQL = True
+RUNSERVER_PLUS_PRINT_SQL_TRUNCATE = 100000

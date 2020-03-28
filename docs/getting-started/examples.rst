@@ -70,6 +70,6 @@ something like:
 
 **Next Steps**
 
-  * :doc:`../general-usage/types`
+  * :doc:`../general-usage/graphql-types`
   * :doc:`../general-usage/preview`
 

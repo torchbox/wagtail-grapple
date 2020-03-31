@@ -2,7 +2,6 @@ import os
 import base64
 import tempfile
 from PIL import Image, ImageFilter
-from colorthief import ColorThief
 from django.conf import settings
 from wagtail.search.index import class_is_indexed
 from wagtail.search.models import Query

@@ -13,7 +13,7 @@ from home.factories import (
     BlogPageFactory,
     BlogPageRelatedLinkFactory,
     ImageGalleryImageFactory,
-    AuthorPageFactory
+    AuthorPageFactory,
 )
 
 
@@ -53,6 +53,7 @@ class BlogTest(BaseGrappleTest):
                         ),
                     },
                 ),
+                ("objectives", ["Read all of article!"]),
                 ("video", {"youtube_link": EmbedValue("https://youtube.com/")}),
             ]
         )
@@ -92,7 +93,9 @@ class BlogTest(BaseGrappleTest):
         )
         executed = self.client.execute(query)
         page = executed["data"]["page"]["author"]
-        self.assertTrue(isinstance(page["name"], str) and page["name"] == self.blog_page.author.name)
+        self.assertTrue(
+            isinstance(page["name"], str) and page["name"] == self.blog_page.author.name
+        )
 
     def get_blocks_from_body(self, block_type, block_query="rawValue"):
         query = """
@@ -274,6 +277,27 @@ class BlogTest(BaseGrappleTest):
                 count += 1
         # Check that we test all blocks that were returned.
         self.assertEquals(len(query_blocks), count)
+
+    def test_blog_body_objectives(self):
+        block_type = "ListBlock"
+        query_blocks = self.get_blocks_from_body(
+            block_type,
+            block_query="""
+            field
+            items {
+                ...on CharBlock {
+                    value
+                }
+            }
+            """,
+        )
+        # Check we have exactly one value
+        self.assertEquals(len(query_blocks), 1)
+        # Check that first value matches hardcoded value
+        first_block = query_blocks[0]
+        first_item = first_block.get("items", [])[0]
+        first_value = first_item.get("value")
+        self.assertEquals(first_value, "Read all of article!")
 
     def test_blog_embed(self):
         query = """

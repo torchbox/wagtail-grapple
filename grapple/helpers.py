@@ -59,14 +59,14 @@ def register_query_field(field_name, plural_field_name=None, query_params=None):
 
                 # If is a Page then only query live/public pages.
                 if issubclass(cls, Page):
-                    return cls.objects.live().public().get(**kwargs)
+                    return cls.objects.live().public().order_by("-first_published_at").get(**kwargs)
 
                 return cls.objects.get(**kwargs)
 
             def resolve_plural(self, _, info, **kwargs):
                 qs = cls.objects
                 if issubclass(cls, Page):
-                    qs = cls.objects.live().public()
+                    qs = cls.objects.live().public().order_by("-first_published_at")
 
                 return resolve_queryset(qs.all(), info, **kwargs)
 

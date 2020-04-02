@@ -6,9 +6,9 @@ Here are some useful decorators that allow you to expand your GraphQL schema fur
 @register_query_field
 ---------------------
 .. module:: grapple.helpers
-.. class:: register_query_field(field_name, plural_field_name, query_fields)
-Grapple exposes a few fields on the root schema such as ``pages``, ``images`` and ``redirects``. You can easily
-expose a django model in your codebase by adding the ``@register_query_field`` decorator like so:
+.. class:: register_query_field(field_name, plural_field_name=None, query_fields=None)
+Grapple exposes a few fields for the root schema such as ``pages``, ``images`` and ``redirects``. You can easily
+expose any Django model from your codebase by adding the ``@register_query_field`` decorator like so:
 
 .. code-block:: python
 

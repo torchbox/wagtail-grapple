@@ -53,11 +53,11 @@ def register_query_field(field_name, plural_field_name=None, query_params=None):
         def Mixin():
             # Generic methods to get all and query one model instance.
             def resolve_singular(self, _, info, **kwargs):
-                try:
-                    # If no filters then return nothing,
-                    if not kwargs:
-                        return None
+                # If no filters then return nothing,
+                if not kwargs:
+                    return None
 
+                try:
                     # If is a Page then only query live/public pages.
                     if issubclass(cls, Page):
                         return cls.objects.live().public().get(**kwargs)

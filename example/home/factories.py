@@ -2,8 +2,9 @@ import datetime
 
 import factory
 import wagtail_factories
+from factory import fuzzy
 from home.blocks import ImageGalleryBlock, ImageGalleryImage, ImageGalleryImages
-from home.models import BlogPage, BlogPageRelatedLink, AuthorPage
+from home.models import BlogPage, BlogPageRelatedLink, AuthorPage, Advert
 from wagtail.core import blocks
 
 
@@ -92,3 +93,11 @@ class AuthorPageFactory(wagtail_factories.PageFactory):
 
     class Meta:
         model = AuthorPage
+
+
+class AdvertFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Advert
+
+    url = factory.Sequence(lambda n: f"Person {n}")
+    text = fuzzy.FuzzyText()

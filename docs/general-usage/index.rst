@@ -7,3 +7,4 @@ General Usage
     model-types
     graphql-types
     preview
+    decorators

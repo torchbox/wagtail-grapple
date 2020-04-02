@@ -1,3 +1,4 @@
+import graphene
 from django.db import models
 from modelcluster.fields import ParentalKey
 
@@ -19,6 +20,7 @@ from wagtail.documents.edit_handlers import DocumentChooserPanel
 from wagtail_headless_preview.models import HeadlessPreviewMixin
 from wagtailmedia.edit_handlers import MediaChooserPanel
 
+from grapple.helpers import register_query_field
 from grapple.models import (
     GraphQLField,
     GraphQLString,
@@ -151,6 +153,9 @@ class Author(Orderable):
 
 
 @register_snippet
+@register_query_field('advert', 'adverts', {
+    'url': graphene.String()
+})
 class Advert(models.Model):
     url = models.URLField(null=True, blank=True)
     text = models.CharField(max_length=255)

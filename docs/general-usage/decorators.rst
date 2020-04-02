@@ -6,11 +6,12 @@ Here are some useful decorators that allow you to expand your GraphQL schema fur
 @register_query_field
 ---------------------
 .. module:: grapple.helpers
-.. class:: register_query_field(field_name, query_fields)
+.. class:: register_query_field(field_name, plural_field_name, query_fields)
 Grapple exposes a few fields on the root schema such as ``pages``, ``images`` and ``redirects``. You can easily
 expose a django model in your codebase by adding the ``@register_query_field`` decorator like so:
 
-::
+.. code-block:: python
+
     from grapple.helpers import register_query_field
 
     @register_query_field('advert')
@@ -28,7 +29,7 @@ expose a django model in your codebase by adding the ``@register_query_field`` d
 
 You can now query your adverts with the following query:
 
-::
+.. code-block:: graphql
 
     {
         # Get all adverts
@@ -46,16 +47,16 @@ You can now query your adverts with the following query:
 
 You can add custom query paramaters like so:
 
-::
+.. code-block:: python
 
-    @register_query_field('advert', {
-        id: graphene.Int()
-        url: graphene.String()
+    @register_query_field('advert', 'adverts', {
+        "id": graphene.Int()
+        "url": graphene.String()
     })
 
 and then use it in your queries:
 
-::
+.. code-block:: graphql
 
     {
         # Get a specific advert

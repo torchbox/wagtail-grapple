@@ -9,7 +9,13 @@ class AdvertTest(BaseGrappleTest):
         # Create advert
         self.advert = AdvertFactory()
 
-    def test_advert_query(self):
+    def validate_advert(self, advert):
+        # Check all the fields
+        self.assertTrue(isinstance(advert["id"], str))
+        self.assertTrue(isinstance(advert["url"], str))
+        self.assertTrue(isinstance(advert["text"], str))
+
+    def test_advert_all_query(self):
         query = """
         {
            adverts {
@@ -23,6 +29,22 @@ class AdvertTest(BaseGrappleTest):
         advert = executed["data"]["adverts"][0]
 
         # Check all the fields
-        self.assertTrue(isinstance(advert["id"], str))
-        self.assertTrue(isinstance(advert["url"], str))
-        self.assertTrue(isinstance(advert["text"], str))
+        self.validate_advert(advert)
+
+    def test_advert_single_query(self):
+        query = """
+        {
+           advert(url:"%s") {
+                id
+                url
+                text
+            }
+        }
+        """% (
+            self.advert.url
+        )
+        executed = self.client.execute(query)
+        advert = executed["data"]["advert"]
+
+        # Check all the fields
+        self.validate_advert(advert)

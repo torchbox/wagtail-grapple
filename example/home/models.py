@@ -1,3 +1,4 @@
+import graphene
 from django.db import models
 from modelcluster.fields import ParentalKey
 
@@ -152,7 +153,9 @@ class Author(Orderable):
 
 
 @register_snippet
-@register_query_field('advert')
+@register_query_field('advert', 'adverts', {
+    'url': graphene.String()
+})
 class Advert(models.Model):
     url = models.URLField(null=True, blank=True)
     text = models.CharField(max_length=255)

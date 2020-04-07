@@ -39,7 +39,14 @@ def register_graphql_schema(schema_cls):
     return schema_cls
 
 
-def register_query_field(field_name, plural_field_name=None, query_params=None):
+def register_query_field(
+    field_name,
+    plural_field_name=None,
+    query_params=None,
+    required=False,
+    plural_required=False,
+    plural_item_required=False,
+):
     from .types.structures import QuerySetList
     from .utils import resolve_queryset
 
@@ -47,7 +54,7 @@ def register_query_field(field_name, plural_field_name=None, query_params=None):
         plural_field_name = field_name + "s"
 
     def inner(cls):
-        field_type = lambda: registry.models[cls]
+        def field_type(): return registry.models[cls]
         field_query_params = query_params or {"id": graphene.Int()}
 
         def Mixin():
@@ -60,27 +67,46 @@ def register_query_field(field_name, plural_field_name=None, query_params=None):
                 try:
                     # If is a Page then only query live/public pages.
                     if issubclass(cls, Page):
-                        return cls.objects.live().public().get(**kwargs)
+                        return cls.objects.live().public().specific().filter(**kwargs).get()
 
-                    return cls.objects.get(**kwargs)
+                    return cls.objects.filter(**kwargs).get()
                 except:
                     return None
 
             def resolve_plural(self, _, info, **kwargs):
                 qs = cls.objects
                 if issubclass(cls, Page):
-                    qs = cls.objects.live().public().order_by("-first_published_at")
+                    qs = cls.objects.live().public().specific().order_by("-first_published_at")
 
                 return resolve_queryset(qs.all(), info, **kwargs)
 
             # Create schema and add resolve methods
             schema = type(cls.__name__ + "Query", (), {})
+
+            singular_field_type = field_type
+            if required:
+                singular_field_type = graphene.NonNull(field_type)
+
             setattr(
-                schema, field_name, graphene.Field(field_type, **field_query_params)
+                schema,
+                field_name,
+                graphene.Field(singular_field_type, **field_query_params)
             )
-            setattr(schema, plural_field_name, QuerySetList(field_type))
+
+            plural_field_type = field_type
+            if plural_item_required:
+                plural_field_type = graphene.NonNull(field_type)
+
             setattr(
-                schema, "resolve_" + field_name, MethodType(resolve_singular, schema)
+                schema,
+                plural_field_name,
+                QuerySetList(plural_field_type, required=plural_required),
+            )
+
+            setattr(
+                schema,
+                "resolve_" + field_name,
+                MethodType(resolve_singular, schema),
             )
             setattr(
                 schema,

@@ -177,9 +177,8 @@ def GraphQLCollection(
         # Add support for NonNull/required to wrapper field
         required_collection_type = None
         if required:
-            required_collection_type = lambda nested_type: graphene.NonNull(
-                collection_type(nested_type)
-            )
+            required_collection_type = lambda nested_type: collection_type(
+                nested_type, required=True)
 
         return graphql_type, required_collection_type or collection_type
 

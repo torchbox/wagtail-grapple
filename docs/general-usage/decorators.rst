@@ -45,7 +45,7 @@ You can now query your adverts with the following query:
         }
     }
 
-You can add custom query paramaters like so:
+You can add custom query parameters like so:
 
 .. code-block:: python
 
@@ -65,3 +65,57 @@ and then use it in your queries:
             text
         }
     }
+
+You can make the singular query return type required like so:
+
+.. code-block:: python
+
+    @register_query_field('advert', required=True)
+
+and then should look like this on your schema:
+
+.. code-block:: graphql
+
+    advert(id: Int): Advert!
+
+instead of:
+
+.. code-block:: graphql
+
+    advert(id: Int): Advert
+
+You can can also make the plural query return list type required:
+
+.. code-block:: python
+
+    @register_query_field('advert', plural_required=True)
+
+making the plural query look like this on your schema:
+
+.. code-block:: graphql
+
+    adverts(id: Int, ...): [Advert]!
+
+instead of the default:
+
+.. code-block:: graphql
+
+    adverts(id: Int, ...): [Advert]
+
+If you want to make the plural query return list item type required:
+
+.. code-block:: python
+
+    @register_query_field('advert', plural_item_required=True)
+
+making the plural query look like this:
+
+.. code-block:: graphql
+
+    adverts(id: Int, ...): [Advert!]
+
+instead of the default:
+
+.. code-block:: graphql
+
+    adverts(id: Int, ...): [Advert]

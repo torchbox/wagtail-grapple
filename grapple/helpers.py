@@ -54,7 +54,7 @@ def register_query_field(
         plural_field_name = field_name + "s"
 
     def inner(cls):
-        def field_type(): return registry.models[cls]
+        field_type = lambda: registry.models[cls]
         field_query_params = query_params or {"id": graphene.Int()}
 
         def Mixin():
@@ -67,9 +67,9 @@ def register_query_field(
                 try:
                     # If is a Page then only query live/public pages.
                     if issubclass(cls, Page):
-                        return cls.objects.live().public().specific().filter(**kwargs).get()
+                        return cls.objects.live().public().specific().get(**kwargs)
 
-                    return cls.objects.filter(**kwargs).get()
+                    return cls.objects.get(**kwargs)
                 except:
                     return None
 

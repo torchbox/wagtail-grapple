@@ -128,7 +128,7 @@ GraphQLInt
 .. class:: GraphQLInt(field_name, required=False)
 
     It's all fairly self explanatory but a `GraphQLInt` is used to
-    serialize interger based Django fields such as IntegerField
+    serialize integer based Django fields such as IntegerField
     or PositiveSmallIntegerField.
 
 

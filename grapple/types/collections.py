@@ -19,13 +19,6 @@ class CollectionObjectType(DjangoObjectType):
     name = graphene.String()
     descendants = graphene.List(lambda: CollectionObjectType)
     ancestors = graphene.List(lambda: CollectionObjectType)
-    contents = graphene.List(lambda: CollectionObjectType)
-
-    def resolve_contents(self, info):
-        return list([
-            hook(self)
-            for hook in hooks.get_hooks("describe_collection_contents")
-        ])
 
     def resolve_descendants(self, info):
         return self.get_descendants()

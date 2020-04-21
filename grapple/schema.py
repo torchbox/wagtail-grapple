@@ -23,6 +23,7 @@ def create_schema():
     from .registry import registry
     from .types.documents import DocumentsQuery
     from .types.images import ImagesQuery
+    from .types.collections import CollectionsQuery
     from .types.pages import PagesQuery, PagesSubscription
     from .types.search import SearchQuery
     from .types.settings import SettingsQuery
@@ -33,6 +34,7 @@ def create_schema():
         graphene.ObjectType,
         PagesQuery(),
         ImagesQuery(),
+        CollectionsQuery(),
         DocumentsQuery(),
         SnippetsQuery(),
         SettingsQuery(),

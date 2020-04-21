@@ -14,6 +14,7 @@ from wagtail.images.models import (
 from ..registry import registry
 from ..utils import resolve_queryset
 from .structures import QuerySetList
+from .collections import CollectionObjectType
 
 
 def get_image_url(cls):
@@ -29,11 +30,12 @@ def get_image_url(cls):
 
 
 class BaseImageObjectType(graphene.ObjectType):
-    width = graphene.Int(required=True)
-    height = graphene.Int(required=True)
-    src = graphene.String(required=True)
-    aspect_ratio = graphene.Float(required=True)
-    sizes = graphene.String(required=True)
+    width = graphene.Int()
+    height = graphene.Int()
+    src = graphene.String()
+    aspect_ratio = graphene.Float()
+    sizes = graphene.String()
+    collection = graphene.Field(lambda: CollectionObjectType)
 
     def resolve_src(self, info):
         """

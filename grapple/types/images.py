@@ -10,6 +10,7 @@ from wagtail.images.models import (
 from ..registry import registry
 from ..utils import resolve_queryset, get_media_item_url
 from .structures import QuerySetList
+from .collections import CollectionObjectType
 
 
 class BaseImageObjectType(graphene.ObjectType):
@@ -20,6 +21,7 @@ class BaseImageObjectType(graphene.ObjectType):
     url = graphene.String(required=True)
     aspect_ratio = graphene.Float(required=True)
     sizes = graphene.String(required=True)
+    collection = graphene.Field(lambda: CollectionObjectType)
 
     def resolve_url(self, info, **kwargs):
         """

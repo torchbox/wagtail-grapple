@@ -40,7 +40,12 @@ def DocumentsQuery():
 
     class Mixin:
         documents = QuerySetList(
-            graphene.NonNull(model_type), enable_search=True, required=True
+            graphene.NonNull(model_type),
+            enable_search=True,
+            required=True,
+            collection=graphene.Argument(
+                graphene.ID, description="Filter by collection id"
+            ),
         )
 
         # Return all pages, ideally specific.

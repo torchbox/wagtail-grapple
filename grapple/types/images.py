@@ -139,7 +139,12 @@ def ImagesQuery():
 
     class Mixin:
         images = QuerySetList(
-            graphene.NonNull(mdl_type), enable_search=True, required=True
+            graphene.NonNull(mdl_type),
+            enable_search=True,
+            required=True,
+            collection=graphene.Argument(
+                graphene.ID, description="Filter by collection id"
+            ),
         )
         image_type = graphene.String(required=True)
 

@@ -9,7 +9,15 @@ from wagtail.search.backends import get_search_backend
 
 
 def resolve_queryset(
-    qs, info, limit=None, offset=None, search_query=None, id=None, order=None, **kwargs
+    qs,
+    info,
+    limit=None,
+    offset=None,
+    search_query=None,
+    id=None,
+    order=None,
+    collection=None,
+    **kwargs
 ):
     """
     Add limit, offset and search capabilities to the query. This contains
@@ -20,7 +28,7 @@ def resolve_queryset(
     :param limit: Limit number of objects in the QuerySet.
     :type limit: int
     :param id: Filter by the primary key.
-    :type limit: int
+    :type id: int
     :param offset: Omit a number of objects from the beggining of the query set
     :type offset: int
     :param search_query: Using wagtail search exclude objects that do not match
@@ -28,6 +36,8 @@ def resolve_queryset(
     :type search_query: str
     :param order: Use Django ordering format to order the query set.
     :type order: str
+    :param collection: Use Wagtail's collection id to filter images or documents
+    :type collection: int
     """
     offset = int(offset or 0)
 
@@ -53,6 +63,9 @@ def resolve_queryset(
     if limit is not None:
         limit = int(limit)
         qs = qs[offset : limit + offset]
+
+    if collection is not None:
+        qs = qs.filter(collection=collection)
 
     return qs
 

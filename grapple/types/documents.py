@@ -48,7 +48,12 @@ def DocumentsQuery():
     class Mixin:
         document = graphene.Field(model_type, id=graphene.ID())
         documents = QuerySetList(
-            graphene.NonNull(model_type), enable_search=True, required=True
+            graphene.NonNull(model_type),
+            enable_search=True,
+            required=True,
+            collection=graphene.Argument(
+                graphene.ID, description="Filter by collection id"
+            ),
         )
 
         # Return one document.

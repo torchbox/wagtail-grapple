@@ -12,7 +12,15 @@ from .types.structures import BasePaginatedType, PaginationType
 
 
 def resolve_queryset(
-    qs, info, limit=None, offset=None, search_query=None, id=None, order=None, **kwargs
+    qs,
+    info,
+    limit=None,
+    offset=None,
+    search_query=None,
+    id=None,
+    order=None,
+    collection=None,
+    **kwargs
 ):
     """
     Add limit, offset and search capabilities to the query. This contains
@@ -31,6 +39,8 @@ def resolve_queryset(
     :type search_query: str
     :param order: Order the query set using the Django QuerySet order_by format.
     :type order: str
+    :param collection: Use Wagtail's collection id to filter images or documents
+    :type collection: int
     """
     offset = int(offset or 0)
 
@@ -56,6 +66,9 @@ def resolve_queryset(
     if limit is not None:
         limit = int(limit)
         qs = qs[offset : limit + offset]
+
+    if collection is not None:
+        qs = qs.filter(collection=collection)
 
     return qs
 

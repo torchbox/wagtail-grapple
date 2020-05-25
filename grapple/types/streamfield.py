@@ -30,9 +30,9 @@ def convert_stream_field(field, registry=None):
 
 class StreamFieldInterface(graphene.Interface):
     id = graphene.String()
-    block_type = graphene.String()
-    field = graphene.String()
-    raw_value = graphene.String()
+    block_type = graphene.String(required=True)
+    field = graphene.String(required=True)
+    raw_value = graphene.String(required=True)
 
     @classmethod
     def resolve_type(cls, instance, info):
@@ -131,7 +131,7 @@ class StructBlock(graphene.ObjectType):
     class Meta:
         interfaces = (StreamFieldInterface,)
 
-    blocks = graphene.List(StreamFieldInterface)
+    blocks = graphene.List(graphene.NonNull(StreamFieldInterface), required=True)
 
     def resolve_blocks(self, info, **kwargs):
         stream_blocks = []
@@ -160,77 +160,77 @@ class StreamBlock(StructBlock):
 
 
 class StreamFieldBlock(graphene.ObjectType):
-    value = graphene.String()
+    value = graphene.String(required=True)
 
     class Meta:
         interfaces = (StreamFieldInterface,)
 
 
 class CharBlock(graphene.ObjectType):
-    value = graphene.String()
+    value = graphene.String(required=True)
 
     class Meta:
         interfaces = (StreamFieldInterface,)
 
 
 class TextBlock(graphene.ObjectType):
-    value = graphene.String()
+    value = graphene.String(required=True)
 
     class Meta:
         interfaces = (StreamFieldInterface,)
 
 
 class EmailBlock(graphene.ObjectType):
-    value = graphene.String()
+    value = graphene.String(required=True)
 
     class Meta:
         interfaces = (StreamFieldInterface,)
 
 
 class IntegerBlock(graphene.ObjectType):
-    value = graphene.Int()
+    value = graphene.Int(required=True)
 
     class Meta:
         interfaces = (StreamFieldInterface,)
 
 
 class FloatBlock(graphene.ObjectType):
-    value = graphene.Float()
+    value = graphene.Float(required=True)
 
     class Meta:
         interfaces = (StreamFieldInterface,)
 
 
 class DecimalBlock(graphene.ObjectType):
-    value = graphene.Float()
+    value = graphene.Float(required=True)
 
     class Meta:
         interfaces = (StreamFieldInterface,)
 
 
 class RegexBlock(graphene.ObjectType):
-    value = graphene.String()
+    value = graphene.String(required=True)
 
     class Meta:
         interfaces = (StreamFieldInterface,)
 
 
 class URLBlock(graphene.ObjectType):
-    value = graphene.String()
+    value = graphene.String(required=True)
 
     class Meta:
         interfaces = (StreamFieldInterface,)
 
 
 class BooleanBlock(graphene.ObjectType):
-    value = graphene.Boolean()
+    value = graphene.Boolean(required=True)
 
     class Meta:
         interfaces = (StreamFieldInterface,)
 
 
 class DateBlock(graphene.ObjectType):
-    value = graphene.String(format=graphene.String())
+    value = graphene.String(format=graphene.String(), required=True)
 
     class Meta:
         interfaces = (StreamFieldInterface,)
@@ -253,34 +253,34 @@ class TimeBlock(DateBlock):
 
 
 class RichTextBlock(graphene.ObjectType):
-    value = graphene.String()
+    value = graphene.String(required=True)
 
     class Meta:
         interfaces = (StreamFieldInterface,)
 
 
 class RawHTMLBlock(graphene.ObjectType):
-    value = graphene.String()
+    value = graphene.String(required=True)
 
     class Meta:
         interfaces = (StreamFieldInterface,)
 
 
 class BlockQuoteBlock(graphene.ObjectType):
-    value = graphene.String()
+    value = graphene.String(required=True)
 
     class Meta:
         interfaces = (StreamFieldInterface,)
 
 
 class ChoiceOption(graphene.ObjectType):
-    key = graphene.String()
-    value = graphene.String()
+    key = graphene.String(required=True)
+    value = graphene.String(required=True)
 
 
 class ChoiceBlock(graphene.ObjectType):
-    value = graphene.String()
-    choices = graphene.List(ChoiceOption)
+    value = graphene.String(required=True)
+    choices = graphene.List(graphene.NonNull(ChoiceOption), required=True)
 
     class Meta:
         interfaces = (StreamFieldInterface,)
@@ -300,8 +300,8 @@ def get_media_url(url):
 
 
 class EmbedBlock(graphene.ObjectType):
-    value = graphene.String()
-    url = graphene.String()
+    value = graphene.String(required=True)
+    url = graphene.String(required=True)
 
     class Meta:
         interfaces = (StreamFieldInterface,)
@@ -313,14 +313,14 @@ class EmbedBlock(graphene.ObjectType):
 
 
 class StaticBlock(graphene.ObjectType):
-    value = graphene.String()
+    value = graphene.String(required=True)
 
     class Meta:
         interfaces = (StreamFieldInterface,)
 
 
 class ListBlock(graphene.ObjectType):
-    items = graphene.List(StreamFieldInterface)
+    items = graphene.List(graphene.NonNull(StreamFieldInterface), required=True)
 
     class Meta:
         interfaces = (StreamFieldInterface,)
@@ -366,7 +366,7 @@ def register_streamfield_blocks():
     from .images import get_image_type
 
     class PageChooserBlock(graphene.ObjectType):
-        page = graphene.Field(PageInterface)
+        page = graphene.Field(PageInterface, required=True)
 
         class Meta:
             interfaces = (StreamFieldInterface,)
@@ -375,7 +375,7 @@ def register_streamfield_blocks():
             return self.value
 
     class DocumentChooserBlock(graphene.ObjectType):
-        document = graphene.Field(get_document_type())
+        document = graphene.Field(get_document_type(), required=True)
 
         class Meta:
             interfaces = (StreamFieldInterface,)
@@ -384,7 +384,7 @@ def register_streamfield_blocks():
             return self.value
 
     class ImageChooserBlock(graphene.ObjectType):
-        image = graphene.Field(get_image_type())
+        image = graphene.Field(get_image_type(), required=True)
 
         class Meta:
             interfaces = (StreamFieldInterface,)
@@ -393,7 +393,7 @@ def register_streamfield_blocks():
             return self.value
 
     class SnippetChooserBlock(graphene.ObjectType):
-        snippet = graphene.String()
+        snippet = graphene.String(required=True)
 
         class Meta:
             interfaces = (StreamFieldInterface,)

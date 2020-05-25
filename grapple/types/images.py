@@ -29,11 +29,11 @@ def get_image_url(cls):
 
 
 class BaseImageObjectType(graphene.ObjectType):
-    width = graphene.Int()
-    height = graphene.Int()
-    src = graphene.String()
-    aspect_ratio = graphene.Float()
-    sizes = graphene.String()
+    width = graphene.Int(required=True)
+    height = graphene.Int(required=True)
+    src = graphene.String(required=True)
+    aspect_ratio = graphene.Float(required=True)
+    sizes = graphene.String(required=True)
 
     def resolve_src(self, info):
         """
@@ -52,8 +52,8 @@ class BaseImageObjectType(graphene.ObjectType):
 
 
 class ImageRenditionObjectType(DjangoObjectType, BaseImageObjectType):
-    id = graphene.ID()
-    url = graphene.String()
+    id = graphene.ID(required=True)
+    url = graphene.String(required=True)
 
     class Meta:
         model = WagtailImageRendition
@@ -136,8 +136,8 @@ def ImagesQuery():
     mdl_type = get_image_type()
 
     class Mixin:
-        images = QuerySetList(mdl_type, enable_search=True)
-        image_type = graphene.String()
+        images = QuerySetList(graphene.NonNull(mdl_type), enable_search=True, required=True)
+        image_type = graphene.String(required=True)
 
         # Return all pages, ideally specific.
         def resolve_images(self, info, **kwargs):

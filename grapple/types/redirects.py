@@ -8,11 +8,11 @@ from .pages import PageInterface
 
 
 class RedirectType(graphene.ObjectType):
-    old_path = graphene.String()
-    old_url = graphene.String()
-    new_url = graphene.String()
+    old_path = graphene.String(required=True)
+    old_url = graphene.String(required=True)
+    new_url = graphene.String(required=True)
     page = graphene.Field(PageInterface)
-    is_permanent = graphene.Boolean()
+    is_permanent = graphene.Boolean(required=True)
 
     # Give old_path with BASE_URL attached.
     def resolve_old_url(self, info, **kwargs):
@@ -32,7 +32,7 @@ class RedirectType(graphene.ObjectType):
 
 
 class RedirectsQuery:
-    redirects = graphene.List(RedirectType)
+    redirects = graphene.List(graphene.NonNull(RedirectType), required=True)
 
     # Return all redirects.
     def resolve_redirects(self, info, **kwargs):

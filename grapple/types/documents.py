@@ -17,10 +17,10 @@ class DocumentObjectType(DjangoObjectType):
         model = WagtailDocument
         exclude_fields = ("tags",)
 
-    id = graphene.ID()
-    title = graphene.String()
-    file = graphene.String()
-    created_at = graphene.DateTime()
+    id = graphene.ID(required=True)
+    title = graphene.String(required=True)
+    file = graphene.String(required=True)
+    created_at = graphene.DateTime(required=True)
     file_size = graphene.Int()
     file_hash = graphene.String()
 
@@ -31,7 +31,7 @@ def DocumentsQuery():
     model_type = registry.documents[mdl]
 
     class Mixin:
-        documents = QuerySetList(model_type, enable_search=True)
+        documents = QuerySetList(graphene.NonNull(model_type), enable_search=True, required=True)
 
         # Return all pages, ideally specific.
         def resolve_documents(self, info, **kwargs):

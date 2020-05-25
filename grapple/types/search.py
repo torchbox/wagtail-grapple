@@ -14,7 +14,7 @@ def SearchQuery():
                 types = tuple(registry.class_models.values())
 
         class Mixin:
-            search = graphene.List(Search, query=graphene.String())
+            search = graphene.List(graphene.NonNull(Search), query=graphene.String(), required=True)
 
             # Return just one setting base on name param.
             def resolve_search(self, info, **kwargs):

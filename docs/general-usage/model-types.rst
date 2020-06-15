@@ -6,8 +6,8 @@ in GraphQL.
 
 The field types below are simple to use and all work in the same way.
 We have created a bunch of built-in types for you to use in but you can always
-create your own using [Graphene](https://github.com/graphql-python/graphene)
-(Grapples underlying library) and take advantage of Grapple's generic ``GraphQLField`` type.
+create your own using `Graphene 
+<https://github.com/graphql-python/graphene/>`_ (Grapples underlying library) and take advantage of Grapple's generic ``GraphQLField`` type.
 
 
 GraphQLString

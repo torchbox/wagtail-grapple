@@ -1,13 +1,13 @@
 Model Types
 ===========
-What do we mean when we say types? Well in a Grapple context, a type is descriptor
-function that tells grapple what type a Django Models field is represented by
+What do we mean when we say types? In a Grapple context, a type is a descriptor
+function that instructs Grapple what type a Django model field is represented by
 in GraphQL.
 
 The field types below are simple to use and all work in the same way.
-We have created a bunch of built-in types for you to use in but you can always
-create your own using `Graphene 
-<https://github.com/graphql-python/graphene/>`_ (Grapples underlying library) and take advantage of Grapple's generic ``GraphQLField`` type.
+We created a number of built-in types for general use, but you can create your own 
+using `Graphene <https://github.com/graphql-python/graphene/>`_ (Grapple's underlying library) 
+and take advantage of Grapple's generic ``GraphQLField`` type.
 
 
 GraphQLString
@@ -127,9 +127,8 @@ GraphQLInt
 .. module:: grapple.models
 .. class:: GraphQLInt(field_name, required=False)
 
-    It's all fairly self explanatory but a `GraphQLInt` is used to
-    serialize integer based Django fields such as IntegerField
-    or PositiveSmallIntegerField.
+    Used to serialize integer-based Django fields such as ``IntegerField``
+    or ``PositiveSmallIntegerField``.
 
 
 GraphQLFloat
@@ -137,7 +136,7 @@ GraphQLFloat
 .. module:: grapple.models
 .. class:: GraphQLFloat(field_name, required=False)
 
-    Like GraphQLInt, This field is used to serialize Float and Decimal fields.
+    Like ``GraphQLInt``, this field is used to serialize ``Float`` and ``Decimal`` fields.
 
 
 GraphQLBoolean
@@ -151,8 +150,8 @@ GraphQLStreamfield
 .. module:: grapple.models
 .. class:: GraphQLStreamfield(field_name, required=False)
 
-This field type supports all built in Streamfield blocks. It also supports
-custom blocks built using StructBlock and the like.
+This field type supports all built-in ``Streamfield`` blocks. It also supports
+custom blocks built using ``StructBlock`` and the like.
 
 
 GraphQLSnippet
@@ -160,7 +159,7 @@ GraphQLSnippet
 .. module:: grapple.models
 .. class:: GraphQLSnippet(field_name, snippet_modal, required=False)
 
-    GraphQLSnippet is a little bit more complicated; You first need to define
+    ``GraphQLSnippet`` is a little bit more complicated; You first need to define
     a `graphql_field` list on your snippet like you do your page. Then you need
     to reference the snippet in the field type function.
 
@@ -234,7 +233,7 @@ GraphQLForeignKey
 .. module:: grapple.models
 .. class:: GraphQLForeignKey(field_name, content_type, required=False)
 
-    GraphQLForeignKey is similar to GraphQLSnippet in that you pass a
+    ``GraphQLForeignKey`` is similar to ``GraphQLSnippet`` in that you pass a
     ``field_name`` and ``content_type`` but you can also specify that the field
     is a list (for example when using ``Orderable``).
 
@@ -272,8 +271,7 @@ GraphQLImage
 .. module:: grapple.models
 .. class:: GraphQLImage(field_name, required=False)
 
-    To serialize the WagtailImages or custom Image model then use this field
-    type.
+    Use this field type to serialize the core Wagtail or your custom Image model.
 
 
 GraphQLDocument
@@ -282,7 +280,6 @@ GraphQLDocument
 .. module:: grapple.models
 .. class:: GraphQLDocument(field_name, required=False)
 
-    To serialize the WagtailDocuments or custom Document model then use this
-    field type.
+    Us this field type to serialize the core Wagtail or your custom Document model.
 
 

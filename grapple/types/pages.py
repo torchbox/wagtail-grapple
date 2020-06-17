@@ -3,6 +3,7 @@ from django.contrib.contenttypes.models import ContentType
 from wagtail.core.models import Page as WagtailPage
 from wagtail_headless_preview.signals import preview_update
 from graphene_django.types import DjangoObjectType
+from graphql.error import GraphQLLocatedError
 from graphql.execution.base import ResolveInfo
 from rx.subjects import Subject
 from django.dispatch import receiver
@@ -55,21 +56,24 @@ class PageInterface(graphene.Interface):
     def resolve_parent(self, info, **kwargs):
         """
         Resolves the parent node of current page node.
-        Docs: http://docs.wagtail.io/en/v2.5.1/reference/pages/model_reference.html?highlight=get_parent#wagtail.core.models.Page.get_parent
+        Docs: https://docs.wagtail.io/en/stable/reference/pages/model_reference.html#wagtail.core.models.Page.get_parent
         """
-        return resolve_queryset(self.get_parent().specific(), info, **kwargs)
+        try:
+            return resolve_queryset(self.get_parent().specific, info, **kwargs)
+        except GraphQLLocatedError:
+            return WagtailPage.objects.none()
 
     def resolve_children(self, info, **kwargs):
         """
         Resolves a list of live children of this page with `show_in_menus` set.
-        Docs: http://docs.wagtail.io/en/v2.5.1/reference/pages/queryset_reference.html#examples
+        Docs: https://docs.wagtail.io/en/stable/reference/pages/queryset_reference.html#examples
         """
         return resolve_queryset(self.get_children().specific(), info, **kwargs)
 
     def resolve_siblings(self, info, **kwargs):
         """
         Resolves a list of sibling nodes to this page.
-        Docs: http://docs.wagtail.io/en/v2.5.1/reference/pages/queryset_reference.html?highlight=get_siblings#wagtail.core.query.PageQuerySet.sibling_of
+        Docs: https://docs.wagtail.io/en/stable/reference/pages/queryset_reference.html?highlight=get_siblings#wagtail.core.query.PageQuerySet.sibling_of
         """
         return resolve_queryset(
             self.get_siblings().exclude(pk=self.pk).specific(), info, **kwargs
@@ -96,7 +100,7 @@ class PageInterface(graphene.Interface):
     def resolve_ancestors(self, info, **kwargs):
         """
         Resolves a list of nodes pointing to the current page’s ancestors.
-        Docs: https://docs.wagtail.io/en/v2.5.1/reference/pages/model_reference.html?highlight=get_ancestors#wagtail.core.models.Page.get_ancestors
+        Docs: https://docs.wagtail.io/en/stable/reference/pages/model_reference.html#wagtail.core.models.Page.get_ancestors
         """
         return resolve_queryset(self.get_ancestors().specific(), info, **kwargs)
 

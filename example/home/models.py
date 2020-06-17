@@ -1,4 +1,4 @@
-from __future__ import unicode_literals
+import graphene
 from django.db import models
 from modelcluster.fields import ParentalKey
 
@@ -7,7 +7,6 @@ from wagtail.core.fields import StreamField
 from wagtail.contrib.settings.models import BaseSetting, register_setting
 
 from wagtail.core import blocks
-from wagtail.core.fields import RichTextField, StreamField
 from wagtail.admin.edit_handlers import FieldPanel, StreamFieldPanel, InlinePanel
 from wagtail.images.blocks import ImageChooserBlock
 from wagtail.documents.blocks import DocumentChooserBlock
@@ -21,6 +20,7 @@ from wagtail.documents.edit_handlers import DocumentChooserPanel
 from wagtail_headless_preview.models import HeadlessPreviewMixin
 from wagtailmedia.edit_handlers import MediaChooserPanel
 
+from grapple.helpers import register_query_field
 from grapple.models import (
     GraphQLField,
     GraphQLString,
@@ -153,6 +153,9 @@ class Author(Orderable):
 
 
 @register_snippet
+@register_query_field('advert', 'adverts', {
+    'url': graphene.String()
+})
 class Advert(models.Model):
     url = models.URLField(null=True, blank=True)
     text = models.CharField(max_length=255)

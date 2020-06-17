@@ -1,4 +1,5 @@
 import graphene
+from django.conf import settings
 from graphql.validation.rules import NoUnusedFragments, specified_rules
 
 # HACK: Remove NoUnusedFragments validator
@@ -45,7 +46,10 @@ def create_schema():
         pass
 
     return graphene.Schema(
-        query=Query, types=list(registry.models.values()), subscription=Subscription
+        query=Query,
+        subscription=Subscription,
+        types=list(registry.models.values()),
+        auto_camelcase=getattr(settings, 'GRAPPLE_AUTO_CAMELCASE', True)
     )
 
 

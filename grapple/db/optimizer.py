@@ -60,7 +60,7 @@ class QueryOptimzer:
 
     # Sort the requested fields, depending on relation to model.
     def sort_fields(self):
-        for field_name in self.query_fields:
+        for field_name in self.query_fields or []:
             # Make sure field name is snake not pascal (graphene converts them that way)
             field_name = pascal_to_snake.sub("_", field_name).lower()
 
@@ -169,6 +169,10 @@ class AstExplorer:
                 return field
 
     def parse_field(self, field, field_prefix):
+        # Don't crash if the field isn't parsable...
+        if field is None:
+            return
+
         field_name = field.name.value
 
         # If field has subset fields

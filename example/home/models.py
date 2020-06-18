@@ -58,7 +58,7 @@ class BlogPage(HeadlessPreviewMixin, Page):
         related_name="+",
     )
     cover = models.ForeignKey(
-        "wagtailimages.Image",
+        "images.CustomImage",
         null=True,
         blank=True,
         on_delete=models.SET_NULL,

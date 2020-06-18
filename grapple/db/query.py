@@ -73,7 +73,7 @@ def specific_iterator(qs, defer=True):
         # Query pages
         pages = specific_model.objects.filter(pk__in=pks)
         # Defer all fields apart from those required
-        pages = pages.only(*only_fields, *only_fields_specific)
+        pages = pages.only(*only_fields, *only_fields_specific, *select_related_fields)
         # Apply select_related fields (passed down from optimizer.py)
         pages = pages.select_related(*select_related_fields)
         # Apply prefetch_related fields (passed down from optimizer.py)

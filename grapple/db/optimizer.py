@@ -98,6 +98,10 @@ class QueryOptimzer:
         if hasattr(model, "id"):
             self.only_fields.append("id")
 
+        # Don't select property functions
+        if isinstance(field, property):
+            return
+
         if not getattr(field, "is_relation", False):
             if model:
                 # Cache selection for future optimisation (query.py)

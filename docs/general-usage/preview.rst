@@ -14,8 +14,8 @@ support to any client whether that be a SPA or Native App.
 Setup
 ^^^^^
 
-Make sure you installed Django Channels (version 1) when you installed Grapple, 
-your installed apps in your settings should look like so:
+Make sure you installed Django Channels (version 1) when you installed Grapple. 
+Your installed apps in your settings should look like so:
 
 ::
 
@@ -24,9 +24,15 @@ your installed apps in your settings should look like so:
         "grapple",
         "graphene_django",
         "channels",
+        "wagtail_headless_preview",
         ...
     ]
 
+Now you need to run the migrations that come with Wagtail Headless Preview. 
+
+::
+
+   $ python manage.py migrate
 
 Add the following Django Channels configuration to your settings. This tells
 Django Channels that you want to add a channel layer that points to Grapple
@@ -61,11 +67,11 @@ Two HTTP params are also passed to this url:
  - content_type: The content type string of the Model you're viewing.
  - token: The preview token you need to retrieve the preview data.
 
-
+*Attention*: When the user clicks the "Preview" or "View Draft" button in the Wagtail admin the preview opens in a new tab. The URL in the preview tab will not reveal the actual preview URL set in the setting. It will rather show the admin URL of the page with an additional URL element ``/preview`` or ``/view_draft`` (e.g. ``http://localhost:8000/admin/pages/5/edit/preview/``).
 
 
 Your next step is to subclass any Page models you want headless preview on with
-`wagtail_headless_preview.models.HeadlessPreviewMixin` to override the original Wagtail preview methods:
+``wagtail_headless_preview.models.HeadlessPreviewMixin`` to override the original Wagtail preview methods:
 
 ::
 
@@ -89,7 +95,7 @@ And you are done!
 How to use
 ^^^^^^^^^^
 
-Now when you click the 'Preview' button in Wagtail you will be redirected to 
+Now when you click the 'Preview' button in Wagtail a page will open with the content of 
 your defined `HEADLESS_PREVIEW_CLIENT_URLS`. You can either load the preview token through
 the HTTP params or through the ``used-token`` cookie which has been set in 
 both the Admin and the redirected page.

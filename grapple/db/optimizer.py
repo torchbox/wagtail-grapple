@@ -64,6 +64,10 @@ class QueryOptimzer:
             # Make sure field name is snake not pascal (graphene converts them that way)
             field_name = pascal_to_snake.sub("_", field_name).lower()
 
+            # Ignore typename that causes null error
+            if field_name == "__typename":
+                continue
+
             # Support using simple field
             field = getattr(self.model, field_name, None)
             if field:

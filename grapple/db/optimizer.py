@@ -223,9 +223,9 @@ class AstExplorer:
 
         # Get fragment type from name and return it parsed.
         fragment_type = self.fragments[fragment_name]
-        return self.parse_inline_fragment(fragment_type, field_prefix)
+        return self.parse_inline_fragment(fragment_type, field_prefix, is_fragment_spread = True)
 
-    def parse_inline_fragment(self, inline_fragment, field_prefix):
+    def parse_inline_fragment(self, inline_fragment, field_prefix, is_fragment_spread = False):
         # Get type of inline fragment
         gql_type_name = inline_fragment.type_condition.name.value
         gql_type = self.schema.get_type(gql_type_name)
@@ -248,7 +248,8 @@ class AstExplorer:
         selections = []
         if inline_fragment.selection_set:
             selections = self.parse_selection_set(
-                inline_fragment.selection_set, type_prefix
+                inline_fragment.selection_set,
+                field_prefix if is_fragment_spread else type_prefix
             )
             selections = list(map(prefix_type, selections))
 

@@ -31,7 +31,9 @@ def DocumentsQuery():
     model_type = registry.documents[mdl]
 
     class Mixin:
-        documents = QuerySetList(graphene.NonNull(model_type), enable_search=True, required=True)
+        documents = QuerySetList(
+            graphene.NonNull(model_type), enable_search=True, required=True
+        )
 
         # Return all pages, ideally specific.
         def resolve_documents(self, info, **kwargs):

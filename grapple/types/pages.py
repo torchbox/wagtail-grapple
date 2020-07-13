@@ -27,12 +27,24 @@ class PageInterface(graphene.Interface):
     content_type = graphene.String(required=True)
     last_published_at = graphene.DateTime()
     parent = graphene.Field(lambda: PageInterface)
-    children = QuerySetList(graphene.NonNull(lambda: PageInterface), enable_search=True, required=True)
-    siblings = QuerySetList(graphene.NonNull(lambda: PageInterface), enable_search=True, required=True)
-    next_siblings = QuerySetList(graphene.NonNull(lambda: PageInterface), enable_search=True, required=True)
-    previous_siblings = QuerySetList(graphene.NonNull(lambda: PageInterface), enable_search=True, required=True)
-    descendants = QuerySetList(graphene.NonNull(lambda: PageInterface), enable_search=True, required=True)
-    ancestors = QuerySetList(graphene.NonNull(lambda: PageInterface), enable_search=True, required=True)
+    children = QuerySetList(
+        graphene.NonNull(lambda: PageInterface), enable_search=True, required=True
+    )
+    siblings = QuerySetList(
+        graphene.NonNull(lambda: PageInterface), enable_search=True, required=True
+    )
+    next_siblings = QuerySetList(
+        graphene.NonNull(lambda: PageInterface), enable_search=True, required=True
+    )
+    previous_siblings = QuerySetList(
+        graphene.NonNull(lambda: PageInterface), enable_search=True, required=True
+    )
+    descendants = QuerySetList(
+        graphene.NonNull(lambda: PageInterface), enable_search=True, required=True
+    )
+    ancestors = QuerySetList(
+        graphene.NonNull(lambda: PageInterface), enable_search=True, required=True
+    )
 
     def resolve_content_type(self, info: ResolveInfo):
         self.content_type = ContentType.objects.get_for_model(self)
@@ -161,7 +173,9 @@ def PagesQuery():
     registry.pages[type(WagtailPage)] = Page
 
     class Mixin:
-        pages = QuerySetList(graphene.NonNull(lambda: PageInterface), enable_search=True, required=True)
+        pages = QuerySetList(
+            graphene.NonNull(lambda: PageInterface), enable_search=True, required=True
+        )
         page = graphene.Field(
             PageInterface,
             id=graphene.Int(),

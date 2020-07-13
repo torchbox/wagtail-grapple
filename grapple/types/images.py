@@ -136,7 +136,9 @@ def ImagesQuery():
     mdl_type = get_image_type()
 
     class Mixin:
-        images = QuerySetList(graphene.NonNull(mdl_type), enable_search=True, required=True)
+        images = QuerySetList(
+            graphene.NonNull(mdl_type), enable_search=True, required=True
+        )
         image_type = graphene.String(required=True)
 
         # Return all pages, ideally specific.

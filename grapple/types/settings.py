@@ -11,7 +11,7 @@ def SettingsQuery():
 
         class Mixin:
             setting = graphene.Field(SettingsObjectType, name=graphene.String())
-            settings = graphene.List(SettingsObjectType)
+            settings = graphene.List(graphene.NonNull(SettingsObjectType), required=True)
 
             # Return just one setting base on name param.
             def resolve_setting(self, info, **kwargs):

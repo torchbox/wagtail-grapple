@@ -1,7 +1,6 @@
 from example.tests.test_grapple import BaseGrappleTest
-from home.factories import (
-    AdvertFactory
-)
+from home.factories import AdvertFactory
+
 
 class AdvertTest(BaseGrappleTest):
     def setUp(self):
@@ -40,7 +39,7 @@ class AdvertTest(BaseGrappleTest):
                 text
             }
         }
-        """% (
+        """ % (
             self.advert.url
         )
         executed = self.client.execute(query)

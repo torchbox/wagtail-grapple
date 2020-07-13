@@ -22,14 +22,12 @@ def graphiql(request):
 
 # Traditional URL routing
 SHOULD_EXPOSE_GRAPHIQL = settings.DEBUG or getattr(
-    settings, 'GRAPPLE_EXPOSE_GRAPHIQL', False)
-urlpatterns = [
-    url(r"^graphql", csrf_exempt(GraphQLView.as_view()))
-]
+    settings, "GRAPPLE_EXPOSE_GRAPHIQL", False
+)
+urlpatterns = [url(r"^graphql", csrf_exempt(GraphQLView.as_view()))]
 
 if SHOULD_EXPOSE_GRAPHIQL:
     urlpatterns.append(url(r"^graphiql", graphiql))
 
 # Django Channel (v1.x) routing for subscription support
-channel_routing = [route_class(
-    GraphQLSubscriptionConsumer, path=r"^/subscriptions")]
+channel_routing = [route_class(GraphQLSubscriptionConsumer, path=r"^/subscriptions")]

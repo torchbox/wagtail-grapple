@@ -29,6 +29,7 @@ jobs:
         
     - name: Run Tests
       run: |
+        cd example
         rm db.sqlite3	
         python manage.py migrate
         python manage.py test

@@ -51,6 +51,14 @@ class VideoBlock(blocks.StructBlock):
     graphql_fields = [GraphQLEmbed("youtube_link")]
 
 
+@register_streamfield_block
+class CarouselBlock(blocks.StreamBlock):
+    text = blocks.CharBlock(classname="full title")
+    image = ImageChooserBlock()
+
+    graphql_fields = [GraphQLString("text"), GraphQLImage("image")]
+
+
 class StreamFieldBlock(blocks.StreamBlock):
     heading = blocks.CharBlock(classname="full title")
     paragraph = blocks.RichTextBlock()
@@ -61,3 +69,4 @@ class StreamFieldBlock(blocks.StreamBlock):
     gallery = ImageGalleryBlock()
     video = VideoBlock()
     objectives = blocks.ListBlock(blocks.CharBlock())
+    carousel = CarouselBlock()

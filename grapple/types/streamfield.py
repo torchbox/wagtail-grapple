@@ -137,7 +137,11 @@ class StructBlock(graphene.ObjectType):
         stream_blocks = []
         for name, value in self.value.items():
             block = self.block.child_blocks[name]
-            if not issubclass(type(block), blocks.StreamBlock):
+            if issubclass(type(block), wagtail.core.blocks.ChooserBlock) and hasattr(
+                value, "id"
+            ):
+                value = block.to_python(value.id)
+            elif not issubclass(type(block), blocks.StreamBlock):
                 value = block.to_python(value)
 
             stream_blocks.append(StructBlockItem(name, block, value))
@@ -152,10 +156,13 @@ class StreamBlock(StructBlock):
         stream_blocks = []
         for field in self.value.stream_data:
             block = self.value.stream_block.child_blocks[field["type"]]
-            if not issubclass(type(block), blocks.StructBlock):
-                value = block.to_python(field["value"])
+            value = field["value"]
+            if issubclass(
+                type(block), wagtail.core.blocks.ChooserBlock
+            ) or not issubclass(type(block), blocks.StructBlock):
+                value = block.to_python(value)
 
-            stream_blocks.append(StructBlockItem(field["type"], block, field["value"]))
+            stream_blocks.append(StructBlockItem(field["type"], block, value))
         return stream_blocks
 
 

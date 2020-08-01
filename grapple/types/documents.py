@@ -1,8 +1,10 @@
 import graphene
 
+from graphene_django.types import DjangoObjectType
+
 from wagtail import VERSION as WAGTAIL_VERSION
 from wagtail.documents.models import Document as WagtailDocument
-from graphene_django.types import DjangoObjectType
+
 
 if WAGTAIL_VERSION < (2, 9):
     from wagtail.documents.models import get_document_model

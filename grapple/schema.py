@@ -24,7 +24,7 @@ def create_schema():
     from .types.documents import DocumentsQuery
     from .types.images import ImagesQuery
     from .types.media import MediaQuery
-    from .types.pages import PagesQuery, PagesSubscription
+    from .types.pages import PagesQuery, has_channels
     from .types.search import SearchQuery
     from .types.settings import SettingsQuery
     from .types.snippets import SnippetsQuery
@@ -44,12 +44,15 @@ def create_schema():
     ):
         pass
 
-    class Subscription(PagesSubscription(), graphene.ObjectType):
-        pass
+    if has_channels:
+        from .types.pages import PagesSubscription
+
+        class Subscription(PagesSubscription(), graphene.ObjectType):
+            pass
 
     return graphene.Schema(
         query=Query,
-        subscription=Subscription,
+        subscription=Subscription if has_channels else None,
         types=list(registry.models.values()),
         auto_camelcase=getattr(settings, "GRAPPLE_AUTO_CAMELCASE", True),
     )

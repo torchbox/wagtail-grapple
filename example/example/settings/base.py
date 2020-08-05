@@ -170,12 +170,17 @@ GRAPPLE_ADD_SEARCH_HIT = True
 HEADLESS_PREVIEW_CLIENT_URLS = {"default": "http://localhost:8001/preview"}
 HEADLESS_PREVIEW_LIVE = True
 
-ASGI_APPLICATION = "asgi.channel_layer"
-CHANNELS_WS_PROTOCOLS = ["graphql-ws"]
-CHANNEL_LAYERS = {
-    "default": {
-        # "BACKEND": "asgi_redis.RedisChannelLayer",
-        "BACKEND": "asgiref.inmemory.ChannelLayer",
-        "ROUTING": "grapple.urls.channel_routing",
+try:
+    from channels.asgi import get_channel_layer  # noqa
+    ASGI_APPLICATION = "asgi.channel_layer"
+    CHANNELS_WS_PROTOCOLS = ["graphql-ws"]
+
+    CHANNEL_LAYERS = {
+        "default": {
+            # "BACKEND": "asgi_redis.RedisChannelLayer",
+            "BACKEND": "asgiref.inmemory.ChannelLayer",
+            "ROUTING": "grapple.urls.channel_routing",
+        }
     }
-}
+except ImportError:
+    pass

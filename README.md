@@ -73,8 +73,8 @@ This library is an abstraction upon and relies heavily on Graphene & Graphene Dj
 We also use Django Channels and the Potrace image library.
 * [Graphene](https://github.com/graphql-python/graphene)
 * [Graphene Django](https://github.com/graphql-python/graphene)
-* [Django Channels](https://github.com/django/channels)
 * [Potrace](https://github.com/skyrpex/potrace)
+* [Django Channels](https://github.com/django/channels) when installed with `wagtail_grapple[channels]`
 
 
 ## Getting Started
@@ -83,14 +83,15 @@ Getting Grapple installed is designed to be as simple as possible!
 
 ### Prerequisites
 ```
-Django  >= 2.2, <2.3
+Django  >= 2.2, <3.1 (<2.3 if using channels)
 wagtail >= 2.5, <2.11
 ```
 
 ### Installation
-`pip install wagtail_grapple`
 
-<br />
+```bash
+pip install wagtail_grapple
+```
 
 Add the following to the `installed_apps` list in your Wagtail settings file:
 
@@ -104,7 +105,19 @@ installed_apps = [
 ]
 ```
 
-<br />
+For GraphQL Subscriptions with Django Channels, run `pip install wagtail_grapple[channels]`  and add 
+`channels` to installed apps:
+
+```python
+installed_apps = [
+    ...
+    "grapple",
+    "graphene_django",
+    "channels",
+    ...
+]
+```
+
 
 Add the following to the bottom of the same settings file, where each key is the app you want to this library to scan and the value is the prefix you want to give to GraphQL types (you can usually leave this blank):
 
@@ -115,8 +128,6 @@ GRAPPLE_APPS = {
     "home": ""
 }
 ```
-
-<br />
 
 Add the GraphQL URLs to your `urls.py`:
 
@@ -130,10 +141,8 @@ urlpatterns = [
 ]
 ```
 
-<br/>
 Done! Now you can proceed onto configuring your models to generate GraphQL types that adopt their structure :tada:
 _Your GraphQL endpoint is available at http://localhost:8000/graphql/_
-<br/>
 
 ## Usage
 
@@ -197,7 +206,7 @@ Contributions are what make the open source community such an amazing place to b
 
 Wagtail Grapple supports:
 
-- Django 2.2.x
+- Django 2.2.x, 3.0.x
 - Python 3.6, 3.7 and 3.8
 - Wagtail >= 2.5, < 2.11
 

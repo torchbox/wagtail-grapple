@@ -38,4 +38,6 @@ if SHOULD_EXPOSE_GRAPHIQL:
 
 if has_channels:
     # Django Channel (v1.x) routing for subscription support
-    channel_routing = [route_class(GraphQLSubscriptionConsumer, path=r"^/subscriptions")]
+    channel_routing = [
+        route_class(GraphQLSubscriptionConsumer, path=r"^/subscriptions")
+    ]

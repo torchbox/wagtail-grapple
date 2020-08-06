@@ -172,6 +172,7 @@ HEADLESS_PREVIEW_LIVE = True
 
 try:
     from channels.asgi import get_channel_layer  # noqa
+
     ASGI_APPLICATION = "asgi.channel_layer"
     CHANNELS_WS_PROTOCOLS = ["graphql-ws"]
 

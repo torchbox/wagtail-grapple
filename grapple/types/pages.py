@@ -10,6 +10,7 @@ from graphql.execution.base import ResolveInfo
 
 try:
     from rx.subjects import Subject
+
     has_channels = True
 except ImportError:
     has_channels = False
@@ -212,18 +213,16 @@ if has_channels:
     # Subject to sync Django Signals to Observable
     preview_subject = Subject()
 
-
     @receiver(preview_update)
     def on_updated(sender, token, **kwargs):
         preview_subject.on_next(token)
 
-
     # Subscription Mixin
     def PagesSubscription():
         def preview_observable(id, slug, token, content_type):
-            return preview_subject.filter(lambda previewToken: previewToken == token).map(
-                lambda token: get_specific_page(id, slug, token, content_type)
-            )
+            return preview_subject.filter(
+                lambda previewToken: previewToken == token
+            ).map(lambda token: get_specific_page(id, slug, token, content_type))
 
         class Mixin:
             page = graphene.Field(

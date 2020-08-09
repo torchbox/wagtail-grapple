@@ -8,7 +8,7 @@ from grapple.models import GraphQLString, GraphQLInt, GraphQLImage
 class CustomImage(AbstractImage):
     admin_form_fields = Image.admin_form_fields
 
-    def custom_image_property():
+    def custom_image_property(self):
         return "Image Model!"
 
     graphql_fields = (GraphQLString("custom_image_property"),)
@@ -22,7 +22,7 @@ class CustomImageRendition(AbstractRendition):
     class Meta:
         unique_together = (("image", "filter_spec", "focal_point_key"),)
 
-    def custom_rendition_property():
+    def custom_rendition_property(self):
         return "Rendition Model!"
 
     graphql_fields = (

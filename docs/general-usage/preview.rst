@@ -37,7 +37,7 @@ Now you need to run the migrations that come with Wagtail Headless Preview.
 Add the following Django Channels configuration to your settings. This tells
 Django Channels that you want to add a channel layer that points to Grapple
 and you want to use the 'in-memory' backend. You will want to research different
-Channel backends to see which one works best for your production enviroment:
+Channel backends to see which one works best for your production environment:
 https://channels.readthedocs.io/en/1.x/backends.html
 
 ::

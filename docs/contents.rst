@@ -6,7 +6,7 @@
 Welcome to Wagtail Grapple's documentation!
 ===========================================
 
-There is a range of GraphQL packages for Python and sepcifically Django. 
+There is a range of GraphQL packages for Python and specifically Django. 
 However, Getting these packages to work out of the box with an existing 
 infrastructure without errors isn't as easy to come by.
 
@@ -31,7 +31,7 @@ Features
    -  Search (on all models)
 
 -  Custom Image & Document model support
--  Advanced headless preview functionality buit using GraphQL
+-  Advanced headless preview functionality built using GraphQL
    Subscriptions to enable Page previews on any device!
 -  Gatsby Image support (both base64 and SVG tracing)!
 

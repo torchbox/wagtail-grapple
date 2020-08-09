@@ -2,13 +2,12 @@ name: Example Tests
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
   pull_request:
-    branches: [ master ]
+    branches: [master]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
     strategy:
       max-parallel: 4
@@ -16,20 +15,20 @@ jobs:
         python-version: [3.6, 3.7, 3.8]
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v1
-      with:
-        python-version: ${{ matrix.python-version }}
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
 
-    - name: Install Dependencies
-      run: |
-        pip install -r requirements.txt
-        pip install .
-        
-    - name: Run Tests
-      run: |
-        cd example
-        rm db.sqlite3	
-        python manage.py migrate
-        python manage.py test
+      - name: Install Dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install .
+
+      - name: Run Tests
+        run: |
+          cd example
+          rm db.sqlite3	
+          python manage.py migrate
+          python manage.py test

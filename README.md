@@ -1,6 +1,6 @@
 <p align="center">
-  <a href="https://github.com/torchbox/wagtail-grapple">
-    <img src="https://github.com/torchbox/wagtail-grapple/raw/master/.github/wagtail-grapple.svg?sanitize=true" alt="A red g with a grapple hook" width="80" height="80">
+  <a href="https://github.com/GrappleGQL/wagtail-grapple">
+    <img src="https://github.com/GrappleGQL/wagtail-grapple/raw/master/.github/wagtail-grapple.svg?sanitize=true" alt="A red g with a grapple hook" width="80" height="80">
   </a>
 
   <h3 align="center">Wagtail Grapple <a href="https://pypi.org/project/wagtail-grapple/"><img src="https://img.shields.io/pypi/v/wagtail-grapple.svg"></a> <a href="https://github.com/psf/black"><img src="https://img.shields.io/badge/code%20style-black-000000.svg"></a></h3>
@@ -12,11 +12,11 @@
     <a href="https://wagtail-grapple.readthedocs.io/en/latest/"><strong>Explore the docs »</strong></a>
     <br />
     <br />
-    <a href="https://github.com/torchbox/wagtail-grapple#about-the-project">View Demo</a>
+    <a href="https://github.com/GrappleGQL/wagtail-grapple#about-the-project">View Demo</a>
     ·
-    <a href="https://github.com/torchbox/wagtail-grapple/issues">Report Bug</a>
+    <a href="https://github.com/GrappleGQL/wagtail-grapple/issues">Report Bug</a>
     ·
-    <a href="https://github.com/torchbox/wagtail-grapple/issues">Request Feature</a>
+    <a href="https://github.com/GrappleGQL/wagtail-grapple/issues">Request Feature</a>
   </p>
 </p>
 
@@ -64,7 +64,7 @@ to your model and away you go (although if you want to go deeper you can!).
     - Settings
     - Search (on all models)
 * Custom Image & Document model support
-* Advanced headless preview functionality buit using GraphQL Subscriptions to enable Page previews on any device!
+* Advanced headless preview functionality built using GraphQL Subscriptions to enable Page previews on any device!
 * Gatsby Image support (both base64 and SVG tracing)! :fire:
 
 
@@ -131,8 +131,8 @@ urlpatterns = [
 ```
 
 <br/>
-Done! Now you can proceed onto configuring your models to generate GraphQL types that adopt their stucture :tada:
-_Your graphql endpoint is available at http://localhost:8000/graphql/_
+Done! Now you can proceed onto configuring your models to generate GraphQL types that adopt their structure :tada:
+_Your graphql endpoint is available at http://localhost:8000/graphql_
 <br/>
 
 ## Usage
@@ -151,7 +151,7 @@ class BlogPage(Page):
     body = StreamField(
         [
             ("heading", blocks.CharBlock(classname="full title")),
-            ("paraagraph", blocks.RichTextBlock()),
+            ("paragraph", blocks.RichTextBlock()),
             ("image", ImageChooserBlock()),
         ]
     )
@@ -211,9 +211,9 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 Nathan Horrigan
 - [@NathHorrigan](https://github.com/NathHorrigan)
-- NathHorrigan@gmail.com
+- nathan.horrigan@torchbox.com
 
-Project Link: [https://github.com/torchbox/wagtail-grapple](https://github.com/torchbox/wagtail-grapple)
+Project Link: [https://github.com/GrappleGQL/wagtail-grapple](https://github.com/GrappleGQL/wagtail-grapple)
 
 
 <!-- ACKNOWLEDGEMENTS -->

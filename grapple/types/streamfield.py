@@ -346,7 +346,7 @@ class ListBlock(graphene.ObjectType):
     def resolve_items(self, info, **kwargs):
         # Get the nested StreamBlock type
         block_type = self.block.child_block
-        # Return a list of GraphQL types from the list of valuess
+        # Return a list of GraphQL types from the list of values
         return [StructBlockItem(self.id, block_type, item) for item in self.value]
 
 

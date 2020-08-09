@@ -25,7 +25,7 @@ Wagtail docs:
        body = StreamField(
            [
                ("heading", blocks.CharBlock(classname="full title")),
-               ("paraagraph", blocks.RichTextBlock()),
+               ("paragraph", blocks.RichTextBlock()),
                ("image", ImageChooserBlock()),
            ]
        )

@@ -7,7 +7,7 @@ on:
     branches: [master]
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     strategy:
       max-parallel: 4
@@ -29,6 +29,6 @@ jobs:
       - name: Run Tests
         run: |
           cd example
-          rm db.sqlite3	
+          rm db.sqlite3
           python manage.py migrate
           python manage.py test

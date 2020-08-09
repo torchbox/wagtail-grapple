@@ -5,6 +5,7 @@ import wagtail_factories
 from django.conf import settings
 from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError
+from django.utils.safestring import SafeText
 from wagtail.core.blocks import BoundBlock, StreamValue, StructValue
 from wagtail.core.rich_text import RichText
 from wagtail.embeds.blocks import EmbedValue
@@ -65,6 +66,9 @@ class BlogTest(BaseGrappleTest):
                         ),
                     },
                 ),
+                ("callout", {
+                    "text": RichText("<p>Hello, World</p>")
+                }),
                 ("objectives", ["Read all of article!"]),
                 ("video", {"youtube_link": EmbedValue("https://youtube.com/")}),
             ]
@@ -227,6 +231,22 @@ class BlogTest(BaseGrappleTest):
             validator(url)
         except ValidationError:
             self.fail(f"{url} is not a valid url")
+
+    def test_blog_body_calloutblock(self):
+        # Query stream block
+        block_type = "CalloutBlock"
+        query_blocks = self.get_blocks_from_body(
+            block_type,
+            block_query="""
+                text
+            """,
+        )
+
+        # Check HTML is string
+        for block in self.blog_page.body:
+            if type(block.block).__name__ == block_type:
+                html = query_blocks[0]['text']
+                self.assertEquals(type(html), SafeText)
 
     def test_blog_body_decimalblock(self):
         block_type = "DecimalBlock"

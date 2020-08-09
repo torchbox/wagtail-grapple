@@ -55,6 +55,13 @@ class VideoBlock(blocks.StructBlock):
 class CarouselBlock(blocks.StreamBlock):
     text = blocks.CharBlock(classname="full title")
     image = ImageChooserBlock()
+    markup = blocks.RichTextBlock()
+
+
+@register_streamfield_block
+class CalloutBlock(blocks.StructBlock):
+    text = blocks.RichTextBlock()
+    image = ImageChooserBlock()
 
     graphql_fields = [GraphQLString("text"), GraphQLImage("image")]
 
@@ -70,3 +77,4 @@ class StreamFieldBlock(blocks.StreamBlock):
     video = VideoBlock()
     objectives = blocks.ListBlock(blocks.CharBlock())
     carousel = CarouselBlock()
+    callout = CalloutBlock()

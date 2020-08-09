@@ -60,7 +60,7 @@ available here by using a 'on' spread operator and the name of the model like so
 As mentioned above there is both a plural ``pages`` and singular ``page``
 field on the root Query type that returns a ``PageInterface``. 
 
-The plural ``pages`` field (as do all pleural fields)  
+The plural ``pages`` field (as do all plural fields)  
 accepts the following arguments:
 
 ::

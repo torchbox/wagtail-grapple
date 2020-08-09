@@ -1,5 +1,5 @@
 Django>=2.2,<2.3
-wagtail>=2.5,<2.9
+wagtail>=2.5,<2.11
 graphene-django==2.7.1
 channels==1.1.8
 asgi_redis
@@ -8,5 +8,5 @@ wagtailmedia
 graphql-core==2.2.1
 factory-boy==2.12.0
 wagtail-factories==2.0.0
-django-cors-headers==3.0.2
+django-cors-headers==3.4.0
 wagtail-headless-preview==0.1.4

@@ -43,12 +43,16 @@ Add the GraphQL urls to your ``urls.py``:
    ]
 
 Done! Now you can proceed onto configuring your models to generate
-GraphQL types that adopt their stucture.
+GraphQL types that adopt their structure.
+
+By default, all field and argument names will be converted from `snake_case`
+to `camelCase`. To disable this behavior, set the `GRAPPLE_AUTO_CAMELCASE`
+setting to `False` on your project settings.
 
 * **Next Steps**
 
   * :doc:`examples`
-  * :doc:`../general-usage/types`
+  * :doc:`../general-usage/graphql-types`
 
 
-*Your graphql endpoint is available at http://localhost:8000/graphql/*
+*Your GraphQL endpoint is available at http://localhost:8000/graphql/*

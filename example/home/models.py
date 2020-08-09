@@ -104,7 +104,11 @@ class BlogPage(HeadlessPreviewMixin, Page):
         GraphQLString("date", required=True),
         GraphQLStreamfield("body"),
         GraphQLCollection(
-            GraphQLForeignKey, "related_links", "home.blogpagerelatedlink", required=True, item_required=True
+            GraphQLForeignKey,
+            "related_links",
+            "home.blogpagerelatedlink",
+            required=True,
+            item_required=True,
         ),
         GraphQLCollection(GraphQLString, "related_urls", source="related_links.url"),
         GraphQLCollection(GraphQLString, "authors", source="authors.person.name"),
@@ -153,9 +157,7 @@ class Author(Orderable):
 
 
 @register_snippet
-@register_query_field('advert', 'adverts', {
-    'url': graphene.String()
-})
+@register_query_field("advert", "adverts", {"url": graphene.String()})
 class Advert(models.Model):
     url = models.URLField(null=True, blank=True)
     text = models.CharField(max_length=255)

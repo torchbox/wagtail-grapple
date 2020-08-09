@@ -10,7 +10,7 @@ def SnippetsQuery():
                 types = registry.snippets.types
 
         class Mixin:
-            snippets = graphene.List(SnippetObjectType)
+            snippets = graphene.List(graphene.NonNull(SnippetObjectType), required=True)
             # Return all snippets.
 
             def resolve_snippets(self, info, **kwargs):

@@ -76,7 +76,12 @@ def register_query_field(
             def resolve_plural(self, _, info, **kwargs):
                 qs = cls.objects
                 if issubclass(cls, Page):
-                    qs = cls.objects.live().public().specific().order_by("-first_published_at")
+                    qs = (
+                        cls.objects.live()
+                        .public()
+                        .specific()
+                        .order_by("-first_published_at")
+                    )
 
                 return resolve_queryset(qs.all(), info, **kwargs)
 
@@ -90,7 +95,7 @@ def register_query_field(
             setattr(
                 schema,
                 field_name,
-                graphene.Field(singular_field_type, **field_query_params)
+                graphene.Field(singular_field_type, **field_query_params),
             )
 
             plural_field_type = field_type
@@ -104,9 +109,7 @@ def register_query_field(
             )
 
             setattr(
-                schema,
-                "resolve_" + field_name,
-                MethodType(resolve_singular, schema),
+                schema, "resolve_" + field_name, MethodType(resolve_singular, schema),
             )
             setattr(
                 schema,

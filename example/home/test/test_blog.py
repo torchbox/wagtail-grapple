@@ -66,9 +66,7 @@ class BlogTest(BaseGrappleTest):
                         ),
                     },
                 ),
-                ("callout", {
-                    "text": RichText("<p>Hello, World</p>")
-                }),
+                ("callout", {"text": RichText("<p>Hello, World</p>")}),
                 ("objectives", ["Read all of article!"]),
                 ("video", {"youtube_link": EmbedValue("https://youtube.com/")}),
             ]
@@ -245,7 +243,7 @@ class BlogTest(BaseGrappleTest):
         # Check HTML is string
         for block in self.blog_page.body:
             if type(block.block).__name__ == block_type:
-                html = query_blocks[0]['text']
+                html = query_blocks[0]["text"]
                 self.assertEquals(type(html), SafeText)
 
     def test_blog_body_decimalblock(self):

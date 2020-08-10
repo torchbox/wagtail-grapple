@@ -19,6 +19,7 @@ def graphiql(request):
         "REACT_VERSION": "16.13.1",
         "GRAPHIQL_VERSION": "0.17.5",
         "endpointURL": "/graphql",
+        "supports_subscriptions": has_channels,
     }
     if has_channels:
         graphiql_settings["SUBSCRIPTIONS_TRANSPORT_VERSION"] = "0.9.16"

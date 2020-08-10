@@ -52,7 +52,8 @@
       }
     }
     var fetcher;
-    if (true) {
+    var supports_subscriptions = {{ supports_subscriptions|lower }};
+    if (supports_subscriptions) {
       var subscriptionsClient = new window.SubscriptionsTransportWs.SubscriptionClient('{{subscriptionsEndpoint}}', {
         reconnect: true
       });

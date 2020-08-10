@@ -7,9 +7,11 @@ import wagtail.embeds.blocks
 import wagtail.images.blocks
 import wagtail.snippets.blocks
 from django.conf import settings
+from django.template.loader import render_to_string
 from graphene.types import Scalar
 from graphene_django.converter import convert_django_field
 from wagtail.core.fields import StreamField
+from wagtail.core.rich_text import RichText, expand_db_html
 from wagtail.core import blocks
 
 from ..registry import registry
@@ -146,15 +148,15 @@ class StructBlock(graphene.ObjectType):
             stream_data = self.value
             child_blocks = self.block.child_blocks
 
-        for field in stream_data:
-            block = child_blocks[field["type"]]
-            value = field["value"]
+        for field, value in stream_data.items():
+            block = dict(child_blocks)[field]
             if issubclass(
                 type(block), wagtail.core.blocks.ChooserBlock
             ) or not issubclass(type(block), blocks.StructBlock):
-                value = block.to_python(value)
+                if isinstance(value, int):
+                    value = block.to_python(value)
 
-            stream_blocks.append(StructBlockItem(field["type"], block, value))
+            stream_blocks.append(StructBlockItem(field, block, value))
 
         return stream_blocks
 
@@ -275,6 +277,12 @@ class RichTextBlock(graphene.ObjectType):
 
     class Meta:
         interfaces = (StreamFieldInterface,)
+
+    def resolve_value(self, value):
+        # Allow custom markup for RichText
+        return render_to_string(
+            "wagtailcore/richtext.html", {"html": expand_db_html(self.value.source)}
+        )
 
 
 class RawHTMLBlock(graphene.ObjectType):

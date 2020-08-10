@@ -132,7 +132,7 @@ urlpatterns = [
 
 <br/>
 Done! Now you can proceed onto configuring your models to generate GraphQL types that adopt their structure :tada:
-_Your graphql endpoint is available at http://localhost:8000/graphql_
+_Your GraphQL endpoint is available at http://localhost:8000/graphql/_
 <br/>
 
 ## Usage

@@ -55,4 +55,4 @@ setting to `False` on your project settings.
   * :doc:`../general-usage/graphql-types`
 
 
-*Your GraphQL endpoint is available at http://localhost:8000/graphql*
+*Your GraphQL endpoint is available at http://localhost:8000/graphql/*

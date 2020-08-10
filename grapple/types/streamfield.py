@@ -148,7 +148,7 @@ class StructBlock(graphene.ObjectType):
             stream_data = self.value
             child_blocks = self.block.child_blocks
 
-        for (field, value) in stream_data.items():
+        for field, value in stream_data.items():
             block = dict(child_blocks)[field]
             if issubclass(
                 type(block), wagtail.core.blocks.ChooserBlock

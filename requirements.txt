@@ -1,9 +1,6 @@
-Django>=2.2,<2.3
+Django>=2.2,<3.1
 wagtail>=2.5,<2.11
 graphene-django==2.7.1
-channels==1.1.8
-asgi_redis
-graphql_ws
 wagtailmedia
 graphql-core==2.2.1
 factory-boy==2.12.0

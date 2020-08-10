@@ -1,0 +1,5 @@
+-r requirements.txt
+Django>=2.2,<2.3
+channels==1.1.8
+asgi_redis
+graphql_ws

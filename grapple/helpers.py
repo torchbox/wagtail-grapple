@@ -67,7 +67,7 @@ def register_query_field(
                 try:
                     # If is a Page then only query live/public pages.
                     if issubclass(cls, Page):
-                        return cls.objects.live().public().specific().get(**kwargs)
+                        return cls.objects.live().public().get(**kwargs)
 
                     return cls.objects.get(**kwargs)
                 except:
@@ -76,12 +76,7 @@ def register_query_field(
             def resolve_plural(self, _, info, **kwargs):
                 qs = cls.objects
                 if issubclass(cls, Page):
-                    qs = (
-                        cls.objects.live()
-                        .public()
-                        .specific()
-                        .order_by("-first_published_at")
-                    )
+                    qs = cls.objects.live().public().order_by("-first_published_at")
 
                 return resolve_queryset(qs.all(), info, **kwargs)
 

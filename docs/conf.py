@@ -13,6 +13,8 @@
 import os
 import sys
 
+from grapple import __version__
+
 sys.path.insert(0, os.path.abspath("./grapple"))
 
 
@@ -23,7 +25,7 @@ copyright = "2019, Nathan Horrigan"
 author = "Nathan Horrigan"
 
 # The full version, including alpha/beta/rc tags
-release = "0.5.1"
+release = __version__
 
 
 # -- General configuration ---------------------------------------------------

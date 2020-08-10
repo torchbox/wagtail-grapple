@@ -53,7 +53,6 @@ INSTALLED_APPS = [
     # GRAPPLE SPECIFIC MODULES
     "grapple",
     "graphene_django",
-    "channels",
 ]
 
 MIDDLEWARE = [
@@ -173,6 +172,7 @@ HEADLESS_PREVIEW_LIVE = True
 try:
     from channels.asgi import get_channel_layer  # noqa
 
+    INSTALLED_APPS += ["channels"]
     ASGI_APPLICATION = "asgi.channel_layer"
     CHANNELS_WS_PROTOCOLS = ["graphql-ws"]
 

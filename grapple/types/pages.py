@@ -76,7 +76,7 @@ class PageInterface(graphene.Interface):
 
     def resolve_children(self, info, **kwargs):
         """
-        Resolves a list of live children of this page with `show_in_menus` set.
+        Resolves a list of live children of this page.
         Docs: https://docs.wagtail.io/en/stable/reference/pages/queryset_reference.html#examples
         """
         return resolve_queryset(self.get_children().specific(), info, **kwargs)

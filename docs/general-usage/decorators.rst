@@ -45,7 +45,7 @@ You can now query your adverts with the following query:
         }
     }
 
-You can add custom query paramaters like so:
+You can add custom query parameters like so:
 
 .. code-block:: python
 

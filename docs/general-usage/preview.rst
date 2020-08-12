@@ -8,13 +8,13 @@ it in the admin (in real-time!).
 
 Grapple's Headless Preview is built-on GraphQL Subscriptions which means
 that your client subscribes to the preview page and any changes in the Admin
-will be pushed to your client via WebSockets. This allows you to add preview 
+will be pushed to your client via WebSockets. This allows you to add preview
 support to any client whether that be a SPA or Native App.
 
 Setup
 ^^^^^
 
-Make sure you installed Django Channels (version 1) when you installed Grapple. 
+Make sure you installed Django Channels (version 1) when you installed Grapple.
 Your installed apps in your settings should look like so:
 
 ::
@@ -28,7 +28,7 @@ Your installed apps in your settings should look like so:
         ...
     ]
 
-Now you need to run the migrations that come with Wagtail Headless Preview. 
+Now you need to run the migrations that come with Wagtail Headless Preview.
 
 ::
 
@@ -37,7 +37,7 @@ Now you need to run the migrations that come with Wagtail Headless Preview.
 Add the following Django Channels configuration to your settings. This tells
 Django Channels that you want to add a channel layer that points to Grapple
 and you want to use the 'in-memory' backend. You will want to research different
-Channel backends to see which one works best for your production enviroment:
+Channel backends to see which one works best for your production environment:
 https://channels.readthedocs.io/en/1.x/backends.html
 
 ::
@@ -52,7 +52,7 @@ https://channels.readthedocs.io/en/1.x/backends.html
     }
 
 
-You also want to add to your settings the URL you want to redirect to when the 
+You also want to add to your settings the URL you want to redirect to when the
 user clicks the 'Preview' button:
 
 ::
@@ -95,9 +95,9 @@ And you are done!
 How to use
 ^^^^^^^^^^
 
-Now when you click the 'Preview' button in Wagtail a page will open with the content of 
+Now when you click the 'Preview' button in Wagtail a page will open with the content of
 your defined `HEADLESS_PREVIEW_CLIENT_URLS`. You can either load the preview token through
-the HTTP params or through the ``used-token`` cookie which has been set in 
+the HTTP params or through the ``used-token`` cookie which has been set in
 both the Admin and the redirected page.
 
 Once you've pushed the 'Preview' button, Any data input into the Admin form

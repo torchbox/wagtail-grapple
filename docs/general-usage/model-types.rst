@@ -5,8 +5,8 @@ function that instructs Grapple what type a Django model field is represented by
 in GraphQL.
 
 The field types below are simple to use and all work in the same way.
-We created a number of built-in types for general use, but you can create your own 
-using `Graphene <https://github.com/graphql-python/graphene/>`_ (Grapple's underlying library) 
+We created a number of built-in types for general use, but you can create your own
+using `Graphene <https://github.com/graphql-python/graphene/>`_ (Grapple's underlying library)
 and take advantage of Grapple's generic ``GraphQLField`` type.
 
 
@@ -281,5 +281,3 @@ GraphQLDocument
 .. class:: GraphQLDocument(field_name, required=False)
 
     Us this field type to serialize the core Wagtail or your custom Document model.
-
-

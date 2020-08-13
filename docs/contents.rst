@@ -6,14 +6,14 @@
 Welcome to Wagtail Grapple's documentation!
 ===========================================
 
-There is a range of GraphQL packages for Python and sepcifically Django. 
-However, Getting these packages to work out of the box with an existing 
+There is a range of GraphQL packages for Python and specifically Django.
+However, Getting these packages to work out of the box with an existing
 infrastructure without errors isn't as easy to come by.
 
-The purpose of Grapple is to be able to build GraphQL endpoints on a model 
-by model basis as quickly as possible. The setup and configuration have been 
-designed to be as simple but also provide the best features; No complex serliazers 
-need to be written just add a graphql_fields list to your model and away 
+The purpose of Grapple is to be able to build GraphQL endpoints on a model
+by model basis as quickly as possible. The setup and configuration have been
+designed to be as simple but also provide the best features; No complex serliazers
+need to be written just add a graphql_fields list to your model and away
 you go (although if you want to go deeper you can!).
 
 Features
@@ -31,7 +31,7 @@ Features
    -  Search (on all models)
 
 -  Custom Image & Document model support
--  Advanced headless preview functionality buit using GraphQL
+-  Advanced headless preview functionality built using GraphQL
    Subscriptions to enable Page previews on any device!
 -  Gatsby Image support (both base64 and SVG tracing)!
 

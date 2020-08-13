@@ -2,8 +2,8 @@ GraphQL Types
 =============
 
 Each of the field types in last chapter correspond to an outputted GraphQL
-(or more specifically Graphene) type. Many are self-expanatory such as 
-``GraphQLString`` or ``GraphQLFloat`` but some have a sub-selection which we 
+(or more specifically Graphene) type. Many are self-explanatory such as
+``GraphQLString`` or ``GraphQLFloat`` but some have a sub-selection which we
 detail below.
 
 An existing understanding of GraphQL types will help here.
@@ -12,13 +12,13 @@ An existing understanding of GraphQL types will help here.
 PageInterface
 ^^^^^^^^^^^^^
 
-One of the things you'll do most when using Grapple is querying pages and to 
+One of the things you'll do most when using Grapple is querying pages and to
 do that you'll have to use the ``PageInterface``. This is accessible though
 the ``pages`` or ``page`` field on the root query type.
 
 
 
-The interface itself has the following fields (you'll notice a similarity to 
+The interface itself has the following fields (you'll notice a similarity to
 the fields on a Wagtail Page model). As such with GraphQL interfaces, your page
 models inherit these fields also:
 
@@ -35,15 +35,15 @@ models inherit these fields also:
     showInMenus: Boolean
     contentType: String
     parent: PageInterface
-    children(limit: PositiveIntoffset: PositiveIntorder: StringsearchQuery: Stringid: ID): [PageInterface]
-    siblings(limit: PositiveIntoffset: PositiveIntorder: StringsearchQuery: Stringid: ID): [PageInterface]
-    nextSiblings(limit: PositiveIntoffset: PositiveIntorder: StringsearchQuery: Stringid: ID): [PageInterface]
-    previousSiblings(limit: PositiveIntoffset: PositiveIntorder: StringsearchQuery: Stringid: ID): [PageInterface]
-    descendants(limit: PositiveIntoffset: PositiveIntorder: StringsearchQuery: Stringid: ID): [PageInterface]
-    ancestors(limit: PositiveIntoffset: PositiveIntorder: StringsearchQuery: Stringid: ID): [PageInterface]
+    children(limit: PositiveInt, offset: PositiveInt, order: String, searchQuery: String, id: ID): [PageInterface]
+    siblings(limit: PositiveInt, offset: PositiveInt, order: String, searchQuery: String, id: ID): [PageInterface]
+    nextSiblings(limit: PositiveInt, offset: PositiveInt, order: String, searchQuery: String, id: ID): [PageInterface]
+    previousSiblings(limit: PositiveInt, offset: PositiveInt, order: String, searchQuery: String, id: ID): [PageInterface]
+    descendants(limit: PositiveInt, offset: PositiveInt, order: String, searchQuery: String, id: ID): [PageInterface]
+    ancestors(limit: PositiveInt, offset: PositiveInt, order: String, searchQuery: String, id: ID): [PageInterface]
 
 
-Also, each of your Page models that you have appeneded ``graphql_fields`` to will be
+Also, each of your Page models that you have appended ``graphql_fields`` to will be
 available here by using a 'on' spread operator and the name of the model like so:
 
 ::
@@ -58,9 +58,9 @@ available here by using a 'on' spread operator and the name of the model like so
 
 
 As mentioned above there is both a plural ``pages`` and singular ``page``
-field on the root Query type that returns a ``PageInterface``. 
+field on the root Query type that returns a ``PageInterface``.
 
-The plural ``pages`` field (as do all plural fields)  
+The plural ``pages`` field (as do all plural fields)
 accepts the following arguments:
 
 ::
@@ -86,7 +86,7 @@ The singular ``page`` field accepts the following arguments:
 ImageObjectType
 ^^^^^^^^^^^^^^^
 
-Any image-based field type (whether ``GraphQLImage`` or Streamfield block) will 
+Any image-based field type (whether ``GraphQLImage`` or Streamfield block) will
 return a ``ImageObjectType``. Images are queryable from the ``images`` field on
 the root query type like so:
 
@@ -120,8 +120,8 @@ need for Gatsby Image features to work (see Handy Fragments page for more info):
     src: String
     srcSet(sizes: [Int]): String
     rendition(
-        max: String 
-        min: String 
+        max: String
+        min: String
         width: Int
         height: Int
         fill: String
@@ -133,7 +133,7 @@ need for Gatsby Image features to work (see Handy Fragments page for more info):
     base64: String
 
 
-ImageRenditions are useful feature in Wagtail and they exist in Grapple aswell
+ImageRenditions are useful feature in Wagtail and they exist in Grapple as well
 the ``ImageRenditionObjectType`` provides the following fields:
 
 ::
@@ -170,9 +170,9 @@ The following fields are returned:
 SnippetObjectType
 ^^^^^^^^^^^^^^^^^
 
-You won't see much of ``SnippetObjectType`` as it's only a Union type that 
-groups all your Snippet models together. You can query all the avaiable snippets
-under the ``snippets`` field under the root Query, The query is similar to 
+You won't see much of ``SnippetObjectType`` as it's only a Union type that
+groups all your Snippet models together. You can query all the available snippets
+under the ``snippets`` field under the root Query, The query is similar to
 an interface but ``SnippetObjectType`` doesn't provide any fields itself.
 
 When snippets are attached to Pages you interact with your generated type itself
@@ -196,9 +196,9 @@ An example of querying all snippets:
 SettingObjectType
 ^^^^^^^^^^^^^^^^^
 
-Similar to ``SnippetObjectType``, Settings are grouped togethe under the
+Similar to ``SnippetObjectType``, Settings are grouped together under the
 ``SettingObjectType`` union. You can then query any settings that you have
-appened a ``graphql_fields`` list to like so:
+appended a ``graphql_fields`` list to like so:
 
 ::
 
@@ -240,5 +240,4 @@ You can also simply search all models via GraphQL like so:
                 title
             }
         }
-    } 
-
+    }

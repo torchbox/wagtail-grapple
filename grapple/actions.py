@@ -89,7 +89,7 @@ def register_model(cls: type, type_prefix: str):
         if issubclass(cls, WagtailPage):
             register_page_model(cls, type_prefix)
         elif issubclass(cls, AbstractDocument):
-            register_documment_model(cls, type_prefix)
+            register_document_model(cls, type_prefix)
         elif issubclass(cls, AbstractImage):
             register_image_model(cls, type_prefix)
         elif issubclass(cls, AbstractRendition):
@@ -195,11 +195,11 @@ def build_node_type(
 ):
     """
     Build a graphene node type from a model class and associate
-    with an interface. If it has custom fields then implmement them.
+    with an interface. If it has custom fields then implement them.
     """
     type_name = type_prefix + cls.__name__
 
-    # Create a tempory model and tempory node that will be replaced later on.
+    # Create a temporary model and temporary node that will be replaced later on.
     class StubModel(models.Model):
         class Meta:
             managed = False
@@ -370,7 +370,7 @@ def register_page_model(cls: Type[WagtailPage], type_prefix: str):
         registry.pages[cls] = page_node_type
 
 
-def register_documment_model(cls: Type[AbstractDocument], type_prefix: str):
+def register_document_model(cls: Type[AbstractDocument], type_prefix: str):
     """
     Create graphene node type for a model than inherits from AbstractDocument.
     Only one model will actually be generated because a default document model

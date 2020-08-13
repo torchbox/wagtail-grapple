@@ -1,8 +1,16 @@
 import graphene
+
 from django.apps import apps
-from wagtail.documents.models import get_document_model
+
+from wagtail import VERSION as WAGTAIL_VERSION
 from wagtail.images import get_image_model
 from wagtail.search.backends import get_search_backend
+
+if WAGTAIL_VERSION < (2, 9):
+    from wagtail.documents.models import get_document_model
+else:
+    from wagtail.documents import get_document_model
+
 from ..registry import registry
 
 

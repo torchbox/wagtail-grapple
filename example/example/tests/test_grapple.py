@@ -138,7 +138,7 @@ class DocumentsTest(BaseGrappleTest):
         self.example_document.get_file_size()
         self.assertEqual(self.document_model.objects.all().count(), 1)
 
-    def test_propteries_on_saved_example_document(self):
+    def test_properties_on_saved_example_document(self):
         example_doc = self.document_model.objects.first()
 
         self.assertEqual(example_doc.id, 1)
@@ -151,7 +151,7 @@ class DocumentsTest(BaseGrappleTest):
         self.assertNotEqual(example_doc.file_hash, "")
         self.assertNotEqual(example_doc.file_size, None)
 
-    def test_minimal_documents_query(self):
+    def test_query_documents_id(self):
         query = """
         {
             documents {
@@ -173,7 +173,7 @@ class DocumentsTest(BaseGrappleTest):
             str(self.example_document.id),
         )
 
-    def test_file_field(self):
+    def test_query_file_field(self):
         query = """
         {
             documents {
@@ -190,7 +190,7 @@ class DocumentsTest(BaseGrappleTest):
             self.example_document.file.name,
         )
 
-    def test_file_hash_field(self):
+    def test_query_file_hash_field(self):
         query = """
         {
             documents {
@@ -207,7 +207,7 @@ class DocumentsTest(BaseGrappleTest):
             self.example_document.file_hash,
         )
 
-    def test_file_size_field(self):
+    def test_query_file_size_field(self):
         query = """
         {
             documents {

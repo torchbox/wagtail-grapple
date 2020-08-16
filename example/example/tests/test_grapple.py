@@ -1,12 +1,16 @@
+import os
+
 from collections import OrderedDict
 from pydoc import locate
 
 from django.conf import settings
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, override_settings
 
 from graphene.test import Client
 
 from wagtail.core.models import Page
+from wagtail.documents import get_document_model
 
 from grapple.schema import create_schema
 
@@ -66,3 +70,68 @@ class DisableAutoCamelCaseTest(TestCase):
         pages = Page.objects.all()
 
         self.assertEquals(len(executed["data"]["pages"]), pages.count())
+
+
+class DocumentsTest(BaseGrappleTest):
+    def setUp(self):
+        super().setUp()
+        self.document_model = get_document_model()
+        uploaded_file = SimpleUploadedFile("example.txt", b"Hello world!")
+        self.example_document = self.document_model(
+            title="Example File",
+            file=uploaded_file,
+        )
+        self.example_document.full_clean()
+        self.example_document.save()
+
+    def test_example_document_in_wagtail(self):
+        example_doc = self.document_model.objects.first()
+
+        self.assertEqual(example_doc.id, 1)
+        self.assertEqual(example_doc.title, "Example File")
+
+        example_doc.file.seek(0)
+
+        self.assertEqual(example_doc.file.readline(), b"Hello world!")
+
+    def test_minimal_documents_query(self):
+        query = """
+        {
+            documents {
+                id
+            }
+        }
+        """
+
+        executed = self.client.execute(query)
+
+        documents = self.document_model.objects.all()
+
+        self.assertEquals(
+            len(executed["data"]["documents"]),
+            documents.count(),
+        )
+        self.assertEquals(
+            executed["data"]["documents"][0]["id"],
+            str(self.example_document.id),
+        )
+
+    def test_file_field(self):
+        query = """
+        {
+            documents {
+                id
+                file
+            }
+        }
+        """
+
+        executed = self.client.execute(query)
+
+        self.assertEquals(
+            executed["data"]["documents"][0]["file"],
+            self.example_document.file.name,
+        )
+
+    def tearDown(self):
+        self.example_document.file.delete()

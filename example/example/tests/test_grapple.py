@@ -83,8 +83,10 @@ class DocumentsTest(BaseGrappleTest):
         )
         self.example_document.full_clean()
         self.example_document.save()
+        self.example_document.get_file_hash()
+        self.example_document.get_file_size()
 
-    def test_example_document_in_wagtail(self):
+    def test_propteries_on_example_document_in_wagtail(self):
         example_doc = self.document_model.objects.first()
 
         self.assertEqual(example_doc.id, 1)
@@ -93,6 +95,9 @@ class DocumentsTest(BaseGrappleTest):
         example_doc.file.seek(0)
 
         self.assertEqual(example_doc.file.readline(), b"Hello world!")
+
+        self.assertNotEqual(example_doc.file_hash, "")
+        self.assertNotEqual(example_doc.file_size, None)
 
     def test_minimal_documents_query(self):
         query = """
@@ -131,6 +136,40 @@ class DocumentsTest(BaseGrappleTest):
         self.assertEquals(
             executed["data"]["documents"][0]["file"],
             self.example_document.file.name,
+        )
+
+    def test_file_hash_field(self):
+        query = """
+        {
+            documents {
+                id
+                fileHash
+            }
+        }
+        """
+
+        executed = self.client.execute(query)
+
+        self.assertEquals(
+            executed["data"]["documents"][0]["fileHash"],
+            self.example_document.file_hash,
+        )
+
+    def test_file_size_field(self):
+        query = """
+        {
+            documents {
+                id
+                fileSize
+            }
+        }
+        """
+
+        executed = self.client.execute(query)
+
+        self.assertEquals(
+            executed["data"]["documents"][0]["fileSize"],
+            self.example_document.file_size,
         )
 
     def tearDown(self):

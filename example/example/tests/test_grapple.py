@@ -3,6 +3,7 @@ import os
 from collections import OrderedDict
 from pydoc import locate
 
+import django
 from django.conf import settings
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, override_settings
@@ -11,6 +12,9 @@ from graphene.test import Client
 
 from wagtail.core.models import Page
 from wagtail.documents import get_document_model
+from wagtail.images import get_image_model
+
+import wagtail_factories
 
 from grapple.schema import create_schema
 
@@ -72,6 +76,51 @@ class DisableAutoCamelCaseTest(TestCase):
         self.assertEquals(len(executed["data"]["pages"]), pages.count())
 
 
+class ImagesTest(BaseGrappleTest):
+    def setUp(self):
+        super().setUp()
+        self.image_model = get_image_model()
+        self.assertEqual(self.image_model.objects.all().count(), 0)
+        self.example_image = wagtail_factories.ImageFactory(
+            title="Example Image",
+        )
+        self.example_image.full_clean()
+        self.example_image.save()
+        self.assertEqual(self.image_model.objects.all().count(), 1)
+
+    def test_properties_on_saved_example_image(self):
+        example_img = self.image_model.objects.first()
+
+        self.assertEqual(example_img.id, 1)
+        self.assertEqual(example_img.title, "Example Image")
+
+    def test_query_image_src(self):
+        query = """
+        {
+            images {
+                id
+                src
+            }
+        }
+        """
+
+        executed = self.client.execute(query)
+
+        self.assertEquals(
+            executed["data"]["images"][0]["id"],
+            "1",
+        )
+        self.assertEquals(
+            executed["data"]["images"][0]["src"],
+            "http://localhost:8000" + self.example_image.file.url,
+        )
+
+    def tearDown(self):
+        example_image_path = self.example_image.file.path
+        self.example_image.delete()
+        os.remove(example_image_path)
+
+
 class DocumentsTest(BaseGrappleTest):
     def setUp(self):
         super().setUp()
@@ -89,7 +138,7 @@ class DocumentsTest(BaseGrappleTest):
         self.example_document.get_file_size()
         self.assertEqual(self.document_model.objects.all().count(), 1)
 
-    def test_propteries_on_example_document_in_wagtail(self):
+    def test_propteries_on_saved_example_document(self):
         example_doc = self.document_model.objects.first()
 
         self.assertEqual(example_doc.id, 1)

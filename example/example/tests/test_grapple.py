@@ -76,6 +76,8 @@ class DocumentsTest(BaseGrappleTest):
     def setUp(self):
         super().setUp()
         self.document_model = get_document_model()
+        self.assertEqual(self.document_model.objects.all().count(), 0)
+
         uploaded_file = SimpleUploadedFile("example.txt", b"Hello world!")
         self.example_document = self.document_model(
             title="Example File",
@@ -85,6 +87,7 @@ class DocumentsTest(BaseGrappleTest):
         self.example_document.save()
         self.example_document.get_file_hash()
         self.example_document.get_file_size()
+        self.assertEqual(self.document_model.objects.all().count(), 1)
 
     def test_propteries_on_example_document_in_wagtail(self):
         example_doc = self.document_model.objects.first()

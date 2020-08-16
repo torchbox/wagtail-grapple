@@ -94,7 +94,7 @@ class ImagesTest(BaseGrappleTest):
         self.assertEqual(example_img.id, 1)
         self.assertEqual(example_img.title, "Example Image")
 
-    def test_query_image_src(self):
+    def test_query_src_field(self):
         query = """
         {
             images {
@@ -222,6 +222,23 @@ class DocumentsTest(BaseGrappleTest):
         self.assertEquals(
             executed["data"]["documents"][0]["fileSize"],
             self.example_document.file_size,
+        )
+
+    def test_query_src_field(self):
+        query = """
+        {
+            documents {
+                id
+                src
+            }
+        }
+        """
+
+        executed = self.client.execute(query)
+
+        self.assertEquals(
+            executed["data"]["documents"][0]["src"],
+            "http://localhost:8000" + self.example_document.file.url,
         )
 
     def tearDown(self):

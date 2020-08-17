@@ -13,6 +13,9 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 
+from wagtail import VERSION as WAGTAIL_VERSION
+
+
 PROJECT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BASE_DIR = os.path.dirname(PROJECT_DIR)
 
@@ -64,7 +67,12 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "django.middleware.security.SecurityMiddleware",
-    "wagtail.core.middleware.SiteMiddleware",
+]
+
+if WAGTAIL_VERSION < (2, 9):
+    MIDDLEWARE += ["wagtail.core.middleware.SiteMiddleware"]
+
+MIDDLEWARE += [
     "wagtail.contrib.redirects.middleware.RedirectMiddleware",
 ]
 

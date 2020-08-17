@@ -80,9 +80,7 @@ class ImagesTest(BaseGrappleTest):
         super().setUp()
         self.image_model = get_image_model()
         self.assertEqual(self.image_model.objects.all().count(), 0)
-        self.example_image = wagtail_factories.ImageFactory(
-            title="Example Image",
-        )
+        self.example_image = wagtail_factories.ImageFactory(title="Example Image")
         self.example_image.full_clean()
         self.example_image.save()
         self.assertEqual(self.image_model.objects.all().count(), 1)
@@ -105,10 +103,7 @@ class ImagesTest(BaseGrappleTest):
 
         executed = self.client.execute(query)
 
-        self.assertEquals(
-            executed["data"]["images"][0]["id"],
-            "1",
-        )
+        self.assertEquals(executed["data"]["images"][0]["id"], "1")
         self.assertEquals(
             executed["data"]["images"][0]["src"],
             "http://localhost:8000" + self.example_image.file.url,
@@ -128,8 +123,7 @@ class DocumentsTest(BaseGrappleTest):
 
         uploaded_file = SimpleUploadedFile("example.txt", b"Hello world!")
         self.example_document = self.document_model(
-            title="Example File",
-            file=uploaded_file,
+            title="Example File", file=uploaded_file
         )
         self.example_document.full_clean()
         self.example_document.save()
@@ -163,13 +157,9 @@ class DocumentsTest(BaseGrappleTest):
 
         documents = self.document_model.objects.all()
 
+        self.assertEquals(len(executed["data"]["documents"]), documents.count())
         self.assertEquals(
-            len(executed["data"]["documents"]),
-            documents.count(),
-        )
-        self.assertEquals(
-            executed["data"]["documents"][0]["id"],
-            str(self.example_document.id),
+            executed["data"]["documents"][0]["id"], str(self.example_document.id)
         )
 
     def test_query_file_field(self):
@@ -185,8 +175,7 @@ class DocumentsTest(BaseGrappleTest):
         executed = self.client.execute(query)
 
         self.assertEquals(
-            executed["data"]["documents"][0]["file"],
-            self.example_document.file.name,
+            executed["data"]["documents"][0]["file"], self.example_document.file.name
         )
 
     def test_query_file_hash_field(self):

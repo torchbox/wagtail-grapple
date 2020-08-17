@@ -52,6 +52,7 @@ class DocumentObjectType(DjangoObjectType):
         """
         return get_document_url(self)
 
+
 def DocumentsQuery():
     registry.documents[WagtailDocument] = DocumentObjectType
     mdl = get_document_model()

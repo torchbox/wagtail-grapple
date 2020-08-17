@@ -1,5 +1,6 @@
 import graphene
 
+from django.conf import settings
 from graphene_django.types import DjangoObjectType
 
 from wagtail import VERSION as WAGTAIL_VERSION
@@ -31,6 +32,11 @@ class DocumentObjectType(DjangoObjectType):
     created_at = graphene.DateTime(required=True)
     file_size = graphene.Int()
     file_hash = graphene.String()
+
+    def resolve_file(self, info, **kwargs):
+        if self.file.url[0] == "/":
+            return settings.BASE_URL + self.file.url
+        return self.file.url
 
 
 def DocumentsQuery():

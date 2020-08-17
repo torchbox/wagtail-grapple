@@ -44,9 +44,9 @@ class DocumentObjectType(DjangoObjectType):
     created_at = graphene.DateTime(required=True)
     file_size = graphene.Int()
     file_hash = graphene.String()
-    src = graphene.String(required=True)
+    url = graphene.String(required=True)
 
-    def resolve_src(self, info):
+    def resolve_url(self, info):
         """
         Get url of the document.
         """

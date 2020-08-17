@@ -47,4 +47,3 @@ jobs:
         run: |
           pip install -r requirements-channels.txt
           pip install .
-

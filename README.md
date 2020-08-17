@@ -105,7 +105,7 @@ installed_apps = [
 ]
 ```
 
-For GraphQL Subscriptions with Django Channels, run `pip install wagtail_grapple[channels]`  and add 
+For GraphQL Subscriptions with Django Channels, run `pip install wagtail_grapple[channels]`  and add
 `channels` to installed apps:
 
 ```python

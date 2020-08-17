@@ -212,12 +212,12 @@ class DocumentsTest(BaseGrappleTest):
             self.example_document.file_size,
         )
 
-    def test_query_src_field_with_default_document_serve_method(self):
+    def test_query_url_field_with_default_document_serve_method(self):
         query = """
         {
             documents {
                 id
-                src
+                url
             }
         }
         """
@@ -225,18 +225,18 @@ class DocumentsTest(BaseGrappleTest):
         executed = self.client.execute(query)
 
         self.assertEqual(
-            executed["data"]["documents"][0]["src"],
+            executed["data"]["documents"][0]["url"],
             "http://localhost:8000" + self.example_document.url,
         )
 
-    def test_query_src_field_with_direct_document_serve_method(self):
+    def test_query_url_field_with_direct_document_serve_method(self):
         serve_method_at_test_start = settings.WAGTAILDOCS_SERVE_METHOD
         settings.WAGTAILDOCS_SERVE_METHOD = "direct"
         query = """
         {
             documents {
                 id
-                src
+                url
             }
         }
         """
@@ -244,7 +244,7 @@ class DocumentsTest(BaseGrappleTest):
         executed = self.client.execute(query)
 
         self.assertEqual(
-            executed["data"]["documents"][0]["src"],
+            executed["data"]["documents"][0]["url"],
             "http://localhost:8000" + self.example_document.file.url,
         )
         settings.WAGTAILDOCS_SERVE_METHOD = serve_method_at_test_start

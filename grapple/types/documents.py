@@ -1,5 +1,6 @@
 import graphene
 
+from django.conf import settings
 from graphene_django.types import DjangoObjectType
 
 from wagtail import VERSION as WAGTAIL_VERSION
@@ -13,6 +14,18 @@ else:
 from ..registry import registry
 from ..utils import resolve_queryset
 from .structures import QuerySetList
+
+
+def get_document_url(cls):
+    url = ""
+    if hasattr(cls, "url"):
+        url = cls.url
+    else:
+        url = cls.file.url
+
+    if url[0] == "/":
+        return settings.BASE_URL + url
+    return url
 
 
 class DocumentObjectType(DjangoObjectType):
@@ -31,7 +44,13 @@ class DocumentObjectType(DjangoObjectType):
     created_at = graphene.DateTime(required=True)
     file_size = graphene.Int()
     file_hash = graphene.String()
+    src = graphene.String(required=True)
 
+    def resolve_src(self, info):
+        """
+        Get url of the document.
+        """
+        return get_document_url(self)
 
 def DocumentsQuery():
     registry.documents[WagtailDocument] = DocumentObjectType

@@ -1,6 +1,5 @@
 import graphene
 
-from django.conf import settings
 from graphene_django.types import DjangoObjectType
 
 from wagtail import VERSION as WAGTAIL_VERSION
@@ -12,20 +11,8 @@ else:
     from wagtail.documents import get_document_model
 
 from ..registry import registry
-from ..utils import resolve_queryset
+from ..utils import get_media_item_url, resolve_queryset
 from .structures import QuerySetList
-
-
-def get_document_url(cls):
-    url = ""
-    if hasattr(cls, "url"):
-        url = cls.url
-    else:
-        url = cls.file.url
-
-    if url[0] == "/":
-        return settings.BASE_URL + url
-    return url
 
 
 class DocumentObjectType(DjangoObjectType):
@@ -48,9 +35,9 @@ class DocumentObjectType(DjangoObjectType):
 
     def resolve_url(self, info):
         """
-        Get url of the document.
+        Get document file url.
         """
-        return get_document_url(self)
+        return get_media_item_url(self)
 
 
 def DocumentsQuery():

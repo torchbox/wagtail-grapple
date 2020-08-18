@@ -8,6 +8,7 @@ from grapple.models import (
     GraphQLString,
     GraphQLCollection,
     GraphQLEmbed,
+    GraphQLStreamfield,
 )
 
 from wagtail.images.blocks import ImageChooserBlock
@@ -66,6 +67,26 @@ class CalloutBlock(blocks.StructBlock):
     graphql_fields = [GraphQLString("text"), GraphQLImage("image")]
 
 
+@register_streamfield_block
+class ButtonBlock(blocks.StructBlock):
+    button_text = blocks.CharBlock(required=True, max_length=50, label="Text")
+    button_link = blocks.CharBlock(required=True, max_length=255, label="Link")
+
+    graphql_fields = [GraphQLString("button_text"), GraphQLString("button_link")]
+
+
+@register_streamfield_block
+class TextAndButtonsBlock(blocks.StructBlock):
+    text = blocks.TextBlock()
+    buttons = blocks.ListBlock(ButtonBlock())
+
+    graphql_fields = [
+        GraphQLString("text"),
+        GraphQLImage("image"),
+        GraphQLStreamfield("buttons"),
+    ]
+
+
 class StreamFieldBlock(blocks.StreamBlock):
     heading = blocks.CharBlock(classname="full title")
     paragraph = blocks.RichTextBlock()
@@ -78,3 +99,4 @@ class StreamFieldBlock(blocks.StreamBlock):
     objectives = blocks.ListBlock(blocks.CharBlock())
     carousel = CarouselBlock()
     callout = CalloutBlock()
+    text_and_buttons = TextAndButtonsBlock()

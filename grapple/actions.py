@@ -11,8 +11,8 @@ from django.contrib.contenttypes.models import ContentType
 from django.template.loader import render_to_string
 from wagtail.contrib.settings.models import BaseSetting
 from wagtail.core.models import Page as WagtailPage
-from wagtail.core.blocks import BaseBlock, RichTextBlock, stream_block
 from wagtail.core.rich_text import RichText, expand_db_html
+from wagtail.core.blocks import BaseBlock, RichTextBlock, stream_block, StructValue
 from wagtail.documents.models import AbstractDocument
 from wagtail.images.models import AbstractImage, AbstractRendition
 from wagtail.images.blocks import ImageChooserBlock
@@ -279,23 +279,32 @@ def convert_to_underscore(name):
     return re.sub("([a-z0-9])([A-Z])", r"\1_\2", s1).lower()
 
 
+def get_field_value(instance, field_name: str):
+    """
+    Returns the value of a given field on an object of a StreamField.
+
+    Different types of objects require different ways to access the values.
+    """
+    if isinstance(instance, StructValue):
+        return instance[field_name]
+    elif isinstance(instance.value, RichText):
+        # Allow custom markup for RichText
+        return render_to_string(
+            "wagtailcore/richtext.html", {"html": expand_db_html(instance.value.source)}
+        )
+    elif isinstance(instance.value, stream_block.StreamValue):
+        stream_data = dict(instance.value.stream_data)
+        return stream_data[field_name]
+    else:
+        return instance.value[field_name]
+
+
 def streamfield_resolver(self, instance, info, **kwargs):
     value = None
     if hasattr(instance, "block"):
         field_name = convert_to_underscore(info.field_name)
         block = instance.block.child_blocks[field_name]
-
-        if isinstance(instance.value, stream_block.StreamValue):
-            stream_data = dict(instance.value.stream_data)
-            value = stream_data[field_name]
-        else:
-            value = instance.value[field_name]
-
-        # Allow custom markup for RichText
-        if isinstance(value, RichText):
-            value = render_to_string(
-                "wagtailcore/richtext.html", {"html": expand_db_html(value.source)}
-            )
+        value = get_field_value(instance, field_name)
 
         if not block or not value:
             return None

@@ -39,7 +39,14 @@ def register_graphql_schema(schema_cls):
     return schema_cls
 
 
-def register_query_field(field_name, plural_field_name=None, query_params=None):
+def register_query_field(
+    field_name,
+    plural_field_name=None,
+    query_params=None,
+    required=False,
+    plural_required=False,
+    plural_item_required=False,
+):
     from .types.structures import QuerySetList
     from .utils import resolve_queryset
 
@@ -75,12 +82,29 @@ def register_query_field(field_name, plural_field_name=None, query_params=None):
 
             # Create schema and add resolve methods
             schema = type(cls.__name__ + "Query", (), {})
+
+            singular_field_type = field_type
+            if required:
+                singular_field_type = graphene.NonNull(field_type)
+
             setattr(
-                schema, field_name, graphene.Field(field_type, **field_query_params)
+                schema,
+                field_name,
+                graphene.Field(singular_field_type, **field_query_params),
             )
-            setattr(schema, plural_field_name, QuerySetList(field_type))
+
+            plural_field_type = field_type
+            if plural_item_required:
+                plural_field_type = graphene.NonNull(field_type)
+
             setattr(
-                schema, "resolve_" + field_name, MethodType(resolve_singular, schema)
+                schema,
+                plural_field_name,
+                QuerySetList(plural_field_type, required=plural_required),
+            )
+
+            setattr(
+                schema, "resolve_" + field_name, MethodType(resolve_singular, schema),
             )
             setattr(
                 schema,

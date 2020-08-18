@@ -157,7 +157,14 @@ class Author(Orderable):
 
 
 @register_snippet
-@register_query_field("advert", "adverts", {"url": graphene.String()})
+@register_query_field(
+    "advert",
+    "adverts",
+    {"url": graphene.String()},
+    required=True,
+    plural_required=True,
+    plural_item_required=True,
+)
 class Advert(models.Model):
     url = models.URLField(null=True, blank=True)
     text = models.CharField(max_length=255)

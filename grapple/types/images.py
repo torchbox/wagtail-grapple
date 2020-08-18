@@ -15,7 +15,7 @@ from .structures import QuerySetList
 class BaseImageObjectType(graphene.ObjectType):
     width = graphene.Int(required=True)
     height = graphene.Int(required=True)
-    src = graphene.String(required=True)
+    src = graphene.String(required=True, deprecation_reason="Use the `url` attribute")
     url = graphene.String(required=True)
     aspect_ratio = graphene.Float(required=True)
     sizes = graphene.String(required=True)

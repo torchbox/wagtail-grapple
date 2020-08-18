@@ -1,8 +1,8 @@
 import os
 import base64
-import tempfile
-from PIL import Image, ImageFilter
+
 from django.conf import settings
+
 from wagtail.search.index import class_is_indexed
 from wagtail.search.models import Query
 from wagtail.search.backends import get_search_backend
@@ -55,6 +55,18 @@ def resolve_queryset(
         qs = qs[offset : limit + offset]
 
     return qs
+
+
+def get_media_item_url(cls):
+    url = ""
+    if hasattr(cls, "url"):
+        url = cls.url
+    elif hasattr(cls, "file"):
+        url = cls.file.url
+
+    if url[0] == "/":
+        return settings.BASE_URL + url
+    return url
 
 
 def image_as_base64(image_file, format="png"):

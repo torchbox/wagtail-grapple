@@ -23,6 +23,7 @@ def create_schema():
     from .registry import registry
     from .types.documents import DocumentsQuery
     from .types.images import ImagesQuery
+    from .types.media import MediaQuery
     from .types.pages import PagesQuery, PagesSubscription
     from .types.search import SearchQuery
     from .types.settings import SettingsQuery
@@ -34,6 +35,7 @@ def create_schema():
         PagesQuery(),
         ImagesQuery(),
         DocumentsQuery(),
+        MediaQuery(),
         SnippetsQuery(),
         SettingsQuery(),
         SearchQuery(),

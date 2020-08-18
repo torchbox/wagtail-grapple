@@ -1,4 +1,5 @@
 import os
+import wagtail_factories
 
 from collections import OrderedDict
 from pydoc import locate
@@ -9,11 +10,11 @@ from django.test import TestCase, override_settings
 
 from graphene.test import Client
 
+from wagtailmedia.models import get_media_model
+
 from wagtail.core.models import Page
 from wagtail.documents import get_document_model
 from wagtail.images import get_image_model
-
-import wagtail_factories
 
 from grapple.schema import create_schema
 
@@ -91,11 +92,12 @@ class ImagesTest(BaseGrappleTest):
         self.assertEqual(example_img.id, 1)
         self.assertEqual(example_img.title, "Example Image")
 
-    def test_query_src_field(self):
+    def test_query_url_field(self):
         query = """
         {
             images {
                 id
+                url
                 src
             }
         }
@@ -105,8 +107,11 @@ class ImagesTest(BaseGrappleTest):
 
         self.assertEquals(executed["data"]["images"][0]["id"], "1")
         self.assertEquals(
-            executed["data"]["images"][0]["src"],
+            executed["data"]["images"][0]["url"],
             "http://localhost:8000" + self.example_image.file.url,
+        )
+        self.assertEquals(
+            executed["data"]["images"][0]["url"], executed["data"]["images"][0]["src"],
         )
 
     def tearDown(self):
@@ -251,3 +256,60 @@ class DocumentsTest(BaseGrappleTest):
 
     def tearDown(self):
         self.example_document.file.delete()
+
+
+class MediaTest(BaseGrappleTest):
+    def setUp(self):
+        super().setUp()
+
+        self.media_model = get_media_model()
+        self.assertEqual(self.media_model.objects.all().count(), 0)
+
+        uploaded_file = SimpleUploadedFile("example.mp4", b"")
+        self.media_item = self.media_model(
+            title="Example Media File", file=uploaded_file, duration=0, type="video"
+        )
+        self.media_item.full_clean()
+        self.media_item.save()
+        self.assertEqual(self.media_model.objects.all().count(), 1)
+
+    def test_properties_on_saved_example_media(self):
+        media_item = self.media_model.objects.first()
+
+        self.assertEqual(media_item.id, 1)
+        self.assertEqual(media_item.title, "Example Media File")
+
+    def test_query_media_id(self):
+        query = """
+        {
+            media {
+                id
+            }
+        }
+        """
+
+        executed = self.client.execute(query)
+
+        media = self.media_model.objects.all()
+
+        self.assertEquals(len(executed["data"]["media"]), media.count())
+        self.assertEquals(executed["data"]["media"][0]["id"], str(self.media_item.id))
+
+    def test_query_file_field(self):
+        query = """
+        {
+            media {
+                id
+                file
+            }
+        }
+        """
+
+        executed = self.client.execute(query)
+
+        self.assertEquals(
+            executed["data"]["media"][0]["file"], self.media_item.file.name
+        )
+
+    def tearDown(self):
+        self.media_item.file.delete()

@@ -11,7 +11,13 @@ from wagtail.core.rich_text import RichText
 from wagtail.embeds.blocks import EmbedValue
 
 from example.tests.test_grapple import BaseGrappleTest
-from home.blocks import ImageGalleryImage, ImageGalleryImages, VideoBlock, CarouselBlock
+from home.blocks import (
+    ButtonBlock,
+    ImageGalleryImage,
+    ImageGalleryImages,
+    VideoBlock,
+    CarouselBlock,
+)
 from home.factories import (
     BlogPageFactory,
     BlogPageRelatedLinkFactory,
@@ -69,6 +75,18 @@ class BlogTest(BaseGrappleTest):
                 ("callout", {"text": RichText("<p>Hello, World</p>")}),
                 ("objectives", ["Read all of article!"]),
                 ("video", {"youtube_link": EmbedValue("https://youtube.com/")}),
+                (
+                    "text_and_buttons",
+                    {
+                        "text": "Button text",
+                        "buttons": [
+                            {
+                                "button_text": "btn",
+                                "button_link": "https://www.graphql.com/",
+                            }
+                        ],
+                    },
+                ),
             ]
         )
 
@@ -426,3 +444,25 @@ class BlogTest(BaseGrappleTest):
         self.assertEqual(len(links), 5)
         for url in links:
             self.assertTrue(isinstance(url, str))
+
+    def test_structvalue_block(self):
+        # Query stream block
+        block_type = "TextAndButtonsBlock"
+        query_blocks = self.get_blocks_from_body(
+            block_type,
+            block_query="""
+                buttons {
+                    ... on ButtonBlock {
+                        buttonText
+                        buttonLink
+                    }
+               }
+            """,
+        )
+
+        # Check HTML is string
+        for block in self.blog_page.body:
+            if type(block.block).__name__ == block_type:
+                buttons = query_blocks[0]["buttons"]
+                self.assertEquals(buttons[0]["buttonText"], "btn")
+                self.assertEquals(buttons[0]["buttonLink"], "https://www.graphql.com/")

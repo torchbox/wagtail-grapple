@@ -281,15 +281,20 @@ def convert_to_underscore(name):
 
 def get_field_value(instance, field_name: str):
     """
-    Returns the value of a given field on an object of a streamfield.
+    Returns the value of a given field on an object of a StreamField.
 
     Different types of objects require different ways to access the values.
     """
-    if isinstance(instance.value, stream_block.StreamValue):
+    if isinstance(instance, StructValue):
+        return instance[field_name]
+    elif isinstance(instance.value, RichText):
+        # Allow custom markup for RichText
+        return render_to_string(
+            "wagtailcore/richtext.html", {"html": expand_db_html(instance.value.source)}
+        )
+    elif isinstance(instance.value, stream_block.StreamValue):
         stream_data = dict(instance.value.stream_data)
         return stream_data[field_name]
-    elif isinstance(instance, StructValue):
-        return instance[field_name]
     else:
         return instance.value[field_name]
 
@@ -300,12 +305,6 @@ def streamfield_resolver(self, instance, info, **kwargs):
         field_name = convert_to_underscore(info.field_name)
         block = instance.block.child_blocks[field_name]
         value = get_field_value(instance, field_name)
-
-        # Allow custom markup for RichText
-        if isinstance(value, RichText):
-            value = render_to_string(
-                "wagtailcore/richtext.html", {"html": expand_db_html(value.source)}
-            )
 
         if not block or not value:
             return None

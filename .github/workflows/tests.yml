@@ -32,3 +32,18 @@ jobs:
           rm db.sqlite3
           python manage.py migrate
           python manage.py test
+
+
+  test_channels:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+
+      - name: Install Dependencies
+        run: |
+          pip install -r requirements-channels.txt
+          pip install .

@@ -1,12 +1,19 @@
 import graphene
 from django.contrib.contenttypes.models import ContentType
+from django.dispatch import receiver
+
 from wagtail.core.models import Page as WagtailPage
 from wagtail_headless_preview.signals import preview_update
 from graphene_django.types import DjangoObjectType
 from graphql.error import GraphQLLocatedError
 from graphql.execution.base import ResolveInfo
-from rx.subjects import Subject
-from django.dispatch import receiver
+
+try:
+    from rx.subjects import Subject
+
+    has_channels = True
+except ImportError:
+    has_channels = False
 
 from ..registry import registry
 from ..utils import resolve_queryset
@@ -202,37 +209,36 @@ def PagesQuery():
     return Mixin
 
 
-# Subject to sync Django Signals to Observable
-preview_subject = Subject()
+if has_channels:
+    # Subject to sync Django Signals to Observable
+    preview_subject = Subject()
 
+    @receiver(preview_update)
+    def on_updated(sender, token, **kwargs):
+        preview_subject.on_next(token)
 
-@receiver(preview_update)
-def on_updated(sender, token, **kwargs):
-    preview_subject.on_next(token)
+    # Subscription Mixin
+    def PagesSubscription():
+        def preview_observable(id, slug, token, content_type):
+            return preview_subject.filter(
+                lambda previewToken: previewToken == token
+            ).map(lambda token: get_specific_page(id, slug, token, content_type))
 
-
-# Subscription Mixin
-def PagesSubscription():
-    def preview_observable(id, slug, token, content_type):
-        return preview_subject.filter(lambda previewToken: previewToken == token).map(
-            lambda token: get_specific_page(id, slug, token, content_type)
-        )
-
-    class Mixin:
-        page = graphene.Field(
-            PageInterface,
-            id=graphene.Int(),
-            slug=graphene.String(),
-            token=graphene.String(),
-            content_type=graphene.String(),
-        )
-
-        def resolve_page(self, info, **kwargs):
-            return preview_observable(
-                id=kwargs.get("id"),
-                slug=kwargs.get("slug"),
-                token=kwargs.get("token"),
-                content_type=kwargs.get("content_type"),
+        class Mixin:
+            page = graphene.Field(
+                PageInterface,
+                id=graphene.Int(),
+                slug=graphene.String(),
+                token=graphene.String(),
+                content_type=graphene.String(),
             )
 
-    return Mixin
+            def resolve_page(self, info, **kwargs):
+                return preview_observable(
+                    id=kwargs.get("id"),
+                    slug=kwargs.get("slug"),
+                    token=kwargs.get("token"),
+                    content_type=kwargs.get("content_type"),
+                )
+
+        return Mixin

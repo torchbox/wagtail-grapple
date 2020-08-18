@@ -9,6 +9,7 @@ class Registry:
     pages = RegistryItem()
     documents = RegistryItem()
     images = RegistryItem()
+    media = RegistryItem()
     snippets = RegistryItem()
     streamfield_blocks = RegistryItem()
     django_models = RegistryItem()
@@ -19,6 +20,7 @@ class Registry:
         "pages",
         "documents",
         "images",
+        "media",
         "snippets",
         "django_models",
         "settings",

@@ -30,7 +30,7 @@ class BaseImageObjectType(graphene.ObjectType):
         """
         Deprecated. Use the `url` attribute.
         """
-        return self.resolve_url(info)
+        return get_media_item_url(self)
 
     def resolve_aspect_ratio(self, info, **kwargs):
         """

@@ -10,7 +10,7 @@ from django.test import TestCase, override_settings
 
 from graphene.test import Client
 
-from wagtailmedia.models import Media
+from wagtailmedia.models import get_media_model
 
 from wagtail.core.models import Page
 from wagtail.documents import get_document_model
@@ -260,17 +260,17 @@ class DocumentsTest(BaseGrappleTest):
 
 class MediaTest(BaseGrappleTest):
     def setUp(self):
-        self.media_model = Media  # TODO: use wagtailmedia.models.get_media_model
+        super().setUp()
+
+        self.media_model = get_media_model()
         self.assertEqual(self.media_model.objects.all().count(), 0)
 
         uploaded_file = SimpleUploadedFile("example.mp4", b"")
         self.media_item = self.media_model(
-            title="Example Media File", file=uploaded_file
+            title="Example Media File", file=uploaded_file, duration=0, type="video"
         )
         self.media_item.full_clean()
         self.media_item.save()
-        self.media_item.get_file_hash()
-        self.media_item.get_file_size()
         self.assertEqual(self.media_model.objects.all().count(), 1)
 
     def test_properties_on_saved_example_media(self):

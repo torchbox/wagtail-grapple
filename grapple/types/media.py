@@ -1,7 +1,7 @@
 import graphene
 from graphene_django import DjangoObjectType
 from wagtailmedia.models import Media
-from django.conf import settings
+from ..utils import get_media_item_url, resolve_queryset
 
 
 class MediaObjectType(DjangoObjectType):
@@ -9,7 +9,10 @@ class MediaObjectType(DjangoObjectType):
         model = Media
         exclude_fields = ("tags",)
 
-    def resolve_file(self, info, **kwargs):
-        if self.file.url[0] == "/":
-            return settings.BASE_URL + self.file.url
-        return self.file.url
+    url = graphene.String(required=True)
+
+    def resolve_url(self, info):
+        """
+        Get Media file url.
+        """
+        return get_media_item_url(self)

@@ -100,7 +100,6 @@ installed_apps = [
     ...
     "grapple",
     "graphene_django",
-    "channels",
     ...
 ]
 ```

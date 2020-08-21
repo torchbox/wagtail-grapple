@@ -1,3 +1,3 @@
 default_app_config = "grapple.apps.Grapple"
 
-__version__ = "0.5.6"
+__version__ = "0.6.0"

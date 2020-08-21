@@ -73,7 +73,7 @@ class ImageObjectType(DjangoObjectType, BaseImageObjectType):
         webpquality=graphene.Int(),
     )
     src_set = graphene.String(sizes=graphene.List(graphene.Int))
-    tags = graphene.List(graphene.String))
+    tags = graphene.List(graphene.String)
 
     class Meta:
         model = WagtailImage

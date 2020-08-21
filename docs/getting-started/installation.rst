@@ -14,6 +14,18 @@ settings file:
        ...
        "grapple",
        "graphene_django",
+       ...
+   ]
+
+For GraphQL Subscriptions with Django Channels, run ``pip install wagtail_grapple[channels]`` and add
+``channels`` to installed apps:
+
+::
+
+   installed_apps = [
+       ...
+       "grapple",
+       "graphene_django",
        "channels",
        ...
    ]

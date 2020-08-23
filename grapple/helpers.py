@@ -104,7 +104,88 @@ def register_query_field(
             )
 
             setattr(
-                schema, "resolve_" + field_name, MethodType(resolve_singular, schema),
+                schema, "resolve_" + field_name, MethodType(resolve_singular, schema)
+            )
+            setattr(
+                schema,
+                "resolve_" + plural_field_name,
+                MethodType(resolve_plural, schema),
+            )
+            return schema
+
+        # Send schema to Grapple schema.
+        register_graphql_schema(Mixin())
+        return cls
+
+    return inner
+
+
+def register_paginated_query_field(
+    field_name,
+    plural_field_name=None,
+    query_params=None,
+    required=False,
+    plural_required=False,
+    plural_item_required=False,
+):
+    from .types.structures import PaginatedQuerySet
+    from .utils import resolve_paginated_queryset
+
+    if not plural_field_name:
+        plural_field_name = field_name + "s"
+
+    def inner(cls):
+        field_type = lambda: registry.models[cls]
+        field_query_params = query_params or {"id": graphene.Int()}
+
+        def Mixin():
+            # Generic methods to get all and query one model instance.
+            def resolve_singular(self, _, info, **kwargs):
+                # If no filters then return nothing,
+                if not kwargs:
+                    return None
+
+                try:
+                    # If is a Page then only query live/public pages.
+                    if issubclass(cls, Page):
+                        return cls.objects.live().public().get(**kwargs)
+
+                    return cls.objects.get(**kwargs)
+                except:
+                    return None
+
+            def resolve_plural(self, _, info, **kwargs):
+                qs = cls.objects
+                if issubclass(cls, Page):
+                    qs = cls.objects.live().public().order_by("-first_published_at")
+
+                return resolve_paginated_queryset(qs.all(), info, **kwargs)
+
+            # Create schema and add resolve methods
+            schema = type(cls.__name__ + "Query", (), {})
+
+            singular_field_type = field_type
+            if required:
+                singular_field_type = graphene.NonNull(field_type)
+
+            setattr(
+                schema,
+                field_name,
+                graphene.Field(singular_field_type, **field_query_params),
+            )
+
+            plural_field_type = field_type
+            if plural_item_required:
+                plural_field_type = graphene.NonNull(field_type)
+
+            setattr(
+                schema,
+                plural_field_name,
+                PaginatedQuerySet(plural_field_type, cls, required=plural_required),
+            )
+
+            setattr(
+                schema, "resolve_" + field_name, MethodType(resolve_singular, schema)
             )
             setattr(
                 schema,

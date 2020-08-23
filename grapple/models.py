@@ -58,9 +58,7 @@ def GraphQLBoolean(field_name: str, **kwargs):
     return Mixin
 
 
-def GraphQLSnippet(
-    field_name: str, snippet_model: str, is_list: bool = False, **kwargs
-):
+def GraphQLSnippet(field_name: str, snippet_model: str, **kwargs):
     def Mixin():
         from django.apps import apps
 
@@ -71,9 +69,6 @@ def GraphQLSnippet(
             field_type = lambda: registry.snippets[mdl]
         else:
             field_type = graphene.String
-
-        if field_type and is_list:
-            field_type = graphene.List(field_type)
 
         return GraphQLField(field_name, field_type, **kwargs)
 

@@ -48,6 +48,19 @@
         "infra",
         "maintenance"
       ]
+    },
+    {
+      "login": "ruisaraiva19",
+      "name": "Rui Saraiva",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/7356098?v=4",
+      "profile": "https://github.com/ruisaraiva19",
+      "contributions": [
+        "code",
+        "bug",
+        "doc",
+        "infra",
+        "maintenance"
+      ]
     }
   ],
   "contributorsPerLine": 7

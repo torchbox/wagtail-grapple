@@ -112,6 +112,10 @@ class TagList(graphene.JSONString):
 
 
 class PaginationType(graphene.ObjectType):
+    """
+    GraphQL type for Paginated QuerySet pagination field.
+    """
+
     total = PositiveInt(required=True)
     count = PositiveInt(required=True)
     per_page = PositiveInt(required=True)
@@ -122,11 +126,32 @@ class PaginationType(graphene.ObjectType):
 
 
 class BasePaginatedType(graphene.ObjectType):
+    """
+    GraphQL type for Paginated QuerySet result.
+    """
+
     items = graphene.List(graphene.String)
     pagination = graphene.NonNull(PaginationType)
 
 
 def PaginatedQuerySet(of_type, type_class, **kwargs):
+    """
+    Paginated QuerySet type with arguments used by Django's query sets.
+
+    This type setts the following arguments on itself:
+
+    * ``id``
+    * ``page``
+    * ``per_page``
+    * ``search_query``
+    * ``order``
+
+    :param enable_search: Enable search query argument.
+    :type enable_search: bool
+    :param enable_order: Enable ordering via query argument.
+    :type enable_order: bool
+    """
+
     enable_search = kwargs.pop("enable_search", True)
     enable_order = kwargs.pop("enable_order", True)
     required = kwargs.get("required", False)

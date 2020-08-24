@@ -72,6 +72,16 @@
         "bug",
         "doc"
       ]
+    },
+    {
+      "login": "timmysmalls",
+      "name": "timmysmalls",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/48223453?v=4",
+      "profile": "https://github.com/timmysmalls",
+      "contributions": [
+        "code",
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7

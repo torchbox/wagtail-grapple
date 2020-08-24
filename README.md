@@ -236,6 +236,12 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
 <!-- prettier-ignore-start -->
 <!-- markdownlint-disable -->
+<table>
+  <tr>
+    <td align="center"><a href="https://github.com/NathHorrigan"><img src="https://avatars3.githubusercontent.com/u/13197111?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Nathan Horrigan</b></sub></a><br /><a href="https://github.com/GrappleGQL/wagtail-grapple/commits?author=NathHorrigan" title="Code">💻</a> <a href="https://github.com/GrappleGQL/wagtail-grapple/issues?q=author%3ANathHorrigan" title="Bug reports">🐛</a> <a href="https://github.com/GrappleGQL/wagtail-grapple/commits?author=NathHorrigan" title="Documentation">📖</a> <a href="#infra-NathHorrigan" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="#maintenance-NathHorrigan" title="Maintenance">🚧</a></td>
+  </tr>
+</table>
+
 <!-- markdownlint-restore -->
 <!-- prettier-ignore-end -->
 <!-- ALL-CONTRIBUTORS-LIST:END -->

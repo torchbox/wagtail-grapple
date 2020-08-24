@@ -35,6 +35,19 @@
         "infra",
         "maintenance"
       ]
+    },
+    {
+      "login": "zerolab",
+      "name": "Dan Braghis",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/31622?v=4",
+      "profile": "https://zerolab.org/",
+      "contributions": [
+        "code",
+        "bug",
+        "doc",
+        "infra",
+        "maintenance"
+      ]
     }
   ],
   "contributorsPerLine": 7

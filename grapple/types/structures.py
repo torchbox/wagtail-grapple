@@ -130,6 +130,8 @@ def PaginatedQuerySet(of_type, type_class, **kwargs):
     enable_search = kwargs.pop("enable_search", True)
     enable_order = kwargs.pop("enable_order", True)
     required = kwargs.get("required", False)
+    type_name = type_class if isinstance(type_class, str) else type_class.__name__
+    type_name = type_name.lstrip("Stub")
 
     # Check if the type is a Django model type. Do not perform the
     # check if value is lazy.
@@ -182,6 +184,6 @@ def PaginatedQuerySet(of_type, type_class, **kwargs):
         items = graphene.List(of_type, required=required)
 
         class Meta:
-            name = type_class.__name__ + "PaginatedType"
+            name = type_name + "PaginatedType"
 
     return graphene.Field(PaginatedType, **kwargs)

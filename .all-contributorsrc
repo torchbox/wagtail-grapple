@@ -22,6 +22,19 @@
         "infra",
         "maintenance"
       ]
+    },
+    {
+      "login": "jafacakes2011",
+      "name": "Cameron Lamb",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/4086447?v=4",
+      "profile": "https://github.com/jafacakes2011",
+      "contributions": [
+        "code",
+        "bug",
+        "doc",
+        "infra",
+        "maintenance"
+      ]
     }
   ],
   "contributorsPerLine": 7

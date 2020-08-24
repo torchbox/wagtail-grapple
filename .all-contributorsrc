@@ -92,6 +92,17 @@
         "code",
         "doc"
       ]
+    },
+    {
+      "login": "fabienheureux",
+      "name": "fabienheureux",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/1702255?v=4",
+      "profile": "https://fabien.cool/",
+      "contributions": [
+        "code",
+        "bug",
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7

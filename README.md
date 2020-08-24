@@ -246,6 +246,9 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://github.com/timmysmalls"><img src="https://avatars2.githubusercontent.com/u/48223453?v=4?s=100" width="100px;" alt=""/><br /><sub><b>timmysmalls</b></sub></a><br /><a href="https://github.com/GrappleGQL/wagtail-grapple/commits?author=timmysmalls" title="Code">💻</a> <a href="https://github.com/GrappleGQL/wagtail-grapple/issues?q=author%3Atimmysmalls" title="Bug reports">🐛</a></td>
     <td align="center"><a href="https://wagtail.io/"><img src="https://avatars0.githubusercontent.com/u/15543?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Tom Dyson</b></sub></a><br /><a href="https://github.com/GrappleGQL/wagtail-grapple/commits?author=tomdyson" title="Code">💻</a> <a href="https://github.com/GrappleGQL/wagtail-grapple/commits?author=tomdyson" title="Documentation">📖</a></td>
   </tr>
+  <tr>
+    <td align="center"><a href="https://fabien.cool/"><img src="https://avatars1.githubusercontent.com/u/1702255?v=4?s=100" width="100px;" alt=""/><br /><sub><b>fabienheureux</b></sub></a><br /><a href="https://github.com/GrappleGQL/wagtail-grapple/commits?author=fabienheureux" title="Code">💻</a> <a href="https://github.com/GrappleGQL/wagtail-grapple/issues?q=author%3Afabienheureux" title="Bug reports">🐛</a> <a href="https://github.com/GrappleGQL/wagtail-grapple/commits?author=fabienheureux" title="Documentation">📖</a></td>
+  </tr>
 </table>
 
 <!-- markdownlint-restore -->

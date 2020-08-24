@@ -61,6 +61,17 @@
         "infra",
         "maintenance"
       ]
+    },
+    {
+      "login": "tbrlpld",
+      "name": "Tibor",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/24797493?v=4",
+      "profile": "https://github.com/tbrlpld",
+      "contributions": [
+        "code",
+        "bug",
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7

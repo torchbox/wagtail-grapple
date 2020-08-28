@@ -445,6 +445,91 @@ class BlogTest(BaseGrappleTest):
         for url in links:
             self.assertTrue(isinstance(url, str))
 
+    def test_blog_page_paginated_authors(self):
+        page = 1
+        per_page = 5
+
+        def query():
+            return """
+        {
+            page(id:%s) {
+                ... on BlogPage {
+                    paginatedAuthors(page:%s, perPage:%s) {
+                        items {
+                            role
+                            person {
+                                name
+                                job
+                            }
+                        }
+                        pagination {
+                            total
+                            count
+                            perPage
+                            currentPage
+                            prevPage
+                            nextPage
+                            totalPages
+                        }
+                    }
+                }
+            }
+        }
+        """ % (
+                self.blog_page.id,
+                page,
+                per_page,
+            )
+
+        executed = self.client.execute(query())
+
+        authors = executed["data"]["page"]["paginatedAuthors"]["items"]
+        pagination = executed["data"]["page"]["paginatedAuthors"]["pagination"]
+        self.assertEqual(len(authors), 5)
+        for author in authors:
+            self.assertTrue(isinstance(author["role"], str))
+            self.assertTrue(isinstance(author["person"]["name"], str))
+            self.assertTrue(isinstance(author["person"]["job"], str))
+        self.assertTrue(isinstance(pagination["total"], int))
+        self.assertTrue(isinstance(pagination["count"], int))
+        self.assertTrue(isinstance(pagination["perPage"], int))
+        self.assertTrue(isinstance(pagination["currentPage"], int))
+        self.assertTrue(pagination["prevPage"] is None)
+        self.assertTrue(isinstance(pagination["nextPage"], int))
+        self.assertTrue(isinstance(pagination["totalPages"], int))
+        self.assertEquals(pagination["total"], 8)
+        self.assertEquals(pagination["count"], 5)
+        self.assertEquals(pagination["perPage"], per_page)
+        self.assertEquals(pagination["currentPage"], page)
+        self.assertEquals(pagination["prevPage"], None)
+        self.assertEquals(pagination["nextPage"], 2)
+        self.assertEquals(pagination["totalPages"], 2)
+
+        page = 2
+        executed = self.client.execute(query())
+
+        authors = executed["data"]["page"]["paginatedAuthors"]["items"]
+        pagination = executed["data"]["page"]["paginatedAuthors"]["pagination"]
+        self.assertEqual(len(authors), 3)
+        for author in authors:
+            self.assertTrue(isinstance(author["role"], str))
+            self.assertTrue(isinstance(author["person"]["name"], str))
+            self.assertTrue(isinstance(author["person"]["job"], str))
+        self.assertTrue(isinstance(pagination["total"], int))
+        self.assertTrue(isinstance(pagination["count"], int))
+        self.assertTrue(isinstance(pagination["perPage"], int))
+        self.assertTrue(isinstance(pagination["currentPage"], int))
+        self.assertTrue(isinstance(pagination["prevPage"], int))
+        self.assertTrue(pagination["nextPage"] is None)
+        self.assertTrue(isinstance(pagination["totalPages"], int))
+        self.assertEquals(pagination["total"], 8)
+        self.assertEquals(pagination["count"], 3)
+        self.assertEquals(pagination["perPage"], per_page)
+        self.assertEquals(pagination["currentPage"], page)
+        self.assertEquals(pagination["prevPage"], 1)
+        self.assertEquals(pagination["nextPage"], None)
+        self.assertEquals(pagination["totalPages"], 2)
+
     def test_structvalue_block(self):
         # Query stream block
         block_type = "TextAndButtonsBlock"

@@ -4,7 +4,14 @@ import factory
 import wagtail_factories
 from factory import fuzzy
 from home.blocks import ImageGalleryBlock, ImageGalleryImage, ImageGalleryImages
-from home.models import BlogPage, BlogPageRelatedLink, AuthorPage, Advert
+from home.models import (
+    BlogPage,
+    BlogPageRelatedLink,
+    AuthorPage,
+    Advert,
+    Author,
+    Person,
+)
 from wagtail.core import blocks
 
 
@@ -63,6 +70,23 @@ class BlogPageRelatedLinkFactory(factory.DjangoModelFactory):
     url = factory.Sequence(lambda n: f"Url {n}")
 
 
+class AuthorFactory(factory.DjangoModelFactory):
+    class Meta:
+        model = Author
+
+    page = factory.SubFactory("home.factories.BlogPageFactory")
+    role = factory.Sequence(lambda n: f"Role {n}")
+    person = factory.SubFactory("home.factories.PersonFactory")
+
+
+class PersonFactory(factory.DjangoModelFactory):
+    class Meta:
+        model = Person
+
+    name = factory.Sequence(lambda n: f"Name {n}")
+    job = factory.Sequence(lambda n: f"Job {n}")
+
+
 class BlogPageFactory(wagtail_factories.PageFactory):
     date = datetime.date.today()
     author = factory.SubFactory("home.factories.AuthorPageFactory")
@@ -86,6 +110,10 @@ class BlogPageFactory(wagtail_factories.PageFactory):
         if create:
             # Create Blog Links
             BlogPageRelatedLinkFactory.create_batch(5, page=self)
+            # Create a Person
+            person = PersonFactory.create()
+            # Create Blog Authors
+            AuthorFactory.create_batch(8, page=self, person=person)
 
 
 class AuthorPageFactory(wagtail_factories.PageFactory):

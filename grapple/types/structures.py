@@ -5,6 +5,7 @@ import graphene_django
 from django.utils.translation import ugettext_lazy as _
 from wagtail.search.index import class_is_indexed
 from taggit.managers import _TaggableManager
+from graphene import relay
 from graphene.types import Int
 
 
@@ -109,3 +110,48 @@ class TagList(graphene.JSONString):
         if isinstance(value, _TaggableManager):
             return list(value.values_list("name", flat=True))
         raise ValueError("Cannot convert tags object")
+
+
+def CursorQuerySet(of_type, type_class, **kwargs):
+    """
+    Paginated QuerySet type with arguments used by Django's query sets.
+
+    This type setts the following arguments on itself:
+
+    * ``first``
+    * ``last``
+    * ``before``
+    * ``after``
+
+    :param enable_search: Enable search query argument.
+    :type enable_search: bool
+    :param enable_order: Enable ordering via query argument.
+    :type enable_order: bool
+    """
+
+    type_name = type_class if isinstance(type_class, str) else type_class.__name__
+    type_name = type_name.lstrip("Stub")
+
+    # Check if the type is a Django model type. Do not perform the
+    # check if value is lazy.
+    if inspect.isclass(of_type) and not issubclass(
+        of_type, graphene_django.DjangoObjectType
+    ):
+        raise TypeError(
+            f"{of_type} is not a subclass of DjangoObjectType and it "
+            "cannot be used with QuerySetList."
+        )
+
+    class ModelCursor(graphene_django.DjangoObjectType):
+        class Meta:
+            name = type_name + "CursorType"
+            model = type_class
+            interfaces = (relay.Node,)
+            fields = "__all__"
+
+    class CursorConnection(relay.Connection):
+        class Meta:
+            name = type_name + "ConnectionType"
+            node = ModelCursor
+
+    return relay.ConnectionField(CursorConnection, **kwargs)

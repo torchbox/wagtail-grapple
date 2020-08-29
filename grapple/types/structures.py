@@ -131,7 +131,7 @@ class BasePaginatedType(graphene.ObjectType):
     """
 
     items = graphene.List(graphene.String)
-    pagination = graphene.NonNull(PaginationType)
+    pagination = graphene.Field(PaginationType)
 
 
 def PaginatedQuerySet(of_type, type_class, **kwargs):
@@ -207,6 +207,7 @@ def PaginatedQuerySet(of_type, type_class, **kwargs):
 
     class PaginatedType(BasePaginatedType):
         items = graphene.List(of_type, required=required)
+        pagination = graphene.Field(PaginationType, required=required)
 
         class Meta:
             name = type_name + "PaginatedType"

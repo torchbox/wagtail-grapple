@@ -18,13 +18,13 @@ GraphQLString
     A basic field type is string. Commonly used for CharField, TextField,
     UrlField or any other Django field that returns a string as it's value.
 
-    .. attribute:: GraphQLString.field_name
+    .. attribute:: field_name (str)
 
         This is the name of the class property used in your model definition.
 
-    .. attribute:: GraphQLString.required
+    .. attribute:: required (bool=False)
 
-        Represents the field as non-nullable in the schema, This promises the client that it will have a value returned.
+        Represents the field as non-nullable in the schema. This promises the client that it will have a value returned.
 
     In your models.py:
     ::
@@ -50,17 +50,17 @@ GraphQLString
 
 
 GraphQLCollection
--------------
+-----------------
 .. module:: grapple.models
-.. class:: GraphQLCollection(nested_type, *args, required=False, item_required=False, **kwargs)
+.. class:: GraphQLCollection(nested_type, field_name, *args, is_queryset=False, is_paginated_queryset=False, required=False, item_required=False, **kwargs)
 
     A field type that wraps another model type in a list. Best suited for referencing Orderables (i.e. ForeignKey lists).
 
     .. attribute:: nested_type
 
-        A Grapple model type such as `GraphQLString` or `GraphQLForeignKey`.
+        A Grapple model type such as ``GraphQLString`` or ``GraphQLForeignKey``.
 
-    .. attribute:: field_name
+    .. attribute:: field_name (str)
 
         The name of the class property used in your model definition.
 
@@ -68,19 +68,29 @@ GraphQLCollection
 
         Any positional arguments that you want to pass on to the nested type.
 
-    .. attribute:: GraphQLString.required
+    .. attribute:: is_queryset (bool=False)
 
-        Represents the list as non-nullable in the schema, This promises the client that it will have an array will be returned.
+        This sets the arguments ``id``, ``limit``, ``offset``, ``search_query``, and ``order`` on the field.
 
-    .. attribute:: GraphQLString.item_required
+    .. attribute:: is_paginated_queryset (bool=False)
 
-        Represents the fields in the list as non-nullable in the schema, This promises the client that it will have an array will be returned items that won't be null.
+        This sets the arguments ``id``, ``page``, ``per_page``, ``search_query``, and ``order`` on the field.
+
+        Also sets the return value as an extended PaginatedType (example below).
+
+    .. attribute:: required (bool=False)
+
+        Represents the list as non-nullable in the schema. This promises the client that an array will be returned.
+
+    .. attribute:: item_required (bool=False)
+
+        Represents the fields in the list as non-nullable in the schema. This promises the client that the array items won't be null.
 
     .. attribute:: **kwargs
 
         Any keyword args that you want to pass on to the nested type.
 
-        One keyword argument that is more powerful with Collections is the `source` argument. With ``GraphQLCollection``,
+        One keyword argument that is more powerful with Collections is the ``source`` argument. With ``GraphQLCollection``,
         You can pass a source string that is multiple layers deep and Grapple will handle the querying for you through
         multiple models (example below).
 
@@ -92,12 +102,15 @@ GraphQLCollection
         class BlogPage(Page):
             author = models.CharField(max_length=255)
 
+            def paginated_related_links(self, info, **kwargs):
+                return resolve_paginated_queryset(self.related_links.all(), info, **kwargs)
+
             graphql_fields = [
                 # Basic reference to Orderable model
                 GraphQLCollection(
                     GraphQLForeignKey,
                     "related_links",
-                    "home.blogpagerelatedlink"
+                    "home.BlogPageRelatedLink"
                 ),
 
                 # Will return an array of just the url from each link
@@ -105,6 +118,14 @@ GraphQLCollection
                     GraphQLString,
                     "related_urls",
                     source="related_links.url"
+                ),
+
+                # Reference to Orderable model with pagination
+                GraphQLCollection(
+                    GraphQLForeignKey,
+                    "paginated_related_links",
+                    "home.BlogPageRelatedLink",
+                    is_paginated_queryset=True
                 ),
             ]
 
@@ -118,6 +139,20 @@ GraphQLCollection
                 relatedLinks {
                     name
                 }
+                paginatedRelatedLinks {
+                    items {
+                        name
+                    }
+                    pagination {
+                        total
+                        count
+                        perPage
+                        currentPage
+                        prevPage
+                        nextPage
+                        totalPages
+                    }
+                }
             }
         }
 
@@ -130,6 +165,14 @@ GraphQLInt
     Used to serialize integer-based Django fields such as ``IntegerField``
     or ``PositiveSmallIntegerField``.
 
+    .. attribute:: field_name (str)
+
+        This is the name of the class property used in your model definition.
+
+    .. attribute:: required (bool=False)
+
+        Represents the field as non-nullable in the schema. This promises the client that it will have a value returned.
+
 
 GraphQLFloat
 ------------
@@ -138,11 +181,29 @@ GraphQLFloat
 
     Like ``GraphQLInt``, this field is used to serialize ``Float`` and ``Decimal`` fields.
 
+    .. attribute:: field_name (str)
+
+        This is the name of the class property used in your model definition.
+
+    .. attribute:: required (bool=False)
+
+        Represents the field as non-nullable in the schema. This promises the client that it will have a value returned.
+
 
 GraphQLBoolean
 --------------
 .. module:: grapple.models
 .. class:: GraphQLBoolean(field_name, required=False)
+
+    Used to serialize ``Boolean`` fields.
+
+    .. attribute:: field_name (str)
+
+        This is the name of the class property used in your model definition.
+
+    .. attribute:: required (bool=False)
+
+        Represents the field as non-nullable in the schema. This promises the client that it will have a value returned.
 
 
 GraphQLStreamfield
@@ -150,14 +211,22 @@ GraphQLStreamfield
 .. module:: grapple.models
 .. class:: GraphQLStreamfield(field_name, required=False)
 
-This field type supports all built-in ``Streamfield`` blocks. It also supports
-custom blocks built using ``StructBlock`` and the like.
+    This field type supports all built-in ``Streamfield`` blocks. It also supports
+    custom blocks built using ``StructBlock`` and the like.
+
+    .. attribute:: field_name (str)
+
+        This is the name of the class property used in your model definition.
+
+    .. attribute:: required (bool=False)
+
+        Represents the field as non-nullable in the schema. This promises the client that it will have a value returned.
 
 
 GraphQLSnippet
 --------------
 .. module:: grapple.models
-.. class:: GraphQLSnippet(field_name, snippet_modal, required=False)
+.. class:: GraphQLSnippet(field_name, snippet_model, required=False)
 
     ``GraphQLSnippet`` is a little bit more complicated; You first need to define
     a `graphql_field` list on your snippet like you do your page. Then you need
@@ -166,13 +235,17 @@ GraphQLSnippet
     Your snippet values are then available through a sub-selection query on the
     field name.
 
-    .. attribute:: GraphQLString.field_name
+    .. attribute:: field_name (str)
 
         This is the name of the class property used in your model definition.
 
-    .. attribute:: GraphQLString.snippet_modal
+    .. attribute:: snippet_model (str)
 
         String which defines the location of the snippet model.
+
+    .. attribute:: required (bool=False)
+
+        Represents the field as non-nullable in the schema. This promises the client that it will have a value returned.
 
 
     In your models.py:
@@ -237,13 +310,17 @@ GraphQLForeignKey
     ``field_name`` and ``content_type`` but you can also specify that the field
     is a list (for example when using ``Orderable``).
 
-    .. attribute:: GraphQLString.field_name
+    .. attribute:: field_name (str)
 
         This is the name of the class property used in your model definition.
 
-    .. attribute:: GraphQLString.field_type
+    .. attribute:: content_type (str)
 
         String which defines the location of the model model you are referencing. You can also pass the model class itself.
+
+    .. attribute:: required (bool=False)
+
+        Represents the field as non-nullable in the schema. This promises the client that it will have a value returned.
 
     ::
 
@@ -273,6 +350,14 @@ GraphQLImage
 
     Use this field type to serialize the core Wagtail or your custom Image model.
 
+    .. attribute:: field_name (str)
+
+        This is the name of the class property used in your model definition.
+
+    .. attribute:: required (bool=False)
+
+        Represents the field as non-nullable in the schema. This promises the client that it will have a value returned.
+
 
 GraphQLDocument
 ---------------
@@ -280,4 +365,12 @@ GraphQLDocument
 .. module:: grapple.models
 .. class:: GraphQLDocument(field_name, required=False)
 
-    Us this field type to serialize the core Wagtail or your custom Document model.
+    Use this field type to serialize the core Wagtail or your custom Document model.
+
+    .. attribute:: field_name (str)
+
+        This is the name of the class property used in your model definition.
+
+    .. attribute:: required (bool=False)
+
+        Represents the field as non-nullable in the schema. This promises the client that it will have a value returned.

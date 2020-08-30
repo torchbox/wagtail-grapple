@@ -11,7 +11,7 @@ Here are some useful decorators that allow you to expand your GraphQL schema fur
 .. class:: register_query_field(field_name, plural_field_name=None, query_params=None, required=False, plural_required=False, plural_item_required=False)
 You can easily expose any Django model from your codebase by adding the ``@register_query_field`` decorator like so:
 
-.. code-block:: python
+::
 
     from grapple.helpers import register_query_field
 
@@ -30,11 +30,11 @@ You can easily expose any Django model from your codebase by adding the ``@regis
 
 You can now query your adverts with the following query:
 
-.. code-block:: graphql
+::
 
     {
         # Get all adverts
-        adverts(limit: Int, offset: Int, order: String, searchQuery: String) {
+        adverts {
             url
             text
         }
@@ -48,7 +48,7 @@ You can now query your adverts with the following query:
 
 You can add custom query parameters like so:
 
-.. code-block:: python
+::
 
     @register_query_field('advert', 'adverts', {
         "id": graphene.Int()
@@ -57,7 +57,7 @@ You can add custom query parameters like so:
 
 and then use it in your queries:
 
-.. code-block:: graphql
+::
 
     {
         # Get a specific advert
@@ -69,55 +69,55 @@ and then use it in your queries:
 
 You can make the singular query return type required like so:
 
-.. code-block:: python
+::
 
     @register_query_field('advert', required=True)
 
 and then should look like this on your schema:
 
-.. code-block:: graphql
+::
 
     advert(id: Int): Advert!
 
 instead of:
 
-.. code-block:: graphql
+::
 
     advert(id: Int): Advert
 
 You can can also make the plural query return list type required:
 
-.. code-block:: python
+::
 
     @register_query_field('advert', plural_required=True)
 
 making the plural query look like this on your schema:
 
-.. code-block:: graphql
+::
 
     adverts(id: Int, ...): [Advert]!
 
 instead of the default:
 
-.. code-block:: graphql
+::
 
     adverts(id: Int, ...): [Advert]
 
 If you want to make the plural query return list item type required:
 
-.. code-block:: python
+::
 
     @register_query_field('advert', plural_item_required=True)
 
 making the plural query look like this:
 
-.. code-block:: graphql
+::
 
     adverts(id: Int, ...): [Advert!]
 
 instead of the default:
 
-.. code-block:: graphql
+::
 
     adverts(id: Int, ...): [Advert]
 
@@ -128,7 +128,7 @@ instead of the default:
 .. class:: register_paginated_query_field(field_name, plural_field_name=None, query_params=None, required=False, plural_required=False, plural_item_required=False)
 You can easily expose any Django model from your codebase by adding the ``@register_paginated_query_field`` decorator like so:
 
-.. code-block:: python
+::
 
     from grapple.helpers import register_paginated_query_field
 
@@ -147,11 +147,11 @@ You can easily expose any Django model from your codebase by adding the ``@regis
 
 You can now query your adverts with the following query:
 
-.. code-block:: graphql
+::
 
     {
-        # Get all adverts
-        adverts(page: Int, perPage: Int, order: String, searchQuery: String) {
+        # Get adverts paginated
+        adverts(page: 1, perPage: 10) {
             items {
                 url
                 text
@@ -176,7 +176,7 @@ You can now query your adverts with the following query:
 
 You can add custom query parameters like so:
 
-.. code-block:: python
+::
 
     @register_paginated_query_field('advert', 'adverts', {
         "id": graphene.Int()
@@ -185,7 +185,7 @@ You can add custom query parameters like so:
 
 and then use it in your queries:
 
-.. code-block:: graphql
+::
 
     {
         # Get a specific advert
@@ -197,31 +197,31 @@ and then use it in your queries:
 
 You can make the singular query return type required like so:
 
-.. code-block:: python
+::
 
     @register_paginated_query_field('advert', required=True)
 
 and then should look like this on your schema:
 
-.. code-block:: graphql
+::
 
     advert(id: Int): Advert!
 
 instead of:
 
-.. code-block:: graphql
+::
 
     advert(id: Int): Advert
 
 You can can also make the plural query return list type required:
 
-.. code-block:: python
+::
 
     @register_paginated_query_field('advert', plural_required=True)
 
 making the plural query look like this on your schema:
 
-.. code-block:: graphql
+::
 
     adverts(page: Int, perPage: Int, ...): AdvertPaginatedType!
 
@@ -232,7 +232,7 @@ making the plural query look like this on your schema:
 
 instead of the default:
 
-.. code-block:: graphql
+::
 
     adverts(page: Int, perPage: Int, ...): AdvertPaginatedType
 
@@ -243,13 +243,13 @@ instead of the default:
 
 If you want to make the plural query return list item type required:
 
-.. code-block:: python
+::
 
     @register_paginated_query_field('advert', plural_item_required=True)
 
 making the plural query look like this:
 
-.. code-block:: graphql
+::
 
     adverts(page: Int, perPage: Int, ...): AdvertPaginatedType
 
@@ -260,7 +260,7 @@ making the plural query look like this:
 
 instead of the default:
 
-.. code-block:: graphql
+::
 
     adverts(page: Int, perPage: Int, ...): AdvertPaginatedType
 

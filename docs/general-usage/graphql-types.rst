@@ -129,8 +129,6 @@ need for Gatsby Image features to work (see Handy Fragments page for more info):
         bgcolor: String
         jpegquality: Int
     ): ImageRenditionObjectType
-    tracedSvg: String
-    base64: String
 
 
 ImageRenditions are useful feature in Wagtail and they exist in Grapple as well

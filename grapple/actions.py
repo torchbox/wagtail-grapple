@@ -242,7 +242,20 @@ def load_type_fields():
                     interfaces = (interface,) if interface is not None else tuple()
 
                 type_meta = {"Meta": Meta, "id": graphene.ID(), "name": type_name}
-                exclude_fields = get_fields_and_properties(cls)
+
+                exclude_fields = []
+                for field in get_fields_and_properties(cls):
+                    # Filter our any fields that are defined on the interface of base type to prevent the
+                    # 'Excluding the custom field "<field>" on DjangoObjectType "<cls>" has no effect.
+                    # Either remove the custom field or remove the field from the "exclude" list.' warning
+                    if (
+                        field == "id"
+                        or hasattr(interface, field)
+                        or hasattr(base_type, field)
+                    ):
+                        continue
+
+                    exclude_fields.append(field)
 
                 # Add any custom fields to node if they are defined.
                 methods = {}

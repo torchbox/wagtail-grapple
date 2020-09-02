@@ -1,0 +1,109 @@
+{
+  "projectName": "wagtail-grapple",
+  "projectOwner": "GrappleGQL",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": true,
+  "commitConvention": "angular",
+  "contributors": [
+    {
+      "login": "NathHorrigan",
+      "name": "Nathan Horrigan",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/13197111?v=4",
+      "profile": "https://github.com/NathHorrigan",
+      "contributions": [
+        "code",
+        "bug",
+        "doc",
+        "infra",
+        "maintenance"
+      ]
+    },
+    {
+      "login": "jafacakes2011",
+      "name": "Cameron Lamb",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/4086447?v=4",
+      "profile": "https://github.com/jafacakes2011",
+      "contributions": [
+        "code",
+        "bug",
+        "doc",
+        "infra",
+        "maintenance"
+      ]
+    },
+    {
+      "login": "zerolab",
+      "name": "Dan Braghis",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/31622?v=4",
+      "profile": "https://zerolab.org/",
+      "contributions": [
+        "code",
+        "bug",
+        "doc",
+        "infra",
+        "maintenance"
+      ]
+    },
+    {
+      "login": "ruisaraiva19",
+      "name": "Rui Saraiva",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/7356098?v=4",
+      "profile": "https://github.com/ruisaraiva19",
+      "contributions": [
+        "code",
+        "bug",
+        "doc",
+        "infra",
+        "maintenance"
+      ]
+    },
+    {
+      "login": "tbrlpld",
+      "name": "Tibor",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/24797493?v=4",
+      "profile": "https://github.com/tbrlpld",
+      "contributions": [
+        "code",
+        "bug",
+        "doc"
+      ]
+    },
+    {
+      "login": "timmysmalls",
+      "name": "timmysmalls",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/48223453?v=4",
+      "profile": "https://github.com/timmysmalls",
+      "contributions": [
+        "code",
+        "bug"
+      ]
+    },
+    {
+      "login": "tomdyson",
+      "name": "Tom Dyson",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/15543?v=4",
+      "profile": "https://wagtail.io/",
+      "contributions": [
+        "code",
+        "doc"
+      ]
+    },
+    {
+      "login": "fabienheureux",
+      "name": "fabienheureux",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/1702255?v=4",
+      "profile": "https://fabien.cool/",
+      "contributions": [
+        "code",
+        "bug",
+        "doc"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7
+}

@@ -111,7 +111,6 @@ def get_fields_and_properties(cls):
     """
     fields = [field.name for field in cls._meta.get_fields(include_parents=False)]
 
-    properties = []
     try:
         properties = [
             method[0]

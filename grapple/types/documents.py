@@ -23,7 +23,7 @@ class DocumentObjectType(DjangoObjectType):
 
     class Meta:
         model = WagtailDocument
-        exclude_fields = ("tags",)
+        exclude = ("tags",)
 
     id = graphene.ID(required=True)
     title = graphene.String(required=True)

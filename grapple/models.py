@@ -58,9 +58,7 @@ def GraphQLBoolean(field_name: str, **kwargs):
     return Mixin
 
 
-def GraphQLSnippet(
-    field_name: str, snippet_model: str, is_list: bool = False, **kwargs
-):
+def GraphQLSnippet(field_name: str, snippet_model: str, **kwargs):
     def Mixin():
         from django.apps import apps
 
@@ -71,9 +69,6 @@ def GraphQLSnippet(
             field_type = lambda: registry.snippets[mdl]
         else:
             field_type = graphene.String
-
-        if field_type and is_list:
-            field_type = graphene.List(field_type)
 
         return GraphQLField(field_name, field_type, **kwargs)
 
@@ -147,12 +142,13 @@ def GraphQLCollection(
     field_name,
     *args,
     is_queryset=False,
+    is_paginated_queryset=False,
     required=False,
     item_required=False,
     **kwargs
 ):
     def Mixin():
-        from .types.structures import QuerySetList
+        from .types.structures import QuerySetList, PaginatedQuerySet
 
         # Check if using nested field extracion:
         source = kwargs.get("source", None)
@@ -165,6 +161,13 @@ def GraphQLCollection(
         # Create the nested type and wrap it in some list field.
         graphql_type = nested_type(field_name, *args, required=item_required, **kwargs)
         collection_type = graphene.List
+
+        if is_paginated_queryset:
+            type_class = nested_type(field_name, *args)().field_type()
+            collection_type = lambda nested_type: PaginatedQuerySet(
+                nested_type, type_class, required=required
+            )
+            return graphql_type, collection_type
 
         # Add queryset filtering when necessary.
         if (

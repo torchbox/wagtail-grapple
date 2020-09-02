@@ -109,3 +109,107 @@ class TagList(graphene.JSONString):
         if isinstance(value, _TaggableManager):
             return list(value.values_list("name", flat=True))
         raise ValueError("Cannot convert tags object")
+
+
+class PaginationType(graphene.ObjectType):
+    """
+    GraphQL type for Paginated QuerySet pagination field.
+    """
+
+    total = PositiveInt(required=True)
+    count = PositiveInt(required=True)
+    per_page = PositiveInt(required=True)
+    current_page = PositiveInt(required=True)
+    prev_page = PositiveInt()
+    next_page = PositiveInt()
+    total_pages = PositiveInt(required=True)
+
+
+class BasePaginatedType(graphene.ObjectType):
+    """
+    GraphQL type for Paginated QuerySet result.
+    """
+
+    items = graphene.List(graphene.String)
+    pagination = graphene.Field(PaginationType)
+
+
+def PaginatedQuerySet(of_type, type_class, **kwargs):
+    """
+    Paginated QuerySet type with arguments used by Django's query sets.
+
+    This type setts the following arguments on itself:
+
+    * ``id``
+    * ``page``
+    * ``per_page``
+    * ``search_query``
+    * ``order``
+
+    :param enable_search: Enable search query argument.
+    :type enable_search: bool
+    :param enable_order: Enable ordering via query argument.
+    :type enable_order: bool
+    """
+
+    enable_search = kwargs.pop("enable_search", True)
+    enable_order = kwargs.pop("enable_order", True)
+    required = kwargs.get("required", False)
+    type_name = type_class if isinstance(type_class, str) else type_class.__name__
+    type_name = type_name.lstrip("Stub")
+
+    # Check if the type is a Django model type. Do not perform the
+    # check if value is lazy.
+    if inspect.isclass(of_type) and not issubclass(
+        of_type, graphene_django.DjangoObjectType
+    ):
+        raise TypeError(
+            f"{of_type} is not a subclass of DjangoObjectType and it "
+            "cannot be used with QuerySetList."
+        )
+
+    # Enable page for Django Paginator.
+    if "page" not in kwargs:
+        kwargs["page"] = graphene.Argument(
+            PositiveInt,
+            default_value=1,
+            description=_("Page of resulting objects to return."),
+        )
+
+    # Enable per_page for Django Paginator.
+    if "per_page" not in kwargs:
+        kwargs["per_page"] = graphene.Argument(
+            PositiveInt,
+            default_value=10,
+            description=_("The maximum number of items to include on a page."),
+        )
+
+    # Enable ordering of the queryset
+    if enable_order is True and "order" not in kwargs:
+        kwargs["order"] = graphene.Argument(
+            graphene.String, description=_("Use Django ordering format.")
+        )
+
+    # If type is provided as a lazy value (e.g. using lambda), then
+    # the search has to be enabled explicitly.
+    if (enable_search is True and not inspect.isclass(of_type)) or (
+        enable_search is True
+        and inspect.isclass(of_type)
+        and class_is_indexed(of_type._meta.model)
+        and "search_query" not in kwargs
+    ):
+        kwargs["search_query"] = graphene.Argument(
+            graphene.String, description=_("Filter the results using Wagtail's search.")
+        )
+
+    if "id" not in kwargs:
+        kwargs["id"] = graphene.Argument(graphene.ID, description=_("Filter by ID"))
+
+    class PaginatedType(BasePaginatedType):
+        items = graphene.List(of_type, required=required)
+        pagination = graphene.Field(PaginationType, required=required)
+
+        class Meta:
+            name = type_name + "PaginatedType"
+
+    return graphene.Field(PaginatedType, **kwargs)

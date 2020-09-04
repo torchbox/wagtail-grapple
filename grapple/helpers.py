@@ -55,7 +55,11 @@ def register_query_field(
 
     def inner(cls):
         field_type = lambda: registry.models[cls]
-        field_query_params = query_params or {"id": graphene.Int()}
+        field_query_params = query_params or {
+            "id": graphene.Int(),
+            "slug": graphene.String(),
+            "token": graphene.String(),
+        }
 
         def Mixin():
             # Generic methods to get all and query one model instance.
@@ -63,6 +67,9 @@ def register_query_field(
                 # If no filters then return nothing,
                 if not kwargs:
                     return None
+
+                if "token" in kwargs and hasattr(cls, "get_page_from_preview_token"):
+                    return cls.get_page_from_preview_token(kwargs["token"])
 
                 try:
                     # If is a Page then only query live/public pages.
@@ -136,7 +143,11 @@ def register_paginated_query_field(
 
     def inner(cls):
         field_type = lambda: registry.models[cls]
-        field_query_params = query_params or {"id": graphene.Int()}
+        field_query_params = query_params or {
+            "id": graphene.Int(),
+            "slug": graphene.String(),
+            "token": graphene.String(),
+        }
 
         def Mixin():
             # Generic methods to get all and query one model instance.
@@ -144,6 +155,9 @@ def register_paginated_query_field(
                 # If no filters then return nothing,
                 if not kwargs:
                     return None
+
+                if "token" in kwargs and hasattr(cls, "get_page_from_preview_token"):
+                    return cls.get_page_from_preview_token(kwargs["token"])
 
                 try:
                     # If is a Page then only query live/public pages.

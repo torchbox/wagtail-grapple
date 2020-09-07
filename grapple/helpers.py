@@ -68,12 +68,14 @@ def register_query_field(
                 if not kwargs:
                     return None
 
-                if "token" in kwargs and hasattr(cls, "get_page_from_preview_token"):
-                    return cls.get_page_from_preview_token(kwargs["token"])
-
                 try:
                     # If is a Page then only query live/public pages.
                     if issubclass(cls, Page):
+                        if "token" in kwargs and hasattr(
+                            cls, "get_page_from_preview_token"
+                        ):
+                            return cls.get_page_from_preview_token(kwargs["token"])
+
                         return cls.objects.live().public().get(**kwargs)
 
                     return cls.objects.get(**kwargs)
@@ -152,16 +154,18 @@ def register_paginated_query_field(
         def Mixin():
             # Generic methods to get all and query one model instance.
             def resolve_singular(self, _, info, **kwargs):
-                # If no filters then return nothing,
+                # If no filters then return nothing.
                 if not kwargs:
                     return None
-
-                if "token" in kwargs and hasattr(cls, "get_page_from_preview_token"):
-                    return cls.get_page_from_preview_token(kwargs["token"])
 
                 try:
                     # If is a Page then only query live/public pages.
                     if issubclass(cls, Page):
+                        if "token" in kwargs and hasattr(
+                            cls, "get_page_from_preview_token"
+                        ):
+                            return cls.get_page_from_preview_token(kwargs["token"])
+
                         return cls.objects.live().public().get(**kwargs)
 
                     return cls.objects.get(**kwargs)

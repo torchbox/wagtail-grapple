@@ -61,11 +61,13 @@ to your model and away you go (although if you want to go deeper you can!).
     - Snippets
     - Images
     - Documents
+    - Media
     - Settings
+    - Redirects
     - Search (on all models)
 * Custom Image & Document model support
+* Pagination support
 * Advanced headless preview functionality built using GraphQL Subscriptions to enable Page previews on any device!
-* Gatsby Image support (both base64 and SVG tracing)! :fire:
 
 
 ### Built With

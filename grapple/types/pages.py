@@ -9,7 +9,7 @@ from graphql.error import GraphQLLocatedError
 from graphql.execution.base import ResolveInfo
 
 try:
-    from rx.subjects import Subject
+    from channels.routing import route_class
 
     has_channels = True
 except ImportError:
@@ -213,6 +213,8 @@ def PagesQuery():
 
 
 if has_channels:
+    from rx.subjects import Subject
+
     # Subject to sync Django Signals to Observable
     preview_subject = Subject()
 

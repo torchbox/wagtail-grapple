@@ -77,7 +77,7 @@ class QuerySetList(graphene.List):
         # Enable ordering of the queryset
         if enable_order is True and "order" not in kwargs:
             kwargs["order"] = graphene.Argument(
-                graphene.String, description=_("Use Django ordering format.")
+                graphene.String, description=_("Use the Django queryset order format.")
             )
 
         # If type is provided as a lazy value (e.g. using lambda), then
@@ -187,7 +187,7 @@ def PaginatedQuerySet(of_type, type_class, **kwargs):
     # Enable ordering of the queryset
     if enable_order is True and "order" not in kwargs:
         kwargs["order"] = graphene.Argument(
-            graphene.String, description=_("Use Django ordering format.")
+            graphene.String, description=_("Use the Django QuerySet order_by format.")
         )
 
     # If type is provided as a lazy value (e.g. using lambda), then

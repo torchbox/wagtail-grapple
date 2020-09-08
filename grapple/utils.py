@@ -18,18 +18,18 @@ def resolve_queryset(
     Add limit, offset and search capabilities to the query. This contains
     argument names used by
     :class:`~grapple.types.structures.QuerySetList`.
-    :param qs: Query set to be modified.
-    :param info: Graphene's info object.
+    :param qs: The query set to be modified.
+    :param info: The Graphene info object.
     :param limit: Limit number of objects in the QuerySet.
     :type limit: int
     :param id: Filter by the primary key.
     :type id: int
-    :param offset: Omit a number of objects from the beggining of the query set
+    :param offset: Omit a number of objects from the beginning of the query set
     :type offset: int
-    :param search_query: Using wagtail search exclude objects that do not match
+    :param search_query: Using Wagtail search, exclude objects that do not match
                          the search query.
     :type search_query: str
-    :param order: Use Django ordering format to order the query set.
+    :param order: Order the query set using the Django QuerySet order_by format.
     :type order: str
     """
     offset = int(offset or 0)
@@ -100,18 +100,18 @@ def resolve_paginated_queryset(
     Add page, per_page and search capabilities to the query. This contains
     argument names used by
     :function:`~grapple.types.structures.PaginatedQuerySet`.
-    :param qs: Query set to be modified.
-    :param info: Graphene's info object.
+    :param qs: The query set to be modified.
+    :param info: The Graphene info object.
     :param page: Page of resulting objects to return from the QuerySet.
     :type page: int
     :param id: Filter by the primary key.
     :type id: int
     :param per_page: The maximum number of items to include on a page.
     :type per_page: int
-    :param search_query: Using wagtail search exclude objects that do not match
+    :param search_query: Using Wagtail search, exclude objects that do not match
                          the search query.
     :type search_query: str
-    :param order: Use Django ordering format to order the query set.
+    :param order: Order the query set using the Django QuerySet order_by format.
     :type order: str
     """
     per_page = int(per_page or 10)

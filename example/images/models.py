@@ -27,7 +27,7 @@ class CustomImageRendition(AbstractRendition):
 
     graphql_fields = (
         GraphQLString("custom_rendition_property"),
-        GraphQLString("id"),
+        GraphQLInt("id"),
         GraphQLString("url"),
         GraphQLString("width"),
         GraphQLString("height"),

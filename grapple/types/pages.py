@@ -138,7 +138,7 @@ class PageInterface(graphene.Interface):
 
 class Page(DjangoObjectType):
     """
-    Base page type used if one isn't generated for the current model.
+    Base Page type used if one isn't generated for the current model.
     All other node types extend this.
     """
 
@@ -149,7 +149,7 @@ class Page(DjangoObjectType):
 
 def get_specific_page(id, slug, token, content_type=None):
     """
-    Get a specific page, also get preview if token is passed
+    Get a specific page, given a page_id, slug or preview if a preview token is passed
     """
     page = None
     try:

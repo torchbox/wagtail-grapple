@@ -1,11 +1,8 @@
 import graphene
 import inspect
-from typing import Type
 from types import MethodType
 
 from wagtail.core.models import Page
-
-from graphene_django.types import DjangoObjectType
 
 from .registry import registry
 from .types.streamfield import StreamFieldInterface
@@ -15,8 +12,6 @@ streamfield_types = []
 
 
 def register_streamfield_block(cls):
-    from wagtail.core import blocks
-
     base_block = None
     for block_class in inspect.getmro(cls):
         if block_class in registry.streamfield_blocks:
@@ -85,7 +80,7 @@ def register_query_field(
             def resolve_plural(self, _, info, **kwargs):
                 qs = cls.objects
                 if issubclass(cls, Page):
-                    qs = cls.objects.live().public().order_by("-first_published_at")
+                    qs = qs.live().public().order_by("-first_published_at")
 
                 return resolve_queryset(qs.all(), info, **kwargs)
 
@@ -175,7 +170,7 @@ def register_paginated_query_field(
             def resolve_plural(self, _, info, **kwargs):
                 qs = cls.objects
                 if issubclass(cls, Page):
-                    qs = cls.objects.live().public().order_by("-first_published_at")
+                    qs = qs.live().public().order_by("-first_published_at")
 
                 return resolve_paginated_queryset(qs.all(), info, **kwargs)
 

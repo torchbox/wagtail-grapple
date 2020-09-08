@@ -14,7 +14,7 @@ from wagtailmedia.models import AbstractMedia
 from wagtail.contrib.settings.models import BaseSetting
 from wagtail.core.models import Page as WagtailPage
 from wagtail.core.rich_text import RichText, expand_db_html
-from wagtail.core.blocks import BaseBlock, RichTextBlock, stream_block, StructValue
+from wagtail.core.blocks import stream_block, StructValue
 from wagtail.documents.models import AbstractDocument
 from wagtail.images.models import AbstractImage, AbstractRendition
 from wagtail.images.blocks import ImageChooserBlock

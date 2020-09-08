@@ -6,7 +6,7 @@ from django.conf import settings
 from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError
 from django.utils.safestring import SafeText
-from wagtail.core.blocks import BoundBlock, StreamValue, StructValue
+from wagtail.core.blocks import StreamValue
 from wagtail.core.rich_text import RichText
 from wagtail.embeds.blocks import EmbedValue
 

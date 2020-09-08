@@ -551,3 +551,33 @@ class BlogTest(BaseGrappleTest):
                 buttons = query_blocks[0]["buttons"]
                 self.assertEquals(buttons[0]["buttonText"], "btn")
                 self.assertEquals(buttons[0]["buttonLink"], "https://www.graphql.com/")
+
+    def test_singular_blog_page_query(self):
+        def query():
+            return """
+        {
+            firstPost {
+                id
+            }
+        }
+        """
+
+        # add a new blog post
+        another_post = BlogPageFactory()
+        results = self.client.execute(query())
+
+        self.assertTrue("firstPost" in results["data"])
+        self.assertEqual(int(results["data"]["firstPost"]["id"]), self.blog_page.id)
+
+        results = self.client.execute(
+            """
+            {
+                firstPost(order: "-id") {
+                    id
+                }
+            }
+            """
+        )
+
+        self.assertTrue("firstPost" in results["data"])
+        self.assertEqual(int(results["data"]["firstPost"]["id"]), another_post.id)

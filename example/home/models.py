@@ -15,7 +15,11 @@ from wagtail.documents.edit_handlers import DocumentChooserPanel
 from wagtail_headless_preview.models import HeadlessPreviewMixin
 from wagtailmedia.edit_handlers import MediaChooserPanel
 
-from grapple.helpers import register_query_field, register_paginated_query_field
+from grapple.helpers import (
+    register_query_field,
+    register_paginated_query_field,
+    register_singular_query_field,
+)
 from grapple.utils import resolve_paginated_queryset
 from grapple.models import (
     GraphQLString,
@@ -44,6 +48,7 @@ class AuthorPage(Page):
     graphql_fields = [GraphQLString("name")]
 
 
+@register_singular_query_field("first_post")
 @register_paginated_query_field("blog_page")
 class BlogPage(HeadlessPreviewMixin, Page):
     date = models.DateField("Post date")

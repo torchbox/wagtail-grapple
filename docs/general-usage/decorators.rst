@@ -268,3 +268,55 @@ instead of the default:
         items: [Advert]
         pagination: PaginationType
     }
+
+
+@register_singular_query_field
+-------------------------------
+.. module:: grapple.helpers
+.. class:: register_singular_query_field(field_name, query_params=None, required=False)
+
+Returns the first item of the given type using the ``Model`` ordering.
+You can expose any Django model by decorating it with ``@register_singular_query_field``. This is especially useful
+when you have Wagtail Pages with ``max_count`` of one(`Ref: Wagtail documentation <https://docs.wagtail.io/en/stable/reference/pages/model_reference.html#wagtail.core.models.Page.max_count>`_),
+thus there is no need to query by id.
+
+::
+
+    from grapple.helpers import register_singular_query_field
+
+    @register_singular_query_field('first_advert')
+    class Advert(models.Model):
+        url = models.URLField(null=True, blank=True)
+        text = models.CharField(max_length=255)
+
+        panels = [FieldPanel("url"), FieldPanel("text")]
+
+        graphql_fields = [GraphQLString("url"), GraphQLString("text")]
+
+        def __str__(self):
+            return self.text
+
+
+and then use it in your queries:
+
+::
+
+    {
+        # Get the first advert
+        firstAdvert {
+            url
+            text
+        }
+    }
+
+If you have multiple items, you could change the order:
+
+::
+
+    {
+        # Get the first advert
+        firstAdvert(order: "-id") {
+            url
+            text
+        }
+    }

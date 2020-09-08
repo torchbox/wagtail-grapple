@@ -23,7 +23,7 @@ class RedirectType(graphene.ObjectType):
         if self.redirect_page is None:
             return self.link
 
-        return self.redirect_page.url_path
+        return self.redirect_page.url
 
     # Return the page that's being redirected to, if at all.
     def resolve_page(self, info, **kwargs):

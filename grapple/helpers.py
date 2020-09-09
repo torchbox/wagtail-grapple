@@ -51,11 +51,17 @@ def register_query_field(
 
     def inner(cls):
         field_type = lambda: registry.models[cls]
-        field_query_params = query_params or {
-            "id": graphene.Int(),
-            "slug": graphene.String(),
-            "token": graphene.String(),
-        }
+        field_query_params = query_params
+        if field_query_params is None:
+            field_query_params = {"id": graphene.Int()}
+
+            if issubclass(cls, Page):
+                field_query_params["slug"] = graphene.Argument(
+                    graphene.String, description=ugettext_lazy("The page slug.")
+                )
+                field_query_params["token"] = graphene.Argument(
+                    graphene.String, description=ugettext_lazy("The preview token.")
+                )
 
         def Mixin():
             # Generic methods to get all and query one model instance.
@@ -141,11 +147,17 @@ def register_paginated_query_field(
 
     def inner(cls):
         field_type = lambda: registry.models[cls]
-        field_query_params = query_params or {
-            "id": graphene.Int(),
-            "slug": graphene.String(),
-            "token": graphene.String(),
-        }
+        field_query_params = query_params
+        if field_query_params is None:
+            field_query_params = {"id": graphene.Int()}
+
+            if issubclass(cls, Page):
+                field_query_params["slug"] = graphene.Argument(
+                    graphene.String, description=ugettext_lazy("The page slug.")
+                )
+                field_query_params["token"] = graphene.Argument(
+                    graphene.String, description=ugettext_lazy("The preview token.")
+                )
 
         def Mixin():
             # Generic methods to get all and query one model instance.

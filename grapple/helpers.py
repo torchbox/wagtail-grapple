@@ -218,15 +218,21 @@ def register_paginated_query_field(
 def register_singular_query_field(field_name, query_params=None, required=False):
     def inner(cls):
         field_type = lambda: registry.models[cls]
-        field_query_params = query_params or {
-            "token": graphene.Argument(
-                graphene.String, description=ugettext_lazy("The preview token.")
-            ),
-            "order": graphene.Argument(
-                graphene.String,
-                description=ugettext_lazy("Use the Django QuerySet order_by format."),
-            ),
-        }
+        field_query_params = query_params
+
+        if field_query_params is None:
+            field_query_params = {
+                "order": graphene.Argument(
+                    graphene.String,
+                    description=ugettext_lazy(
+                        "Use the Django QuerySet order_by format."
+                    ),
+                ),
+            }
+            if issubclass(cls, Page):
+                field_query_params["token"] = graphene.Argument(
+                    graphene.String, description=ugettext_lazy("The preview token.")
+                )
 
         def Mixin():
             # Generic methods to get all and query one model instance.

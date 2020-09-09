@@ -232,6 +232,10 @@ def register_singular_query_field(field_name, query_params=None, required=False)
             # Generic methods to get all and query one model instance.
             def resolve_singular(self, _, info, **kwargs):
                 try:
+                    qs = cls.objects
+                    if "order" in kwargs:
+                        qs = qs.order_by(kwargs.pop("order"))
+
                     # If is a Page then only query live/public pages.
                     if issubclass(cls, Page):
                         if "token" in kwargs and hasattr(
@@ -239,12 +243,9 @@ def register_singular_query_field(field_name, query_params=None, required=False)
                         ):
                             return cls.get_page_from_preview_token(kwargs["token"])
 
-                        qs = cls.objects.live().public()
-                        if "order" in kwargs:
-                            qs = qs.order_by(kwargs.pop("order"))
-                        return qs.filter(**kwargs).first()
+                        return qs.live().public().filter(**kwargs).first()
 
-                    return cls.objects.first()
+                    return cls.filter(**kwargs).first()
                 except:
                     return None
 

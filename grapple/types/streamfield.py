@@ -11,7 +11,7 @@ from django.template.loader import render_to_string
 from graphene.types import Scalar
 from graphene_django.converter import convert_django_field
 from wagtail.core.fields import StreamField
-from wagtail.core.rich_text import RichText, expand_db_html
+from wagtail.core.rich_text import expand_db_html
 from wagtail.core import blocks
 
 from ..registry import registry

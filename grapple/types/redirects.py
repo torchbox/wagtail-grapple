@@ -3,7 +3,6 @@ import graphene
 from django.conf import settings
 from wagtail.contrib.redirects.models import Redirect
 
-from ..registry import registry
 from .pages import PageInterface
 
 
@@ -36,6 +35,4 @@ class RedirectsQuery:
 
     # Return all redirects.
     def resolve_redirects(self, info, **kwargs):
-        redirects = Redirect.objects.select_related("redirect_page")
-
         return Redirect.objects.select_related("redirect_page")

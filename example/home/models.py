@@ -6,13 +6,8 @@ from wagtail.core.models import Page, Orderable
 from wagtail.core.fields import StreamField
 from wagtail.contrib.settings.models import BaseSetting, register_setting
 
-from wagtail.core import blocks
 from wagtail.admin.edit_handlers import FieldPanel, StreamFieldPanel, InlinePanel
-from wagtail.images.blocks import ImageChooserBlock
-from wagtail.documents.blocks import DocumentChooserBlock
-from wagtail.embeds.blocks import EmbedBlock
 from wagtail.snippets.models import register_snippet
-from wagtail.snippets.blocks import SnippetChooserBlock
 from wagtail.snippets.edit_handlers import SnippetChooserPanel
 from wagtail.images.edit_handlers import ImageChooserPanel
 from wagtail.documents.edit_handlers import DocumentChooserPanel
@@ -23,7 +18,6 @@ from wagtailmedia.edit_handlers import MediaChooserPanel
 from grapple.helpers import register_query_field, register_paginated_query_field
 from grapple.utils import resolve_paginated_queryset
 from grapple.models import (
-    GraphQLField,
     GraphQLString,
     GraphQLSnippet,
     GraphQLStreamfield,
@@ -34,6 +28,7 @@ from grapple.models import (
     GraphQLCollection,
     GraphQLPage,
 )
+
 from home.blocks import StreamFieldBlock
 
 

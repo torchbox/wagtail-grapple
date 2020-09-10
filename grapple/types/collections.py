@@ -15,12 +15,12 @@ class CollectionObjectType(DjangoObjectType):
     class Meta:
         model = Collection
 
-    id = graphene.ID()
-    name = graphene.String()
-    descendants = graphene.List(lambda: CollectionObjectType)
-    ancestors = graphene.List(lambda: CollectionObjectType)
+    id = graphene.ID(required=True)
+    name = graphene.String(required=True)
+    descendants = graphene.List(lambda: CollectionObjectType, required=True)
+    ancestors = graphene.List(lambda: CollectionObjectType, required=True)
 
-    def resolve_descendants(self, info):
+    def resolve_descendants(self, info, **kwargs):
         return self.get_descendants()
 
     def resolve_ancestors(self, info):

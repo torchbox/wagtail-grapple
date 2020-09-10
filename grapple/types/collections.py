@@ -23,7 +23,7 @@ class CollectionObjectType(DjangoObjectType):
     def resolve_descendants(self, info, **kwargs):
         return self.get_descendants()
 
-    def resolve_ancestors(self, info):
+    def resolve_ancestors(self, info, **kwargs):
         return self.get_ancestors()
 
 
@@ -32,8 +32,8 @@ def CollectionsQuery():
     mdl_type = registry.collections.get(mdl, CollectionObjectType)
 
     class Mixin:
-        collections = QuerySetList(mdl_type, enable_search=False)
-        collection_type = graphene.String()
+        collections = QuerySetList(mdl_type, enable_search=False, required=True)
+        collection_type = graphene.String(required=True)
 
         # Return all collections
         def resolve_collections(self, info, **kwargs):

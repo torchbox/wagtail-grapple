@@ -203,7 +203,9 @@ def PagesQuery():
         def resolve_pages(self, info, **kwargs):
             site = Site.find_for_request(info.context)
             return resolve_queryset(
-                WagtailPage.objects.in_site(site).live().public().specific(), info, **kwargs
+                WagtailPage.objects.in_site(site).live().public().specific(),
+                info,
+                **kwargs
             )
 
         # Return a specific page, identified by ID or Slug.

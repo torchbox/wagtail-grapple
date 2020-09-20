@@ -41,9 +41,7 @@ class SiteType(DjangoObjectType):
 def SitesQuery():
     class Mixin:
         site = graphene.Field(
-            SiteType,
-            hostname=graphene.String(),
-            id=graphene.String()
+            SiteType, hostname=graphene.String(), id=graphene.String()
         )
         sites = QuerySetList(
             graphene.NonNull(SiteType), enable_search=True, required=True
@@ -51,9 +49,7 @@ def SitesQuery():
 
         # Return all sites.
         def resolve_sites(self, info, **kwargs):
-            return resolve_queryset(
-                Site.objects.all(), info, **kwargs
-            )
+            return resolve_queryset(Site.objects.all(), info, **kwargs)
 
         # Return all sites, identified by ID or hostname.
         def resolve_site(self, info, **kwargs):

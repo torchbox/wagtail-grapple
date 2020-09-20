@@ -34,7 +34,7 @@ class BaseGrappleTest(TestCase):
 class PagesTest(BaseGrappleTest):
     def setUp(self):
         self.factory = RequestFactory()
-        self.request = self.factory.get('/')
+        self.request = self.factory.get("/")
 
         super().setUp()
 
@@ -69,7 +69,9 @@ class PagesTest(BaseGrappleTest):
 
 class SitesTest(TestCase):
     def setUp(self):
-        self.site = wagtail_factories.SiteFactory(hostname="grapple.localhost", site_name="Grapple test site")
+        self.site = wagtail_factories.SiteFactory(
+            hostname="grapple.localhost", site_name="Grapple test site"
+        )
         self.client = Client(SCHEMA)
 
     def test_sites(self):
@@ -101,7 +103,9 @@ class SitesTest(TestCase):
         }
         """
 
-        executed = self.client.execute(query, variables={'hostname': self.site.hostname})
+        executed = self.client.execute(
+            query, variables={"hostname": self.site.hostname}
+        )
 
         self.assertEquals(type(executed["data"]), OrderedDict)
         self.assertEquals(type(executed["data"]["site"]), OrderedDict)
@@ -110,7 +114,9 @@ class SitesTest(TestCase):
         pages = Page.objects.in_site(self.site)
 
         self.assertEquals(len(executed["data"]["site"]["pages"]), pages.count())
-        self.assertNotEqual(len(executed["data"]["site"]["pages"]), Page.objects.count())
+        self.assertNotEqual(
+            len(executed["data"]["site"]["pages"]), Page.objects.count()
+        )
 
 
 @override_settings(GRAPPLE_AUTO_CAMELCASE=False)
@@ -119,7 +125,7 @@ class DisableAutoCamelCaseTest(TestCase):
         schema = create_schema()
         self.client = Client(schema)
         self.factory = RequestFactory()
-        self.request = self.factory.get('/')
+        self.request = self.factory.get("/")
 
     def test_disable_auto_camel_case(self):
         query = """

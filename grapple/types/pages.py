@@ -2,7 +2,7 @@ import graphene
 from django.contrib.contenttypes.models import ContentType
 from django.dispatch import receiver
 
-from wagtail.core.models import Page as WagtailPage
+from wagtail.core.models import Page as WagtailPage, Site
 from wagtail_headless_preview.signals import preview_update
 from graphene_django.types import DjangoObjectType
 from graphql.error import GraphQLLocatedError
@@ -150,16 +150,21 @@ class Page(DjangoObjectType):
         interfaces = (PageInterface,)
 
 
-def get_specific_page(id, slug, token, content_type=None):
+def get_specific_page(id, slug, token, content_type=None, site=None):
     """
     Get a specific page, given a page_id, slug or preview if a preview token is passed
     """
     page = None
     try:
+        qs = WagtailPage.objects.live().public().specific()
+
+        if site:
+            qs = qs.in_site(site)
+
         if id:
-            page = WagtailPage.objects.live().public().specific().get(pk=id)
+            page = qs.get(pk=id)
         elif slug:
-            page = WagtailPage.objects.live().public().specific().get(slug=slug)
+            page = qs.get(slug=slug)
 
         if token:
             if page:
@@ -194,10 +199,11 @@ def PagesQuery():
             content_type=graphene.String(),
         )
 
-        # Return all pages, ideally specific.
+        # Return all pages in site, ideally specific.
         def resolve_pages(self, info, **kwargs):
+            site = Site.find_for_request(info.context)
             return resolve_queryset(
-                WagtailPage.objects.live().public().specific(), info, **kwargs
+                WagtailPage.objects.in_site(site).live().public().specific(), info, **kwargs
             )
 
         # Return a specific page, identified by ID or Slug.
@@ -207,6 +213,7 @@ def PagesQuery():
                 slug=kwargs.get("slug"),
                 token=kwargs.get("token"),
                 content_type=kwargs.get("content_type"),
+                site=Site.find_for_request(info.context),
             )
 
     return Mixin

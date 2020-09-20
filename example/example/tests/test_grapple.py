@@ -11,13 +11,13 @@ from pydoc import locate
 
 from django.conf import settings
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.test import TestCase, override_settings
+from django.test import RequestFactory, TestCase, override_settings
 
 from graphene.test import Client
 
 from wagtailmedia.models import get_media_model
 
-from wagtail.core.models import Page
+from wagtail.core.models import Page, Site
 from wagtail.documents import get_document_model
 from wagtail.images import get_image_model
 
@@ -32,6 +32,12 @@ class BaseGrappleTest(TestCase):
 
 
 class PagesTest(BaseGrappleTest):
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.request = self.factory.get('/')
+
+        super().setUp()
+
     def test_pages(self):
         query = """
         {
@@ -43,7 +49,7 @@ class PagesTest(BaseGrappleTest):
         }
         """
 
-        executed = self.client.execute(query)
+        executed = self.client.execute(query, context_value=self.request)
 
         self.assertEquals(type(executed["data"]), dict_type)
         self.assertEquals(type(executed["data"]["pages"]), list)
@@ -55,9 +61,56 @@ class PagesTest(BaseGrappleTest):
         self.assertEquals(pages_data[1]["contentType"], "home.HomePage")
         self.assertEquals(pages_data[1]["pageType"], "HomePage")
 
-        pages = Page.objects.all()
+        site = Site.find_for_request(self.request)
+        pages = Page.objects.in_site(site)
 
         self.assertEquals(len(executed["data"]["pages"]), pages.count())
+
+
+class SitesTest(TestCase):
+    def setUp(self):
+        self.site = wagtail_factories.SiteFactory(hostname="grapple.localhost", site_name="Grapple test site")
+        self.client = Client(SCHEMA)
+
+    def test_sites(self):
+        query = """
+        {
+            sites {
+                siteName
+                hostname
+            }
+        }
+        """
+
+        executed = self.client.execute(query)
+
+        self.assertEquals(type(executed["data"]), OrderedDict)
+        self.assertEquals(type(executed["data"]["sites"]), list)
+        self.assertEquals(len(executed["data"]["sites"]), Site.objects.count())
+
+    def test_site(self):
+        query = """
+        query($hostname: String)
+        {
+            site(hostname: $hostname) {
+                siteName
+                pages {
+                    title
+                }
+            }
+        }
+        """
+
+        executed = self.client.execute(query, variables={'hostname': self.site.hostname})
+
+        self.assertEquals(type(executed["data"]), OrderedDict)
+        self.assertEquals(type(executed["data"]["site"]), OrderedDict)
+        self.assertEquals(type(executed["data"]["site"]["pages"]), list)
+
+        pages = Page.objects.in_site(self.site)
+
+        self.assertEquals(len(executed["data"]["site"]["pages"]), pages.count())
+        self.assertNotEqual(len(executed["data"]["site"]["pages"]), Page.objects.count())
 
 
 @override_settings(GRAPPLE_AUTO_CAMELCASE=False)
@@ -65,6 +118,8 @@ class DisableAutoCamelCaseTest(TestCase):
     def setUp(self):
         schema = create_schema()
         self.client = Client(schema)
+        self.factory = RequestFactory()
+        self.request = self.factory.get('/')
 
     def test_disable_auto_camel_case(self):
         query = """
@@ -75,8 +130,7 @@ class DisableAutoCamelCaseTest(TestCase):
             }
         }
         """
-
-        executed = self.client.execute(query)
+        executed = self.client.execute(query, context_value=self.request)
 
         self.assertEquals(type(executed["data"]), dict_type)
         self.assertEquals(type(executed["data"]["pages"]), list)
@@ -84,7 +138,8 @@ class DisableAutoCamelCaseTest(TestCase):
         self.assertEquals(type(executed["data"]["pages"][0]["title"]), str)
         self.assertEquals(type(executed["data"]["pages"][0]["url_path"]), str)
 
-        pages = Page.objects.all()
+        site = Site.find_for_request(self.request)
+        pages = Page.objects.in_site(site)
 
         self.assertEquals(len(executed["data"]["pages"]), pages.count())
 

@@ -32,6 +32,8 @@ class PagesTest(BaseGrappleTest):
         {
             pages {
                 title
+                contentType
+                pageType
             }
         }
         """
@@ -41,6 +43,12 @@ class PagesTest(BaseGrappleTest):
         self.assertEquals(type(executed["data"]), OrderedDict)
         self.assertEquals(type(executed["data"]["pages"]), list)
         self.assertEquals(type(executed["data"]["pages"][0]), OrderedDict)
+
+        pages_data = executed["data"]["pages"]
+        self.assertEquals(pages_data[0]["contentType"], "wagtailcore.Page")
+        self.assertEquals(pages_data[0]["pageType"], "Page")
+        self.assertEquals(pages_data[1]["contentType"], "home.HomePage")
+        self.assertEquals(pages_data[1]["pageType"], "HomePage")
 
         pages = Page.objects.all()
 

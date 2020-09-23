@@ -53,12 +53,6 @@ class PageInterface(graphene.Interface):
         graphene.NonNull(lambda: PageInterface), enable_search=True, required=True
     )
 
-    def resolve_content_type(self, info: ResolveInfo):
-        self.content_type = ContentType.objects.get_for_model(self)
-        return (
-            self.content_type.app_label + "." + self.content_type.model_class().__name__
-        )
-
     @classmethod
     def resolve_type(cls, instance, info: ResolveInfo):
         """
@@ -70,6 +64,15 @@ class PageInterface(graphene.Interface):
             return registry.pages[mdl]
         else:
             return Page
+
+    def resolve_content_type(self, info: ResolveInfo):
+        self.content_type = ContentType.objects.get_for_model(self)
+        return (
+            self.content_type.app_label + "." + self.content_type.model_class().__name__
+        )
+
+    def resolve_page_type(self, info, **kwargs):
+        return PageInterface.resolve_type(self.specific, info)
 
     def resolve_parent(self, info, **kwargs):
         """

@@ -10,6 +10,7 @@ from django.conf import settings
 from django.template.loader import render_to_string
 from graphene.types import Scalar
 from graphene_django.converter import convert_django_field
+from wagtail.core.blocks import StructValue
 from wagtail.core.fields import StreamField
 from wagtail.core.rich_text import expand_db_html
 from wagtail.core import blocks
@@ -63,6 +64,9 @@ class StreamFieldInterface(graphene.Interface):
         return self.block.name
 
     def resolve_raw_value(self, info, **kwargs):
+        if isinstance(self, StructValue):
+            # This is the value for a nested StructBlock defined via GraphQLStreamfield
+            return serialize_struct_obj(self)
         if isinstance(self.value, dict):
             return serialize_struct_obj(self.value)
 

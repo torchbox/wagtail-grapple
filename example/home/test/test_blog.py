@@ -85,6 +85,10 @@ class BlogTest(BaseGrappleTest):
                                 "button_link": "https://www.graphql.com/",
                             }
                         ],
+                        "mainbutton": {
+                            "button_text": "Take me to the source",
+                            "button_link": "https://wagtail.io/",
+                        },
                     },
                 ),
             ]
@@ -551,6 +555,28 @@ class BlogTest(BaseGrappleTest):
                 buttons = query_blocks[0]["buttons"]
                 self.assertEquals(buttons[0]["buttonText"], "btn")
                 self.assertEquals(buttons[0]["buttonLink"], "https://www.graphql.com/")
+
+    def test_nested_structvalue_block(self):
+        # Query stream block
+        block_type = "TextAndButtonsBlock"
+        query_blocks = self.get_blocks_from_body(
+            block_type,
+            block_query="""
+                mainbutton {
+                    ... on ButtonBlock {
+                        buttonText
+                        buttonLink
+                    }
+               }
+            """,
+        )
+
+        # Check HTML is string
+        for block in self.blog_page.body:
+            if type(block.block).__name__ == block_type:
+                button = query_blocks[0]["mainbutton"]
+                self.assertEquals(button["buttonText"], "Take me to the source")
+                self.assertEquals(button["buttonLink"], "https://wagtail.io/")
 
     def test_singular_blog_page_query(self):
         def query():

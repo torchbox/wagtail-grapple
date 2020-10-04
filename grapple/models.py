@@ -95,7 +95,11 @@ def GraphQLStreamfield(field_name: str, **kwargs):
     def Mixin():
         from .types.streamfield import StreamFieldInterface
 
-        return GraphQLField(field_name, graphene.List(StreamFieldInterface), **kwargs)
+        # Note that GraphQLStreamfield children should always be considered list elements,
+        # unless they specifically are requested not to. e.g. a GraphQLStreamfield for a nested StructBlock
+        if "is_list" not in kwargs:
+            kwargs["is_list"] = True
+        return GraphQLField(field_name, StreamFieldInterface, **kwargs)
 
     return Mixin
 
@@ -150,7 +154,7 @@ def GraphQLCollection(
     def Mixin():
         from .types.structures import QuerySetList, PaginatedQuerySet
 
-        # Check if using nested field extracion:
+        # Check if using nested field extraction:
         source = kwargs.get("source", None)
         if source and "." in source:
             source, *key = source.split(".")

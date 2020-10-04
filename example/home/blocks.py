@@ -77,11 +77,15 @@ class ButtonBlock(blocks.StructBlock):
 class TextAndButtonsBlock(blocks.StructBlock):
     text = blocks.TextBlock()
     buttons = blocks.ListBlock(ButtonBlock())
+    mainbutton = ButtonBlock()
 
     graphql_fields = [
         GraphQLString("text"),
         GraphQLImage("image"),
         GraphQLStreamfield("buttons"),
+        GraphQLStreamfield(
+            "mainbutton", is_list=False
+        ),  # this is a direct StructBlock, not a list of sub-blocks
     ]
 
 

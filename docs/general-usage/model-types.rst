@@ -209,7 +209,7 @@ GraphQLBoolean
 GraphQLStreamfield
 ------------------
 .. module:: grapple.models
-.. class:: GraphQLStreamfield(field_name, required=False)
+.. class:: GraphQLStreamfield(field_name, **kwargs)
 
     This field type supports all built-in ``Streamfield`` blocks. It also supports
     custom blocks built using ``StructBlock`` and the like.
@@ -222,6 +222,70 @@ GraphQLStreamfield
 
         Represents the field as non-nullable in the schema. This promises the client that it will have a value returned.
 
+    .. attribute:: kwargs
+
+        Keyword arguments to pass to the field type definition. Notably:
+
+        * is_list (bool=True)
+            Defaults to True to indicate a list of blocks. Set this to false when the nested ``StructBlock``s
+            do not return a value.
+
+        e.g.
+
+    ::
+
+        @register_streamfield_block
+        class ButtonBlock(blocks.StructBlock):
+            button_text = blocks.CharBlock(required=True, max_length=50, label="Text")
+            button_link = blocks.CharBlock(required=True, max_length=255, label="Link")
+
+            graphql_fields = [GraphQLString("button_text"), GraphQLString("button_link")]
+
+
+        @register_streamfield_block
+        class TextAndButtonsBlock(blocks.StructBlock):
+            text = blocks.TextBlock()
+            buttons = blocks.ListBlock(ButtonBlock())
+            mainbutton = ButtonBlock()
+
+            graphql_fields = [
+                GraphQLString("text"),
+                GraphQLImage("image"),
+                GraphQLStreamfield("buttons"),
+                GraphQLStreamfield("mainbutton", is_list=False),  # this is a direct StructBlock, not a list of sub-blocks
+            ]
+
+        @register_paginated_query_field("blog_page")
+        class BlogPage(Page):
+            body = StreamField([
+                ("text_and_buttons", TextAndButtonsBlock()),
+            ])
+
+            graphql_fields = [GraphQLStreamfield("body")]
+
+    ::
+
+        # Example query, based on the above
+        {
+            blogPage(id: 123) {
+                body {
+                    ... on TextAndButtonsBlock {
+                        mainbutton {
+                            ... on ButtonBlock {
+                                buttonText
+                                buttonLink
+                            }
+                        }
+                        buttons {
+                            ... on ButtonBlock {
+                                buttonText
+                                buttonLink
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
 GraphQLSnippet
 --------------
@@ -229,7 +293,7 @@ GraphQLSnippet
 .. class:: GraphQLSnippet(field_name, snippet_model, required=False)
 
     ``GraphQLSnippet`` is a little bit more complicated; You first need to define
-    a `graphql_field` list on your snippet like you do your page. Then you need
+    a ``graphql_field`` list on your snippet like you do your page. Then you need
     to reference the snippet in the field type function.
 
     Your snippet values are then available through a sub-selection query on the
@@ -290,7 +354,7 @@ GraphQLSnippet
 
     ::
 
-        #Example Query
+        # Example query
         {
             page(slug: "some-blog-page") {
                 advert {

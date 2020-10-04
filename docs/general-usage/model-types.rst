@@ -307,8 +307,8 @@ GraphQLForeignKey
 .. class:: GraphQLForeignKey(field_name, content_type, required=False)
 
     ``GraphQLForeignKey`` is similar to ``GraphQLSnippet`` in that you pass a
-    ``field_name`` and ``content_type`` but you can also specify that the field
-    is a list (for example when using ``Orderable``).
+    ``field_name`` and ``content_type``. You can also specify that the field
+    is a list (for example when using ``Orderable``). For foreign keys to ``wagtailcore.Page``, use ``GraphQLPage``.
 
     .. attribute:: field_name (str)
 
@@ -316,7 +316,7 @@ GraphQLForeignKey
 
     .. attribute:: content_type (str)
 
-        String which defines the location of the model model you are referencing. You can also pass the model class itself.
+        String which defines the location of the model you are referencing. You can also pass the model class itself.
 
     .. attribute:: required (bool=False)
 
@@ -374,3 +374,29 @@ GraphQLDocument
     .. attribute:: required (bool=False)
 
         Represents the field as non-nullable in the schema. This promises the client that it will have a value returned.
+
+
+GraphQLPage
+-----------
+
+.. module:: grapple.models
+.. class:: GraphQLPage(field_name: str, **kwargs)
+
+    Use this field type to serialize a relationship to a Wagtail Page or Page-derived model. The resulting type
+    is the generic Wagtail Page type. A useful type for foreign keys that are not limited to a single, custom Page
+    model, registered with Grapple.
+
+
+    .. attribute:: field_name (str)
+
+        This is the name of the class property used in your model definition.
+
+    .. attribute:: kwargs
+
+        Useful keyword arguments:
+
+        * ``required`` (bool=False)
+            Represents the field as non-nullable in the schema. This promises the client that it will have a value returned.
+        * ``source`` (string)
+            You can pass a source string that is an attribute or method on the model itself. It can also be several
+            layers deep and Grapple will handle the querying for you through multiple models.

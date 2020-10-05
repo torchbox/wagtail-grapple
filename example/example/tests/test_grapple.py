@@ -124,7 +124,7 @@ class ImagesTest(BaseGrappleTest):
             "http://localhost:8000" + self.example_image.file.url,
         )
         self.assertEquals(
-            executed["data"]["images"][0]["url"], executed["data"]["images"][0]["src"],
+            executed["data"]["images"][0]["url"], executed["data"]["images"][0]["src"]
         )
 
     def tearDown(self):

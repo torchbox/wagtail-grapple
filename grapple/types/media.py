@@ -12,7 +12,7 @@ from .structures import QuerySetList
 class MediaObjectType(DjangoObjectType):
     class Meta:
         model = Media
-        exclude_fields = ("tags",)
+        exclude = ("tags",)
 
     url = graphene.String(required=True)
 

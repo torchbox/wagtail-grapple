@@ -1,7 +1,12 @@
 import os
+import sys
 import wagtail_factories
 
-from collections import OrderedDict
+if sys.version_info >= (3, 7):
+    from builtins import dict as dict_type
+else:
+    from collections import OrderedDict as dict_type
+
 from pydoc import locate
 
 from django.conf import settings
@@ -40,9 +45,9 @@ class PagesTest(BaseGrappleTest):
 
         executed = self.client.execute(query)
 
-        self.assertEquals(type(executed["data"]), OrderedDict)
+        self.assertEquals(type(executed["data"]), dict_type)
         self.assertEquals(type(executed["data"]["pages"]), list)
-        self.assertEquals(type(executed["data"]["pages"][0]), OrderedDict)
+        self.assertEquals(type(executed["data"]["pages"][0]), dict_type)
 
         pages_data = executed["data"]["pages"]
         self.assertEquals(pages_data[0]["contentType"], "wagtailcore.Page")
@@ -73,9 +78,9 @@ class DisableAutoCamelCaseTest(TestCase):
 
         executed = self.client.execute(query)
 
-        self.assertEquals(type(executed["data"]), OrderedDict)
+        self.assertEquals(type(executed["data"]), dict_type)
         self.assertEquals(type(executed["data"]["pages"]), list)
-        self.assertEquals(type(executed["data"]["pages"][0]), OrderedDict)
+        self.assertEquals(type(executed["data"]["pages"][0]), dict_type)
         self.assertEquals(type(executed["data"]["pages"][0]["title"]), str)
         self.assertEquals(type(executed["data"]["pages"][0]["url_path"]), str)
 

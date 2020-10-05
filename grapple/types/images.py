@@ -75,7 +75,7 @@ class ImageObjectType(DjangoObjectType, BaseImageObjectType):
 
     class Meta:
         model = WagtailImage
-        exclude_fields = ("tags",)
+        exclude = ("tags",)
 
     def resolve_rendition(self, info, **kwargs):
         """

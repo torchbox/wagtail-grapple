@@ -1,4 +1,3 @@
-import json
 import graphene
 import wagtail
 import inspect
@@ -10,10 +9,10 @@ from django.conf import settings
 from django.template.loader import render_to_string
 from graphene.types import Scalar
 from graphene_django.converter import convert_django_field
-from wagtail.core.blocks import StructValue
 from wagtail.core.fields import StreamField
 from wagtail.core.rich_text import expand_db_html
 from wagtail.core import blocks
+from wagtail.embeds.blocks import EmbedValue
 from wagtail.embeds.embeds import get_embed
 from wagtail.embeds.exceptions import EmbedException
 
@@ -66,7 +65,7 @@ class StreamFieldInterface(graphene.Interface):
         return self.block.name
 
     def resolve_raw_value(self, info, **kwargs):
-        if isinstance(self, StructValue):
+        if isinstance(self, blocks.StructValue):
             # This is the value for a nested StructBlock defined via GraphQLStreamfield
             return serialize_struct_obj(self)
         if isinstance(self.value, dict):
@@ -355,8 +354,8 @@ class EmbedBlock(graphene.ObjectType):
         return get_media_url(get_embed_url(self))
 
     def resolve_raw_value(self, info, **kwargs):
-        if isinstance(self, wagtail.EmbedValue):
-            return serialize_struct_obj(self)
+        if isinstance(self, EmbedValue):
+            return self
         return StreamFieldInterface.resolve_raw_value(info, **kwargs)
 
     def resolve_embed(self, info, **kwargs):

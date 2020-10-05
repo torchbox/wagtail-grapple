@@ -15,6 +15,7 @@ from wagtail.core.fields import StreamField
 from wagtail.core.rich_text import expand_db_html
 from wagtail.core import blocks
 from wagtail.embeds.embeds import get_embed
+from wagtail.embeds.exceptions import EmbedException
 
 from ..registry import registry
 
@@ -334,6 +335,13 @@ def get_embed_url(instance):
     return instance.value.url if hasattr(instance, "value") else instance.url
 
 
+def get_embed_object(instance):
+    try:
+        return get_embed(get_embed_url(instance))
+    except EmbedException:
+        pass
+
+
 class EmbedBlock(graphene.ObjectType):
     value = graphene.String(required=True)
     url = graphene.String(required=True)
@@ -352,19 +360,21 @@ class EmbedBlock(graphene.ObjectType):
         return StreamFieldInterface.resolve_raw_value(info, **kwargs)
 
     def resolve_embed(self, info, **kwargs):
-        embed = get_embed(get_embed_url(self))
-        return embed.html
+        embed = get_embed_object(self)
+        if embed:
+            return embed.html
 
     def resolve_raw_embed(self, info, **kwargs):
-        embed = get_embed(get_embed_url(self))
-        return {
-            "title": embed.title,
-            "type": embed.type,
-            "thumbnail_url": embed.thumbnail_url,
-            "width": embed.width,
-            "height": embed.height,
-            "html": embed.html,
-        }
+        embed = get_embed_object(self)
+        if embed:
+            return {
+                "title": embed.title,
+                "type": embed.type,
+                "thumbnail_url": embed.thumbnail_url,
+                "width": embed.width,
+                "height": embed.height,
+                "html": embed.html,
+            }
 
 
 class StaticBlock(graphene.ObjectType):

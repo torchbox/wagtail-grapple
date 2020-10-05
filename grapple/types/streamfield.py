@@ -1,4 +1,3 @@
-import json
 import graphene
 import wagtail
 import inspect
@@ -10,10 +9,12 @@ from django.conf import settings
 from django.template.loader import render_to_string
 from graphene.types import Scalar
 from graphene_django.converter import convert_django_field
-from wagtail.core.blocks import StructValue
 from wagtail.core.fields import StreamField
 from wagtail.core.rich_text import expand_db_html
 from wagtail.core import blocks
+from wagtail.embeds.blocks import EmbedValue
+from wagtail.embeds.embeds import get_embed
+from wagtail.embeds.exceptions import EmbedException
 
 from ..registry import registry
 
@@ -64,7 +65,7 @@ class StreamFieldInterface(graphene.Interface):
         return self.block.name
 
     def resolve_raw_value(self, info, **kwargs):
-        if isinstance(self, StructValue):
+        if isinstance(self, blocks.StructValue):
             # This is the value for a nested StructBlock defined via GraphQLStreamfield
             return serialize_struct_obj(self)
         if isinstance(self.value, dict):
@@ -329,17 +330,50 @@ def get_media_url(url):
     return url
 
 
+def get_embed_url(instance):
+    return instance.value.url if hasattr(instance, "value") else instance.url
+
+
+def get_embed_object(instance):
+    try:
+        return get_embed(get_embed_url(instance))
+    except EmbedException:
+        pass
+
+
 class EmbedBlock(graphene.ObjectType):
     value = graphene.String(required=True)
     url = graphene.String(required=True)
+    embed = graphene.String()
+    raw_embed = graphene.JSONString()
 
     class Meta:
         interfaces = (StreamFieldInterface,)
 
     def resolve_url(self, info, **kwargs):
-        if hasattr(self, "value"):
-            return get_media_url(self.value.url)
-        return get_media_url(self.url)
+        return get_media_url(get_embed_url(self))
+
+    def resolve_raw_value(self, info, **kwargs):
+        if isinstance(self, EmbedValue):
+            return self
+        return StreamFieldInterface.resolve_raw_value(info, **kwargs)
+
+    def resolve_embed(self, info, **kwargs):
+        embed = get_embed_object(self)
+        if embed:
+            return embed.html
+
+    def resolve_raw_embed(self, info, **kwargs):
+        embed = get_embed_object(self)
+        if embed:
+            return {
+                "title": embed.title,
+                "type": embed.type,
+                "thumbnail_url": embed.thumbnail_url,
+                "width": embed.width,
+                "height": embed.height,
+                "html": embed.html,
+            }
 
 
 class StaticBlock(graphene.ObjectType):

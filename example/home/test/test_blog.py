@@ -1,5 +1,6 @@
 import datetime
 import decimal
+import json
 
 import wagtail_factories
 from django.conf import settings
@@ -74,7 +75,14 @@ class BlogTest(BaseGrappleTest):
                 ),
                 ("callout", {"text": RichText("<p>Hello, World</p>")}),
                 ("objectives", ["Read all of article!"]),
-                ("video", {"youtube_link": EmbedValue("https://youtube.com/")}),
+                (
+                    "video",
+                    {
+                        "youtube_link": EmbedValue(
+                            "https://www.youtube.com/watch?v=_U79Wc965vw"
+                        )
+                    },
+                ),
                 (
                     "text_and_buttons",
                     {
@@ -388,6 +396,8 @@ class BlogTest(BaseGrappleTest):
                         ...on VideoBlock {
                             youtubeLink {
                                 url
+                                embed
+                                rawEmbed
                             }
                         }
                     }
@@ -400,9 +410,20 @@ class BlogTest(BaseGrappleTest):
         executed = self.client.execute(query)
         body = executed["data"]["page"]["body"]
 
+        raw_embed = {
+            "title": "Wagtail Space 2018",
+            "type": "video",
+            "thumbnail_url": "https://i.ytimg.com/vi/_U79Wc965vw/hqdefault.jpg",
+            "width": 480,
+            "height": 270,
+            "html": '<iframe width="480" height="270" src="https://www.youtube.com/embed/_U79Wc965vw?feature=oembed" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>',
+        }
         for block in body:
             if block["blockType"] == "VideoBlock":
-                self.assertTrue(isinstance(block["youtubeLink"]["url"], str))
+                embed = block["youtubeLink"]
+                self.assertTrue(isinstance(embed["url"], str))
+                self.assertEquals(embed["embed"], raw_embed["html"])
+                self.assertEquals(embed["rawEmbed"], json.dumps(raw_embed))
                 return
 
         self.fail("VideoBlock type not instantiated in Streamfield")

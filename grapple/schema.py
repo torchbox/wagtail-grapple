@@ -29,6 +29,7 @@ def create_schema():
     from .types.settings import SettingsQuery
     from .types.snippets import SnippetsQuery
     from .types.redirects import RedirectsQuery
+    from .types.tags import TagsQuery
 
     class Query(
         graphene.ObjectType,
@@ -40,6 +41,7 @@ def create_schema():
         SettingsQuery(),
         SearchQuery(),
         RedirectsQuery,
+        TagsQuery(),
         *registry.schema,
     ):
         pass

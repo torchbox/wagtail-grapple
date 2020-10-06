@@ -464,3 +464,21 @@ GraphQLPage
         * ``source`` (string)
             You can pass a source string that is an attribute or method on the model itself. It can also be several
             layers deep and Grapple will handle the querying for you through multiple models.
+
+
+GraphQLTags
+-----------
+
+.. module:: grapple.models
+.. class:: GraphQLTags(field_name: str, **kwargs)
+
+    Use this field type to serialize a ClusterTaggableManager.
+
+
+    .. attribute:: field_name (str)
+
+        This is the name of the class property used in your model definition.
+
+    .. attribute:: required (bool=False)
+
+        Represents the field as non-nullable in the schema. This promises the client that it will have a value returned.

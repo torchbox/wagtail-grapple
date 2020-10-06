@@ -628,3 +628,27 @@ class BlogTest(BaseGrappleTest):
 
         self.assertTrue("firstPost" in results["data"])
         self.assertEqual(int(results["data"]["firstPost"]["id"]), another_post.id)
+
+    def test_blog_page_tags(self):
+        query = """
+        {
+            page(id:%s) {
+                ... on BlogPage {
+                    tags {
+                        id
+                        name
+                    }
+                }
+            }
+        }
+        """ % (
+            self.blog_page.id
+        )
+        executed = self.client.execute(query)
+
+        tags = executed["data"]["page"]["tags"]
+        self.assertEqual(len(tags), 3)
+        for idx, tag in enumerate(tags, start=1):
+            self.assertEqual(int(tag["id"]), idx)
+            self.assertTrue(isinstance(tag["name"], str))
+            self.assertEqual(tag["name"], "Tag " + str(idx))

@@ -34,8 +34,6 @@ class BaseGrappleTest(TestCase):
 class PagesTest(BaseGrappleTest):
     def setUp(self):
         self.factory = RequestFactory()
-        self.request = self.factory.get("/")
-
         super().setUp()
 
     def test_pages(self):
@@ -49,7 +47,7 @@ class PagesTest(BaseGrappleTest):
         }
         """
 
-        executed = self.client.execute(query, context_value=self.request)
+        executed = self.client.execute(query)
 
         self.assertEquals(type(executed["data"]), dict_type)
         self.assertEquals(type(executed["data"]["pages"]), list)
@@ -61,7 +59,29 @@ class PagesTest(BaseGrappleTest):
         self.assertEquals(pages_data[1]["contentType"], "home.HomePage")
         self.assertEquals(pages_data[1]["pageType"], "HomePage")
 
-        site = Site.find_for_request(self.request)
+        pages = Page.objects.all()
+
+        self.assertEquals(len(executed["data"]["pages"]), pages.count())
+
+    def test_pages_in_site(self):
+        query = """
+        {
+            pages(inSite: true) {
+                title
+                contentType
+                pageType
+            }
+        }
+        """
+
+        request = self.factory.get("/")
+        executed = self.client.execute(query, context_value=request)
+
+        self.assertEquals(type(executed["data"]), dict_type)
+        self.assertEquals(type(executed["data"]["pages"]), list)
+        self.assertEquals(type(executed["data"]["pages"][0]), dict_type)
+
+        site = Site.find_for_request(request)
         pages = Page.objects.in_site(site)
 
         self.assertEquals(len(executed["data"]["pages"]), pages.count())
@@ -80,13 +100,21 @@ class SitesTest(TestCase):
             sites {
                 siteName
                 hostname
+                port
+                isDefaultSite
+                rootPage {
+                    title
+                }
+                pages {
+                    title
+                }
             }
         }
         """
 
         executed = self.client.execute(query)
 
-        self.assertEquals(type(executed["data"]), OrderedDict)
+        self.assertEquals(type(executed["data"]), dict_type)
         self.assertEquals(type(executed["data"]["sites"]), list)
         self.assertEquals(len(executed["data"]["sites"]), Site.objects.count())
 
@@ -107,8 +135,8 @@ class SitesTest(TestCase):
             query, variables={"hostname": self.site.hostname}
         )
 
-        self.assertEquals(type(executed["data"]), OrderedDict)
-        self.assertEquals(type(executed["data"]["site"]), OrderedDict)
+        self.assertEquals(type(executed["data"]), dict_type)
+        self.assertEquals(type(executed["data"]["site"]), dict_type)
         self.assertEquals(type(executed["data"]["site"]["pages"]), list)
 
         pages = Page.objects.in_site(self.site)
@@ -124,8 +152,6 @@ class DisableAutoCamelCaseTest(TestCase):
     def setUp(self):
         schema = create_schema()
         self.client = Client(schema)
-        self.factory = RequestFactory()
-        self.request = self.factory.get("/")
 
     def test_disable_auto_camel_case(self):
         query = """
@@ -136,7 +162,7 @@ class DisableAutoCamelCaseTest(TestCase):
             }
         }
         """
-        executed = self.client.execute(query, context_value=self.request)
+        executed = self.client.execute(query)
 
         self.assertEquals(type(executed["data"]), dict_type)
         self.assertEquals(type(executed["data"]["pages"]), list)
@@ -144,8 +170,7 @@ class DisableAutoCamelCaseTest(TestCase):
         self.assertEquals(type(executed["data"]["pages"][0]["title"]), str)
         self.assertEquals(type(executed["data"]["pages"][0]["url_path"]), str)
 
-        site = Site.find_for_request(self.request)
-        pages = Page.objects.in_site(site)
+        pages = Page.objects.all()
 
         self.assertEquals(len(executed["data"]["pages"]), pages.count())
 

@@ -189,7 +189,10 @@ def PagesQuery():
 
     class Mixin:
         pages = QuerySetList(
-            graphene.NonNull(lambda: PageInterface), enable_search=True, required=True
+            graphene.NonNull(lambda: PageInterface),
+            in_site=graphene.Boolean(),
+            enable_search=True,
+            required=True,
         )
         page = graphene.Field(
             PageInterface,
@@ -197,16 +200,18 @@ def PagesQuery():
             slug=graphene.String(),
             token=graphene.String(),
             content_type=graphene.String(),
+            in_site=graphene.Boolean(),
         )
 
         # Return all pages in site, ideally specific.
         def resolve_pages(self, info, **kwargs):
-            site = Site.find_for_request(info.context)
-            return resolve_queryset(
-                WagtailPage.objects.in_site(site).live().public().specific(),
-                info,
-                **kwargs
-            )
+            pages = WagtailPage.objects.live().public().specific()
+
+            if kwargs.get("in_site", False):
+                site = Site.find_for_request(info.context)
+                pages = pages.in_site(site)
+
+            return resolve_queryset(pages, info, **kwargs)
 
         # Return a specific page, identified by ID or Slug.
         def resolve_page(self, info, **kwargs):
@@ -215,7 +220,9 @@ def PagesQuery():
                 slug=kwargs.get("slug"),
                 token=kwargs.get("token"),
                 content_type=kwargs.get("content_type"),
-                site=Site.find_for_request(info.context),
+                site=Site.find_for_request(info.context)
+                if kwargs.get("in_site", False)
+                else None,
             )
 
     return Mixin

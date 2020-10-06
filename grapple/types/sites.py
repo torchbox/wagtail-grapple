@@ -8,7 +8,7 @@ from .pages import PageInterface, get_specific_page
 from .structures import QuerySetList
 
 
-class SiteType(DjangoObjectType):
+class SiteObjectType(DjangoObjectType):
     pages = QuerySetList(
         graphene.NonNull(lambda: PageInterface), enable_search=True, required=True
     )
@@ -41,17 +41,17 @@ class SiteType(DjangoObjectType):
 def SitesQuery():
     class Mixin:
         site = graphene.Field(
-            SiteType, hostname=graphene.String(), id=graphene.String()
+            SiteObjectType, hostname=graphene.String(), id=graphene.ID()
         )
         sites = QuerySetList(
-            graphene.NonNull(SiteType), enable_search=True, required=True
+            graphene.NonNull(SiteObjectType), enable_search=True, required=True
         )
 
         # Return all sites.
         def resolve_sites(self, info, **kwargs):
             return resolve_queryset(Site.objects.all(), info, **kwargs)
 
-        # Return all sites, identified by ID or hostname.
+        # Return a site, identified by ID or hostname.
         def resolve_site(self, info, **kwargs):
             id, hostname = kwargs.get("id"), kwargs.get("hostname")
 

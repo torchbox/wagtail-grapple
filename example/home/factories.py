@@ -114,6 +114,9 @@ class BlogPageFactory(wagtail_factories.PageFactory):
             person = PersonFactory.create()
             # Create Blog Authors
             AuthorFactory.create_batch(8, page=self, person=person)
+            # Create Blog tags
+            for tag in ["Tag 1", "Tag 2", "Tag 3"]:
+                self.tags.add(tag)
 
 
 class AuthorPageFactory(wagtail_factories.PageFactory):

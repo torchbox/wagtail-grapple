@@ -1,6 +1,9 @@
 import graphene
 from django.db import models
 from modelcluster.fields import ParentalKey
+from modelcluster.contrib.taggit import ClusterTaggableManager
+
+from taggit.models import TaggedItemBase
 
 from wagtail.core.models import Page, Orderable
 from wagtail.core.fields import StreamField
@@ -31,6 +34,7 @@ from grapple.models import (
     GraphQLMedia,
     GraphQLCollection,
     GraphQLPage,
+    GraphQLTag,
 )
 
 from home.blocks import StreamFieldBlock
@@ -46,6 +50,12 @@ class AuthorPage(Page):
     content_panels = Page.content_panels + [FieldPanel("name")]
 
     graphql_fields = [GraphQLString("name")]
+
+
+class BlogPageTag(TaggedItemBase):
+    content_object = ParentalKey(
+        "BlogPage", related_name="tagged_items", on_delete=models.CASCADE
+    )
 
 
 @register_singular_query_field("first_post")
@@ -84,11 +94,13 @@ class BlogPage(HeadlessPreviewMixin, Page):
         AuthorPage, null=True, blank=True, on_delete=models.SET_NULL, related_name="+"
     )
     body = StreamField(StreamFieldBlock())
+    tags = ClusterTaggableManager(through=BlogPageTag, blank=True)
 
     content_panels = Page.content_panels + [
         FieldPanel("date"),
         ImageChooserPanel("cover"),
         StreamFieldPanel("body"),
+        FieldPanel("tags"),
         InlinePanel("related_links", label="Related links"),
         InlinePanel("authors", label="Authors"),
         FieldPanel("author"),
@@ -108,6 +120,7 @@ class BlogPage(HeadlessPreviewMixin, Page):
         GraphQLString("heading"),
         GraphQLString("date", required=True),
         GraphQLStreamfield("body"),
+        GraphQLTag("tags"),
         GraphQLCollection(
             GraphQLForeignKey,
             "related_links",

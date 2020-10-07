@@ -200,3 +200,14 @@ def GraphQLEmbed(field_name: str):
         return GraphQLField(field_name, EmbedBlock)
 
     return Mixin
+
+
+def GraphQLTag(field_name: str, **kwargs):
+    def Mixin():
+        from .types.tags import TagObjectType
+
+        if "is_list" not in kwargs:
+            kwargs["is_list"] = True
+        return GraphQLField(field_name, TagObjectType, **kwargs)
+
+    return Mixin

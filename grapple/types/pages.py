@@ -80,7 +80,7 @@ class PageInterface(graphene.Interface):
         Docs: https://docs.wagtail.io/en/stable/reference/pages/model_reference.html#wagtail.core.models.Page.get_parent
         """
         try:
-            return resolve_queryset(self.get_parent().specific, info, **kwargs)
+            return self.get_parent().specific
         except GraphQLLocatedError:
             return WagtailPage.objects.none()
 

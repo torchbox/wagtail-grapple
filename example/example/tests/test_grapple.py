@@ -23,6 +23,11 @@ from wagtail.images import get_image_model
 
 from grapple.schema import create_schema
 
+
+from home.factories import BlogPageFactory
+from home.models import HomePage
+
+
 SCHEMA = locate(settings.GRAPHENE["SCHEMA"])
 
 
@@ -40,6 +45,7 @@ class PagesTest(BaseGrappleTest):
         query = """
         {
             pages {
+                id
                 title
                 contentType
                 pageType
@@ -85,6 +91,29 @@ class PagesTest(BaseGrappleTest):
         pages = Page.objects.in_site(site)
 
         self.assertEquals(len(executed["data"]["pages"]), pages.count())
+
+    def test_page(self):
+        query = """
+        query($id: Int) {
+            page(id: $id) {
+                contentType
+                parent {
+                    contentType
+                }
+            }
+        }
+        """
+
+        blog_page = BlogPageFactory(parent=HomePage.objects.first())
+
+        executed = self.client.execute(query, variables={"id": blog_page.id})
+
+        self.assertEquals(type(executed["data"]), dict_type)
+        self.assertEquals(type(executed["data"]["page"]), dict_type)
+
+        page_data = executed["data"]["page"]
+        self.assertEquals(page_data["contentType"], "home.BlogPage")
+        self.assertEquals(page_data["parent"]["contentType"], "home.HomePage")
 
 
 class SitesTest(TestCase):

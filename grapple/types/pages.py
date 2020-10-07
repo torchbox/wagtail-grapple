@@ -2,7 +2,7 @@ import graphene
 from django.contrib.contenttypes.models import ContentType
 from django.dispatch import receiver
 
-from wagtail.core.models import Page as WagtailPage
+from wagtail.core.models import Page as WagtailPage, Site
 from wagtail_headless_preview.signals import preview_update
 from graphene_django.types import DjangoObjectType
 from graphql.error import GraphQLLocatedError
@@ -150,16 +150,21 @@ class Page(DjangoObjectType):
         interfaces = (PageInterface,)
 
 
-def get_specific_page(id, slug, token, content_type=None):
+def get_specific_page(id, slug, token, content_type=None, site=None):
     """
     Get a specific page, given a page_id, slug or preview if a preview token is passed
     """
     page = None
     try:
+        qs = WagtailPage.objects.live().public().specific()
+
+        if site:
+            qs = qs.in_site(site)
+
         if id:
-            page = WagtailPage.objects.live().public().specific().get(pk=id)
+            page = qs.get(pk=id)
         elif slug:
-            page = WagtailPage.objects.live().public().specific().get(slug=slug)
+            page = qs.get(slug=slug)
 
         if token:
             if page:
@@ -184,7 +189,10 @@ def PagesQuery():
 
     class Mixin:
         pages = QuerySetList(
-            graphene.NonNull(lambda: PageInterface), enable_search=True, required=True
+            graphene.NonNull(lambda: PageInterface),
+            in_site=graphene.Boolean(),
+            enable_search=True,
+            required=True,
         )
         page = graphene.Field(
             PageInterface,
@@ -192,13 +200,18 @@ def PagesQuery():
             slug=graphene.String(),
             token=graphene.String(),
             content_type=graphene.String(),
+            in_site=graphene.Boolean(),
         )
 
-        # Return all pages, ideally specific.
+        # Return all pages in site, ideally specific.
         def resolve_pages(self, info, **kwargs):
-            return resolve_queryset(
-                WagtailPage.objects.live().public().specific(), info, **kwargs
-            )
+            pages = WagtailPage.objects.live().public().specific()
+
+            if kwargs.get("in_site", False):
+                site = Site.find_for_request(info.context)
+                pages = pages.in_site(site)
+
+            return resolve_queryset(pages, info, **kwargs)
 
         # Return a specific page, identified by ID or Slug.
         def resolve_page(self, info, **kwargs):
@@ -207,6 +220,9 @@ def PagesQuery():
                 slug=kwargs.get("slug"),
                 token=kwargs.get("token"),
                 content_type=kwargs.get("content_type"),
+                site=Site.find_for_request(info.context)
+                if kwargs.get("in_site", False)
+                else None,
             )
 
     return Mixin

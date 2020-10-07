@@ -13,7 +13,7 @@ PageInterface
 ^^^^^^^^^^^^^
 
 One of the things you'll do most when using Grapple is querying pages and to
-do that you'll have to use the ``PageInterface``. This is accessible though
+do that you'll have to use the ``PageInterface``. This is accessible through
 the ``pages`` or ``page`` field on the root query type.
 
 
@@ -70,6 +70,7 @@ accepts the following arguments:
     offset: PositiveInt
     order: String
     searchQuery: String
+    inSite: Boolean
 
 
 The singular ``page`` field accepts the following arguments:
@@ -80,6 +81,7 @@ The singular ``page`` field accepts the following arguments:
     slug: String                  # Can be used on it's own
     contentType: String           # Can be used on it's own
     token: String                 # Must be used with one of the others
+    inSite: Boolean               # Can be used on it's own
 
 
 
@@ -220,6 +222,57 @@ You can also query a setting by model name:
                 facebook
                 instagram
                 youtube
+            }
+        }
+    }
+
+
+SiteObjectType
+^^^^^^^^^^^^^^
+
+Field type based on the Wagtail's ``Site`` model. This is accessible through
+the ``sites`` or ``site`` field on the root query type. Available fields for the
+``SiteObjectType`` are:
+
+::
+
+    id: ID
+    port: Int
+    siteName: String
+    hostname: String
+    isDefaultSite: Boolean
+    rootPage: PageInterface
+    page(id: Int, slug: String, contentType: String, token: String): PageInterface
+    pages(limit: PositiveInt, offset: PositiveInt, order: String, searchQuery: String, id: ID): [PageInterface]
+
+
+The plural ``sites`` field is queryable like so:
+
+::
+
+    {
+        sites {
+            port
+            hostname
+        }
+    }
+
+The singular ``site`` field accepts the following arguments:
+
+::
+
+    # Either the `id` or `hostName` must be provided.
+    id: ID
+    hostName: String
+
+and is queryable like so:
+
+::
+
+    {
+        site(hostName: "my.domain") {
+            pages {
+                title
             }
         }
     }

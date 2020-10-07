@@ -26,6 +26,7 @@ def create_schema():
     from .types.pages import PagesQuery, has_channels
     from .types.search import SearchQuery
     from .types.settings import SettingsQuery
+    from .types.sites import SitesQuery
     from .types.snippets import SnippetsQuery
     from .types.redirects import RedirectsQuery
     from .types.tags import TagsQuery
@@ -33,6 +34,7 @@ def create_schema():
     query_kwargs = [
         graphene.ObjectType,
         PagesQuery(),
+        SitesQuery(),
         ImagesQuery(),
         DocumentsQuery(),
         SnippetsQuery(),

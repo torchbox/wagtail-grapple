@@ -23,7 +23,6 @@ def create_schema():
     from .registry import registry
     from .types.documents import DocumentsQuery
     from .types.images import ImagesQuery
-    from .types.media import MediaQuery
     from .types.pages import PagesQuery, has_channels
     from .types.search import SearchQuery
     from .types.settings import SettingsQuery
@@ -31,19 +30,28 @@ def create_schema():
     from .types.redirects import RedirectsQuery
     from .types.tags import TagsQuery
 
-    class Query(
+    query_kwargs = [
         graphene.ObjectType,
         PagesQuery(),
         ImagesQuery(),
         DocumentsQuery(),
-        MediaQuery(),
         SnippetsQuery(),
         SettingsQuery(),
         SearchQuery(),
         RedirectsQuery,
         TagsQuery(),
-        *registry.schema,
-    ):
+    ]
+
+    try:
+        from .types.media import MediaQuery
+
+        query_kwargs.append(MediaQuery())
+    except ModuleNotFoundError:
+        pass
+
+    query_kwargs += registry.schema
+
+    class Query(*query_kwargs,):
         pass
 
     if has_channels:
@@ -52,9 +60,12 @@ def create_schema():
         class Subscription(PagesSubscription(), graphene.ObjectType):
             pass
 
+    else:
+        Subscription = None
+
     return graphene.Schema(
         query=Query,
-        subscription=Subscription if has_channels else None,
+        subscription=Subscription,
         types=list(registry.models.values()),
         auto_camelcase=getattr(settings, "GRAPPLE_AUTO_CAMELCASE", True),
     )

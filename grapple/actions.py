@@ -9,7 +9,6 @@ from django.conf import settings
 from django.template.loader import render_to_string
 
 from graphene_django.types import DjangoObjectType
-from wagtailmedia.models import AbstractMedia
 
 from wagtail.contrib.settings.models import BaseSetting
 from wagtail.core.models import Page as WagtailPage
@@ -23,10 +22,29 @@ from wagtail.snippets.models import get_snippet_models
 from .registry import registry
 from .types.documents import DocumentObjectType
 from .types.images import ImageObjectType
-from .types.media import MediaObjectType
 from .types.pages import PageInterface, Page
 from .types.streamfield import generate_streamfield_union
 from .helpers import streamfield_types
+
+try:
+    from wagtailmedia.models import AbstractMedia
+    from .types.media import MediaObjectType
+
+    has_wagtail_media = True
+except ModuleNotFoundError:
+    # TODO: find a better way to have this as an optional dependency
+    class AbstractMedia:
+        def __init__(self):
+            pass
+
+        def __add__(self, other):
+            pass
+
+        def __name__(self):
+            pass
+
+    MediaObjectType = None
+    has_wagtail_media = False
 
 
 def import_apps():
@@ -95,7 +113,7 @@ def register_model(cls: type, type_prefix: str):
             register_image_model(cls, type_prefix)
         elif issubclass(cls, AbstractRendition):
             register_image_model(cls, type_prefix)
-        elif issubclass(cls, AbstractMedia):
+        elif has_wagtail_media and issubclass(cls, AbstractMedia):
             register_media_model(cls, AbstractMedia)
         elif issubclass(cls, BaseSetting):
             register_settings_model(cls, type_prefix)

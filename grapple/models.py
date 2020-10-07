@@ -202,7 +202,7 @@ def GraphQLEmbed(field_name: str):
     return Mixin
 
 
-def GraphQLTags(field_name: str, **kwargs):
+def GraphQLTag(field_name: str, **kwargs):
     def Mixin():
         from .types.tags import TagObjectType
 

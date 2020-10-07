@@ -466,13 +466,13 @@ GraphQLPage
             layers deep and Grapple will handle the querying for you through multiple models.
 
 
-GraphQLTags
+GraphQLTag
 -----------
 
 .. module:: grapple.models
-.. class:: GraphQLTags(field_name: str, **kwargs)
+.. class:: GraphQLTag(field_name: str, **kwargs)
 
-    Use this field type to serialize a ClusterTaggableManager.
+    Use this field type to serialize a ``ClusterTaggableManager`` field.
 
 
     .. attribute:: field_name (str)

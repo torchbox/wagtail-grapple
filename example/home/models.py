@@ -34,7 +34,7 @@ from grapple.models import (
     GraphQLMedia,
     GraphQLCollection,
     GraphQLPage,
-    GraphQLTags,
+    GraphQLTag,
 )
 
 from home.blocks import StreamFieldBlock
@@ -120,7 +120,7 @@ class BlogPage(HeadlessPreviewMixin, Page):
         GraphQLString("heading"),
         GraphQLString("date", required=True),
         GraphQLStreamfield("body"),
-        GraphQLTags("tags"),
+        GraphQLTag("tags"),
         GraphQLCollection(
             GraphQLForeignKey,
             "related_links",

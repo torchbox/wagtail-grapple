@@ -70,6 +70,7 @@ class ImageObjectType(DjangoObjectType, BaseImageObjectType):
         format=graphene.String(),
         bgcolor=graphene.String(),
         jpegquality=graphene.Int(),
+        webpquality=graphene.Int(),
     )
     src_set = graphene.String(sizes=graphene.List(graphene.Int))
 

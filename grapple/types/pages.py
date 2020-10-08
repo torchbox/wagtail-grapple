@@ -89,7 +89,9 @@ class PageInterface(graphene.Interface):
         Resolves a list of live children of this page.
         Docs: https://docs.wagtail.io/en/stable/reference/pages/queryset_reference.html#examples
         """
-        return resolve_queryset(self.get_children().live().public().specific(), info, **kwargs)
+        return resolve_queryset(
+            self.get_children().live().public().specific(), info, **kwargs
+        )
 
     def resolve_siblings(self, info, **kwargs):
         """
@@ -97,7 +99,9 @@ class PageInterface(graphene.Interface):
         Docs: https://docs.wagtail.io/en/stable/reference/pages/queryset_reference.html?highlight=get_siblings#wagtail.core.query.PageQuerySet.sibling_of
         """
         return resolve_queryset(
-            self.get_siblings().exclude(pk=self.pk).live().public().specific(), info, **kwargs
+            self.get_siblings().exclude(pk=self.pk).live().public().specific(),
+            info,
+            **kwargs
         )
 
     def resolve_next_siblings(self, info, **kwargs):
@@ -106,7 +110,9 @@ class PageInterface(graphene.Interface):
         Source: https://github.com/wagtail/wagtail/blob/master/wagtail/core/models.py#L1384
         """
         return resolve_queryset(
-            self.get_next_siblings().exclude(pk=self.pk).live().public().specific(), info, **kwargs
+            self.get_next_siblings().exclude(pk=self.pk).live().public().specific(),
+            info,
+            **kwargs
         )
 
     def resolve_previous_siblings(self, info, **kwargs):
@@ -115,7 +121,9 @@ class PageInterface(graphene.Interface):
         Source: https://github.com/wagtail/wagtail/blob/master/wagtail/core/models.py#L1387
         """
         return resolve_queryset(
-            self.get_prev_siblings().exclude(pk=self.pk).live().public().specific(), info, **kwargs
+            self.get_prev_siblings().exclude(pk=self.pk).live().public().specific(),
+            info,
+            **kwargs
         )
 
     def resolve_descendants(self, info, **kwargs):
@@ -123,14 +131,18 @@ class PageInterface(graphene.Interface):
         Resolves a list of nodes pointing to the current page’s descendants.
         Docs: https://docs.wagtail.io/en/stable/reference/pages/model_reference.html#wagtail.core.models.Page.get_descendants
         """
-        return resolve_queryset(self.get_descendants().live().public().specific(), info, **kwargs)
+        return resolve_queryset(
+            self.get_descendants().live().public().specific(), info, **kwargs
+        )
 
     def resolve_ancestors(self, info, **kwargs):
         """
         Resolves a list of nodes pointing to the current page’s ancestors.
         Docs: https://docs.wagtail.io/en/stable/reference/pages/model_reference.html#wagtail.core.models.Page.get_ancestors
         """
-        return resolve_queryset(self.get_ancestors().live().public().specific(), info, **kwargs)
+        return resolve_queryset(
+            self.get_ancestors().live().public().specific(), info, **kwargs
+        )
 
     def resolve_seo_title(self, info):
         """

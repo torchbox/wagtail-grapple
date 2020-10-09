@@ -131,12 +131,21 @@ def ImagesQuery():
     mdl_type = get_image_type()
 
     class Mixin:
+        image = graphene.Field(mdl_type, id=graphene.ID())
         images = QuerySetList(
             graphene.NonNull(mdl_type), enable_search=True, required=True
         )
         image_type = graphene.String(required=True)
 
-        # Return all pages, ideally specific.
+        # Return one image.
+        def resolve_image(self, info, **kwargs):
+            id = kwargs.get("id")
+            try:
+                return mdl.objects.get(pk=id)
+            except BaseException:
+                return None
+
+        # Return all images.
         def resolve_images(self, info, **kwargs):
             return resolve_queryset(mdl.objects.all(), info, **kwargs)
 

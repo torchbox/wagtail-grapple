@@ -13,6 +13,7 @@ from .structures import QuerySetList
 
 
 class BaseImageObjectType(graphene.ObjectType):
+    id = graphene.ID(required=True)
     width = graphene.Int(required=True)
     height = graphene.Int(required=True)
     src = graphene.String(required=True, deprecation_reason="Use the `url` attribute")
@@ -20,13 +21,13 @@ class BaseImageObjectType(graphene.ObjectType):
     aspect_ratio = graphene.Float(required=True)
     sizes = graphene.String(required=True)
 
-    def resolve_url(self, info):
+    def resolve_url(self, info, **kwargs):
         """
         Get the uploaded image url.
         """
         return get_media_item_url(self)
 
-    def resolve_src(self, info):
+    def resolve_src(self, info, **kwargs):
         """
         Deprecated. Use the `url` attribute.
         """
@@ -38,14 +39,11 @@ class BaseImageObjectType(graphene.ObjectType):
         """
         return self.width / self.height
 
-    def resolve_sizes(self, info):
+    def resolve_sizes(self, info, **kwargs):
         return "(max-width: {}px) 100vw, {}px".format(self.width, self.width)
 
 
 class ImageRenditionObjectType(DjangoObjectType, BaseImageObjectType):
-    id = graphene.ID(required=True)
-    url = graphene.String(required=True)
-
     class Meta:
         model = WagtailImageRendition
 
@@ -138,8 +136,7 @@ def ImagesQuery():
         image_type = graphene.String(required=True)
 
         # Return one image.
-        def resolve_image(self, info, **kwargs):
-            id = kwargs.get("id")
+        def resolve_image(self, info, id, **kwargs):
             try:
                 return mdl.objects.get(pk=id)
             except BaseException:

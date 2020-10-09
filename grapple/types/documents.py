@@ -33,7 +33,7 @@ class DocumentObjectType(DjangoObjectType):
     file_hash = graphene.String()
     url = graphene.String(required=True)
 
-    def resolve_url(self, info):
+    def resolve_url(self, info, **kwargs):
         """
         Get document file url.
         """
@@ -52,8 +52,7 @@ def DocumentsQuery():
         )
 
         # Return one document.
-        def resolve_document(self, info, **kwargs):
-            id = kwargs.get("id")
+        def resolve_document(self, info, id, **kwargs):
             try:
                 return mdl.objects.get(pk=id)
             except BaseException:

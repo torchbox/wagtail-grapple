@@ -6,7 +6,6 @@ from wagtail.core.models import Page as WagtailPage, Site
 from wagtail_headless_preview.signals import preview_update
 from graphene_django.types import DjangoObjectType
 from graphql.error import GraphQLLocatedError
-from graphql.execution.base import ResolveInfo
 
 try:
     from channels.routing import route_class
@@ -54,7 +53,7 @@ class PageInterface(graphene.Interface):
     )
 
     @classmethod
-    def resolve_type(cls, instance, info: ResolveInfo):
+    def resolve_type(cls, instance, info, **kwargs):
         """
         If model has a custom Graphene Node type in registry then use it,
         otherwise use base page type.
@@ -65,7 +64,7 @@ class PageInterface(graphene.Interface):
         else:
             return Page
 
-    def resolve_content_type(self, info: ResolveInfo):
+    def resolve_content_type(self, info, **kwargs):
         self.content_type = ContentType.objects.get_for_model(self)
         return (
             self.content_type.app_label + "." + self.content_type.model_class().__name__
@@ -144,7 +143,7 @@ class PageInterface(graphene.Interface):
             self.get_ancestors().live().public().specific(), info, **kwargs
         )
 
-    def resolve_seo_title(self, info):
+    def resolve_seo_title(self, info, **kwargs):
         """
         Get page's SEO title. Fallback to a normal page's title if absent.
         """

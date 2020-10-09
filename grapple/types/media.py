@@ -16,7 +16,7 @@ class MediaObjectType(DjangoObjectType):
 
     url = graphene.String(required=True)
 
-    def resolve_url(self, info):
+    def resolve_url(self, info, **kwargs):
         """
         Get Media file url.
         """

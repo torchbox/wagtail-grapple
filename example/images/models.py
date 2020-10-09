@@ -8,10 +8,10 @@ from grapple.models import GraphQLString, GraphQLInt, GraphQLImage
 class CustomImage(AbstractImage):
     admin_form_fields = Image.admin_form_fields
 
-    def custom_image_property(self):
+    def custom_image_property(self, info, **kwargs):
         return "Image Model!"
 
-    graphql_fields = (GraphQLString("custom_image_property"),)
+    graphql_fields = (GraphQLString("custom_image_property", required=True),)
 
 
 class CustomImageRendition(AbstractRendition):
@@ -22,15 +22,15 @@ class CustomImageRendition(AbstractRendition):
     class Meta:
         unique_together = (("image", "filter_spec", "focal_point_key"),)
 
-    def custom_rendition_property(self):
+    def custom_rendition_property(self, info, **kwargs):
         return "Rendition Model!"
 
     graphql_fields = (
-        GraphQLString("custom_rendition_property"),
-        GraphQLInt("id"),
-        GraphQLString("url"),
-        GraphQLString("width"),
-        GraphQLString("height"),
-        GraphQLImage("image"),
-        GraphQLString("file"),
+        GraphQLString("custom_rendition_property", required=True),
+        GraphQLInt("id", required=True),
+        GraphQLString("url", required=True),
+        GraphQLString("width", required=True),
+        GraphQLString("height", required=True),
+        GraphQLImage("image", required=True),
+        GraphQLString("file", required=True),
     )

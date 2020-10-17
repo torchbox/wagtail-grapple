@@ -18,10 +18,10 @@ class TagObjectType(graphene.ObjectType):
     tag_id = graphene.ID(name="id", required=True)
     name = graphene.String(required=True)
 
-    def resolve_tag_id(self, info):
+    def resolve_tag_id(self, info, **kwargs):
         return self.id
 
-    def resolve_name(self, info):
+    def resolve_name(self, info, **kwargs):
         return self.name
 
 
@@ -32,7 +32,7 @@ def TagsQuery():
             graphene.NonNull(TagObjectType), required=True, enable_search=False
         )
 
-        def resolve_tag(self, info, id):
+        def resolve_tag(self, info, id, **kwargs):
             try:
                 return Tag.objects.get(pk=id)
             except BaseException:

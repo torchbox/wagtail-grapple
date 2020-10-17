@@ -283,7 +283,7 @@ class RichTextBlock(graphene.ObjectType):
     class Meta:
         interfaces = (StreamFieldInterface,)
 
-    def resolve_value(self, value):
+    def resolve_value(self, info, **kwargs):
         # Allow custom markup for RichText
         return render_to_string(
             "wagtailcore/richtext.html", {"html": expand_db_html(self.value.source)}

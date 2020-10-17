@@ -130,6 +130,7 @@ need for Gatsby Image features to work (see Handy Fragments page for more info):
         format: String
         bgcolor: String
         jpegquality: Int
+        webpquality: Int
     ): ImageRenditionObjectType
 
 

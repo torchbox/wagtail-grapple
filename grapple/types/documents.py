@@ -33,7 +33,7 @@ class DocumentObjectType(DjangoObjectType):
     file_hash = graphene.String()
     url = graphene.String(required=True)
 
-    def resolve_url(self, info):
+    def resolve_url(self, info, **kwargs):
         """
         Get document file url.
         """
@@ -46,11 +46,19 @@ def DocumentsQuery():
     model_type = registry.documents[mdl]
 
     class Mixin:
+        document = graphene.Field(model_type, id=graphene.ID())
         documents = QuerySetList(
             graphene.NonNull(model_type), enable_search=True, required=True
         )
 
-        # Return all pages, ideally specific.
+        # Return one document.
+        def resolve_document(self, info, id, **kwargs):
+            try:
+                return mdl.objects.get(pk=id)
+            except BaseException:
+                return None
+
+        # Return all documents.
         def resolve_documents(self, info, **kwargs):
             return resolve_queryset(mdl.objects.all(), info, **kwargs)
 

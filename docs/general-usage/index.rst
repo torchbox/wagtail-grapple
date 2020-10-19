@@ -8,3 +8,4 @@ General Usage
     graphql-types
     preview
     decorators
+    hooks

@@ -1,6 +1,11 @@
 import graphene
+
 from django.conf import settings
 from graphql.validation.rules import NoUnusedFragments, specified_rules
+from wagtail.core import hooks
+
+from .registry import registry
+
 
 # HACK: Remove NoUnusedFragments validator
 # Due to the way previews work on the frontend, we need to pass all
@@ -11,7 +16,6 @@ from graphql.validation.rules import NoUnusedFragments, specified_rules
 
 # We need to update specified_rules in-place so the change appears
 # everywhere it's been imported
-
 specified_rules[:] = [rule for rule in specified_rules if rule is not NoUnusedFragments]
 
 
@@ -20,40 +24,18 @@ def create_schema():
     Root schema object that graphene is pointed at.
     It inherits its queries from each of the specific type mixins.
     """
-    from .registry import registry
-    from .types.documents import DocumentsQuery
-    from .types.images import ImagesQuery
-    from .types.pages import PagesQuery, has_channels
-    from .types.search import SearchQuery
-    from .types.settings import SettingsQuery
-    from .types.sites import SitesQuery
-    from .types.snippets import SnippetsQuery
-    from .types.redirects import RedirectsQuery
-    from .types.tags import TagsQuery
 
-    query_kwargs = [
-        graphene.ObjectType,
-        PagesQuery(),
-        SitesQuery(),
-        ImagesQuery(),
-        DocumentsQuery(),
-        SnippetsQuery(),
-        SettingsQuery(),
-        SearchQuery(),
-        RedirectsQuery,
-        TagsQuery(),
-    ]
+    from .types.pages import has_channels
 
-    try:
-        from .types.media import MediaQuery
+    query_mixins = []
+    for fn in hooks.get_hooks("register_schema_query"):
+        fn(query_mixins)
 
-        query_kwargs.append(MediaQuery())
-    except ModuleNotFoundError:
-        pass
+    # ensure graphene.ObjectType is always present
+    if graphene.ObjectType not in query_mixins:
+        query_mixins.append(graphene.ObjectType)
 
-    query_kwargs += registry.schema
-
-    class Query(*query_kwargs,):
+    class Query(*query_mixins):
         pass
 
     if has_channels:

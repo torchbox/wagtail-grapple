@@ -106,7 +106,7 @@ def GraphQLStreamfield(field_name: str, **kwargs):
 
 def GraphQLImage(field_name: str, **kwargs):
     def Mixin():
-        from .types.images import get_image_type, ImageObjectType
+        from .types.images import get_image_type
 
         return GraphQLField(field_name, get_image_type, **kwargs)
 

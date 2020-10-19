@@ -58,11 +58,7 @@ class PageInterface(graphene.Interface):
         If model has a custom Graphene Node type in registry then use it,
         otherwise use base page type.
         """
-        mdl = type(instance)
-        if mdl in registry.pages:
-            return registry.pages[mdl]
-        else:
-            return Page
+        return registry.pages.get(type(instance), Page)
 
     def resolve_content_type(self, info, **kwargs):
         self.content_type = ContentType.objects.get_for_model(self)
@@ -71,7 +67,7 @@ class PageInterface(graphene.Interface):
         )
 
     def resolve_page_type(self, info, **kwargs):
-        return PageInterface.resolve_type(self.specific, info)
+        return PageInterface.resolve_type(self.specific, info, **kwargs)
 
     def resolve_parent(self, info, **kwargs):
         """

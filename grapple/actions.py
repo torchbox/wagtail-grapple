@@ -220,12 +220,16 @@ def build_node_type(
     type_name = type_prefix + cls.__name__
 
     # Create a temporary model and temporary node that will be replaced later on.
-    class StubModel(models.Model):
-        class Meta:
-            managed = False
+    class UnmanagedMeta:
+        app_label = type_name
+        managed = False
+
+    stub_model = type(
+        type_name, (models.Model,), {"__module__": "", "Meta": UnmanagedMeta}
+    )
 
     class StubMeta:
-        model = StubModel
+        model = stub_model
 
     type_meta = {
         "Meta": StubMeta,

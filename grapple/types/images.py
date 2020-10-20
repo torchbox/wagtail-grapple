@@ -21,7 +21,7 @@ class BaseImageObjectType(graphene.ObjectType):
     url = graphene.String(required=True)
     aspect_ratio = graphene.Float(required=True)
     sizes = graphene.String(required=True)
-    collection = graphene.Field(lambda: CollectionObjectType)
+    collection = graphene.Field(lambda: CollectionObjectType, required=True)
 
     def resolve_url(self, info, **kwargs):
         """

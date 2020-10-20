@@ -90,7 +90,8 @@ def add_app(app_label: str, prefix: str = ""):
 
     # Add snippet models to model collection.
     for snippet in get_snippet_models():
-        models.append(snippet)
+        if snippet._meta.app_label == app_label:
+            models.append(snippet)
 
     # Create add each model to correct section of registry.
     for model in models:

@@ -1,7 +1,8 @@
-from wagtail.core.models import Collection
-from wagtail.core import hooks
-from graphene_django.types import DjangoObjectType
 import graphene
+
+from graphene_django.types import DjangoObjectType 
+from wagtail.core.models import Collection
+
 from ..registry import registry
 from ..utils import resolve_queryset
 from .structures import QuerySetList

@@ -9,8 +9,8 @@ from wagtail.images.models import (
 
 from ..registry import registry
 from ..utils import resolve_queryset, get_media_item_url
-from .structures import QuerySetList
 from .collections import CollectionObjectType
+from .structures import QuerySetList
 
 
 class BaseImageObjectType(graphene.ObjectType):

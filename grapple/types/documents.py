@@ -12,6 +12,7 @@ else:
 
 from ..registry import registry
 from ..utils import get_media_item_url, resolve_queryset
+from .collections import CollectionObjectType
 from .structures import QuerySetList
 
 
@@ -32,6 +33,7 @@ class DocumentObjectType(DjangoObjectType):
     file_size = graphene.Int()
     file_hash = graphene.String()
     url = graphene.String(required=True)
+    collection = graphene.Field(lambda: CollectionObjectType, required=True)
 
     def resolve_url(self, info, **kwargs):
         """

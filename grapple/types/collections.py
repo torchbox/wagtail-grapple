@@ -1,6 +1,6 @@
 import graphene
 
-from graphene_django.types import DjangoObjectType 
+from graphene_django.types import DjangoObjectType
 from wagtail.core.models import Collection
 
 from ..registry import registry

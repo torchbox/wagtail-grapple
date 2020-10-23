@@ -2,6 +2,7 @@ from graphene import ObjectType
 from wagtail.core import hooks
 
 from .registry import registry
+from .types.collections import CollectionsQuery
 from .types.documents import DocumentsQuery
 from .types.images import ImagesQuery
 from .types.pages import PagesQuery
@@ -25,6 +26,7 @@ def register_schema_query(query_mixins):
         SettingsQuery(),
         SearchQuery(),
         TagsQuery(),
+        CollectionsQuery()
         RedirectsQuery,
     ]
 

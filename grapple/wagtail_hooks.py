@@ -26,7 +26,7 @@ def register_schema_query(query_mixins):
         SettingsQuery(),
         SearchQuery(),
         TagsQuery(),
-        CollectionsQuery()
+        CollectionsQuery(),
         RedirectsQuery,
     ]
 

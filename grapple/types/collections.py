@@ -36,7 +36,6 @@ def CollectionsQuery():
 
     class Mixin:
         collections = QuerySetList(mdl_type, enable_search=False, required=True)
-        collection_type = graphene.String(required=True)
 
         # Return all collections
         def resolve_collections(self, info, **kwargs):

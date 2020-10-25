@@ -10,6 +10,7 @@ class Registry:
     documents = RegistryItem()
     images = RegistryItem()
     media = RegistryItem()
+    collections = RegistryItem()
     snippets = RegistryItem()
     streamfield_blocks = RegistryItem()
     django_models = RegistryItem()
@@ -21,6 +22,7 @@ class Registry:
         "documents",
         "images",
         "media",
+        "collections",
         "snippets",
         "django_models",
         "settings",
@@ -35,6 +37,7 @@ class Registry:
         models.update(self.pages)
         models.update(self.documents)
         models.update(self.images)
+        models.update(self.collections)
         models.update(self.snippets)
         models.update(self.django_models)
         models.update(self.settings)
@@ -46,6 +49,7 @@ class Registry:
         models.update(self.pages)
         models.update(self.documents)
         models.update(self.images)
+        models.update(self.collections)
         models.update(self.snippets)
         models.update(self.streamfield_blocks)
         models.update(self.django_models)

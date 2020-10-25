@@ -9,6 +9,7 @@ from wagtail.images.models import (
 
 from ..registry import registry
 from ..utils import resolve_queryset, get_media_item_url
+from .collections import CollectionObjectType
 from .structures import QuerySetList
 
 
@@ -20,6 +21,7 @@ class BaseImageObjectType(graphene.ObjectType):
     url = graphene.String(required=True)
     aspect_ratio = graphene.Float(required=True)
     sizes = graphene.String(required=True)
+    collection = graphene.Field(lambda: CollectionObjectType, required=True)
 
     def resolve_url(self, info, **kwargs):
         """
@@ -131,20 +133,28 @@ def ImagesQuery():
     class Mixin:
         image = graphene.Field(mdl_type, id=graphene.ID())
         images = QuerySetList(
-            graphene.NonNull(mdl_type), enable_search=True, required=True
+            graphene.NonNull(mdl_type),
+            enable_search=True,
+            required=True,
+            collection=graphene.Argument(
+                graphene.ID, description="Filter by collection id"
+            ),
         )
         image_type = graphene.String(required=True)
 
-        # Return one image.
         def resolve_image(self, info, id, **kwargs):
+            """Returns an image given the id, if in a public collection"""
             try:
-                return mdl.objects.get(pk=id)
+                return mdl.objects.filter(
+                    collection__view_restrictions__isnull=True
+                ).get(pk=id)
             except BaseException:
                 return None
 
-        # Return all images.
         def resolve_images(self, info, **kwargs):
-            return resolve_queryset(mdl.objects.all(), info, **kwargs)
+            """Returns all images in a public collection"""
+            qs = mdl.objects.filter(collection__view_restrictions__isnull=True)
+            return resolve_queryset(qs, info, **kwargs)
 
         # Give name of the image type, used to generate mixins
         def resolve_image_type(self, info, **kwargs):

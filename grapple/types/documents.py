@@ -12,6 +12,7 @@ else:
 
 from ..registry import registry
 from ..utils import get_media_item_url, resolve_queryset
+from .collections import CollectionObjectType
 from .structures import QuerySetList
 
 
@@ -32,6 +33,7 @@ class DocumentObjectType(DjangoObjectType):
     file_size = graphene.Int()
     file_hash = graphene.String()
     url = graphene.String(required=True)
+    collection = graphene.Field(lambda: CollectionObjectType, required=True)
 
     def resolve_url(self, info, **kwargs):
         """
@@ -48,19 +50,27 @@ def DocumentsQuery():
     class Mixin:
         document = graphene.Field(model_type, id=graphene.ID())
         documents = QuerySetList(
-            graphene.NonNull(model_type), enable_search=True, required=True
+            graphene.NonNull(model_type),
+            enable_search=True,
+            required=True,
+            collection=graphene.Argument(
+                graphene.ID, description="Filter by collection id"
+            ),
         )
 
-        # Return one document.
         def resolve_document(self, info, id, **kwargs):
+            """Returns a document given the id, if in a public collection"""
             try:
-                return mdl.objects.get(pk=id)
+                return mdl.objects.filter(
+                    collection__view_restrictions__isnull=True
+                ).get(pk=id)
             except BaseException:
                 return None
 
-        # Return all documents.
         def resolve_documents(self, info, **kwargs):
-            return resolve_queryset(mdl.objects.all(), info, **kwargs)
+            """Returns all documents in a public collection"""
+            qs = mdl.objects.filter(collection__view_restrictions__isnull=True)
+            return resolve_queryset(qs, info, **kwargs)
 
     return Mixin
 

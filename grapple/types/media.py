@@ -28,18 +28,30 @@ class MediaObjectType(DjangoObjectType):
 def MediaQuery():
     registry.media[Media] = MediaObjectType
     mdl = get_media_model()
-    model_type = registry.media[mdl]
+    mdl_type = get_media_type()
 
     class Mixin:
+        media_item = graphene.Field(mdl_type, id=graphene.ID())
         media = QuerySetList(
-            graphene.NonNull(model_type), enable_search=True, required=True
+            graphene.NonNull(mdl_type), enable_search=True, required=True
         )
 
-        # Return all pages, ideally specific.
+        def resolve_media_item(self, info, id, **kwargs):
+            """Returns a media item given the id, if in a public collection"""
+            try:
+                return mdl.objects.filter(
+                    collection__view_restrictions__isnull=True
+                ).get(pk=id)
+            except BaseException:
+                return None
+
         def resolve_media(self, info, **kwargs):
             """Return only the items with no collection or in a public collection"""
             qs = mdl.objects.filter(collection__view_restrictions__isnull=True)
             return resolve_queryset(qs, info, **kwargs)
+
+        def resolve_media_type(self, info, **kwargs):
+            return mdl_type
 
     return Mixin
 

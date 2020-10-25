@@ -22,10 +22,12 @@ class CollectionObjectType(DjangoObjectType):
     ancestors = graphene.List(lambda: CollectionObjectType, required=True)
 
     def resolve_descendants(self, info, **kwargs):
-        return self.get_descendants()
+        # only return public descendant Collections
+        return self.get_descendants().filter(view_restrictions__isnull=True)
 
     def resolve_ancestors(self, info, **kwargs):
-        return self.get_ancestors()
+        # only return public descendant Collections
+        return self.get_ancestors().filter(view_restrictions__isnull=True)
 
 
 def CollectionsQuery():
@@ -38,7 +40,9 @@ def CollectionsQuery():
 
         # Return all collections
         def resolve_collections(self, info, **kwargs):
-            return resolve_queryset(mdl.objects.all(), info, **kwargs)
+            # Only return public Collections
+            qs = mdl.objects.filter(view_restrictions__isnull=True)
+            return resolve_queryset(qs, info, **kwargs)
 
         def resolve_collection_type(self, info, **kwargs):
             return mdl_type

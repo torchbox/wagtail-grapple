@@ -45,12 +45,12 @@ class DocumentObjectType(DjangoObjectType):
 def DocumentsQuery():
     registry.documents[WagtailDocument] = DocumentObjectType
     mdl = get_document_model()
-    model_type = registry.documents[mdl]
+    mdl_type = registry.documents[mdl]
 
     class Mixin:
-        document = graphene.Field(model_type, id=graphene.ID())
+        document = graphene.Field(mdl_type, id=graphene.ID())
         documents = QuerySetList(
-            graphene.NonNull(model_type),
+            graphene.NonNull(mdl_type),
             enable_search=True,
             required=True,
             collection=graphene.Argument(
@@ -71,6 +71,9 @@ def DocumentsQuery():
             """Returns all documents in a public collection"""
             qs = mdl.objects.filter(collection__view_restrictions__isnull=True)
             return resolve_queryset(qs, info, **kwargs)
+
+        def resolve_document_type(self, info, **kwargs):
+            return mdl_type
 
     return Mixin
 

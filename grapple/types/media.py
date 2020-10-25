@@ -37,7 +37,9 @@ def MediaQuery():
 
         # Return all pages, ideally specific.
         def resolve_media(self, info, **kwargs):
-            return resolve_queryset(mdl.objects.all(), info, **kwargs)
+            """Return only the items with no collection or in a public collection"""
+            qs = mdl.objects.filter(collection__view_restrictions__isnull=True)
+            return resolve_queryset(qs, info, **kwargs)
 
     return Mixin
 

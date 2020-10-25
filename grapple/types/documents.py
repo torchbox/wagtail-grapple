@@ -58,16 +58,19 @@ def DocumentsQuery():
             ),
         )
 
-        # Return one document.
         def resolve_document(self, info, id, **kwargs):
+            """Returns a document given the id, if in a public collection"""
             try:
-                return mdl.objects.get(pk=id)
+                return mdl.objects.filter(
+                    collection__view_restrictions__isnull=True
+                ).get(pk=id)
             except BaseException:
                 return None
 
-        # Return all documents.
         def resolve_documents(self, info, **kwargs):
-            return resolve_queryset(mdl.objects.all(), info, **kwargs)
+            """Returns all documents in a public collection"""
+            qs = mdl.objects.filter(collection__view_restrictions__isnull=True)
+            return resolve_queryset(qs, info, **kwargs)
 
     return Mixin
 

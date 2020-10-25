@@ -142,16 +142,19 @@ def ImagesQuery():
         )
         image_type = graphene.String(required=True)
 
-        # Return one image.
         def resolve_image(self, info, id, **kwargs):
+            """Returns an image given the id, if in a public collection"""
             try:
-                return mdl.objects.get(pk=id)
+                return mdl.objects.filter(
+                    collection__view_restrictions__isnull=True
+                ).get(pk=id)
             except BaseException:
                 return None
 
-        # Return all images.
         def resolve_images(self, info, **kwargs):
-            return resolve_queryset(mdl.objects.all(), info, **kwargs)
+            """Returns all images in a public collection"""
+            qs = mdl.objects.filter(collection__view_restrictions__isnull=True)
+            return resolve_queryset(qs, info, **kwargs)
 
         # Give name of the image type, used to generate mixins
         def resolve_image_type(self, info, **kwargs):

@@ -1,5 +1,5 @@
 Django>=2.2,<2.3
-wagtail>=2.5,<2.11
+wagtail>=2.5,<2.12
 graphene-django==2.7.1
 wagtailmedia
 graphql-core==2.2.1

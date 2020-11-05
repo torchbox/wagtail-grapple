@@ -197,7 +197,7 @@ Contributions are what make the open source community such an amazing place to b
 
 ### Local development
 
- - In the python environment of your choice, navigate to `/examples`
+ - In the python environment of your choice, navigate to `/example`
  - Run `pip install -r requirements.txt`
  - Delete the `db.sqlite3` file and run `./manage.py migrate`
  - Run server `./manage.py runserver`
@@ -208,7 +208,7 @@ Contributions are what make the open source community such an amazing place to b
 Wagtail Grapple supports:
 
 - Django 2.2.x, 3.0.x
-- Python 3.6, 3.7 and 3.8
+- Python 3.6, 3.7, 3.8 and 3.9
 - Wagtail >= 2.5, < 2.12
 
 ## License

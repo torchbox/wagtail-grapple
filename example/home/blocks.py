@@ -102,3 +102,4 @@ class StreamFieldBlock(blocks.StreamBlock):
     carousel = CarouselBlock()
     callout = CalloutBlock()
     text_and_buttons = TextAndButtonsBlock()
+    page = blocks.PageChooserBlock()

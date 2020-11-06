@@ -99,6 +99,7 @@ class BlogTest(BaseGrappleTest):
                         },
                     },
                 ),
+                ("page", BlogPageFactory()),
             ]
         )
 
@@ -427,6 +428,37 @@ class BlogTest(BaseGrappleTest):
                 return
 
         self.fail("VideoBlock type not instantiated in Streamfield")
+
+    def test_blog_body_pagechooserblock(self):
+        block_type = "PageChooserBlock"
+        block_query = """
+        page {
+            ... on BlogPage {
+                date
+                authors
+            }
+        }
+        """
+        query_blocks = self.get_blocks_from_body(block_type, block_query)
+
+        # Check output.
+        count = 0
+        for block in self.blog_page.body:
+            if type(block.block).__name__ != block_type:
+                continue
+
+            # Test the values
+            page_data = query_blocks[count]["page"]
+            page = block.value
+            self.assertEquals(page_data["date"], str(page.date))
+            self.assertEquals(
+                page_data["authors"],
+                list(page.authors.values_list("person__name", flat=True)),
+            )
+            # Increment the count
+            count += 1
+        # Check that we test all blocks that were returned.
+        self.assertEquals(len(query_blocks), count)
 
     # Next 2 tests are used to test the Collection API, both ForeignKey and nested field extraction.
     def test_blog_page_related_links(self):

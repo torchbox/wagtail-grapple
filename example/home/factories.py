@@ -41,6 +41,11 @@ class StreamBlockFactory(wagtail_factories.blocks.BlockFactory):
         model = blocks.StreamBlock
 
 
+class PageChooserBlockFactory(wagtail_factories.blocks.BlockFactory):
+    class Meta:
+        model = blocks.PageChooserBlock
+
+
 class ImageGalleryImageFactory(wagtail_factories.StructBlockFactory):
     image = factory.SubFactory(wagtail_factories.ImageChooserBlockFactory)
 
@@ -99,6 +104,7 @@ class BlogPageFactory(wagtail_factories.PageFactory):
             "date": DateBlockFactory,
             "datetime": DateTimeBlockFactory,
             "gallery": ImageGalleryBlockFactory,
+            "page": PageChooserBlockFactory,
         }
     )
 

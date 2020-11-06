@@ -444,7 +444,7 @@ def register_streamfield_blocks():
             interfaces = (StreamFieldInterface,)
 
         def resolve_page(self, info, **kwargs):
-            return self.value
+            return self.value.specific
 
     class DocumentChooserBlock(graphene.ObjectType):
         document = graphene.Field(get_document_type(), required=True)

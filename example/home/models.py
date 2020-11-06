@@ -117,7 +117,6 @@ class BlogPage(HeadlessPreviewMixin, Page):
         return resolve_paginated_queryset(self.authors, info, **kwargs)
 
     graphql_fields = [
-        GraphQLString("heading"),
         GraphQLString("date", required=True),
         GraphQLStreamfield("body"),
         GraphQLTag("tags"),

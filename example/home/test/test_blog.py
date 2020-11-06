@@ -99,7 +99,6 @@ class BlogTest(BaseGrappleTest):
                         },
                     },
                 ),
-                ("page", BlogPageFactory()),
             ]
         )
 
@@ -142,7 +141,7 @@ class BlogTest(BaseGrappleTest):
             isinstance(page["name"], str) and page["name"] == self.blog_page.author.name
         )
 
-    def get_blocks_from_body(self, block_type, block_query="rawValue"):
+    def get_blocks_from_body(self, block_type, block_query="rawValue", page_id=None):
         query = """
         {
             page(id:%s) {
@@ -157,7 +156,7 @@ class BlogTest(BaseGrappleTest):
             }
         }
         """ % (
-            self.blog_page.id,
+            page_id or self.blog_page.id,
             block_type,
             block_query,
         )
@@ -430,6 +429,7 @@ class BlogTest(BaseGrappleTest):
         self.fail("VideoBlock type not instantiated in Streamfield")
 
     def test_blog_body_pagechooserblock(self):
+        another_blog_post = BlogPageFactory(body=[("page", self.blog_page)])
         block_type = "PageChooserBlock"
         block_query = """
         page {
@@ -439,11 +439,13 @@ class BlogTest(BaseGrappleTest):
             }
         }
         """
-        query_blocks = self.get_blocks_from_body(block_type, block_query)
+        query_blocks = self.get_blocks_from_body(
+            block_type, block_query=block_query, page_id=another_blog_post.id
+        )
 
         # Check output.
         count = 0
-        for block in self.blog_page.body:
+        for block in another_blog_post.body:
             if type(block.block).__name__ != block_type:
                 continue
 

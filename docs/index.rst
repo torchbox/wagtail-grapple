@@ -50,7 +50,7 @@ Features
   * :doc:`general-usage/graphql-types`
   * :doc:`general-usage/preview`
   * :doc:`general-usage/decorators`
-
+  * :doc:`general-usage/usage-with-gatsby`
 
 Contents
 ^^^^^^^^

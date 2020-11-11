@@ -114,7 +114,7 @@ def register_model(cls: type, type_prefix: str):
         elif issubclass(cls, AbstractRendition):
             register_image_model(cls, type_prefix)
         elif has_wagtail_media and issubclass(cls, AbstractMedia):
-            register_media_model(cls, AbstractMedia)
+            register_media_model(cls, type_prefix)
         elif issubclass(cls, BaseSetting):
             register_settings_model(cls, type_prefix)
         elif cls in get_snippet_models():

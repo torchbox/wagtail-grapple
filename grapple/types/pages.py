@@ -6,7 +6,7 @@ from django.utils.translation import ugettext_lazy as _
 from wagtail.core.models import Page as WagtailPage, Site
 from wagtail_headless_preview.signals import preview_update
 from graphene_django.types import DjangoObjectType
-from graphql.error import GraphQLLocatedError
+from graphql.error import GraphQLError
 
 try:
     from channels.routing import route_class
@@ -85,7 +85,7 @@ class PageInterface(graphene.Interface):
         """
         try:
             return self.get_parent().specific
-        except GraphQLLocatedError:
+        except GraphQLError:
             return WagtailPage.objects.none()
 
     def resolve_children(self, info, **kwargs):

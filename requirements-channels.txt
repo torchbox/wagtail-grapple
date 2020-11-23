@@ -1,8 +1,8 @@
 Django>=2.2,<2.3
 wagtail>=2.5,<2.12
-graphene-django==2.7.1
+graphene-django==3.0.0b6
 wagtailmedia
-graphql-core==2.2.1
+graphql-core==3.1.2
 factory-boy==2.12.0
 wagtail-factories==2.0.0
 django-cors-headers==3.4.0

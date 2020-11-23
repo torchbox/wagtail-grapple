@@ -1,7 +1,7 @@
 import graphene
 
 from django.conf import settings
-from graphql.validation.rules import NoUnusedFragments, specified_rules
+from graphql.validation import NoUnusedFragments, specified_rules
 from wagtail.core import hooks
 
 from .registry import registry

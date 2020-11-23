@@ -16,7 +16,7 @@ from .registry import registry
 
 # We need to update specified_rules in-place so the change appears
 # everywhere it's been imported
-specified_rules[:] = [rule for rule in specified_rules if rule is not NoUnusedFragments]
+specified_rules[:] = [rule for rule in specified_rules if rule is not NoUnusedFragmentsRule]
 
 
 def create_schema():

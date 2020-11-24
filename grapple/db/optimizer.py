@@ -98,6 +98,10 @@ class QueryOptimizer:
         if isinstance(field, property):
             return
 
+        # Don't select method functions
+        if callable(field):
+            return
+
         if not getattr(field, "is_relation", False):
             if model:
                 # Cache selection for future optimization (query.py)

@@ -12,6 +12,14 @@ class Grapple(AppConfig):
         from .actions import import_apps, load_type_fields
         from .types.streamfield import register_streamfield_blocks
 
+        self.preload_tasks()
         import_apps()
         load_type_fields()
         register_streamfield_blocks()
+
+    def preload_tasks(self):
+        # Monkeypatch Wagtails' PageQueryset .specific method to a more optimized one
+        from wagtail.core.query import PageQuerySet
+        from .db.query import specific
+
+        PageQuerySet.specific = specific

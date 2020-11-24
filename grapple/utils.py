@@ -8,16 +8,17 @@ from wagtail.search.index import class_is_indexed
 from wagtail.search.models import Query
 from wagtail.search.backends import get_search_backend
 
+from .db.optimizer import QueryOptimizer
 from .types.structures import BasePaginatedType, PaginationType
 
 
 def resolve_queryset(
     qs,
     info,
+    id=None,
     limit=None,
     offset=None,
     search_query=None,
-    id=None,
     order=None,
     collection=None,
     **kwargs
@@ -43,9 +44,10 @@ def resolve_queryset(
     :type collection: int
     """
     offset = int(offset or 0)
+    qs = QueryOptimizer.query(qs, info)
 
     if id is not None:
-        qs = qs.filter(pk=id)
+        qs = qs.get(id=id)
     else:
         qs = qs.all()
 

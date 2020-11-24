@@ -16,6 +16,7 @@ except ImportError:
 
 from ..registry import registry
 from ..utils import resolve_queryset
+from ..db.optimizer import QueryOptimizer
 from .structures import QuerySetList
 
 
@@ -157,33 +158,40 @@ class Page(DjangoObjectType):
         interfaces = (PageInterface,)
 
 
-def get_specific_page(id, slug, token, content_type=None, site=None):
+def get_specific_page(id, slug, token, content_type=None, site=None, info=None):
     """
     Get a specific page, given a page_id, slug or preview if a preview token is passed
     """
     page = None
     try:
-        qs = WagtailPage.objects.live().public().specific()
+        # Generate queryset based on given key & Optimise query based on request AST
+        pages = WagtailPage.objects.live().public()
+        pages = QueryOptimizer.query(pages, info)
 
         if site:
-            qs = qs.in_site(site)
+            pages = pages.in_site(site)
 
         if id:
-            page = qs.get(pk=id)
+            page = pages.get(id=id)
         elif slug:
-            page = qs.get(slug=slug)
+            page = pages.get(slug=slug)
+
+        if page:
+            page = page.specific
 
         if token:
             if page:
                 page_type = type(page)
                 if hasattr(page_type, "get_page_from_preview_token"):
                     page = page_type.get_page_from_preview_token(token)
+
             elif content_type:
                 app_label, model = content_type.lower().split(".")
                 mdl = ContentType.objects.get(app_label=app_label, model=model)
                 cls = mdl.model_class()
                 if hasattr(cls, "get_page_from_preview_token"):
                     page = cls.get_page_from_preview_token(token)
+
     except BaseException:
         page = None
 
@@ -212,7 +220,7 @@ def PagesQuery():
 
         # Return all pages in site, ideally specific.
         def resolve_pages(self, info, **kwargs):
-            pages = WagtailPage.objects.live().public().specific()
+            pages = WagtailPage.objects.live().public().specific(defer=True)
 
             if kwargs.get("in_site", False):
                 site = Site.find_for_request(info.context)
@@ -230,6 +238,7 @@ def PagesQuery():
                 site=Site.find_for_request(info.context)
                 if kwargs.get("in_site", False)
                 else None,
+                info=info,
             )
 
     return Mixin
@@ -247,10 +256,14 @@ if has_channels:
 
     # Subscription Mixin
     def PagesSubscription():
-        def preview_observable(id, slug, token, content_type):
+        def preview_observable(id, slug, token, content_type, site, info):
             return preview_subject.filter(
                 lambda previewToken: previewToken == token
-            ).map(lambda token: get_specific_page(id, slug, token, content_type))
+            ).map(
+                lambda token: get_specific_page(
+                    id, slug, token, content_type, site, info
+                )
+            )
 
         class Mixin:
             page = graphene.Field(
@@ -267,6 +280,10 @@ if has_channels:
                     slug=kwargs.get("slug"),
                     token=kwargs.get("token"),
                     content_type=kwargs.get("content_type"),
+                    site=Site.find_for_request(info.context)
+                    if kwargs.get("in_site", False)
+                    else None,
+                    info=info,
                 )
 
         return Mixin

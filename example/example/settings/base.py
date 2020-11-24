@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     # GRAPPLE SPECIFIC MODULES
     "grapple",
     "graphene_django",
+    "django_extensions",
 ]
 
 MIDDLEWARE = [
@@ -191,3 +192,8 @@ try:
     }
 except ImportError:
     pass
+
+
+# Query Optimization helpers
+SHELL_PLUS_PRINT_SQL = True
+RUNSERVER_PLUS_PRINT_SQL_TRUNCATE = 100000

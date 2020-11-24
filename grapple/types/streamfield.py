@@ -1,4 +1,3 @@
-import json
 import graphene
 import wagtail
 import inspect
@@ -7,10 +6,15 @@ import wagtail.embeds.blocks
 import wagtail.images.blocks
 import wagtail.snippets.blocks
 from django.conf import settings
+from django.template.loader import render_to_string
 from graphene.types import Scalar
 from graphene_django.converter import convert_django_field
 from wagtail.core.fields import StreamField
+from wagtail.core.rich_text import expand_db_html
 from wagtail.core import blocks
+from wagtail.embeds.blocks import EmbedValue
+from wagtail.embeds.embeds import get_embed
+from wagtail.embeds.exceptions import EmbedException
 
 from ..registry import registry
 
@@ -30,9 +34,9 @@ def convert_stream_field(field, registry=None):
 
 class StreamFieldInterface(graphene.Interface):
     id = graphene.String()
-    block_type = graphene.String()
-    field = graphene.String()
-    raw_value = graphene.String()
+    block_type = graphene.String(required=True)
+    field = graphene.String(required=True)
+    raw_value = graphene.String(required=True)
 
     @classmethod
     def resolve_type(cls, instance, info):
@@ -61,6 +65,9 @@ class StreamFieldInterface(graphene.Interface):
         return self.block.name
 
     def resolve_raw_value(self, info, **kwargs):
+        if isinstance(self, blocks.StructValue):
+            # This is the value for a nested StructBlock defined via GraphQLStreamfield
+            return serialize_struct_obj(self)
         if isinstance(self.value, dict):
             return serialize_struct_obj(self.value)
 
@@ -131,16 +138,31 @@ class StructBlock(graphene.ObjectType):
     class Meta:
         interfaces = (StreamFieldInterface,)
 
-    blocks = graphene.List(StreamFieldInterface)
+    blocks = graphene.List(graphene.NonNull(StreamFieldInterface), required=True)
 
     def resolve_blocks(self, info, **kwargs):
         stream_blocks = []
-        for name, value in self.value.items():
-            block = self.block.child_blocks[name]
-            if not issubclass(type(block), blocks.StreamBlock):
-                value = block.to_python(value)
 
-            stream_blocks.append(StructBlockItem(name, block, value))
+        if issubclass(type(self.value), wagtail.core.blocks.stream_block.StreamValue):
+            # self: StreamChild, block: StreamBlock, value: StreamValue
+            stream_data = self.value.stream_data
+            child_blocks = self.value.stream_block.child_blocks
+        else:
+            # This occurs when StreamBlock is child of StructBlock
+            # self: StructBlockItem, block: StreamBlock, value: list
+            stream_data = self.value
+            child_blocks = self.block.child_blocks
+
+        for field, value in stream_data.items():
+            block = dict(child_blocks)[field]
+            if issubclass(
+                type(block), wagtail.core.blocks.ChooserBlock
+            ) or not issubclass(type(block), blocks.StructBlock):
+                if isinstance(value, int):
+                    value = block.to_python(value)
+
+            stream_blocks.append(StructBlockItem(field, block, value))
+
         return stream_blocks
 
 
@@ -150,87 +172,98 @@ class StreamBlock(StructBlock):
 
     def resolve_blocks(self, info, **kwargs):
         stream_blocks = []
-        for field in self.value.stream_data:
-            block = self.value.stream_block.child_blocks[field["type"]]
-            if not issubclass(type(block), blocks.StructBlock):
-                value = block.to_python(field["value"])
+        for stream in self.value.stream_data:
+            if type(stream) == tuple:
+                # As of Wagtail 2.11 stream_data is a list of dicts (when lazy) or tuples
+                # when not lazy. The tuple is (block_type, value, id) where value has been run through bulk_to_python()
+                # @see https://github.com/wagtail/wagtail/pull/5976
+                block_type, value, _ = stream
+                block = self.value.stream_block.child_blocks[block_type]
+            else:
+                block_type = stream["type"]
+                value = stream["value"]
+                block = self.value.stream_block.child_blocks[block_type]
+                if issubclass(
+                    type(block), wagtail.core.blocks.ChooserBlock
+                ) or not issubclass(type(block), blocks.StructBlock):
+                    value = block.to_python(value)
 
-            stream_blocks.append(StructBlockItem(field["type"], block, field["value"]))
+            stream_blocks.append(StructBlockItem(block_type, block, value))
         return stream_blocks
 
 
 class StreamFieldBlock(graphene.ObjectType):
-    value = graphene.String()
+    value = graphene.String(required=True)
 
     class Meta:
         interfaces = (StreamFieldInterface,)
 
 
 class CharBlock(graphene.ObjectType):
-    value = graphene.String()
+    value = graphene.String(required=True)
 
     class Meta:
         interfaces = (StreamFieldInterface,)
 
 
 class TextBlock(graphene.ObjectType):
-    value = graphene.String()
+    value = graphene.String(required=True)
 
     class Meta:
         interfaces = (StreamFieldInterface,)
 
 
 class EmailBlock(graphene.ObjectType):
-    value = graphene.String()
+    value = graphene.String(required=True)
 
     class Meta:
         interfaces = (StreamFieldInterface,)
 
 
 class IntegerBlock(graphene.ObjectType):
-    value = graphene.Int()
+    value = graphene.Int(required=True)
 
     class Meta:
         interfaces = (StreamFieldInterface,)
 
 
 class FloatBlock(graphene.ObjectType):
-    value = graphene.Float()
+    value = graphene.Float(required=True)
 
     class Meta:
         interfaces = (StreamFieldInterface,)
 
 
 class DecimalBlock(graphene.ObjectType):
-    value = graphene.Float()
+    value = graphene.Float(required=True)
 
     class Meta:
         interfaces = (StreamFieldInterface,)
 
 
 class RegexBlock(graphene.ObjectType):
-    value = graphene.String()
+    value = graphene.String(required=True)
 
     class Meta:
         interfaces = (StreamFieldInterface,)
 
 
 class URLBlock(graphene.ObjectType):
-    value = graphene.String()
+    value = graphene.String(required=True)
 
     class Meta:
         interfaces = (StreamFieldInterface,)
 
 
 class BooleanBlock(graphene.ObjectType):
-    value = graphene.Boolean()
+    value = graphene.Boolean(required=True)
 
     class Meta:
         interfaces = (StreamFieldInterface,)
 
 
 class DateBlock(graphene.ObjectType):
-    value = graphene.String(format=graphene.String())
+    value = graphene.String(format=graphene.String(), required=True)
 
     class Meta:
         interfaces = (StreamFieldInterface,)
@@ -253,34 +286,40 @@ class TimeBlock(DateBlock):
 
 
 class RichTextBlock(graphene.ObjectType):
-    value = graphene.String()
+    value = graphene.String(required=True)
 
     class Meta:
         interfaces = (StreamFieldInterface,)
 
+    def resolve_value(self, info, **kwargs):
+        # Allow custom markup for RichText
+        return render_to_string(
+            "wagtailcore/richtext.html", {"html": expand_db_html(self.value.source)}
+        )
+
 
 class RawHTMLBlock(graphene.ObjectType):
-    value = graphene.String()
+    value = graphene.String(required=True)
 
     class Meta:
         interfaces = (StreamFieldInterface,)
 
 
 class BlockQuoteBlock(graphene.ObjectType):
-    value = graphene.String()
+    value = graphene.String(required=True)
 
     class Meta:
         interfaces = (StreamFieldInterface,)
 
 
 class ChoiceOption(graphene.ObjectType):
-    key = graphene.String()
-    value = graphene.String()
+    key = graphene.String(required=True)
+    value = graphene.String(required=True)
 
 
 class ChoiceBlock(graphene.ObjectType):
-    value = graphene.String()
-    choices = graphene.List(ChoiceOption)
+    value = graphene.String(required=True)
+    choices = graphene.List(graphene.NonNull(ChoiceOption), required=True)
 
     class Meta:
         interfaces = (StreamFieldInterface,)
@@ -299,28 +338,61 @@ def get_media_url(url):
     return url
 
 
+def get_embed_url(instance):
+    return instance.value.url if hasattr(instance, "value") else instance.url
+
+
+def get_embed_object(instance):
+    try:
+        return get_embed(get_embed_url(instance))
+    except EmbedException:
+        pass
+
+
 class EmbedBlock(graphene.ObjectType):
-    value = graphene.String()
-    url = graphene.String()
+    value = graphene.String(required=True)
+    url = graphene.String(required=True)
+    embed = graphene.String()
+    raw_embed = graphene.JSONString()
 
     class Meta:
         interfaces = (StreamFieldInterface,)
 
     def resolve_url(self, info, **kwargs):
-        if hasattr(self, "value"):
-            return get_media_url(self.value.url)
-        return get_media_url(self.url)
+        return get_media_url(get_embed_url(self))
+
+    def resolve_raw_value(self, info, **kwargs):
+        if isinstance(self, EmbedValue):
+            return self
+        return StreamFieldInterface.resolve_raw_value(info, **kwargs)
+
+    def resolve_embed(self, info, **kwargs):
+        embed = get_embed_object(self)
+        if embed:
+            return embed.html
+
+    def resolve_raw_embed(self, info, **kwargs):
+        embed = get_embed_object(self)
+        if embed:
+            return {
+                "title": embed.title,
+                "type": embed.type,
+                "thumbnail_url": embed.thumbnail_url,
+                "width": embed.width,
+                "height": embed.height,
+                "html": embed.html,
+            }
 
 
 class StaticBlock(graphene.ObjectType):
-    value = graphene.String()
+    value = graphene.String(required=True)
 
     class Meta:
         interfaces = (StreamFieldInterface,)
 
 
 class ListBlock(graphene.ObjectType):
-    items = graphene.List(StreamFieldInterface)
+    items = graphene.List(graphene.NonNull(StreamFieldInterface), required=True)
 
     class Meta:
         interfaces = (StreamFieldInterface,)
@@ -328,7 +400,7 @@ class ListBlock(graphene.ObjectType):
     def resolve_items(self, info, **kwargs):
         # Get the nested StreamBlock type
         block_type = self.block.child_block
-        # Return a list of GraphQL types from the list of valuess
+        # Return a list of GraphQL types from the list of values
         return [StructBlockItem(self.id, block_type, item) for item in self.value]
 
 
@@ -366,16 +438,16 @@ def register_streamfield_blocks():
     from .images import get_image_type
 
     class PageChooserBlock(graphene.ObjectType):
-        page = graphene.Field(PageInterface)
+        page = graphene.Field(PageInterface, required=True)
 
         class Meta:
             interfaces = (StreamFieldInterface,)
 
         def resolve_page(self, info, **kwargs):
-            return self.value
+            return self.value.specific
 
     class DocumentChooserBlock(graphene.ObjectType):
-        document = graphene.Field(get_document_type())
+        document = graphene.Field(get_document_type(), required=True)
 
         class Meta:
             interfaces = (StreamFieldInterface,)
@@ -384,7 +456,7 @@ def register_streamfield_blocks():
             return self.value
 
     class ImageChooserBlock(graphene.ObjectType):
-        image = graphene.Field(get_image_type())
+        image = graphene.Field(get_image_type(), required=True)
 
         class Meta:
             interfaces = (StreamFieldInterface,)
@@ -393,7 +465,7 @@ def register_streamfield_blocks():
             return self.value
 
     class SnippetChooserBlock(graphene.ObjectType):
-        snippet = graphene.String()
+        snippet = graphene.String(required=True)
 
         class Meta:
             interfaces = (StreamFieldInterface,)

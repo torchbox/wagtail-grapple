@@ -25,7 +25,7 @@ Wagtail docs:
        body = StreamField(
            [
                ("heading", blocks.CharBlock(classname="full title")),
-               ("paraagraph", blocks.RichTextBlock()),
+               ("paragraph", blocks.RichTextBlock()),
                ("image", ImageChooserBlock()),
            ]
        )
@@ -44,7 +44,7 @@ Wagtail docs:
            GraphQLStreamfield("body"),
        ]
 
-The following field can then be queries at http://localhost:8000/graphql using 
+The following field can then be queries at http://localhost:8000/graphql using
 something like:
 
 ::
@@ -72,4 +72,3 @@ something like:
 
   * :doc:`../general-usage/graphql-types`
   * :doc:`../general-usage/preview`
-

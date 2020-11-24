@@ -13,6 +13,9 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 
+from wagtail import VERSION as WAGTAIL_VERSION
+
+
 PROJECT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BASE_DIR = os.path.dirname(PROJECT_DIR)
 
@@ -53,7 +56,6 @@ INSTALLED_APPS = [
     # GRAPPLE SPECIFIC MODULES
     "grapple",
     "graphene_django",
-    "channels",
     "django_extensions",
 ]
 
@@ -66,9 +68,12 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "django.middleware.security.SecurityMiddleware",
-    "wagtail.core.middleware.SiteMiddleware",
-    "wagtail.contrib.redirects.middleware.RedirectMiddleware",
 ]
+
+if WAGTAIL_VERSION < (2, 9):
+    MIDDLEWARE += ["wagtail.core.middleware.SiteMiddleware"]
+
+MIDDLEWARE += ["wagtail.contrib.redirects.middleware.RedirectMiddleware"]
 
 ROOT_URLCONF = "example.urls"
 
@@ -155,6 +160,7 @@ MEDIA_URL = "/media/"
 
 WAGTAIL_SITE_NAME = "example"
 WAGTAILIMAGES_IMAGE_MODEL = "images.CustomImage"
+WAGTAILDOCS_SERVE_METHOD = "serve_view"
 
 # Base URL to use when referring to full URLs within the Wagtail admin backend -
 # e.g. in notification emails. Don't include '/admin' or a trailing slash
@@ -170,16 +176,24 @@ GRAPPLE_ADD_SEARCH_HIT = True
 HEADLESS_PREVIEW_CLIENT_URLS = {"default": "http://localhost:8001/preview"}
 HEADLESS_PREVIEW_LIVE = True
 
-ASGI_APPLICATION = "asgi.channel_layer"
-CHANNELS_WS_PROTOCOLS = ["graphql-ws"]
-CHANNEL_LAYERS = {
-    "default": {
-        # "BACKEND": "asgi_redis.RedisChannelLayer",
-        "BACKEND": "asgiref.inmemory.ChannelLayer",
-        "ROUTING": "grapple.urls.channel_routing",
-    }
-}
+try:
+    from channels.asgi import get_channel_layer  # noqa
 
-# Query Optimisation helpers
+    INSTALLED_APPS += ["channels"]
+    ASGI_APPLICATION = "asgi.channel_layer"
+    CHANNELS_WS_PROTOCOLS = ["graphql-ws"]
+
+    CHANNEL_LAYERS = {
+        "default": {
+            # "BACKEND": "asgi_redis.RedisChannelLayer",
+            "BACKEND": "asgiref.inmemory.ChannelLayer",
+            "ROUTING": "grapple.urls.channel_routing",
+        }
+    }
+except ImportError:
+    pass
+
+
+# Query Optimization helpers
 SHELL_PLUS_PRINT_SQL = True
 RUNSERVER_PLUS_PRINT_SQL_TRUNCATE = 100000

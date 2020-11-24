@@ -1,18 +1,16 @@
 import graphene
 from django.db import models
 from modelcluster.fields import ParentalKey
+from modelcluster.contrib.taggit import ClusterTaggableManager
+
+from taggit.models import TaggedItemBase
 
 from wagtail.core.models import Page, Orderable
 from wagtail.core.fields import StreamField
 from wagtail.contrib.settings.models import BaseSetting, register_setting
 
-from wagtail.core import blocks
 from wagtail.admin.edit_handlers import FieldPanel, StreamFieldPanel, InlinePanel
-from wagtail.images.blocks import ImageChooserBlock
-from wagtail.documents.blocks import DocumentChooserBlock
-from wagtail.embeds.blocks import EmbedBlock
 from wagtail.snippets.models import register_snippet
-from wagtail.snippets.blocks import SnippetChooserBlock
 from wagtail.snippets.edit_handlers import SnippetChooserPanel
 from wagtail.images.edit_handlers import ImageChooserPanel
 from wagtail.documents.edit_handlers import DocumentChooserPanel
@@ -20,9 +18,13 @@ from wagtail.documents.edit_handlers import DocumentChooserPanel
 from wagtail_headless_preview.models import HeadlessPreviewMixin
 from wagtailmedia.edit_handlers import MediaChooserPanel
 
-from grapple.helpers import register_query_field
+from grapple.helpers import (
+    register_query_field,
+    register_paginated_query_field,
+    register_singular_query_field,
+)
+from grapple.utils import resolve_paginated_queryset
 from grapple.models import (
-    GraphQLField,
     GraphQLString,
     GraphQLSnippet,
     GraphQLStreamfield,
@@ -32,7 +34,9 @@ from grapple.models import (
     GraphQLMedia,
     GraphQLCollection,
     GraphQLPage,
+    GraphQLTag,
 )
+
 from home.blocks import StreamFieldBlock
 
 
@@ -48,6 +52,14 @@ class AuthorPage(Page):
     graphql_fields = [GraphQLString("name")]
 
 
+class BlogPageTag(TaggedItemBase):
+    content_object = ParentalKey(
+        "BlogPage", related_name="tagged_items", on_delete=models.CASCADE
+    )
+
+
+@register_singular_query_field("first_post")
+@register_paginated_query_field("blog_page")
 class BlogPage(HeadlessPreviewMixin, Page):
     date = models.DateField("Post date")
     advert = models.ForeignKey(
@@ -82,11 +94,13 @@ class BlogPage(HeadlessPreviewMixin, Page):
         AuthorPage, null=True, blank=True, on_delete=models.SET_NULL, related_name="+"
     )
     body = StreamField(StreamFieldBlock())
+    tags = ClusterTaggableManager(through=BlogPageTag, blank=True)
 
     content_panels = Page.content_panels + [
         FieldPanel("date"),
         ImageChooserPanel("cover"),
         StreamFieldPanel("body"),
+        FieldPanel("tags"),
         InlinePanel("related_links", label="Related links"),
         InlinePanel("authors", label="Authors"),
         FieldPanel("author"),
@@ -99,15 +113,28 @@ class BlogPage(HeadlessPreviewMixin, Page):
     def copy(self):
         return self
 
+    def paginated_authors(self, info, **kwargs):
+        return resolve_paginated_queryset(self.authors, info, **kwargs)
+
     graphql_fields = [
-        GraphQLString("heading"),
         GraphQLString("date", required=True),
         GraphQLStreamfield("body"),
+        GraphQLTag("tags"),
         GraphQLCollection(
-            GraphQLForeignKey, "related_links", "home.blogpagerelatedlink", required=True, item_required=True
+            GraphQLForeignKey,
+            "related_links",
+            "home.blogpagerelatedlink",
+            required=True,
+            item_required=True,
         ),
         GraphQLCollection(GraphQLString, "related_urls", source="related_links.url"),
         GraphQLCollection(GraphQLString, "authors", source="authors.person.name"),
+        GraphQLCollection(
+            GraphQLForeignKey,
+            "paginated_authors",
+            "home.Author",
+            is_paginated_queryset=True,
+        ),
         GraphQLSnippet("advert", "home.Advert"),
         GraphQLImage("cover"),
         GraphQLDocument("book_file"),
@@ -153,9 +180,14 @@ class Author(Orderable):
 
 
 @register_snippet
-@register_query_field('advert', 'adverts', {
-    'url': graphene.String()
-})
+@register_query_field(
+    "advert",
+    "adverts",
+    {"url": graphene.String()},
+    required=True,
+    plural_required=True,
+    plural_item_required=True,
+)
 class Advert(models.Model):
     url = models.URLField(null=True, blank=True)
     text = models.CharField(max_length=255)

@@ -58,9 +58,7 @@ def GraphQLBoolean(field_name: str, **kwargs):
     return Mixin
 
 
-def GraphQLSnippet(
-    field_name: str, snippet_model: str, is_list: bool = False, **kwargs
-):
+def GraphQLSnippet(field_name: str, snippet_model: str, **kwargs):
     def Mixin():
         from django.apps import apps
 
@@ -71,9 +69,6 @@ def GraphQLSnippet(
             field_type = lambda: registry.snippets[mdl]
         else:
             field_type = graphene.String
-
-        if field_type and is_list:
-            field_type = graphene.List(field_type)
 
         return GraphQLField(field_name, field_type, **kwargs)
 
@@ -100,14 +95,18 @@ def GraphQLStreamfield(field_name: str, **kwargs):
     def Mixin():
         from .types.streamfield import StreamFieldInterface
 
-        return GraphQLField(field_name, graphene.List(StreamFieldInterface), **kwargs)
+        # Note that GraphQLStreamfield children should always be considered list elements,
+        # unless they specifically are requested not to. e.g. a GraphQLStreamfield for a nested StructBlock
+        if "is_list" not in kwargs:
+            kwargs["is_list"] = True
+        return GraphQLField(field_name, StreamFieldInterface, **kwargs)
 
     return Mixin
 
 
 def GraphQLImage(field_name: str, **kwargs):
     def Mixin():
-        from .types.images import get_image_type, ImageObjectType
+        from .types.images import get_image_type
 
         return GraphQLField(field_name, get_image_type, **kwargs)
 
@@ -147,14 +146,15 @@ def GraphQLCollection(
     field_name,
     *args,
     is_queryset=False,
+    is_paginated_queryset=False,
     required=False,
     item_required=False,
     **kwargs
 ):
     def Mixin():
-        from .types.structures import QuerySetList
+        from .types.structures import QuerySetList, PaginatedQuerySet
 
-        # Check if using nested field extracion:
+        # Check if using nested field extraction:
         source = kwargs.get("source", None)
         if source and "." in source:
             source, *key = source.split(".")
@@ -165,6 +165,13 @@ def GraphQLCollection(
         # Create the nested type and wrap it in some list field.
         graphql_type = nested_type(field_name, *args, required=item_required, **kwargs)
         collection_type = graphene.List
+
+        if is_paginated_queryset:
+            type_class = nested_type(field_name, *args)().field_type()
+            collection_type = lambda nested_type: PaginatedQuerySet(
+                nested_type, type_class, required=required
+            )
+            return graphql_type, collection_type
 
         # Add queryset filtering when necessary.
         if (
@@ -178,7 +185,8 @@ def GraphQLCollection(
         required_collection_type = None
         if required:
             required_collection_type = lambda nested_type: collection_type(
-                nested_type, required=True)
+                nested_type, required=True
+            )
 
         return graphql_type, required_collection_type or collection_type
 
@@ -190,5 +198,16 @@ def GraphQLEmbed(field_name: str):
         from .types.streamfield import EmbedBlock
 
         return GraphQLField(field_name, EmbedBlock)
+
+    return Mixin
+
+
+def GraphQLTag(field_name: str, **kwargs):
+    def Mixin():
+        from .types.tags import TagObjectType
+
+        if "is_list" not in kwargs:
+            kwargs["is_list"] = True
+        return GraphQLField(field_name, TagObjectType, **kwargs)
 
     return Mixin

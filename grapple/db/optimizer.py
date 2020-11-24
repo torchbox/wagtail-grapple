@@ -1,28 +1,17 @@
 import re
-from collections.abc import Iterable
-from django.db.models.query_utils import DeferredAttribute
 from django.db.models.fields.related_descriptors import (
     ReverseOneToOneDescriptor,
-    ReverseManyToOneDescriptor,
-    ForwardManyToOneDescriptor,
-    ForwardOneToOneDescriptor,
     ReverseOneToOneDescriptor,
 )
 from graphene.types.definitions import GrapheneInterfaceType
-from graphql.language.ast import (
-    Field,
-    InlineFragment,
-    FragmentSpread,
-    InterfaceTypeDefinition,
-)
+from graphql.language.ast import Field, InlineFragment, FragmentSpread
 
 from modelcluster.fields import ParentalKey
-from django.db.models.fields.related import ForeignKey
 
 pascal_to_snake = re.compile(r"(?<!^)(?=[A-Z])")
 
 
-class QueryOptimzer:
+class QueryOptimizer:
     # Fields extracted from AST that the request wants
     qs = None
     schema = None
@@ -35,15 +24,15 @@ class QueryOptimzer:
         self.only_fields = []
         self.select_related_fields = []
         self.prefetch_related_fields = []
-        # Future Optimisation maps
+        # Future Optimization maps
         self.only_field_types = {}
         self.select_related_types = {}
         self.prefetch_related_types = {}
 
     @staticmethod
     def query(qs, info):
-        # Create new optimiser instance.
-        qs_optimizer = QueryOptimzer()
+        # Create new optimizer instance.
+        qs_optimizer = QueryOptimizer()
         qs_optimizer.qs = qs
         qs_optimizer.schema = info.schema
         qs_optimizer.model = qs.model
@@ -55,7 +44,7 @@ class QueryOptimzer:
         qs_optimizer.sort_fields()
         # Add deferred fields to query.
         qs_optimizer.optimise_fields()
-        # return the new optimised query
+        # return the new optimized query
         return qs_optimizer.qs
 
     # Sort the requested fields, depending on relation to model.
@@ -75,12 +64,15 @@ class QueryOptimzer:
                 continue
 
             # Support more complex sub-selectable fields
-            field_name_prefix, field_name = field_name.split("__", 1)
-            nested_field = getattr(self.model, field_name_prefix)
-            if nested_field:
-                # Add to query to save recomputing down the line
-                self.select_field(nested_field, field_name, field_name_prefix)
-                continue
+            try:
+                field_name_prefix, field_name = field_name.split("__", 1)
+                nested_field = getattr(self.model, field_name_prefix)
+                if nested_field:
+                    # Add to query to save recomputing down the line
+                    self.select_field(nested_field, field_name, field_name_prefix)
+                    continue
+            except:
+                pass
 
     def select_field(self, field, field_name, field_name_prefix=None):
         model = self.model_type_map.get(field_name_prefix, None)
@@ -108,7 +100,7 @@ class QueryOptimzer:
 
         if not getattr(field, "is_relation", False):
             if model:
-                # Cache selection for future optimisation (query.py)
+                # Cache selection for future optimization (query.py)
                 existing_fields = self.only_field_types.get(field_name_prefix, [])
                 self.only_field_types[field_name_prefix] = [
                     field_name,
@@ -119,7 +111,7 @@ class QueryOptimzer:
 
         elif field.one_to_many or field.many_to_many or isinstance(field, ParentalKey):
             if model:
-                # Cache selection for future optimisation (query.py)
+                # Cache selection for future optimization (query.py)
                 existing_fields = self.prefetch_related_types.get(field_name_prefix, [])
                 self.prefetch_related_types[field_name_prefix] = [
                     field_name,
@@ -130,7 +122,7 @@ class QueryOptimzer:
 
         elif field.many_to_one or field.one_to_one:
             if model:
-                # Cache selection for future optimisation (query.py)
+                # Cache selection for future optimization (query.py)
                 existing_fields = self.select_related_types.get(field_name_prefix, [])
                 self.select_related_types[field_name_prefix] = [
                     field_name,
@@ -223,9 +215,13 @@ class AstExplorer:
 
         # Get fragment type from name and return it parsed.
         fragment_type = self.fragments[fragment_name]
-        return self.parse_inline_fragment(fragment_type, field_prefix, is_fragment_spread = True)
+        return self.parse_inline_fragment(
+            fragment_type, field_prefix, is_fragment_spread=True
+        )
 
-    def parse_inline_fragment(self, inline_fragment, field_prefix, is_fragment_spread = False):
+    def parse_inline_fragment(
+        self, inline_fragment, field_prefix, is_fragment_spread=False
+    ):
         # Get type of inline fragment
         gql_type_name = inline_fragment.type_condition.name.value
         gql_type = self.schema.get_type(gql_type_name)
@@ -249,7 +245,7 @@ class AstExplorer:
         if inline_fragment.selection_set:
             selections = self.parse_selection_set(
                 inline_fragment.selection_set,
-                field_prefix if is_fragment_spread else type_prefix
+                field_prefix if is_fragment_spread else type_prefix,
             )
             selections = list(map(prefix_type, selections))
 

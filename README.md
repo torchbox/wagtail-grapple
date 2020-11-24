@@ -1,9 +1,9 @@
 <p align="center">
-  <a href="https://github.com/torchbox/wagtail-grapple">
-    <img src="https://github.com/torchbox/wagtail-grapple/raw/master/.github/wagtail-grapple.svg?sanitize=true" alt="A red g with a grapple hook" width="80" height="80">
+  <a href="https://github.com/GrappleGQL/wagtail-grapple">
+    <img src="https://github.com/GrappleGQL/wagtail-grapple/raw/master/.github/wagtail-grapple.svg?sanitize=true" alt="A red g with a grapple hook" width="80" height="80">
   </a>
 
-  <h3 align="center">Wagtail Grapple <a href="https://pypi.org/project/wagtail-grapple/"><img src="https://img.shields.io/pypi/v/wagtail-grapple.svg"></a> <a href="https://github.com/psf/black"><img src="https://img.shields.io/badge/code%20style-black-000000.svg"></a></h3>
+  <h3 align="center">Wagtail Grapple <a href="https://pypi.org/project/wagtail-grapple/"><img src="https://img.shields.io/pypi/v/wagtail-grapple.svg"></a> <a href="https://github.com/psf/black"><img src="https://img.shields.io/badge/code%20style-black-000000.svg"></a> <a href="https://github.com/pre-commit/pre-commit"><img src="https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white"></a></h3>
 
   <p align="center">
     A library to build GraphQL endpoints easily so you can grapple your Wagtail data from anywhere!
@@ -12,11 +12,11 @@
     <a href="https://wagtail-grapple.readthedocs.io/en/latest/"><strong>Explore the docs »</strong></a>
     <br />
     <br />
-    <a href="https://github.com/torchbox/wagtail-grapple#about-the-project">View Demo</a>
+    <a href="https://github.com/GrappleGQL/wagtail-grapple#about-the-project">View Demo</a>
     ·
-    <a href="https://github.com/torchbox/wagtail-grapple/issues">Report Bug</a>
+    <a href="https://github.com/GrappleGQL/wagtail-grapple/issues">Report Bug</a>
     ·
-    <a href="https://github.com/torchbox/wagtail-grapple/issues">Request Feature</a>
+    <a href="https://github.com/GrappleGQL/wagtail-grapple/issues">Request Feature</a>
   </p>
 </p>
 
@@ -61,11 +61,13 @@ to your model and away you go (although if you want to go deeper you can!).
     - Snippets
     - Images
     - Documents
+    - Media
     - Settings
+    - Redirects
     - Search (on all models)
 * Custom Image & Document model support
-* Advanced headless preview functionality buit using GraphQL Subscriptions to enable Page previews on any device!
-* Gatsby Image support (both base64 and SVG tracing)! :fire:
+* Pagination support
+* Advanced headless preview functionality built using GraphQL Subscriptions to enable Page previews on any device!
 
 
 ### Built With
@@ -73,8 +75,8 @@ This library is an abstraction upon and relies heavily on Graphene & Graphene Dj
 We also use Django Channels and the Potrace image library.
 * [Graphene](https://github.com/graphql-python/graphene)
 * [Graphene Django](https://github.com/graphql-python/graphene)
-* [Django Channels](https://github.com/django/channels)
 * [Potrace](https://github.com/skyrpex/potrace)
+* [Django Channels](https://github.com/django/channels) when installed with `wagtail_grapple[channels]`
 
 
 ## Getting Started
@@ -83,16 +85,29 @@ Getting Grapple installed is designed to be as simple as possible!
 
 ### Prerequisites
 ```
-Django  >= 2.2, <2.3
-wagtail >= 2.5, <2.8
+Django  >= 2.2, <3.1 (<2.3 if using channels)
+wagtail >= 2.5, <2.12
 ```
 
 ### Installation
-`pip install wagtail_grapple`
 
-<br />
+```bash
+pip install wagtail_grapple
+```
 
 Add the following to the `installed_apps` list in your Wagtail settings file:
+
+```python
+installed_apps = [
+    ...
+    "grapple",
+    "graphene_django",
+    ...
+]
+```
+
+For GraphQL Subscriptions with Django Channels, run `pip install wagtail_grapple[channels]`  and add
+`channels` to installed apps:
 
 ```python
 installed_apps = [
@@ -104,7 +119,6 @@ installed_apps = [
 ]
 ```
 
-<br />
 
 Add the following to the bottom of the same settings file, where each key is the app you want to this library to scan and the value is the prefix you want to give to GraphQL types (you can usually leave this blank):
 
@@ -115,8 +129,6 @@ GRAPPLE_APPS = {
     "home": ""
 }
 ```
-
-<br />
 
 Add the GraphQL URLs to your `urls.py`:
 
@@ -130,10 +142,8 @@ urlpatterns = [
 ]
 ```
 
-<br/>
-Done! Now you can proceed onto configuring your models to generate GraphQL types that adopt their stucture :tada:
-_Your graphql endpoint is available at http://localhost:8000/graphql/_
-<br/>
+Done! Now you can proceed onto configuring your models to generate GraphQL types that adopt their structure :tada:
+_Your GraphQL endpoint is available at http://localhost:8000/graphql/_
 
 ## Usage
 
@@ -151,7 +161,7 @@ class BlogPage(Page):
     body = StreamField(
         [
             ("heading", blocks.CharBlock(classname="full title")),
-            ("paraagraph", blocks.RichTextBlock()),
+            ("paragraph", blocks.RichTextBlock()),
             ("image", ImageChooserBlock()),
         ]
     )
@@ -187,7 +197,7 @@ Contributions are what make the open source community such an amazing place to b
 
 ### Local development
 
- - In the python environment of your choice, navigate to `/examples`
+ - In the python environment of your choice, navigate to `/example`
  - Run `pip install -r requirements.txt`
  - Delete the `db.sqlite3` file and run `./manage.py migrate`
  - Run server `./manage.py runserver`
@@ -197,9 +207,9 @@ Contributions are what make the open source community such an amazing place to b
 
 Wagtail Grapple supports:
 
-- Django 2.2.x
-- Python 3.6 and 3.7
-- Wagtail >= 2.5
+- Django 2.2.x, 3.0.x
+- Python 3.6, 3.7, 3.8 and 3.9
+- Wagtail >= 2.5, < 2.12
 
 ## License
 
@@ -211,12 +221,40 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 Nathan Horrigan
 - [@NathHorrigan](https://github.com/NathHorrigan)
-- NathHorrigan@gmail.com
+- nathan.horrigan@torchbox.com
 
-Project Link: [https://github.com/torchbox/wagtail-grapple](https://github.com/torchbox/wagtail-grapple)
+Project Link: [https://github.com/GrappleGQL/wagtail-grapple](https://github.com/GrappleGQL/wagtail-grapple)
 
 
 <!-- ACKNOWLEDGEMENTS -->
 ## Inspired by
 * [@tr11](https://github.com/tr11)
 * [@tmkn](https://github.com/tmkn)
+
+## Contributors ✨
+
+Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
+
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
+<table>
+  <tr>
+    <td align="center"><a href="https://github.com/NathHorrigan"><img src="https://avatars3.githubusercontent.com/u/13197111?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Nathan Horrigan</b></sub></a><br /><a href="https://github.com/GrappleGQL/wagtail-grapple/commits?author=NathHorrigan" title="Code">💻</a> <a href="https://github.com/GrappleGQL/wagtail-grapple/issues?q=author%3ANathHorrigan" title="Bug reports">🐛</a> <a href="https://github.com/GrappleGQL/wagtail-grapple/commits?author=NathHorrigan" title="Documentation">📖</a> <a href="#infra-NathHorrigan" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="#maintenance-NathHorrigan" title="Maintenance">🚧</a></td>
+    <td align="center"><a href="https://github.com/jafacakes2011"><img src="https://avatars3.githubusercontent.com/u/4086447?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Cameron Lamb</b></sub></a><br /><a href="https://github.com/GrappleGQL/wagtail-grapple/commits?author=jafacakes2011" title="Code">💻</a> <a href="https://github.com/GrappleGQL/wagtail-grapple/issues?q=author%3Ajafacakes2011" title="Bug reports">🐛</a> <a href="https://github.com/GrappleGQL/wagtail-grapple/commits?author=jafacakes2011" title="Documentation">📖</a> <a href="#infra-jafacakes2011" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="#maintenance-jafacakes2011" title="Maintenance">🚧</a></td>
+    <td align="center"><a href="https://zerolab.org/"><img src="https://avatars0.githubusercontent.com/u/31622?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Dan Braghis</b></sub></a><br /><a href="https://github.com/GrappleGQL/wagtail-grapple/commits?author=zerolab" title="Code">💻</a> <a href="https://github.com/GrappleGQL/wagtail-grapple/issues?q=author%3Azerolab" title="Bug reports">🐛</a> <a href="https://github.com/GrappleGQL/wagtail-grapple/commits?author=zerolab" title="Documentation">📖</a> <a href="#infra-zerolab" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="#maintenance-zerolab" title="Maintenance">🚧</a></td>
+    <td align="center"><a href="https://github.com/ruisaraiva19"><img src="https://avatars2.githubusercontent.com/u/7356098?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Rui Saraiva</b></sub></a><br /><a href="https://github.com/GrappleGQL/wagtail-grapple/commits?author=ruisaraiva19" title="Code">💻</a> <a href="https://github.com/GrappleGQL/wagtail-grapple/issues?q=author%3Aruisaraiva19" title="Bug reports">🐛</a> <a href="https://github.com/GrappleGQL/wagtail-grapple/commits?author=ruisaraiva19" title="Documentation">📖</a> <a href="#infra-ruisaraiva19" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="#maintenance-ruisaraiva19" title="Maintenance">🚧</a></td>
+    <td align="center"><a href="https://github.com/tbrlpld"><img src="https://avatars1.githubusercontent.com/u/24797493?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Tibor</b></sub></a><br /><a href="https://github.com/GrappleGQL/wagtail-grapple/commits?author=tbrlpld" title="Code">💻</a> <a href="https://github.com/GrappleGQL/wagtail-grapple/issues?q=author%3Atbrlpld" title="Bug reports">🐛</a> <a href="https://github.com/GrappleGQL/wagtail-grapple/commits?author=tbrlpld" title="Documentation">📖</a></td>
+    <td align="center"><a href="https://github.com/timmysmalls"><img src="https://avatars2.githubusercontent.com/u/48223453?v=4?s=100" width="100px;" alt=""/><br /><sub><b>timmysmalls</b></sub></a><br /><a href="https://github.com/GrappleGQL/wagtail-grapple/commits?author=timmysmalls" title="Code">💻</a> <a href="https://github.com/GrappleGQL/wagtail-grapple/issues?q=author%3Atimmysmalls" title="Bug reports">🐛</a></td>
+    <td align="center"><a href="https://wagtail.io/"><img src="https://avatars0.githubusercontent.com/u/15543?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Tom Dyson</b></sub></a><br /><a href="https://github.com/GrappleGQL/wagtail-grapple/commits?author=tomdyson" title="Code">💻</a> <a href="https://github.com/GrappleGQL/wagtail-grapple/commits?author=tomdyson" title="Documentation">📖</a></td>
+  </tr>
+  <tr>
+    <td align="center"><a href="https://fabien.cool/"><img src="https://avatars1.githubusercontent.com/u/1702255?v=4?s=100" width="100px;" alt=""/><br /><sub><b>fabienheureux</b></sub></a><br /><a href="https://github.com/GrappleGQL/wagtail-grapple/commits?author=fabienheureux" title="Code">💻</a> <a href="https://github.com/GrappleGQL/wagtail-grapple/issues?q=author%3Afabienheureux" title="Bug reports">🐛</a> <a href="https://github.com/GrappleGQL/wagtail-grapple/commits?author=fabienheureux" title="Documentation">📖</a></td>
+  </tr>
+</table>
+
+<!-- markdownlint-restore -->
+<!-- prettier-ignore-end -->
+<!-- ALL-CONTRIBUTORS-LIST:END -->
+
+This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!

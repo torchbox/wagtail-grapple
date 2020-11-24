@@ -5,25 +5,46 @@ from types import MethodType
 from collections.abc import Iterable
 
 from django.db import models
-from django.db.models.query import QuerySet
 from django.conf import settings
-from django.contrib.contenttypes.models import ContentType
+from django.template.loader import render_to_string
+
+from graphene_django.types import DjangoObjectType
+
 from wagtail.contrib.settings.models import BaseSetting
 from wagtail.core.models import Page as WagtailPage
-from wagtail.core.blocks import BaseBlock, RichTextBlock
+from wagtail.core.rich_text import RichText, expand_db_html
+from wagtail.core.blocks import stream_block, StructValue
 from wagtail.documents.models import AbstractDocument
 from wagtail.images.models import AbstractImage, AbstractRendition
 from wagtail.images.blocks import ImageChooserBlock
 from wagtail.snippets.models import get_snippet_models
-from graphene_django.types import DjangoObjectType
-
 
 from .registry import registry
-from .types.pages import PageInterface, Page
 from .types.documents import DocumentObjectType
-from .types.streamfield import generate_streamfield_union
 from .types.images import ImageObjectType
+from .types.pages import PageInterface, Page
+from .types.streamfield import generate_streamfield_union
 from .helpers import streamfield_types
+
+try:
+    from wagtailmedia.models import AbstractMedia
+    from .types.media import MediaObjectType
+
+    has_wagtail_media = True
+except ModuleNotFoundError:
+    # TODO: find a better way to have this as an optional dependency
+    class AbstractMedia:
+        def __init__(self):
+            pass
+
+        def __add__(self, other):
+            pass
+
+        def __name__(self):
+            pass
+
+    MediaObjectType = None
+    has_wagtail_media = False
 
 
 def import_apps():
@@ -87,11 +108,13 @@ def register_model(cls: type, type_prefix: str):
         if issubclass(cls, WagtailPage):
             register_page_model(cls, type_prefix)
         elif issubclass(cls, AbstractDocument):
-            register_documment_model(cls, type_prefix)
+            register_document_model(cls, type_prefix)
         elif issubclass(cls, AbstractImage):
             register_image_model(cls, type_prefix)
         elif issubclass(cls, AbstractRendition):
             register_image_model(cls, type_prefix)
+        elif has_wagtail_media and issubclass(cls, AbstractMedia):
+            register_media_model(cls, type_prefix)
         elif issubclass(cls, BaseSetting):
             register_settings_model(cls, type_prefix)
         elif cls in get_snippet_models():
@@ -106,7 +129,6 @@ def get_fields_and_properties(cls):
     """
     fields = [field.name for field in cls._meta.get_fields(include_parents=False)]
 
-    properties = []
     try:
         properties = [
             method[0]
@@ -193,17 +215,21 @@ def build_node_type(
 ):
     """
     Build a graphene node type from a model class and associate
-    with an interface. If it has custom fields then implmement them.
+    with an interface. If it has custom fields then implement them.
     """
     type_name = type_prefix + cls.__name__
 
-    # Create a tempory model and tempory node that will be replaced later on.
-    class StubModel(models.Model):
-        class Meta:
-            managed = False
+    # Create a temporary model and temporary node that will be replaced later on.
+    class UnmanagedMeta:
+        app_label = type_name
+        managed = False
+
+    stub_model = type(
+        type_name, (models.Model,), {"__module__": "", "Meta": UnmanagedMeta}
+    )
 
     class StubMeta:
-        model = StubModel
+        model = stub_model
 
     type_meta = {
         "Meta": StubMeta,
@@ -238,7 +264,20 @@ def load_type_fields():
                     interfaces = (interface,) if interface is not None else tuple()
 
                 type_meta = {"Meta": Meta, "id": graphene.ID(), "name": type_name}
-                exclude_fields = get_fields_and_properties(cls)
+
+                exclude_fields = []
+                for field in get_fields_and_properties(cls):
+                    # Filter our any fields that are defined on the interface of base type to prevent the
+                    # 'Excluding the custom field "<field>" on DjangoObjectType "<cls>" has no effect.
+                    # Either remove the custom field or remove the field from the "exclude" list.' warning
+                    if (
+                        field == "id"
+                        or hasattr(interface, field)
+                        or hasattr(base_type, field)
+                    ):
+                        continue
+
+                    exclude_fields.append(field)
 
                 # Add any custom fields to node if they are defined.
                 methods = {}
@@ -277,12 +316,32 @@ def convert_to_underscore(name):
     return re.sub("([a-z0-9])([A-Z])", r"\1_\2", s1).lower()
 
 
+def get_field_value(instance, field_name: str):
+    """
+    Returns the value of a given field on an object of a StreamField.
+
+    Different types of objects require different ways to access the values.
+    """
+    if isinstance(instance, StructValue):
+        return instance[field_name]
+    elif isinstance(instance.value, RichText):
+        # Allow custom markup for RichText
+        return render_to_string(
+            "wagtailcore/richtext.html", {"html": expand_db_html(instance.value.source)}
+        )
+    elif isinstance(instance.value, stream_block.StreamValue):
+        stream_data = dict(instance.value.stream_data)
+        return stream_data[field_name]
+    else:
+        return instance.value[field_name]
+
+
 def streamfield_resolver(self, instance, info, **kwargs):
     value = None
     if hasattr(instance, "block"):
         field_name = convert_to_underscore(info.field_name)
         block = instance.block.child_blocks[field_name]
-        value = instance.value[field_name]
+        value = get_field_value(instance, field_name)
 
         if not block or not value:
             return None
@@ -357,7 +416,7 @@ def register_page_model(cls: Type[WagtailPage], type_prefix: str):
         registry.pages[cls] = page_node_type
 
 
-def register_documment_model(cls: Type[AbstractDocument], type_prefix: str):
+def register_document_model(cls: Type[AbstractDocument], type_prefix: str):
     """
     Create graphene node type for a model than inherits from AbstractDocument.
     Only one model will actually be generated because a default document model
@@ -412,6 +471,25 @@ def register_image_rendition_model(cls: Type[AbstractRendition], type_prefix: st
     # Add image type to registry.
     if image_node_type:
         registry.images[cls] = image_node_type
+
+
+def register_media_model(cls: Type[AbstractMedia], type_prefix: str):
+    """
+    Create graphene node type for a model than inherits from AbstractDocument.
+    Only one model will actually be generated because a default document model
+    needs to be set in settings.
+    """
+
+    # Avoid gql type duplicates
+    if cls in registry.media:
+        return
+
+    # Create a GQL type derived from media model.
+    media_node_type = build_node_type(cls, type_prefix, None, MediaObjectType)
+
+    # Add media type to registry.
+    if media_node_type:
+        registry.media[cls] = media_node_type
 
 
 def register_settings_model(cls: Type[BaseSetting], type_prefix: str):

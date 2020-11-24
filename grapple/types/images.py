@@ -1,9 +1,5 @@
-import os
-import codecs
-import urllib.parse
 import graphene
 
-from django.conf import settings
 from graphene_django import DjangoObjectType
 from wagtail.images import get_image_model
 from wagtail.images.models import (
@@ -12,34 +8,32 @@ from wagtail.images.models import (
 )
 
 from ..registry import registry
-from ..utils import resolve_queryset
+from ..utils import resolve_queryset, get_media_item_url
+from .collections import CollectionObjectType
 from .structures import QuerySetList
 
 
-def get_image_url(cls):
-    url = ""
-    if hasattr(cls, "url"):
-        url = cls.url
-    else:
-        url = cls.file.url
-
-    if url[0] == "/":
-        return settings.BASE_URL + url
-    return url
-
-
 class BaseImageObjectType(graphene.ObjectType):
-    width = graphene.Int()
-    height = graphene.Int()
-    src = graphene.String()
-    aspect_ratio = graphene.Float()
-    sizes = graphene.String()
+    id = graphene.ID(required=True)
+    width = graphene.Int(required=True)
+    height = graphene.Int(required=True)
+    src = graphene.String(required=True, deprecation_reason="Use the `url` attribute")
+    url = graphene.String(required=True)
+    aspect_ratio = graphene.Float(required=True)
+    sizes = graphene.String(required=True)
+    collection = graphene.Field(lambda: CollectionObjectType, required=True)
 
-    def resolve_src(self, info):
+    def resolve_url(self, info, **kwargs):
         """
-        Get url of the original uploaded image.
+        Get the uploaded image url.
         """
-        return get_image_url(self)
+        return get_media_item_url(self)
+
+    def resolve_src(self, info, **kwargs):
+        """
+        Deprecated. Use the `url` attribute.
+        """
+        return get_media_item_url(self)
 
     def resolve_aspect_ratio(self, info, **kwargs):
         """
@@ -47,14 +41,11 @@ class BaseImageObjectType(graphene.ObjectType):
         """
         return self.width / self.height
 
-    def resolve_sizes(self, info):
+    def resolve_sizes(self, info, **kwargs):
         return "(max-width: {}px) 100vw, {}px".format(self.width, self.width)
 
 
 class ImageRenditionObjectType(DjangoObjectType, BaseImageObjectType):
-    id = graphene.ID()
-    url = graphene.String()
-
     class Meta:
         model = WagtailImageRendition
 
@@ -79,12 +70,13 @@ class ImageObjectType(DjangoObjectType, BaseImageObjectType):
         format=graphene.String(),
         bgcolor=graphene.String(),
         jpegquality=graphene.Int(),
+        webpquality=graphene.Int(),
     )
     src_set = graphene.String(sizes=graphene.List(graphene.Int))
 
     class Meta:
         model = WagtailImage
-        exclude_fields = ("tags",)
+        exclude = ("tags",)
 
     def resolve_rendition(self, info, **kwargs):
         """
@@ -118,7 +110,10 @@ class ImageObjectType(DjangoObjectType, BaseImageObjectType):
                 ]
 
                 return ", ".join(
-                    [f"{get_image_url(img)} {img.width}w" for img in rendition_list]
+                    [
+                        f"{get_media_item_url(img)} {img.width}w"
+                        for img in rendition_list
+                    ]
                 )
         except:
             pass
@@ -136,12 +131,30 @@ def ImagesQuery():
     mdl_type = get_image_type()
 
     class Mixin:
-        images = QuerySetList(mdl_type, enable_search=True)
-        image_type = graphene.String()
+        image = graphene.Field(mdl_type, id=graphene.ID())
+        images = QuerySetList(
+            graphene.NonNull(mdl_type),
+            enable_search=True,
+            required=True,
+            collection=graphene.Argument(
+                graphene.ID, description="Filter by collection id"
+            ),
+        )
+        image_type = graphene.String(required=True)
 
-        # Return all pages, ideally specific.
+        def resolve_image(self, info, id, **kwargs):
+            """Returns an image given the id, if in a public collection"""
+            try:
+                return mdl.objects.filter(
+                    collection__view_restrictions__isnull=True
+                ).get(pk=id)
+            except BaseException:
+                return None
+
         def resolve_images(self, info, **kwargs):
-            return resolve_queryset(mdl.objects.all(), info, **kwargs)
+            """Returns all images in a public collection"""
+            qs = mdl.objects.filter(collection__view_restrictions__isnull=True)
+            return resolve_queryset(qs, info, **kwargs)
 
         # Give name of the image type, used to generate mixins
         def resolve_image_type(self, info, **kwargs):

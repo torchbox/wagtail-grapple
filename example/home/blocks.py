@@ -1,5 +1,6 @@
 from wagtail.core import blocks
 from wagtail.images.blocks import ImageChooserBlock
+from wagtail.embeds.blocks import EmbedBlock
 
 from grapple.helpers import register_streamfield_block
 from grapple.models import (
@@ -8,10 +9,8 @@ from grapple.models import (
     GraphQLString,
     GraphQLCollection,
     GraphQLEmbed,
+    GraphQLStreamfield,
 )
-
-from wagtail.images.blocks import ImageChooserBlock
-from wagtail.embeds.blocks import EmbedBlock
 
 
 @register_streamfield_block
@@ -51,6 +50,45 @@ class VideoBlock(blocks.StructBlock):
     graphql_fields = [GraphQLEmbed("youtube_link")]
 
 
+@register_streamfield_block
+class CarouselBlock(blocks.StreamBlock):
+    text = blocks.CharBlock(classname="full title")
+    image = ImageChooserBlock()
+    markup = blocks.RichTextBlock()
+
+
+@register_streamfield_block
+class CalloutBlock(blocks.StructBlock):
+    text = blocks.RichTextBlock()
+    image = ImageChooserBlock()
+
+    graphql_fields = [GraphQLString("text"), GraphQLImage("image")]
+
+
+@register_streamfield_block
+class ButtonBlock(blocks.StructBlock):
+    button_text = blocks.CharBlock(required=True, max_length=50, label="Text")
+    button_link = blocks.CharBlock(required=True, max_length=255, label="Link")
+
+    graphql_fields = [GraphQLString("button_text"), GraphQLString("button_link")]
+
+
+@register_streamfield_block
+class TextAndButtonsBlock(blocks.StructBlock):
+    text = blocks.TextBlock()
+    buttons = blocks.ListBlock(ButtonBlock())
+    mainbutton = ButtonBlock()
+
+    graphql_fields = [
+        GraphQLString("text"),
+        GraphQLImage("image"),
+        GraphQLStreamfield("buttons"),
+        GraphQLStreamfield(
+            "mainbutton", is_list=False
+        ),  # this is a direct StructBlock, not a list of sub-blocks
+    ]
+
+
 class StreamFieldBlock(blocks.StreamBlock):
     heading = blocks.CharBlock(classname="full title")
     paragraph = blocks.RichTextBlock()
@@ -61,3 +99,7 @@ class StreamFieldBlock(blocks.StreamBlock):
     gallery = ImageGalleryBlock()
     video = VideoBlock()
     objectives = blocks.ListBlock(blocks.CharBlock())
+    carousel = CarouselBlock()
+    callout = CalloutBlock()
+    text_and_buttons = TextAndButtonsBlock()
+    page = blocks.PageChooserBlock()

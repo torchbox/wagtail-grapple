@@ -66,6 +66,7 @@ accepts the following arguments:
 ::
 
     id: ID
+    pageType: String
     limit: PositiveInt
     offset: PositiveInt
     order: String

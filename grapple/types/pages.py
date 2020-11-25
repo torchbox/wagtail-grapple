@@ -198,6 +198,7 @@ def PagesQuery():
         pages = QuerySetList(
             graphene.NonNull(lambda: PageInterface),
             in_site=graphene.Boolean(),
+            page_type=graphene.String(),
             enable_search=True,
             required=True,
         )
@@ -213,6 +214,17 @@ def PagesQuery():
         # Return all pages in site, ideally specific.
         def resolve_pages(self, info, **kwargs):
             pages = WagtailPage.objects.live().public().specific()
+
+            if kwargs.get("page_type"):
+                page_type_name = kwargs['page_type']
+                page_type_names = [page.__name__.split('.')[-1:][0] for page
+                                   in registry.pages.keys()]
+                if page_type_name in page_type_names:
+                    type_idx = page_type_names.index(page_type_name)
+                    page_type = list(registry.pages.keys())[type_idx]
+                    pages = pages.type(page_type)
+                else:
+                    raise ValueError(f"No registered pageType '{page_type_name}'")
 
             if kwargs.get("in_site", False):
                 site = Site.find_for_request(info.context)

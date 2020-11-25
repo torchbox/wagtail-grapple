@@ -96,7 +96,7 @@ class PageInterface(graphene.Interface):
         return resolve_queryset(
             self.get_siblings().exclude(pk=self.pk).live().public().specific(),
             info,
-            **kwargs
+            **kwargs,
         )
 
     def resolve_next_siblings(self, info, **kwargs):
@@ -107,7 +107,7 @@ class PageInterface(graphene.Interface):
         return resolve_queryset(
             self.get_next_siblings().exclude(pk=self.pk).live().public().specific(),
             info,
-            **kwargs
+            **kwargs,
         )
 
     def resolve_previous_siblings(self, info, **kwargs):
@@ -118,7 +118,7 @@ class PageInterface(graphene.Interface):
         return resolve_queryset(
             self.get_prev_siblings().exclude(pk=self.pk).live().public().specific(),
             info,
-            **kwargs
+            **kwargs,
         )
 
     def resolve_descendants(self, info, **kwargs):
@@ -216,9 +216,10 @@ def PagesQuery():
             pages = WagtailPage.objects.live().public().specific()
 
             if kwargs.get("page_type"):
-                page_type_name = kwargs['page_type']
-                page_type_names = [page.__name__.split('.')[-1:][0] for page
-                                   in registry.pages.keys()]
+                page_type_name = kwargs["page_type"]
+                page_type_names = [
+                    page.__name__.split(".")[-1:][0] for page in registry.pages.keys()
+                ]
                 if page_type_name in page_type_names:
                     type_idx = page_type_names.index(page_type_name)
                     page_type = list(registry.pages.keys())[type_idx]

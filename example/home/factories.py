@@ -11,6 +11,7 @@ from home.models import (
     Advert,
     Author,
     Person,
+    SimpleModel,
 )
 from wagtail.core import blocks
 
@@ -138,3 +139,8 @@ class AdvertFactory(factory.django.DjangoModelFactory):
 
     url = factory.Sequence(lambda n: f"Person {n}")
     text = fuzzy.FuzzyText()
+
+
+class SimpleModelFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = SimpleModel

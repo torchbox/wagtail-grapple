@@ -263,7 +263,7 @@ def register_singular_query_field(field_name, query_params=None, required=False)
 
                         return qs.live().public().filter(**kwargs).first()
 
-                    return cls.filter(**kwargs).first()
+                    return qs.filter(**kwargs).first()
                 except:
                     return None
 

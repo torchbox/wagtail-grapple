@@ -40,6 +40,11 @@ from grapple.models import (
 from home.blocks import StreamFieldBlock
 
 
+@register_singular_query_field("simpleModel")
+class SimpleModel(models.Model):
+    pass
+
+
 class HomePage(Page):
     pass
 

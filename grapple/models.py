@@ -114,20 +114,19 @@ def GraphQLImage(field_name: str, **kwargs):
 
 
 def GraphQLDocument(field_name: str, **kwargs):
-    from django.conf import settings
+    def Mixin():
+        from .types.documents import get_document_type
 
-    document_type = "wagtaildocs.Document"
-    if hasattr(settings, "WAGTAILDOCS_DOCUMENT_MODEL"):
-        document_type = settings["WAGTAILDOCS_DOCUMENT_MODEL"]
+        return GraphQLField(field_name, get_document_type, **kwargs)
 
-    return GraphQLForeignKey(field_name, document_type, **kwargs)
+    return Mixin
 
 
 def GraphQLMedia(field_name: str, **kwargs):
     def Mixin():
-        from .types.media import MediaObjectType
+        from .types.media import get_media_type
 
-        return GraphQLField(field_name, MediaObjectType, **kwargs)
+        return GraphQLField(field_name, get_media_type, **kwargs)
 
     return Mixin
 

@@ -18,10 +18,11 @@ from .registry import registry
 # We need to update specified_rules in-place so the change appears
 # everywhere it's been imported
 try:
-    specified_rules[:] = [rule for rule in specified_rules if rule is not NoUnusedFragmentsRule]
+    specified_rules[:] = [
+        rule for rule in specified_rules if rule is not NoUnusedFragmentsRule
+    ]
 except FrozenError:
     pass
-
 
 
 def create_schema():

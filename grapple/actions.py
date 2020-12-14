@@ -127,7 +127,11 @@ def get_fields_and_properties(cls):
     """
     Return all fields and @property methods for a model.
     """
-    fields = [field.name for field in cls._meta.get_fields(include_parents=False)]
+    from graphene_django.utils import get_model_fields
+
+    # Note: graphene-django use this method to get the model fields
+    # cls._meta.get_fields(include_parents=False) includes symmetrical ManyToMany fields, while get_model_fields doesn't
+    fields = [field for field, instance in get_model_fields(cls)]
 
     try:
         properties = [
@@ -267,7 +271,7 @@ def load_type_fields():
 
                 exclude_fields = []
                 for field in get_fields_and_properties(cls):
-                    # Filter our any fields that are defined on the interface of base type to prevent the
+                    # Filter out any fields that are defined on the interface of base type to prevent the
                     # 'Excluding the custom field "<field>" on DjangoObjectType "<cls>" has no effect.
                     # Either remove the custom field or remove the field from the "exclude" list.' warning
                     if (

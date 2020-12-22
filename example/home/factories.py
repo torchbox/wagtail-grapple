@@ -94,6 +94,7 @@ class PersonFactory(factory.DjangoModelFactory):
 
 
 class BlogPageFactory(wagtail_factories.PageFactory):
+    title = factory.Sequence(lambda n: f"Blog post {n}")
     date = datetime.date.today()
     author = factory.SubFactory("home.factories.AuthorPageFactory")
     body = wagtail_factories.StreamFieldFactory(

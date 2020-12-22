@@ -1,6 +1,7 @@
 import graphene
 from django.contrib.contenttypes.models import ContentType
 from django.dispatch import receiver
+from django.utils.translation import ugettext_lazy as _
 
 from wagtail.core.models import Page as WagtailPage, Site
 from wagtail_headless_preview.signals import preview_update
@@ -96,7 +97,7 @@ class PageInterface(graphene.Interface):
         return resolve_queryset(
             self.get_siblings().exclude(pk=self.pk).live().public().specific(),
             info,
-            **kwargs
+            **kwargs,
         )
 
     def resolve_next_siblings(self, info, **kwargs):
@@ -107,7 +108,7 @@ class PageInterface(graphene.Interface):
         return resolve_queryset(
             self.get_next_siblings().exclude(pk=self.pk).live().public().specific(),
             info,
-            **kwargs
+            **kwargs,
         )
 
     def resolve_previous_siblings(self, info, **kwargs):
@@ -118,7 +119,7 @@ class PageInterface(graphene.Interface):
         return resolve_queryset(
             self.get_prev_siblings().exclude(pk=self.pk).live().public().specific(),
             info,
-            **kwargs
+            **kwargs,
         )
 
     def resolve_descendants(self, info, **kwargs):
@@ -157,13 +158,16 @@ class Page(DjangoObjectType):
         interfaces = (PageInterface,)
 
 
-def get_specific_page(id, slug, token, content_type=None, site=None):
+def get_specific_page(
+    id=None, slug=None, url_path=None, token=None, content_type=None, site=None
+):
     """
     Get a specific page, given a page_id, slug or preview if a preview token is passed
     """
     page = None
     try:
-        qs = WagtailPage.objects.live().public().specific()
+        # Everything but the special RootPage
+        qs = WagtailPage.objects.live().public().filter(depth__gt=1).specific()
 
         if site:
             qs = qs.in_site(site)
@@ -172,12 +176,31 @@ def get_specific_page(id, slug, token, content_type=None, site=None):
             page = qs.get(pk=id)
         elif slug:
             page = qs.get(slug=slug)
+        elif url_path:
+            if not url_path.endswith("/"):
+                url_path += "/"
 
+            if site:
+                # Got a site, so make the url_path query as specific as possible
+                qs = qs.filter(
+                    url_path=f"{site.root_page.url_path}{url_path.lstrip('/')}"
+                )
+            else:
+                # if the url_path is not specific enough, or the same url_path exists under multiple
+                # site roots, only the first one will be returned.
+                # To-Do: make site a 1st class argument on the page query, rather than just `in_site`
+                qs = qs.filter(url_path__endswith=url_path)
+
+            if qs.exists():
+                page = qs.first()
+
+        # If token provided then get draft/preview
         if token:
             if page:
                 page_type = type(page)
                 if hasattr(page_type, "get_page_from_preview_token"):
                     page = page_type.get_page_from_preview_token(token)
+
             elif content_type:
                 app_label, model = content_type.lower().split(".")
                 mdl = ContentType.objects.get(app_label=app_label, model=model)
@@ -197,7 +220,11 @@ def PagesQuery():
     class Mixin:
         pages = QuerySetList(
             graphene.NonNull(lambda: PageInterface),
-            in_site=graphene.Boolean(),
+            in_site=graphene.Argument(
+                graphene.Boolean,
+                description=_("Filter to pages in the current site only."),
+                default_value=False,
+            ),
             enable_search=True,
             required=True,
         )
@@ -205,9 +232,30 @@ def PagesQuery():
             PageInterface,
             id=graphene.Int(),
             slug=graphene.String(),
-            token=graphene.String(),
-            content_type=graphene.String(),
-            in_site=graphene.Boolean(),
+            url_path=graphene.Argument(
+                graphene.String,
+                description=_(
+                    "Filter by url path. Note: in a multi-site setup, returns the first available page based. "
+                    "Use `inSite: true` from the relevant site domain."
+                ),
+            ),
+            token=graphene.Argument(
+                graphene.String,
+                description=_(
+                    "Filter by preview token as passed by the `wagtail-headless-preview` package."
+                ),
+            ),
+            content_type=graphene.Argument(
+                graphene.String,
+                description=_(
+                    "Filter by content type using the app.ModelName notation. e.g. `myapp.BlogPage`"
+                ),
+            ),
+            in_site=graphene.Argument(
+                graphene.Boolean,
+                description=_("Filter to pages in the current site only."),
+                default_value=False,
+            ),
         )
 
         # Return all pages in site, ideally specific.
@@ -225,6 +273,7 @@ def PagesQuery():
             return get_specific_page(
                 id=kwargs.get("id"),
                 slug=kwargs.get("slug"),
+                url_path=kwargs.get("url_path"),
                 token=kwargs.get("token"),
                 content_type=kwargs.get("content_type"),
                 site=Site.find_for_request(info.context)
@@ -247,26 +296,56 @@ if has_channels:
 
     # Subscription Mixin
     def PagesSubscription():
-        def preview_observable(id, slug, token, content_type):
+        def preview_observable(id, slug, url_path, token, content_type, site):
             return preview_subject.filter(
                 lambda previewToken: previewToken == token
-            ).map(lambda token: get_specific_page(id, slug, token, content_type))
+            ).map(
+                lambda token: get_specific_page(
+                    id, slug, url_path, token, content_type, site
+                )
+            )
 
         class Mixin:
             page = graphene.Field(
                 PageInterface,
                 id=graphene.Int(),
                 slug=graphene.String(),
-                token=graphene.String(),
-                content_type=graphene.String(),
+                url_path=graphene.Argument(
+                    graphene.String,
+                    description=_(
+                        "Filter by url path. Note: in a multi-site setup, returns the first available page based. "
+                        "Use `inSite: true` from the relevant site domain."
+                    ),
+                ),
+                token=graphene.Argument(
+                    graphene.String,
+                    description=_(
+                        "Filter by preview token as passed by the `wagtail-headless-preview` package."
+                    ),
+                ),
+                content_type=graphene.Argument(
+                    graphene.String,
+                    description=_(
+                        "Filter by content type using the `app.ModelName` notation. e.g. `myapp.BlogPage`"
+                    ),
+                ),
+                in_site=graphene.Argument(
+                    graphene.Boolean,
+                    description=_("Filter to pages in the current site only."),
+                    default_value=False,
+                ),
             )
 
             def resolve_page(self, info, **kwargs):
                 return preview_observable(
                     id=kwargs.get("id"),
                     slug=kwargs.get("slug"),
+                    url_path=kwargs.get("url_path"),
                     token=kwargs.get("token"),
                     content_type=kwargs.get("content_type"),
+                    site=Site.find_for_request(info.context)
+                    if kwargs.get("in_site", False)
+                    else None,
                 )
 
         return Mixin

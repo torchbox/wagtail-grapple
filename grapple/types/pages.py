@@ -3,6 +3,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.dispatch import receiver
 
 from wagtail.core.models import Page as WagtailPage, Site
+from wagtail.core.utils import WAGTAIL_APPEND_SLASH
 from wagtail_headless_preview.signals import preview_update
 from graphene_django.types import DjangoObjectType
 from graphql.error import GraphQLLocatedError
@@ -96,7 +97,7 @@ class PageInterface(graphene.Interface):
         return resolve_queryset(
             self.get_siblings().exclude(pk=self.pk).live().public().specific(),
             info,
-            **kwargs
+            **kwargs,
         )
 
     def resolve_next_siblings(self, info, **kwargs):
@@ -107,7 +108,7 @@ class PageInterface(graphene.Interface):
         return resolve_queryset(
             self.get_next_siblings().exclude(pk=self.pk).live().public().specific(),
             info,
-            **kwargs
+            **kwargs,
         )
 
     def resolve_previous_siblings(self, info, **kwargs):
@@ -118,7 +119,7 @@ class PageInterface(graphene.Interface):
         return resolve_queryset(
             self.get_prev_siblings().exclude(pk=self.pk).live().public().specific(),
             info,
-            **kwargs
+            **kwargs,
         )
 
     def resolve_descendants(self, info, **kwargs):
@@ -175,7 +176,19 @@ def get_specific_page(
         elif slug:
             page = qs.get(slug=slug)
         elif url_path:
-            qs = qs.filter(url_path__contains=url_path.lstrip("/"))
+            if site:
+                # Got a site, so make the url_path query as specific as possible
+                qs = qs.filter(
+                    url_path=f"{site.root_page.url_path}{url_path.lstrip('/')}"
+                )
+            else:
+                # if the url_path is not specific enough, or the same url_path exists under multiple
+                # site roots, only the first one will be returned.
+                # To-Do: make site a 1st class argument on the page query, rather than just `in_site`
+                if WAGTAIL_APPEND_SLASH and not url_path.endswith("/"):
+                    url_path += "/"
+                qs = qs.filter(url_path__endswith=url_path)
+
             if qs.exists():
                 page = qs.first()
 

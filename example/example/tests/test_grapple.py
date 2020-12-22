@@ -1,5 +1,7 @@
 import os
 import sys
+from unittest.mock import patch
+
 import wagtail_factories
 
 if sys.version_info >= (3, 7):
@@ -39,7 +41,6 @@ class BaseGrappleTest(TestCase):
 class PagesTest(BaseGrappleTest):
     def setUp(self):
         self.factory = RequestFactory()
-        super().setUp()
 
     def test_pages(self):
         query = """
@@ -114,6 +115,73 @@ class PagesTest(BaseGrappleTest):
         page_data = executed["data"]["page"]
         self.assertEquals(page_data["contentType"], "home.BlogPage")
         self.assertEquals(page_data["parent"]["contentType"], "home.HomePage")
+
+
+class PageUrlPathTest(BaseGrappleTest):
+    def _query_by_path(self, path, in_site=False):
+        query = """
+        query($urlPath: String, $inSite: Boolean) {
+            page(urlPath: $urlPath, inSite: $inSite) {
+                id
+                url
+            }
+        }
+        """
+
+        executed = self.client.execute(
+            query, variables={"urlPath": path, "inSite": in_site}
+        )
+        return executed["data"].get("page")
+
+    def test_page_url_path_filter(self):
+        home = HomePage.objects.first()
+        home_child = BlogPageFactory(slug="child", parent=home)
+        parent = BlogPageFactory(slug="parent", parent=home)
+
+        child = BlogPageFactory(slug="child", parent=parent)
+
+        page_data = self._query_by_path("/parent/child/")
+        self.assertEquals(int(page_data["id"]), child.id)
+
+        # query without trailing slash
+        page_data = self._query_by_path("/parent/child")
+        self.assertEquals(int(page_data["id"]), child.id)
+
+        # we have two pages with the same slug, however /home/child will
+        # be returned first because of its position in the tree
+        page_data = self._query_by_path("/child")
+        self.assertEquals(int(page_data["id"]), home_child.id)
+
+        page_data = self._query_by_path("/")
+        self.assertEquals(int(page_data["id"]), home.id)
+
+        page_data = self._query_by_path("foo/bar")
+        self.assertIsNone(page_data)
+
+    def test_with_multisite(self):
+        home = HomePage.objects.first()
+        home_child = BlogPageFactory(slug="child", parent=home)
+
+        another_home = HomePage.objects.create(
+            title="Another home", slug="another-home", path="00010002", depth=2
+        )
+        another_site = wagtail_factories.SiteFactory(
+            site_name="Another site", root_page=another_home
+        )
+        another_child = BlogPageFactory(slug="child", parent=another_home)
+
+        # with multiple sites, only the first one will be returned
+        page_data = self._query_by_path("/child/")
+        self.assertEquals(int(page_data["id"]), home_child.id)
+
+        with patch(
+            "wagtail.core.models.Site.find_for_request", return_value=another_site
+        ):
+            page_data = self._query_by_path("/child/", in_site=True)
+            self.assertEquals(int(page_data["id"]), another_child.id)
+
+            page_data = self._query_by_path("/child", in_site=True)
+            self.assertEquals(int(page_data["id"]), another_child.id)
 
 
 class SitesTest(TestCase):

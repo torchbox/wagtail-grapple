@@ -166,7 +166,8 @@ def get_specific_page(
     """
     page = None
     try:
-        qs = WagtailPage.objects.live().public().specific()
+        # Everything but the special RootPage
+        qs = WagtailPage.objects.live().public().filter(depth__gt=1).specific()
 
         if site:
             qs = qs.in_site(site)
@@ -176,6 +177,9 @@ def get_specific_page(
         elif slug:
             page = qs.get(slug=slug)
         elif url_path:
+            if not url_path.endswith("/"):
+                url_path += "/"
+
             if site:
                 # Got a site, so make the url_path query as specific as possible
                 qs = qs.filter(
@@ -185,8 +189,6 @@ def get_specific_page(
                 # if the url_path is not specific enough, or the same url_path exists under multiple
                 # site roots, only the first one will be returned.
                 # To-Do: make site a 1st class argument on the page query, rather than just `in_site`
-                if WAGTAIL_APPEND_SLASH and not url_path.endswith("/"):
-                    url_path += "/"
                 qs = qs.filter(url_path__endswith=url_path)
 
             if qs.exists():

@@ -14,10 +14,10 @@ from wagtail.embeds.blocks import EmbedValue
 from example.tests.test_grapple import BaseGrappleTest
 from home.blocks import (
     ButtonBlock,
+    CarouselBlock,
     ImageGalleryImage,
     ImageGalleryImages,
     VideoBlock,
-    CarouselBlock,
 )
 from home.factories import (
     BlogPageFactory,
@@ -30,6 +30,7 @@ from home.factories import (
 class BlogTest(BaseGrappleTest):
     def setUp(self):
         super().setUp()
+
         # Create Blog
         self.blog_page = BlogPageFactory(
             body=[
@@ -99,7 +100,8 @@ class BlogTest(BaseGrappleTest):
                         },
                     },
                 ),
-            ]
+            ],
+            parent=self.home,
         )
 
     def test_blog_page(self):
@@ -414,9 +416,11 @@ class BlogTest(BaseGrappleTest):
             "title": "Wagtail Space 2018",
             "type": "video",
             "thumbnail_url": "https://i.ytimg.com/vi/_U79Wc965vw/hqdefault.jpg",
-            "width": 480,
-            "height": 270,
-            "html": '<iframe width="480" height="270" src="https://www.youtube.com/embed/_U79Wc965vw?feature=oembed" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>',
+            "width": 200,
+            "height": 113,
+            "html": '<iframe width="200" height="113" src="https://www.youtube.com/embed/_U79Wc965vw?feature=oembed" '
+            'frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; '
+            'picture-in-picture" allowfullscreen></iframe>',
         }
         for block in body:
             if block["blockType"] == "VideoBlock":
@@ -429,7 +433,9 @@ class BlogTest(BaseGrappleTest):
         self.fail("VideoBlock type not instantiated in Streamfield")
 
     def test_blog_body_pagechooserblock(self):
-        another_blog_post = BlogPageFactory(body=[("page", self.blog_page)])
+        another_blog_post = BlogPageFactory(
+            body=[("page", self.blog_page)], parent=self.home
+        )
         block_type = "PageChooserBlock"
         block_query = """
         page {

@@ -36,10 +36,12 @@ SCHEMA = locate(settings.GRAPHENE["SCHEMA"])
 class BaseGrappleTest(TestCase):
     def setUp(self):
         self.client = Client(SCHEMA)
+        self.home = HomePage.objects.first()
 
 
 class PagesTest(BaseGrappleTest):
     def setUp(self):
+        super().setUp()
         self.factory = RequestFactory()
 
     def test_pages(self):
@@ -105,7 +107,7 @@ class PagesTest(BaseGrappleTest):
         }
         """
 
-        blog_page = BlogPageFactory(parent=HomePage.objects.first())
+        blog_page = BlogPageFactory(parent=self.home)
 
         executed = self.client.execute(query, variables={"id": blog_page.id})
 
@@ -134,9 +136,8 @@ class PageUrlPathTest(BaseGrappleTest):
         return executed["data"].get("page")
 
     def test_page_url_path_filter(self):
-        home = HomePage.objects.first()
-        home_child = BlogPageFactory(slug="child", parent=home)
-        parent = BlogPageFactory(slug="parent", parent=home)
+        home_child = BlogPageFactory(slug="child", parent=self.home)
+        parent = BlogPageFactory(slug="parent", parent=self.home)
 
         child = BlogPageFactory(slug="child", parent=parent)
 
@@ -153,14 +154,13 @@ class PageUrlPathTest(BaseGrappleTest):
         self.assertEquals(int(page_data["id"]), home_child.id)
 
         page_data = self._query_by_path("/")
-        self.assertEquals(int(page_data["id"]), home.id)
+        self.assertEquals(int(page_data["id"]), self.home.id)
 
         page_data = self._query_by_path("foo/bar")
         self.assertIsNone(page_data)
 
     def test_with_multisite(self):
-        home = HomePage.objects.first()
-        home_child = BlogPageFactory(slug="child", parent=home)
+        home_child = BlogPageFactory(slug="child", parent=self.home)
 
         another_home = HomePage.objects.create(
             title="Another home", slug="another-home", path="00010002", depth=2

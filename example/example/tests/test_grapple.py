@@ -43,6 +43,7 @@ class PagesTest(BaseGrappleTest):
     def setUp(self):
         super().setUp()
         self.factory = RequestFactory()
+        self.blog_post = BlogPageFactory(parent=self.home)
 
     def test_pages(self):
         query = """
@@ -63,13 +64,12 @@ class PagesTest(BaseGrappleTest):
         self.assertEquals(type(executed["data"]["pages"][0]), dict_type)
 
         pages_data = executed["data"]["pages"]
-        self.assertEquals(pages_data[0]["contentType"], "wagtailcore.Page")
-        self.assertEquals(pages_data[0]["pageType"], "Page")
-        self.assertEquals(pages_data[1]["contentType"], "home.HomePage")
-        self.assertEquals(pages_data[1]["pageType"], "HomePage")
+        self.assertEquals(pages_data[0]["contentType"], "home.HomePage")
+        self.assertEquals(pages_data[0]["pageType"], "HomePage")
+        self.assertEquals(pages_data[1]["contentType"], "home.BlogPage")
+        self.assertEquals(pages_data[1]["pageType"], "BlogPage")
 
-        pages = Page.objects.all()
-
+        pages = Page.objects.filter(depth__gt=1)
         self.assertEquals(len(executed["data"]["pages"]), pages.count())
 
     def test_pages_in_site(self):
@@ -95,6 +95,38 @@ class PagesTest(BaseGrappleTest):
 
         self.assertEquals(len(executed["data"]["pages"]), pages.count())
 
+    def test_pages_content_type_filter(self):
+        def query(content_type):
+            return (
+                """
+            {
+                pages(contentType: "%s") {
+                    id
+                    title
+                    contentType
+                    pageType
+                }
+            }
+            """
+                % content_type
+            )
+
+        results = self.client.execute(query("home.HomePage"))
+        data = results["data"]["pages"]
+        self.assertEquals(len(data), 1)
+        self.assertEqual(int(data[0]["id"]), self.home.id)
+
+        another_post = BlogPageFactory(parent=self.home)
+        results = self.client.execute(query("home.BlogPage"))
+        data = results["data"]["pages"]
+        self.assertEqual(len(data), 2)
+        self.assertListEqual(
+            [int(p["id"]) for p in data], [self.blog_post.id, another_post.id]
+        )
+
+        results = self.client.execute(query("bogus.ContentType"))
+        self.assertListEqual(results["data"]["pages"], [])
+
     def test_page(self):
         query = """
         query($id: Int) {
@@ -107,9 +139,7 @@ class PagesTest(BaseGrappleTest):
         }
         """
 
-        blog_page = BlogPageFactory(parent=self.home)
-
-        executed = self.client.execute(query, variables={"id": blog_page.id})
+        executed = self.client.execute(query, variables={"id": self.blog_post.id})
 
         self.assertEquals(type(executed["data"]), dict_type)
         self.assertEquals(type(executed["data"]["page"]), dict_type)
@@ -267,7 +297,9 @@ class DisableAutoCamelCaseTest(TestCase):
         self.assertEquals(type(executed["data"]["pages"][0]["title"]), str)
         self.assertEquals(type(executed["data"]["pages"][0]["url_path"]), str)
 
-        pages = Page.objects.all()
+        # note: not using .all() as the pages query returns all pages with a depth > 1. Wagtail will normally have
+        # only one page at depth 1 (RootPage). everything else lives under it.
+        pages = Page.objects.filter(depth__gt=1)
 
         self.assertEquals(len(executed["data"]["pages"]), pages.count())
 

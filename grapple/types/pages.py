@@ -168,9 +168,14 @@ def get_specific_page(
     try:
         # Everything but the special RootPage
         qs = WagtailPage.objects.live().public().filter(depth__gt=1).specific()
-
+        ctype = None
         if site:
             qs = qs.in_site(site)
+
+        if content_type:
+            app_label, model = content_type.lower().split(".")
+            ctype = ContentType.objects.get(app_label=app_label, model=model)
+            qs = qs.filter(content_type=ctype)
 
         if id:
             page = qs.get(pk=id)
@@ -201,10 +206,8 @@ def get_specific_page(
                 if hasattr(page_type, "get_page_from_preview_token"):
                     page = page_type.get_page_from_preview_token(token)
 
-            elif content_type:
-                app_label, model = content_type.lower().split(".")
-                mdl = ContentType.objects.get(app_label=app_label, model=model)
-                cls = mdl.model_class()
+            elif ctype:
+                cls = ctype.model_class()
                 if hasattr(cls, "get_page_from_preview_token"):
                     page = cls.get_page_from_preview_token(token)
     except BaseException:
@@ -220,6 +223,10 @@ def PagesQuery():
     class Mixin:
         pages = QuerySetList(
             graphene.NonNull(lambda: PageInterface),
+            content_type=graphene.Argument(
+                graphene.String,
+                description=_("Filter by content type. Uses the `app.Model` notation."),
+            ),
             in_site=graphene.Argument(
                 graphene.Boolean,
                 description=_("Filter to pages in the current site only."),
@@ -260,11 +267,25 @@ def PagesQuery():
 
         # Return all pages in site, ideally specific.
         def resolve_pages(self, info, **kwargs):
-            pages = WagtailPage.objects.live().public().specific()
+            pages = (
+                WagtailPage.objects.live().public().filter(depth__gt=1).specific()
+            )  # no need to the root page
 
             if kwargs.get("in_site", False):
                 site = Site.find_for_request(info.context)
                 pages = pages.in_site(site)
+
+            content_type = kwargs.pop("content_type", None)
+            if content_type:
+                app_label, model = content_type.strip().lower().split(".")
+                try:
+                    ctype = ContentType.objects.get(app_label=app_label, model=model)
+                except:  # noqa
+                    return (
+                        WagtailPage.objects.none()
+                    )  # something not quite right here, bail out early
+                else:
+                    pages = pages.filter(content_type=ctype)
 
             return resolve_queryset(pages, info, **kwargs)
 

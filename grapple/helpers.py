@@ -59,6 +59,9 @@ def register_query_field(
                 field_query_params["slug"] = graphene.Argument(
                     graphene.String, description=ugettext_lazy("The page slug.")
                 )
+                field_query_params["url_path"] = graphene.Argument(
+                    graphene.String, description=ugettext_lazy("The url path.")
+                )
                 field_query_params["token"] = graphene.Argument(
                     graphene.String, description=ugettext_lazy("The preview token.")
                 )
@@ -78,10 +81,19 @@ def register_query_field(
                         ):
                             return cls.get_page_from_preview_token(kwargs["token"])
 
-                        return cls.objects.live().public().get(**kwargs)
+                        qs = cls.objects.live().public()
+                        url_path = kwargs.pop("url_path", None)
+                        if url_path:
+                            if not url_path.endswith("/"):
+                                url_path += "/"
+                            return qs.filter(
+                                url_path__endswith=url_path, **kwargs
+                            ).first()
+
+                        return qs.get(**kwargs)
 
                     return cls.objects.get(**kwargs)
-                except:
+                except Exception as e:
                     return None
 
             def resolve_plural(self, _, info, **kwargs):
@@ -155,6 +167,9 @@ def register_paginated_query_field(
                 field_query_params["slug"] = graphene.Argument(
                     graphene.String, description=ugettext_lazy("The page slug.")
                 )
+                field_query_params["url_path"] = graphene.Argument(
+                    graphene.String, description=ugettext_lazy("The page url path.")
+                )
                 field_query_params["token"] = graphene.Argument(
                     graphene.String, description=ugettext_lazy("The preview token.")
                 )
@@ -174,7 +189,15 @@ def register_paginated_query_field(
                         ):
                             return cls.get_page_from_preview_token(kwargs["token"])
 
-                        return cls.objects.live().public().get(**kwargs)
+                        qs = cls.objects.live().public()
+                        url_path = kwargs.pop("url_path", None)
+                        if url_path:
+                            if not url_path.endswith("/"):
+                                url_path += "/"
+                            return qs.filter(
+                                url_path__endswith=url_path, **kwargs
+                            ).first()
+                        return qs.get(**kwargs)
 
                     return cls.objects.get(**kwargs)
                 except:

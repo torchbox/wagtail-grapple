@@ -65,6 +65,7 @@ class BlogPageTag(TaggedItemBase):
 
 @register_singular_query_field("first_post")
 @register_paginated_query_field("blog_page")
+@register_query_field("post")
 class BlogPage(HeadlessPreviewMixin, Page):
     date = models.DateField("Post date")
     advert = models.ForeignKey(

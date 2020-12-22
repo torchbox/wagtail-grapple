@@ -77,11 +77,11 @@ The singular ``page`` field accepts the following arguments:
 
 ::
 
-    id: Int
-    url: String
-    slug: String
-    contentType: String
+    id: Int                       # Can be used on it's own
+    slug: String                  # Can be used on it's own
+    urlPath: String               # Can be used on it's own
     token: String                 # Must be used with one of the others
+    contentType: String           # Can be used on it's own
     inSite: Boolean               # Can be used on it's own
 
 
@@ -244,7 +244,7 @@ the ``sites`` or ``site`` field on the root query type. Available fields for the
     hostname: String
     isDefaultSite: Boolean
     rootPage: PageInterface
-    page(id: Int, slug: String, contentType: String, token: String): PageInterface
+    page(id: Int, slug: String, urlPath: String, contentType: String, token: String, inSite: Boolean): PageInterface
     pages(limit: PositiveInt, offset: PositiveInt, order: String, searchQuery: String, id: ID): [PageInterface]
 
 

@@ -70,6 +70,7 @@ accepts the following arguments:
     offset: PositiveInt
     order: String
     searchQuery: String
+    contentType: String
     inSite: Boolean
 
 
@@ -80,7 +81,7 @@ The singular ``page`` field accepts the following arguments:
     id: Int                       # Can be used on it's own
     slug: String                  # Can be used on it's own
     urlPath: String               # Can be used on it's own
-    token: String                 # Must be used with one of the others
+    token: String                 # Must be used with one of the others. Usually contentType
     contentType: String           # Can be used on it's own
     inSite: Boolean               # Can be used on it's own
 

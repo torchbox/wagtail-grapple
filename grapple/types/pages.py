@@ -22,17 +22,25 @@ from .structures import QuerySetList
 
 class PageInterface(graphene.Interface):
     id = graphene.ID()
+    title = graphene.String(required=True)
+    slug = graphene.String(required=True)
+    content_type = graphene.String(required=True)
+    page_type = graphene.String()
+    live = graphene.Boolean(required=True)
+
     url = graphene.String()
     url_path = graphene.String(required=True)
-    slug = graphene.String(required=True)
+
     depth = graphene.Int()
-    page_type = graphene.String()
-    title = graphene.String(required=True)
     seo_title = graphene.String(required=True)
-    seo_description = graphene.String()
+    search_description = graphene.String()
     show_in_menus = graphene.Boolean(required=True)
-    content_type = graphene.String(required=True)
+
+    locked = graphene.Boolean()
+
+    first_published_at = graphene.DateTime()
     last_published_at = graphene.DateTime()
+
     parent = graphene.Field(lambda: PageInterface)
     children = QuerySetList(
         graphene.NonNull(lambda: PageInterface), enable_search=True, required=True

@@ -270,6 +270,9 @@ def load_type_fields():
                 type_meta = {"Meta": Meta, "id": graphene.ID(), "name": type_name}
 
                 exclude_fields = []
+                base_type_for_exclusion_checks = (
+                    base_type if not issubclass(cls, WagtailPage) else WagtailPage
+                )
                 for field in get_fields_and_properties(cls):
                     # Filter out any fields that are defined on the interface of base type to prevent the
                     # 'Excluding the custom field "<field>" on DjangoObjectType "<cls>" has no effect.
@@ -277,7 +280,7 @@ def load_type_fields():
                     if (
                         field == "id"
                         or hasattr(interface, field)
-                        or hasattr(base_type, field)
+                        or hasattr(base_type_for_exclusion_checks, field)
                     ):
                         continue
 

@@ -73,6 +73,10 @@ def register_query_field(
                 if not kwargs:
                     return None
 
+                for k, v in dict(kwargs).items():
+                    if v is None:
+                        del kwargs[k]
+
                 token = kwargs.pop("token", None)
 
                 try:

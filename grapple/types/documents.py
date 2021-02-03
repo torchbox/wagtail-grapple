@@ -3,7 +3,6 @@ import graphene
 from graphene_django.types import DjangoObjectType
 
 from wagtail import VERSION as WAGTAIL_VERSION
-from wagtail.documents.models import Document as WagtailDocument
 
 if WAGTAIL_VERSION < (2, 9):
     from wagtail.documents.models import get_document_model
@@ -14,6 +13,8 @@ from ..registry import registry
 from ..utils import get_media_item_url, resolve_queryset
 from .collections import CollectionObjectType
 from .structures import QuerySetList
+
+WagtailDocument = get_document_model()
 
 
 class DocumentObjectType(DjangoObjectType):

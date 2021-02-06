@@ -29,6 +29,7 @@ BASE_DIR = os.path.dirname(PROJECT_DIR)
 INSTALLED_APPS = [
     "home",
     "images",
+    "documents",
     "search",
     "wagtail.contrib.forms",
     "wagtail.contrib.redirects",
@@ -159,6 +160,7 @@ MEDIA_URL = "/media/"
 
 WAGTAIL_SITE_NAME = "example"
 WAGTAILIMAGES_IMAGE_MODEL = "images.CustomImage"
+WAGTAILDOCS_DOCUMENT_MODEL = "documents.CustomDocument"
 WAGTAILDOCS_SERVE_METHOD = "serve_view"
 
 # Base URL to use when referring to full URLs within the Wagtail admin backend -

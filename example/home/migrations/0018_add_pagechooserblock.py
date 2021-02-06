@@ -9,7 +9,9 @@ import wagtail.images.blocks
 
 class Migration(migrations.Migration):
 
-    dependencies = [("home", "0017_auto_20201006_2147")]
+    dependencies = [
+        ("home", "0017_auto_20201006_2147"),
+    ]
 
     operations = [
         migrations.AlterField(
@@ -161,5 +163,5 @@ class Migration(migrations.Migration):
                     ("page", wagtail.core.blocks.PageChooserBlock()),
                 ]
             ),
-        )
+        ),
     ]

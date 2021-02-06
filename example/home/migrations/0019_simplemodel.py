@@ -5,7 +5,9 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [("home", "0018_add_pagechooserblock")]
+    dependencies = [
+        ("home", "0018_add_pagechooserblock"),
+    ]
 
     operations = [
         migrations.CreateModel(
@@ -19,7 +21,7 @@ class Migration(migrations.Migration):
                         serialize=False,
                         verbose_name="ID",
                     ),
-                )
+                ),
             ],
-        )
+        ),
     ]

@@ -6,16 +6,10 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ("home", "0019_simplemodel"),
-        ("images", "0001_initial"),
-    ]
+    dependencies = [("home", "0019_simplemodel"), ("images", "0001_initial")]
 
     operations = [
-        migrations.RemoveField(
-            model_name="blogpage",
-            name="cover",
-        ),
+        migrations.RemoveField(model_name="blogpage", name="cover"),
         migrations.AddField(
             model_name="blogpage",
             name="hero_image",

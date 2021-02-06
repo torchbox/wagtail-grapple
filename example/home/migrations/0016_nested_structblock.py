@@ -9,9 +9,7 @@ import wagtail.images.blocks
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ("home", "0015_auto_20200803_2223"),
-    ]
+    dependencies = [("home", "0015_auto_20200803_2223")]
 
     operations = [
         migrations.AlterField(
@@ -159,5 +157,5 @@ class Migration(migrations.Migration):
                     ),
                 ]
             ),
-        ),
+        )
     ]

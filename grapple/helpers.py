@@ -97,7 +97,7 @@ def register_query_field(
                         return qs.get(**kwargs)
 
                     return cls.objects.get(**kwargs)
-                except Exception as e:
+                except:
                     return None
 
             def resolve_plural(self, _, info, **kwargs):
@@ -133,6 +133,7 @@ def register_query_field(
             setattr(
                 schema, "resolve_" + field_name, MethodType(resolve_singular, schema)
             )
+
             setattr(
                 schema,
                 "resolve_" + plural_field_name,
@@ -186,6 +187,9 @@ def register_paginated_query_field(
                     return None
 
                 token = kwargs.pop("token", None)
+                for k, v in dict(kwargs).items():
+                    if v is None:
+                        del kwargs[k]
 
                 try:
                     # If is a Page then only query live/public pages.
@@ -266,7 +270,7 @@ def register_singular_query_field(field_name, query_params=None, required=False)
                     description=ugettext_lazy(
                         "Use the Django QuerySet order_by format."
                     ),
-                ),
+                )
             }
             if issubclass(cls, Page):
                 field_query_params["token"] = graphene.Argument(

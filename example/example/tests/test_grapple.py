@@ -4,10 +4,7 @@ from unittest.mock import patch
 
 import wagtail_factories
 
-if sys.version_info >= (3, 7):
-    from builtins import dict as dict_type
-else:
-    from collections import OrderedDict as dict_type
+from builtins import dict as dict_type
 
 from pydoc import locate
 

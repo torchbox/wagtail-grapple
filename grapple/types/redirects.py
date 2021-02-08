@@ -3,14 +3,14 @@ import graphene
 from django.conf import settings
 from wagtail.contrib.redirects.models import Redirect
 
-from .pages import PageInterface
+from .pages import get_page_interface
 
 
 class RedirectType(graphene.ObjectType):
     old_path = graphene.String(required=True)
     old_url = graphene.String(required=True)
     new_url = graphene.String(required=True)
-    page = graphene.Field(PageInterface)
+    page = graphene.Field(get_page_interface())
     is_permanent = graphene.Boolean(required=True)
 
     # Give old_path with BASE_URL attached.

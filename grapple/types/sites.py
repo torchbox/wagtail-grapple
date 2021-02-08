@@ -4,16 +4,16 @@ from wagtail.core.models import Page as WagtailPage, Site
 from graphene_django.types import DjangoObjectType
 
 from ..utils import resolve_queryset
-from .pages import PageInterface, get_specific_page
+from .pages import get_specific_page, get_page_interface
 from .structures import QuerySetList
 
 
 class SiteObjectType(DjangoObjectType):
     pages = QuerySetList(
-        graphene.NonNull(lambda: PageInterface), enable_search=True, required=True
+        graphene.NonNull(get_page_interface), enable_search=True, required=True
     )
     page = graphene.Field(
-        PageInterface,
+        get_page_interface(),
         id=graphene.Int(),
         slug=graphene.String(),
         token=graphene.String(),

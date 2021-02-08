@@ -22,7 +22,7 @@ from wagtail.snippets.models import get_snippet_models
 from .registry import registry
 from .types.documents import DocumentObjectType
 from .types.images import ImageObjectType
-from .types.pages import PageInterface, Page
+from .types.pages import Page, get_page_interface
 from .types.streamfield import generate_streamfield_union
 from .helpers import streamfield_types
 
@@ -416,7 +416,7 @@ def register_page_model(cls: Type[WagtailPage], type_prefix: str):
         return
 
     # Create a GQL type derived from page model.
-    page_node_type = build_node_type(cls, type_prefix, PageInterface, Page)
+    page_node_type = build_node_type(cls, type_prefix, get_page_interface(), Page)
 
     # Add page type to registry.
     if page_node_type:

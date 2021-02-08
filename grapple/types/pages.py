@@ -1,6 +1,8 @@
 import graphene
+from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.dispatch import receiver
+from django.utils.module_loading import import_string
 from django.utils.translation import ugettext_lazy as _
 
 from wagtail.core.models import Page as WagtailPage, Site
@@ -18,6 +20,13 @@ except ImportError:
 from ..registry import registry
 from ..utils import resolve_queryset
 from .structures import QuerySetList
+
+
+def get_page_interface():
+    path = getattr(
+        settings, "GRAPPLE_PAGE_INTERFACE", "grapple.types.pages.PageInterface"
+    )
+    return import_string(path)
 
 
 class PageInterface(graphene.Interface):
@@ -41,24 +50,24 @@ class PageInterface(graphene.Interface):
     first_published_at = graphene.DateTime()
     last_published_at = graphene.DateTime()
 
-    parent = graphene.Field(lambda: PageInterface)
+    parent = graphene.Field(get_page_interface)
     children = QuerySetList(
-        graphene.NonNull(lambda: PageInterface), enable_search=True, required=True
+        graphene.NonNull(get_page_interface), enable_search=True, required=True
     )
     siblings = QuerySetList(
-        graphene.NonNull(lambda: PageInterface), enable_search=True, required=True
+        graphene.NonNull(get_page_interface), enable_search=True, required=True
     )
     next_siblings = QuerySetList(
-        graphene.NonNull(lambda: PageInterface), enable_search=True, required=True
+        graphene.NonNull(get_page_interface), enable_search=True, required=True
     )
     previous_siblings = QuerySetList(
-        graphene.NonNull(lambda: PageInterface), enable_search=True, required=True
+        graphene.NonNull(get_page_interface), enable_search=True, required=True
     )
     descendants = QuerySetList(
-        graphene.NonNull(lambda: PageInterface), enable_search=True, required=True
+        graphene.NonNull(get_page_interface), enable_search=True, required=True
     )
     ancestors = QuerySetList(
-        graphene.NonNull(lambda: PageInterface), enable_search=True, required=True
+        graphene.NonNull(get_page_interface), enable_search=True, required=True
     )
 
     @classmethod
@@ -76,7 +85,7 @@ class PageInterface(graphene.Interface):
         )
 
     def resolve_page_type(self, info, **kwargs):
-        return PageInterface.resolve_type(self.specific, info, **kwargs)
+        return get_page_interface().resolve_type(self.specific, info, **kwargs)
 
     def resolve_parent(self, info, **kwargs):
         """
@@ -163,7 +172,7 @@ class Page(DjangoObjectType):
 
     class Meta:
         model = WagtailPage
-        interfaces = (PageInterface,)
+        interfaces = (get_page_interface(),)
 
 
 def get_specific_page(
@@ -230,7 +239,7 @@ def PagesQuery():
 
     class Mixin:
         pages = QuerySetList(
-            graphene.NonNull(lambda: PageInterface),
+            graphene.NonNull(get_page_interface),
             content_type=graphene.Argument(
                 graphene.String,
                 description=_("Filter by content type. Uses the `app.Model` notation."),
@@ -244,7 +253,7 @@ def PagesQuery():
             required=True,
         )
         page = graphene.Field(
-            PageInterface,
+            get_page_interface(),
             id=graphene.Int(),
             slug=graphene.String(),
             url_path=graphene.Argument(
@@ -336,7 +345,7 @@ if has_channels:
 
         class Mixin:
             page = graphene.Field(
-                PageInterface,
+                get_page_interface(),
                 id=graphene.Int(),
                 slug=graphene.String(),
                 url_path=graphene.Argument(

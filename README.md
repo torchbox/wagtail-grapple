@@ -86,7 +86,7 @@ Getting Grapple installed is designed to be as simple as possible!
 ### Prerequisites
 ```
 Django  >= 2.2, <3.1 (<2.3 if using channels)
-wagtail >= 2.5, <2.12
+wagtail >= 2.5, <2.13
 ```
 
 ### Installation
@@ -209,7 +209,7 @@ Wagtail Grapple supports:
 
 - Django 2.2.x, 3.0.x
 - Python 3.6, 3.7, 3.8 and 3.9
-- Wagtail >= 2.5, < 2.12
+- Wagtail >= 2.5, < 2.13
 
 ## License
 

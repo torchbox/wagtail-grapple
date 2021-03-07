@@ -1,5 +1,6 @@
 import graphene
 
+from django.conf import settings
 from graphene_django import DjangoObjectType
 from wagtail.images import get_image_model
 from wagtail.images.models import (
@@ -59,6 +60,15 @@ def get_rendition_type():
     return rendition_type
 
 
+def rendition_allowed(rendition_filter):
+    """Checks a given rendition filter is allowed"""
+    allowed_filters = getattr(settings, "GRAPPLE_ALLOWED_IMAGE_FILTERS", [])
+    if not allowed_filters:
+        return True
+
+    return rendition_filter in allowed_filters
+
+
 class ImageObjectType(DjangoObjectType, BaseImageObjectType):
     rendition = graphene.Field(
         lambda: get_rendition_type(),
@@ -82,43 +92,47 @@ class ImageObjectType(DjangoObjectType, BaseImageObjectType):
         """
         Render a custom rendition of the current image.
         """
+        rendition = None
         try:
             filters = "|".join([f"{key}-{val}" for key, val in kwargs.items()])
-            img = self.get_rendition(filters)
-            rendition_type = get_rendition_type()
 
-            return rendition_type(
-                id=img.id,
-                url=img.url,
-                width=img.width,
-                height=img.height,
-                file=img.file,
-                image=self,
-            )
-        except:
-            return None
+            # Only allowed the defined filters (thus renditions)
+            if rendition_allowed(filters):
+                img = self.get_rendition(filters)
+                rendition_type = get_rendition_type()
+
+                rendition = rendition_type(
+                    id=img.id,
+                    url=img.url,
+                    width=img.width,
+                    height=img.height,
+                    file=img.file,
+                    image=self,
+                )
+        finally:
+            return rendition
 
     def resolve_src_set(self, info, sizes, **kwargs):
         """
         Generate src set of renditions.
         """
+        src_set = ""
         try:
             if self.file.name is not None:
                 rendition_list = [
                     ImageObjectType.resolve_rendition(self, info, width=width)
                     for width in sizes
+                    if rendition_allowed(f"width-{width}")
                 ]
 
-                return ", ".join(
+                src_set = ", ".join(
                     [
                         f"{get_media_item_url(img)} {img.width}w"
                         for img in rendition_list
                     ]
                 )
-        except:
-            pass
-
-        return ""
+        finally:
+            return src_set
 
 
 def get_image_type():

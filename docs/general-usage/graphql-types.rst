@@ -142,13 +142,29 @@ the ``ImageRenditionObjectType`` provides the following fields:
 ::
 
     id: ID
-    filterSpec: String!
+    url: String
     file: String!
     width: Int
     height: Int
-    focalPointKey: String!
+    aspectRatio: Float!
+    sizes: String!
     image: ImageObjectType!
-    url: String
+
+
+To prevent arbitrary renditions from being generated, set ``GRAPPLE_ALLOWED_IMAGE_FILTERS`` in your settings to a
+list of allowed filters. Read more about generating renditions in the Wagtail docs
+(`Generating renditions in Python <https://docs.wagtail.io/en/stable/advanced_topics/images/renditions.html#generating-renditions-in-python>` and
+`Using images in templates <https://docs.wagtail.io/en/stable/topics/images.html#image-tag>`
+
+For example:
+
+::
+
+GRAPPLE_ALLOWED_IMAGE_FILTERS = [
+    "width-1000",
+    "fill-300x150|jpegquality-60",
+    "width-700|format-webp"
+]
 
 
 DocumentObjectType

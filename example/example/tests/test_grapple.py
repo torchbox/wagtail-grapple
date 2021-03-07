@@ -342,6 +342,60 @@ class ImagesTest(BaseGrappleTest):
             executed["data"]["images"][0]["url"], executed["data"]["images"][0]["src"]
         )
 
+    def test_renditions(self):
+        query = """
+        {
+            image(id: 1) {
+                rendition(width: 100) {
+                    url
+                }
+            }
+        }
+        """
+
+        executed = self.client.execute(query)
+        self.assertIn("width-100", executed["data"]["image"]["rendition"]["url"])
+
+    @override_settings(GRAPPLE_ALLOWED_IMAGE_FILTERS=["width-200"])
+    def test_allowed_renditions(self):
+        def get_query(**kwargs):
+            params = ",".join([f"{key}: {value}" for key, value in kwargs.items()])
+            return (
+                """
+            {
+                image(id: 1) {
+                    rendition(%s) {
+                        url
+                    }
+                }
+            }
+            """
+                % params
+            )
+
+        executed = self.client.execute(get_query(width=100))
+        self.assertIsNone(executed["data"]["image"]["rendition"])
+
+        executed = self.client.execute(get_query(width=200))
+        self.assertIsNotNone(executed["data"]["image"]["rendition"])
+        self.assertIn("width-200", executed["data"]["image"]["rendition"]["url"])
+
+    @override_settings(GRAPPLE_ALLOWED_IMAGE_FILTERS=["width-200"])
+    def test_src_set(self):
+        query = """
+        {
+            image(id: 1) {
+                srcSet(sizes: [100, 200])
+            }
+        }
+        """
+
+        executed = self.client.execute(query)
+
+        # only the width-200 rendition is allowed
+        self.assertNotIn("width-100", executed["data"]["image"]["srcSet"])
+        self.assertIn("width-200", executed["data"]["image"]["srcSet"])
+
     def tearDown(self):
         example_image_path = self.example_image.file.path
         self.example_image.delete()

@@ -166,6 +166,9 @@ GRAPPLE_ALLOWED_IMAGE_FILTERS = [
     "width-700|format-webp"
 ]
 
+Note that the ``srcSet`` attribute on ``ImageObjectType`` generates ``width-*`` filters, so if in use consider adding
+the relevant filters to the allowed list.
+
 
 DocumentObjectType
 ^^^^^^^^^^^^^^^^^^

@@ -62,8 +62,8 @@ def get_rendition_type():
 
 def rendition_allowed(rendition_filter):
     """Checks a given rendition filter is allowed"""
-    allowed_filters = getattr(settings, "GRAPPLE_ALLOWED_IMAGE_FILTERS", [])
-    if not allowed_filters:
+    allowed_filters = getattr(settings, "GRAPPLE_ALLOWED_IMAGE_FILTERS", None)
+    if allowed_filters is None or not isinstance(allowed_filters, list):
         return True
 
     return rendition_filter in allowed_filters

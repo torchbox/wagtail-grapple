@@ -1,4 +1,4 @@
-name: Example Tests
+name: CI
 
 on:
   push:
@@ -7,6 +7,20 @@ on:
     branches: [main]
 
 jobs:
+  pre-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - uses: pre-commit/action@v2.0.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
   test:
     runs-on: ubuntu-latest
     strategy:

@@ -1,27 +1,23 @@
-<div align="center">
+<p align="center">
   <a href="https://github.com/GrappleGQL/wagtail-grapple">
     <img src="https://github.com/GrappleGQL/wagtail-grapple/raw/main/.github/wagtail-grapple.svg?sanitize=true" alt="A red g with a grapple hook" width="80" height="80">
   </a>
+</p>
 
-  <h3 align="center">Wagtail Grapple
-  [![Build status](https://github.com/GrappleGQL/wagtail-grapple/actions/workflows/ci.yml/badge.svg)](https://github.com/GrappleGQL/wagtail-grapple/actions)
-  [![PyPi](https://img.shields.io/pypi/v/wagtail-grapple.svg)](https://pypi.org/project/wagtail-grapple/)
-  [![black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-  [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
-  </h3>
+# Wagtail Grapple
 
-  <p align="center">
-    A library to build GraphQL endpoints easily so you can grapple your Wagtail data from anywhere!
-    <br />
-    <br/>
-    [Explore the docs »](https://wagtail-grapple.readthedocs.io/en/latest/)
-    ·
-    [Report Bug](https://github.com/GrappleGQL/wagtail-grapple/issues)
-    ·
-    [Request Feature](https://github.com/GrappleGQL/wagtail-grapple/issues)
-  </p>
-</div>
+[![Build status](https://github.com/GrappleGQL/wagtail-grapple/actions/workflows/ci.yml/badge.svg)](https://github.com/GrappleGQL/wagtail-grapple/actions)
+[![PyPi](https://img.shields.io/pypi/v/wagtail-grapple.svg)](https://pypi.org/project/wagtail-grapple/)
+[![black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
 
+
+A library to build GraphQL endpoints easily so you can grapple your Wagtail data from anywhere!
+
+
+[Explore the docs »](https://wagtail-grapple.readthedocs.io/en/latest/) · 
+[Report Bug](https://github.com/GrappleGQL/wagtail-grapple/issues) · 
+[Request Feature](https://github.com/GrappleGQL/wagtail-grapple/issues)
 
 
 <!-- TABLE OF CONTENTS -->

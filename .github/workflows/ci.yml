@@ -21,6 +21,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
   test:
+    needs: [lint]
     runs-on: ubuntu-latest
     strategy:
       max-parallel: 4
@@ -47,6 +48,7 @@ jobs:
           python manage.py test
 
   test_channels:
+    needs: [lint]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2

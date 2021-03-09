@@ -61,6 +61,7 @@ jobs:
           pip install .
 
   build_and_publish:
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
     needs: [lint, test]
     runs-on: ubuntu-latest
     steps:
@@ -76,7 +77,6 @@ jobs:
       - name: Build
         run: python setup.py sdist bdist_wheel
       - name: Publish to PyPI
-        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           user: __token__

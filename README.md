@@ -15,8 +15,8 @@
 A library to build GraphQL endpoints easily so you can grapple your Wagtail data from anywhere!
 
 
-[Explore the docs »](https://wagtail-grapple.readthedocs.io/en/latest/) · 
-[Report Bug](https://github.com/GrappleGQL/wagtail-grapple/issues) · 
+[Explore the docs »](https://wagtail-grapple.readthedocs.io/en/latest/) ·
+[Report Bug](https://github.com/GrappleGQL/wagtail-grapple/issues) ·
 [Request Feature](https://github.com/GrappleGQL/wagtail-grapple/issues)
 
 

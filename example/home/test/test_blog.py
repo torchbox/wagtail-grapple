@@ -639,6 +639,24 @@ class BlogTest(BaseGrappleTest):
                 self.assertEquals(button["buttonText"], "Take me to the source")
                 self.assertEquals(button["buttonLink"], "https://wagtail.io/")
 
+    def test_empty_list_in_structblock(self):
+        another_blog_post = BlogPageFactory(
+            body=[("text_and_buttons", {"buttons": []})], parent=self.home
+        )
+        block_type = "TextAndButtonsBlock"
+        block_query = """
+        buttons {
+            ... on ButtonBlock {
+                buttonText
+                buttonLink
+            }
+        }
+        """
+        query_blocks = self.get_blocks_from_body(
+            block_type, block_query=block_query, page_id=another_blog_post.id
+        )
+        self.assertEqual(query_blocks, [{"blockType": "TextAndButtonsBlock", "buttons": []}])
+
     def test_singular_blog_page_query(self):
         def query():
             return """

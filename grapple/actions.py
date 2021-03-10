@@ -350,7 +350,7 @@ def streamfield_resolver(self, instance, info, **kwargs):
         block = instance.block.child_blocks[field_name]
         value = get_field_value(instance, field_name)
 
-        if not block or not value:
+        if not block:
             return None
 
         if issubclass(type(block), ImageChooserBlock) and isinstance(value, int):

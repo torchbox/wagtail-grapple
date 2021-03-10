@@ -655,7 +655,9 @@ class BlogTest(BaseGrappleTest):
         query_blocks = self.get_blocks_from_body(
             block_type, block_query=block_query, page_id=another_blog_post.id
         )
-        self.assertEqual(query_blocks, [{"blockType": "TextAndButtonsBlock", "buttons": []}])
+        self.assertEqual(
+            query_blocks, [{"blockType": "TextAndButtonsBlock", "buttons": []}]
+        )
 
     def test_singular_blog_page_query(self):
         def query():

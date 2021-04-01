@@ -4,6 +4,8 @@ from unittest.mock import patch
 
 import wagtail_factories
 
+from grapple.types.images import rendition_allowed
+
 if sys.version_info >= (3, 7):
     from builtins import dict as dict_type
 else:
@@ -341,6 +343,70 @@ class ImagesTest(BaseGrappleTest):
         self.assertEquals(
             executed["data"]["images"][0]["url"], executed["data"]["images"][0]["src"]
         )
+
+    def test_renditions(self):
+        query = """
+        {
+            image(id: 1) {
+                rendition(width: 100) {
+                    url
+                }
+            }
+        }
+        """
+
+        executed = self.client.execute(query)
+        self.assertIn("width-100", executed["data"]["image"]["rendition"]["url"])
+
+    @override_settings(GRAPPLE_ALLOWED_IMAGE_FILTERS=["width-200"])
+    def test_renditions_with_allowed_image_filters_restrictions(self):
+        def get_query(**kwargs):
+            params = ",".join([f"{key}: {value}" for key, value in kwargs.items()])
+            return (
+                """
+            {
+                image(id: 1) {
+                    rendition(%s) {
+                        url
+                    }
+                }
+            }
+            """
+                % params
+            )
+
+        executed = self.client.execute(get_query(width=100))
+        self.assertIsNone(executed["data"]["image"]["rendition"])
+
+        executed = self.client.execute(get_query(width=200))
+        self.assertIsNotNone(executed["data"]["image"]["rendition"])
+        self.assertIn("width-200", executed["data"]["image"]["rendition"]["url"])
+
+    @override_settings(GRAPPLE_ALLOWED_IMAGE_FILTERS=["width-200"])
+    def test_src_set(self):
+        query = """
+        {
+            image(id: 1) {
+                srcSet(sizes: [100, 200])
+            }
+        }
+        """
+
+        executed = self.client.execute(query)
+
+        # only the width-200 rendition is allowed
+        self.assertNotIn("width-100", executed["data"]["image"]["srcSet"])
+        self.assertIn("width-200", executed["data"]["image"]["srcSet"])
+
+    def test_rendition_allowed_method(self):
+        self.assertTrue(rendition_allowed("width-100"))
+        with override_settings(GRAPPLE_ALLOWED_IMAGE_FILTERS=["width-200"]):
+            self.assertFalse(rendition_allowed("width-100"))
+            self.assertTrue(rendition_allowed("width-200"))
+
+        with override_settings(GRAPPLE_ALLOWED_IMAGE_FILTERS=[]):
+            self.assertFalse(rendition_allowed("width-100"))
+            self.assertFalse(rendition_allowed("fill-100x100"))
 
     def tearDown(self):
         example_image_path = self.example_image.file.path

@@ -171,7 +171,7 @@ CORS_ORIGIN_ALLOW_ALL = True
 
 # Grapple Config:
 GRAPHENE = {"SCHEMA": "grapple.schema.schema"}
-GRAPPLE_APPS = {"images": "", "home": ""}
+GRAPPLE_APPS = {"images": "", "home": "", "documents": ""}
 GRAPPLE_ADD_SEARCH_HIT = True
 
 HEADLESS_PREVIEW_CLIENT_URLS = {"default": "http://localhost:8001/preview"}

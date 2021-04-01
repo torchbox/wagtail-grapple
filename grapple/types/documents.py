@@ -9,13 +9,12 @@ if WAGTAIL_VERSION < (2, 9):
 else:
     from wagtail.documents import get_document_model
 
+from wagtail.documents.models import Document as WagtailDocument
+
 from ..registry import registry
 from ..utils import get_media_item_url, resolve_queryset
 from .collections import CollectionObjectType
 from .structures import QuerySetList
-
-WagtailDocument = get_document_model()
-
 
 class DocumentObjectType(DjangoObjectType):
     """
@@ -43,10 +42,13 @@ class DocumentObjectType(DjangoObjectType):
         return get_media_item_url(self)
 
 
-def DocumentsQuery():
-    registry.documents[WagtailDocument] = DocumentObjectType
+def get_document_type():
     mdl = get_document_model()
-    mdl_type = registry.documents[mdl]
+    return registry.documents.get(mdl, DocumentObjectType)
+
+def DocumentsQuery():
+    mdl = get_document_model()
+    mdl_type = get_document_type()
 
     class Mixin:
         document = graphene.Field(mdl_type, id=graphene.ID())
@@ -58,6 +60,7 @@ def DocumentsQuery():
                 graphene.ID, description="Filter by collection id"
             ),
         )
+        document_type = graphene.String(required=True)
 
         def resolve_document(self, info, id, **kwargs):
             """Returns a document given the id, if in a public collection"""
@@ -74,12 +77,8 @@ def DocumentsQuery():
             return resolve_queryset(qs, info, **kwargs)
 
         def resolve_document_type(self, info, **kwargs):
-            return mdl_type
+            return get_document_type()
 
     return Mixin
 
 
-def get_document_type():
-    registry.documents[WagtailDocument] = DocumentObjectType
-    mdl = get_document_model()
-    return registry.documents[mdl]

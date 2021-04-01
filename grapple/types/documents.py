@@ -16,6 +16,7 @@ from ..utils import get_media_item_url, resolve_queryset
 from .collections import CollectionObjectType
 from .structures import QuerySetList
 
+
 class DocumentObjectType(DjangoObjectType):
     """
     Base document type used if one isn't generated for the current model.
@@ -45,6 +46,7 @@ class DocumentObjectType(DjangoObjectType):
 def get_document_type():
     mdl = get_document_model()
     return registry.documents.get(mdl, DocumentObjectType)
+
 
 def DocumentsQuery():
     mdl = get_document_model()
@@ -80,5 +82,3 @@ def DocumentsQuery():
             return get_document_type()
 
     return Mixin
-
-

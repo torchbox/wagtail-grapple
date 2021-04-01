@@ -462,7 +462,8 @@ class DocumentsTest(BaseGrappleTest):
             executed["data"]["documents"][0]["id"], str(self.example_document.id)
         )
         self.assertEquals(
-            executed["data"]["documents"][0]["customDocumentProperty"], "Document Model!"
+            executed["data"]["documents"][0]["customDocumentProperty"],
+            "Document Model!",
         )
 
     def test_query_file_field(self):

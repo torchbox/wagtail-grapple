@@ -1,25 +1,23 @@
 <p align="center">
   <a href="https://github.com/GrappleGQL/wagtail-grapple">
-    <img src="https://github.com/GrappleGQL/wagtail-grapple/raw/master/.github/wagtail-grapple.svg?sanitize=true" alt="A red g with a grapple hook" width="80" height="80">
+    <img src="https://github.com/GrappleGQL/wagtail-grapple/raw/main/.github/wagtail-grapple.svg?sanitize=true" alt="A red g with a grapple hook" width="80" height="80">
   </a>
-
-  <h3 align="center">Wagtail Grapple <a href="https://pypi.org/project/wagtail-grapple/"><img src="https://img.shields.io/pypi/v/wagtail-grapple.svg"></a> <a href="https://github.com/psf/black"><img src="https://img.shields.io/badge/code%20style-black-000000.svg"></a> <a href="https://github.com/pre-commit/pre-commit"><img src="https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white"></a></h3>
-
-  <p align="center">
-    A library to build GraphQL endpoints easily so you can grapple your Wagtail data from anywhere!
-    <br />
-    <br/>
-    <a href="https://wagtail-grapple.readthedocs.io/en/latest/"><strong>Explore the docs »</strong></a>
-    <br />
-    <br />
-    <a href="https://github.com/GrappleGQL/wagtail-grapple#about-the-project">View Demo</a>
-    ·
-    <a href="https://github.com/GrappleGQL/wagtail-grapple/issues">Report Bug</a>
-    ·
-    <a href="https://github.com/GrappleGQL/wagtail-grapple/issues">Request Feature</a>
-  </p>
 </p>
 
+# Wagtail Grapple
+
+[![Build status](https://github.com/GrappleGQL/wagtail-grapple/actions/workflows/ci.yml/badge.svg)](https://github.com/GrappleGQL/wagtail-grapple/actions)
+[![PyPi](https://img.shields.io/pypi/v/wagtail-grapple.svg)](https://pypi.org/project/wagtail-grapple/)
+[![black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
+
+
+A library to build GraphQL endpoints easily so you can grapple your Wagtail data from anywhere!
+
+
+[Explore the docs »](https://wagtail-grapple.readthedocs.io/en/latest/) ·
+[Report Bug](https://github.com/GrappleGQL/wagtail-grapple/issues) ·
+[Request Feature](https://github.com/GrappleGQL/wagtail-grapple/issues)
 
 
 <!-- TABLE OF CONTENTS -->
@@ -86,7 +84,7 @@ Getting Grapple installed is designed to be as simple as possible!
 ### Prerequisites
 ```
 Django  >= 2.2, <3.1 (<2.3 if using channels)
-wagtail >= 2.5, <2.12
+Wagtail >= 2.5, <2.13
 ```
 
 ### Installation
@@ -99,10 +97,10 @@ Add the following to the `installed_apps` list in your Wagtail settings file:
 
 ```python
 installed_apps = [
-    ...
+    # ...
     "grapple",
     "graphene_django",
-    ...
+    # ...
 ]
 ```
 
@@ -111,11 +109,11 @@ For GraphQL Subscriptions with Django Channels, run `pip install wagtail_grapple
 
 ```python
 installed_apps = [
-    ...
+    # ...
     "grapple",
     "graphene_django",
     "channels",
-    ...
+    # ...
 ]
 ```
 
@@ -123,7 +121,7 @@ installed_apps = [
 Add the following to the bottom of the same settings file, where each key is the app you want to this library to scan and the value is the prefix you want to give to GraphQL types (you can usually leave this blank):
 
 ```python
-# Grapple Config:
+# Grapple config:
 GRAPHENE = {"SCHEMA": "grapple.schema.schema"}
 GRAPPLE_APPS = {
     "home": ""
@@ -136,14 +134,14 @@ Add the GraphQL URLs to your `urls.py`:
 from grapple import urls as grapple_urls
 ...
 urlpatterns = [
-    ...
-    url(r"", include(grapple_urls)),
-    ...
+    # ...
+    path("api/", include(grapple_urls)),
+    # ...
 ]
 ```
 
 Done! Now you can proceed onto configuring your models to generate GraphQL types that adopt their structure :tada:
-_Your GraphQL endpoint is available at http://localhost:8000/graphql/_
+_Your GraphQL endpoint is available at http://localhost:8000/api/graphql/_
 
 ## Usage
 
@@ -209,7 +207,7 @@ Wagtail Grapple supports:
 
 - Django 2.2.x, 3.0.x
 - Python 3.6, 3.7, 3.8 and 3.9
-- Wagtail >= 2.5, < 2.12
+- Wagtail >= 2.5, < 2.13
 
 ## License
 

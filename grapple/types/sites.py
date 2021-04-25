@@ -36,7 +36,7 @@ class SiteObjectType(DjangoObjectType):
             app_label, model = content_type.strip().lower().split(".")
             try:
                 ctype = ContentType.objects.get(app_label=app_label, model=model)
-            except:  # noqa
+            except ContentType.DoesNotExist: 
                 return (
                     WagtailPage.objects.none()
                 )  # something not quite right here, bail out early

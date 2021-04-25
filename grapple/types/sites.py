@@ -1,5 +1,8 @@
 import graphene
 
+from django.utils.translation import ugettext_lazy as _
+from django.contrib.contenttypes.models import ContentType
+
 from wagtail.core.models import Page as WagtailPage, Site
 from graphene_django.types import DjangoObjectType
 
@@ -10,7 +13,13 @@ from .structures import QuerySetList
 
 class SiteObjectType(DjangoObjectType):
     pages = QuerySetList(
-        graphene.NonNull(lambda: PageInterface), enable_search=True, required=True
+        graphene.NonNull(lambda: PageInterface),
+        content_type=graphene.Argument(
+            graphene.String,
+            description=_("Filter by content type. Uses the `app.Model` notation."),
+        ),
+        enable_search=True,
+        required=True,
     )
     page = graphene.Field(
         PageInterface,
@@ -21,9 +30,21 @@ class SiteObjectType(DjangoObjectType):
     )
 
     def resolve_pages(self, info, **kwargs):
-        return resolve_queryset(
-            WagtailPage.objects.in_site(self).live().public().specific(), info, **kwargs
-        )
+        pages = WagtailPage.objects.in_site(self).live().public().specific()
+
+        content_type = kwargs.pop("content_type", None)
+        if content_type:
+            app_label, model = content_type.strip().lower().split(".")
+            try:
+                ctype = ContentType.objects.get(app_label=app_label, model=model)
+            except ContentType.DoesNotExist:
+                return (
+                    WagtailPage.objects.none()
+                )  # something not quite right here, bail out early
+            else:
+                pages = pages.filter(content_type=ctype)
+
+        return resolve_queryset(pages, info, **kwargs)
 
     def resolve_page(self, info, **kwargs):
         return get_specific_page(

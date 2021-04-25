@@ -222,6 +222,7 @@ class SitesTest(TestCase):
             hostname="grapple.localhost", site_name="Grapple test site"
         )
         self.client = Client(SCHEMA)
+        self.home = HomePage.objects.first()
 
     def test_sites(self):
         query = """
@@ -274,6 +275,73 @@ class SitesTest(TestCase):
         self.assertNotEqual(
             len(executed["data"]["site"]["pages"]), Page.objects.count()
         )
+
+    def test_site_pages_content_type_filter(self):
+        query = """
+        query($hostname: String $content_type: String)
+        {
+            site(hostname: $hostname) {
+                siteName
+                pages(contentType: $content_type) {
+                    title
+                    contentType
+                }
+            }
+        }
+        """
+        # grapple test site root page
+        results = self.client.execute(
+            query, variables={
+                "hostname": self.site.hostname, "content_type": "wagtailcore.Page"
+            }
+        )
+        data = results["data"]["site"]["pages"]
+        self.assertEquals(len(data), 1)
+        self.assertEquals(data[0]["title"], self.site.root_page.title)
+
+        # Shouldn't return any data
+        results = self.client.execute(
+            query, variables={
+                "hostname": self.site.hostname, "content_type": "home.HomePage"
+            }
+        )
+        data = results["data"]["site"]["pages"]
+        self.assertEquals(len(data), 0)
+
+        # localhost root page
+        results = self.client.execute(
+            query, variables={
+                "hostname": self.home.get_site().hostname, "content_type": "home.HomePage"
+            }
+        )
+        data = results["data"]["site"]["pages"]
+        self.assertEquals(len(data), 1)
+        self.assertEquals(data[0]["contentType"], "home.HomePage")
+        self.assertEquals(data[0]["title"], self.home.title)
+
+        # Blog page under grapple test site
+        blog = BlogPageFactory(parent=self.site.root_page, title='blog on grapple test site')
+        results = self.client.execute(
+            query, variables={
+                "hostname": self.site.hostname, "content_type": "home.BlogPage"
+            }
+        )
+        data = results["data"]["site"]["pages"]
+        self.assertEquals(len(data), 1)
+        self.assertEquals(data[0]["contentType"], "home.BlogPage")
+        self.assertEquals(data[0]["title"], blog.title)
+
+        # Blog page under localhost
+        blog = BlogPageFactory(parent=self.home, title='blog on localhost')
+        results = self.client.execute(
+            query, variables={
+                "hostname": self.home.get_site().hostname, "content_type": "home.BlogPage"
+            }
+        )
+        data = results["data"]["site"]["pages"]
+        self.assertEquals(len(data), 1)
+        self.assertEquals(data[0]["contentType"], "home.BlogPage")
+        self.assertEquals(data[0]["title"], blog.title)
 
 
 @override_settings(GRAPPLE_AUTO_CAMELCASE=False)

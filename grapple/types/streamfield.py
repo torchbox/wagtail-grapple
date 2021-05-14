@@ -118,8 +118,7 @@ def serialize_struct_obj(obj):
             if hasattr(value, "raw_data"):
                 rtn_obj[field] = list(
                     map(
-                        lambda data: serialize_struct_obj(data["value"]),
-                        value.raw_data,
+                        lambda data: serialize_struct_obj(data["value"]), value.raw_data
                     )
                 )
             elif hasattr(value, "value"):

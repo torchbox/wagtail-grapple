@@ -22,7 +22,7 @@ from ..registry import registry
 class GenericStreamFieldInterface(Scalar):
     @staticmethod
     def serialize(stream_value):
-        return stream_value.stream_data
+        return stream_value.raw_data
 
 
 @convert_django_field.register(StreamField)
@@ -108,18 +108,18 @@ class StructBlockItem:
 def serialize_struct_obj(obj):
     rtn_obj = {}
 
-    if hasattr(obj, "stream_data"):
+    if hasattr(obj, "raw_data"):
         rtn_obj = []
-        for field in obj.stream_data:
+        for field in obj.raw_data:
             rtn_obj.append(serialize_struct_obj(field["value"]))
     else:
         for field in obj:
             value = obj[field]
-            if hasattr(value, "stream_data"):
+            if hasattr(value, "raw_data"):
                 rtn_obj[field] = list(
                     map(
                         lambda data: serialize_struct_obj(data["value"]),
-                        value.stream_data,
+                        value.raw_data,
                     )
                 )
             elif hasattr(value, "value"):
@@ -145,15 +145,15 @@ class StructBlock(graphene.ObjectType):
 
         if issubclass(type(self.value), wagtail.core.blocks.stream_block.StreamValue):
             # self: StreamChild, block: StreamBlock, value: StreamValue
-            stream_data = self.value.stream_data
+            raw_data = self.value.raw_data
             child_blocks = self.value.stream_block.child_blocks
         else:
             # This occurs when StreamBlock is child of StructBlock
             # self: StructBlockItem, block: StreamBlock, value: list
-            stream_data = self.value
+            raw_data = self.value
             child_blocks = self.block.child_blocks
 
-        for field, value in stream_data.items():
+        for field, value in raw_data.items():
             block = dict(child_blocks)[field]
             if issubclass(
                 type(block), wagtail.core.blocks.ChooserBlock
@@ -172,7 +172,7 @@ class StreamBlock(StructBlock):
 
     def resolve_blocks(self, info, **kwargs):
         stream_blocks = []
-        for stream in self.value.stream_data:
+        for stream in self.value.raw_data:
             if type(stream) == tuple:
                 # As of Wagtail 2.11 stream_data is a list of dicts (when lazy) or tuples
                 # when not lazy. The tuple is (block_type, value, id) where value has been run through bulk_to_python()

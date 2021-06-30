@@ -110,8 +110,8 @@ def serialize_struct_obj(obj):
 
     if hasattr(obj, "raw_data"):
         rtn_obj = []
-        for field in obj.raw_data:
-            rtn_obj.append(serialize_struct_obj(field["value"]))
+        for field in obj.body[0]:
+            rtn_obj.append(serialize_struct_obj(field.value))
     else:
         for field in obj:
             value = obj[field]

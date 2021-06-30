@@ -170,23 +170,12 @@ class StreamBlock(StructBlock):
     def resolve_blocks(self, info, **kwargs):
         stream_blocks = []
 
-        for stream in self.value[0]:
-            if type(stream) == tuple:
-                # As of Wagtail 2.11 stream_data is a list of dicts (when lazy) or tuples
-                # when not lazy. The tuple is (block_type, value, id) where value has been run through bulk_to_python()
-                # @see https://github.com/wagtail/wagtail/pull/5976
-                block_type, value, _ = stream
-                block = self.value.stream_block.child_blocks[block_type]
-            else:
-                block_type = stream["type"]
-                value = stream["value"]
-                block = self.value.stream_block.child_blocks[block_type]
-                if issubclass(
-                    type(block), wagtail.core.blocks.ChooserBlock
-                ) or not issubclass(type(block), blocks.StructBlock):
-                    value = block.to_python(value)
-
+        for stream in self.value:
+            block_type = stream.block_type
+            value = stream.value
+            block = self.value.stream_block.child_blocks[block_type]
             stream_blocks.append(StructBlockItem(block_type, block, value))
+
         return stream_blocks
 
 

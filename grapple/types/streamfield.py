@@ -117,9 +117,7 @@ def serialize_struct_obj(obj):
             value = obj[field]
             if isinstance(value, blocks.StreamValue):
                 rtn_obj[field] = list(
-                    map(
-                        lambda data: serialize_struct_obj(data.value), value[0]
-                    )
+                    map(lambda data: serialize_struct_obj(data.value), value[0])
                 )
             elif hasattr(value, "value"):
                 rtn_obj[field] = value.value
@@ -154,9 +152,9 @@ class StructBlock(graphene.ObjectType):
 
         for field, value in stream_data.items():
             block = dict(child_blocks)[field]
-            if issubclass(
-                type(block), blocks.ChooserBlock
-            ) or not issubclass(type(block), blocks.StructBlock):
+            if issubclass(type(block), blocks.ChooserBlock) or not issubclass(
+                type(block), blocks.StructBlock
+            ):
                 if isinstance(value, int):
                     value = block.to_python(value)
 

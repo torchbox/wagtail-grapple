@@ -1,4 +1,6 @@
 from wagtail.core import hooks
+import uuid
+from django.utils.crypto import get_random_string
 from wagtail.core.models import Page
 import graphene
 
@@ -9,16 +11,18 @@ from home.models import AuthorPage
 class CreateAuthor(graphene.Mutation):
     class Arguments:
         name = graphene.String()
+        parent = graphene.Int()
 
     ok = graphene.Boolean()
     author = graphene.Field(
         PageInterface,
     )
 
-    def mutate(root, info, name):
-        author = AuthorPage(name=name, title=name, slug=name)
+    def mutate(root, info, name, parent):
+        # We use uuid here in order to ensure the slug will always be unique accross tests
+        author = AuthorPage(name=name, title=name, slug=uuid.uuid4().hex[:6].upper())
         ok = True
-        Page.objects.first().add_child(instance=author)
+        Page.objects.get(id=parent).add_child(instance=author)
         author.save_revision().publish()
         return CreateAuthor(author=author, ok=ok)
 

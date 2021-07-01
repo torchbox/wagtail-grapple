@@ -174,3 +174,43 @@ class TestRegisterPaginatedQueryField(BaseGrappleTest):
         results = self.client.execute(query('slug: "post-two"'))
         data = results["data"]["blogPage"]
         self.assertEqual(int(data["id"]), self.another_post.id)
+
+
+class TestRegisterMutation(BaseGrappleTest):
+    def setUp(self):
+        super().setUp()
+        self.blog_post = BlogPageFactory(parent=self.home, slug="post-one")
+        self.name = "Jean-Claude"
+
+    def test_mutation(self):
+        query = """
+        mutation {
+          createAuthor(name: "%s", parent: %s) {
+            author {
+              id
+              ...on AuthorPage {
+                  name
+              }
+              title
+              slug
+            }
+          }
+        }
+        """ % (
+            self.name,
+            self.blog_post.id,
+        )
+
+        results = self.client.execute(query)
+        data = results["data"]["createAuthor"]
+        self.assertIn("author", data)
+
+        # First we check that standard page fields are available in the returned query
+        self.assertIn("id", data["author"])
+        self.assertIn("title", data["author"])
+        self.assertIn("slug", data["author"])
+
+        # Now we ensure that AuthorPage-specific fields are well returned
+        self.assertIn("name", data["author"])
+
+        self.assertEqual(data["author"]["name"], self.name)

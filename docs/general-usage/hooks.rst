@@ -5,6 +5,10 @@ On loading, Wagtail will search for any app with the file ``wagtail_hooks.py`` a
 This provides a way to register your own functions to execute at certain points in Wagtail’s execution. Read more
 about hooks in the `Wagtail docs <https://docs.wagtail.io/en/stable/reference/hooks.html>`_
 
+
+Query
+^^^^^
+
 Grapple provides a ``register_schema_query`` hook that is called when it creates the schema. You can use it to
 add your custom ``Query`` mixins:
 
@@ -31,4 +35,31 @@ replace or remove any of the default mixins that are not of use in your project:
     @hooks.register('register_schema_query')
     def replace_search_query(query_mixins):
         query_mixins[:] = [item for item in query_mixins if item != SearchQuery]
-        quer_mixins.append(ReplacementQuery)
+        query_mixins.append(ReplacementQuery)
+
+Mutation
+^^^^^^^^
+
+Grapple provides a ``register_schema_mutation`` hook that is called when it creates the schema. You can use it to add your custom ``Mutation`` mixins
+
+.. code-block:: python
+    import graphene
+
+    @hooks.register('register_schema_mutation')
+    class CreateAuthor(graphene.Mutation):
+        class Arguments:
+            name = graphene.String()
+
+        ok = graphene.Boolean()
+        author = graphene.Field(lambda: AuthorPage)
+
+        def mutate(root, info, name):
+            author = AuthorPage(name=name)
+            ok = True
+            return CreateAuthor(author=author, ok=ok)
+
+
+Subscription
+^^^^^^^^^^^^
+
+Grapple provides a ``register_schema_subscription`` hook that is called when it creates the schema. You can use it to add your custom ``Subscription`` mixins

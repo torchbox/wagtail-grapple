@@ -1,6 +1,7 @@
 from wagtail.core import hooks
 import graphene
 
+from grapple.types.pages import PageInterface
 from home.models import AuthorPage
 
 
@@ -9,7 +10,9 @@ class CreateAuthor(graphene.Mutation):
         name = graphene.String()
 
     ok = graphene.Boolean()
-    author = graphene.Field(lambda: AuthorPage)
+    author = graphene.Field(
+        PageInterface,
+    )
 
     def mutate(root, info, name):
         author = AuthorPage(name=name)
@@ -17,6 +20,5 @@ class CreateAuthor(graphene.Mutation):
         return CreateAuthor(author=author, ok=ok)
 
 
-@hooks.register("register_schema_mutation")
-def register_author_mutation(mutation_mixins):
-    mutation_mixins.append(CreateAuthor)
+class Mutations(graphene.ObjectType):
+    create_author = CreateAuthor.Field()

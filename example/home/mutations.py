@@ -1,4 +1,5 @@
 from wagtail.core import hooks
+from wagtail.core.models import Page
 import graphene
 
 from grapple.types.pages import PageInterface
@@ -15,8 +16,10 @@ class CreateAuthor(graphene.Mutation):
     )
 
     def mutate(root, info, name):
-        author = AuthorPage(name=name)
+        author = AuthorPage(name=name, title=name, slug=name)
         ok = True
+        Page.objects.first().add_child(instance=author)
+        author.save_revision().publish()
         return CreateAuthor(author=author, ok=ok)
 
 

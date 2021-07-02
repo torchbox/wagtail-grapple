@@ -182,6 +182,7 @@ class TestRegisterMutation(BaseGrappleTest):
         super().setUp()
         self.blog_post = BlogPageFactory(parent=self.home, slug="post-one")
         self.name = "Jean-Claude"
+        # A randomly generated slug is set here in order to avoid conflicted slug during tests
         self.slug = str(uuid.uuid4().hex[:6].upper())
 
     def test_mutation(self):

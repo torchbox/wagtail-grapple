@@ -1,4 +1,5 @@
 import os
+import collections
 import sys
 from unittest.mock import patch
 
@@ -59,9 +60,11 @@ class PagesTest(BaseGrappleTest):
 
         executed = self.client.execute(query)
 
-        self.assertEquals(type(executed["data"]), dict_type)
+        self.assertTrue(isinstance(executed["data"], collections.OrderedDict))
         self.assertEquals(type(executed["data"]["pages"]), list)
-        self.assertEquals(type(executed["data"]["pages"][0]), dict_type)
+        self.assertTrue(
+            isinstance(executed["data"]["pages"][0], collections.OrderedDict)
+        )
 
         pages_data = executed["data"]["pages"]
         self.assertEquals(pages_data[0]["contentType"], "home.HomePage")
@@ -86,9 +89,11 @@ class PagesTest(BaseGrappleTest):
         request = self.factory.get("/")
         executed = self.client.execute(query, context_value=request)
 
-        self.assertEquals(type(executed["data"]), dict_type)
+        self.assertTrue(isinstance(executed["data"], collections.OrderedDict))
         self.assertEquals(type(executed["data"]["pages"]), list)
-        self.assertEquals(type(executed["data"]["pages"][0]), dict_type)
+        self.assertTrue(
+            isinstance(executed["data"]["pages"][0], collections.OrderedDict)
+        )
 
         site = Site.find_for_request(request)
         pages = Page.objects.in_site(site)
@@ -141,8 +146,8 @@ class PagesTest(BaseGrappleTest):
 
         executed = self.client.execute(query, variables={"id": self.blog_post.id})
 
-        self.assertEquals(type(executed["data"]), dict_type)
-        self.assertEquals(type(executed["data"]["page"]), dict_type)
+        self.assertTrue(isinstance(executed["data"], collections.OrderedDict))
+        self.assertTrue(isinstance(executed["data"]["page"], collections.OrderedDict))
 
         page_data = executed["data"]["page"]
         self.assertEquals(page_data["contentType"], "home.BlogPage")
@@ -241,7 +246,7 @@ class SitesTest(TestCase):
 
         executed = self.client.execute(query)
 
-        self.assertEquals(type(executed["data"]), dict_type)
+        self.assertTrue(isinstance(executed["data"], collections.OrderedDict))
         self.assertEquals(type(executed["data"]["sites"]), list)
         self.assertEquals(len(executed["data"]["sites"]), Site.objects.count())
 
@@ -262,8 +267,8 @@ class SitesTest(TestCase):
             query, variables={"hostname": self.site.hostname}
         )
 
-        self.assertEquals(type(executed["data"]), dict_type)
-        self.assertEquals(type(executed["data"]["site"]), dict_type)
+        self.assertTrue(isinstance(executed["data"], collections.OrderedDict))
+        self.assertTrue(isinstance(executed["data"]["site"], collections.OrderedDict))
         self.assertEquals(type(executed["data"]["site"]["pages"]), list)
 
         pages = Page.objects.in_site(self.site)
@@ -291,9 +296,11 @@ class DisableAutoCamelCaseTest(TestCase):
         """
         executed = self.client.execute(query)
 
-        self.assertEquals(type(executed["data"]), dict_type)
+        self.assertTrue(isinstance(executed["data"], collections.OrderedDict))
         self.assertEquals(type(executed["data"]["pages"]), list)
-        self.assertEquals(type(executed["data"]["pages"][0]), dict_type)
+        self.assertTrue(
+            isinstance(executed["data"]["pages"][0], collections.OrderedDict)
+        )
         self.assertEquals(type(executed["data"]["pages"][0]["title"]), str)
         self.assertEquals(type(executed["data"]["pages"][0]["url_path"]), str)
 

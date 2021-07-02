@@ -47,3 +47,10 @@ jobs:
         run: |
           pip install -r requirements-channels.txt
           pip install .
+
+      - name: Run Tests
+        run: |
+          cd example
+          rm db.sqlite3
+          python manage.py migrate
+          python manage.py test home.test.test_subscriptions

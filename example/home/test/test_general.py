@@ -1,6 +1,7 @@
 from example.tests.test_grapple import BaseGrappleTest
 
 from home.factories import BlogPageFactory, SimpleModelFactory
+import uuid
 
 
 class TestRegisterSingularQueryField(BaseGrappleTest):
@@ -181,11 +182,12 @@ class TestRegisterMutation(BaseGrappleTest):
         super().setUp()
         self.blog_post = BlogPageFactory(parent=self.home, slug="post-one")
         self.name = "Jean-Claude"
+        self.slug = str(uuid.uuid4().hex[:6].upper())
 
     def test_mutation(self):
         query = """
         mutation {
-          createAuthor(name: "%s", parent: %s) {
+          createAuthor(name: "%s", parent: %s, slug: "%s") {
             author {
               id
               ...on AuthorPage {
@@ -199,6 +201,7 @@ class TestRegisterMutation(BaseGrappleTest):
         """ % (
             self.name,
             self.blog_post.id,
+            self.slug,
         )
 
         results = self.client.execute(query)
@@ -213,4 +216,30 @@ class TestRegisterMutation(BaseGrappleTest):
         # Now we ensure that AuthorPage-specific fields are well returned
         self.assertIn("name", data["author"])
 
+        # Finally, we ensure that data passed in the first place to the query are indeed
+        # returned after the author has been saved to the database.
         self.assertEqual(data["author"]["name"], self.name)
+        self.assertEqual(data["author"]["slug"], self.slug)
+
+
+class TestRegisterSubscription(BaseGrappleTest):
+    def test_subscription(self):
+        query = """
+        {
+          __schema {
+            subscriptionType {
+              fields {
+                name
+              }
+            }
+          }
+        }
+        """
+
+        results = self.client.execute(query)
+        subscriptions = results["data"]["__schema"]["subscriptionType"]["fields"]
+
+        # We check here that the subscription defined in example/home/subscriptions.py and
+        # added in example/home/wagtail_hooks.py is indeed added to the graphene schema.
+        # Note: it is hard to test subscriptions, but there is some place for improvement here.
+        self.assertIn("hello", subscriptions)

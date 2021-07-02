@@ -9,5 +9,5 @@ def register_author_mutation(mutation_mixins):
 
 
 @hooks.register("register_schema_subscription")
-def register_time_of_day_subscription(subscription_mixins):
+def register_example_subscription(subscription_mixins):
     subscription_mixins.append(Subscription)

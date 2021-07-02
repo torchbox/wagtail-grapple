@@ -43,20 +43,36 @@ Mutation
 Grapple provides a ``register_schema_mutation`` hook that is called when it creates the schema. You can use it to add your custom ``Mutation`` mixins
 
 .. code-block:: python
-    import graphene
-
-    @hooks.register('register_schema_mutation')
+    # mutations.py
     class CreateAuthor(graphene.Mutation):
         class Arguments:
             name = graphene.String()
+            parent = graphene.Int()
 
         ok = graphene.Boolean()
-        author = graphene.Field(lambda: AuthorPage)
+        author = graphene.Field(
+            PageInterface,
+        )
 
-        def mutate(root, info, name):
-            author = AuthorPage(name=name)
+        def mutate(root, info, name, parent):
+            author = AuthorPage(name=name, title=name, slug=name)
             ok = True
+            Page.objects.get(id=parent).add_child(instance=author)
+            author.save_revision().publish()
             return CreateAuthor(author=author, ok=ok)
+
+
+    class Mutations(graphene.ObjectType):
+        create_author = CreateAuthor.Field()
+
+
+.. code-block:: python
+    # wagtail_hooks.py
+    from .mutations import Mutations
+
+    @hooks.register("register_schema_mutation")
+    def register_author_mutation(mutation_mixins):
+        mutation_mixins.append(Mutations)
 
 
 Subscription

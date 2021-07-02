@@ -2,7 +2,7 @@
 black==19.3b0
 
 # Your app requirements.
--r ../requirements.txt
+-r ../requirements-channels.txt
 
 # Your app in editable mode.
 -e ../

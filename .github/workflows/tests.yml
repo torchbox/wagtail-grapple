@@ -53,4 +53,4 @@ jobs:
           cd example
           rm db.sqlite3
           python manage.py migrate
-          python manage.py test home.test.test_subscriptions
+          python manage.py test

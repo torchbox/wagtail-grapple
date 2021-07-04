@@ -4,6 +4,8 @@ from unittest.mock import patch
 
 import wagtail_factories
 
+from grapple.types.images import rendition_allowed
+
 if sys.version_info >= (3, 7):
     from builtins import dict as dict_type
 else:
@@ -220,6 +222,7 @@ class SitesTest(TestCase):
             hostname="grapple.localhost", site_name="Grapple test site"
         )
         self.client = Client(SCHEMA)
+        self.home = HomePage.objects.first()
 
     def test_sites(self):
         query = """
@@ -272,6 +275,79 @@ class SitesTest(TestCase):
         self.assertNotEqual(
             len(executed["data"]["site"]["pages"]), Page.objects.count()
         )
+
+    def test_site_pages_content_type_filter(self):
+        query = """
+        query($hostname: String $content_type: String)
+        {
+            site(hostname: $hostname) {
+                siteName
+                pages(contentType: $content_type) {
+                    title
+                    contentType
+                }
+            }
+        }
+        """
+        # grapple test site root page
+        results = self.client.execute(
+            query,
+            variables={
+                "hostname": self.site.hostname,
+                "content_type": "wagtailcore.Page",
+            },
+        )
+        data = results["data"]["site"]["pages"]
+        self.assertEquals(len(data), 1)
+        self.assertEquals(data[0]["title"], self.site.root_page.title)
+
+        # Shouldn't return any data
+        results = self.client.execute(
+            query,
+            variables={"hostname": self.site.hostname, "content_type": "home.HomePage"},
+        )
+        data = results["data"]["site"]["pages"]
+        self.assertEquals(len(data), 0)
+
+        # localhost root page
+        results = self.client.execute(
+            query,
+            variables={
+                "hostname": self.home.get_site().hostname,
+                "content_type": "home.HomePage",
+            },
+        )
+        data = results["data"]["site"]["pages"]
+        self.assertEquals(len(data), 1)
+        self.assertEquals(data[0]["contentType"], "home.HomePage")
+        self.assertEquals(data[0]["title"], self.home.title)
+
+        # Blog page under grapple test site
+        blog = BlogPageFactory(
+            parent=self.site.root_page, title="blog on grapple test site"
+        )
+        results = self.client.execute(
+            query,
+            variables={"hostname": self.site.hostname, "content_type": "home.BlogPage"},
+        )
+        data = results["data"]["site"]["pages"]
+        self.assertEquals(len(data), 1)
+        self.assertEquals(data[0]["contentType"], "home.BlogPage")
+        self.assertEquals(data[0]["title"], blog.title)
+
+        # Blog page under localhost
+        blog = BlogPageFactory(parent=self.home, title="blog on localhost")
+        results = self.client.execute(
+            query,
+            variables={
+                "hostname": self.home.get_site().hostname,
+                "content_type": "home.BlogPage",
+            },
+        )
+        data = results["data"]["site"]["pages"]
+        self.assertEquals(len(data), 1)
+        self.assertEquals(data[0]["contentType"], "home.BlogPage")
+        self.assertEquals(data[0]["title"], blog.title)
 
 
 @override_settings(GRAPPLE_AUTO_CAMELCASE=False)
@@ -342,6 +418,70 @@ class ImagesTest(BaseGrappleTest):
             executed["data"]["images"][0]["url"], executed["data"]["images"][0]["src"]
         )
 
+    def test_renditions(self):
+        query = """
+        {
+            image(id: 1) {
+                rendition(width: 100) {
+                    url
+                }
+            }
+        }
+        """
+
+        executed = self.client.execute(query)
+        self.assertIn("width-100", executed["data"]["image"]["rendition"]["url"])
+
+    @override_settings(GRAPPLE_ALLOWED_IMAGE_FILTERS=["width-200"])
+    def test_renditions_with_allowed_image_filters_restrictions(self):
+        def get_query(**kwargs):
+            params = ",".join([f"{key}: {value}" for key, value in kwargs.items()])
+            return (
+                """
+            {
+                image(id: 1) {
+                    rendition(%s) {
+                        url
+                    }
+                }
+            }
+            """
+                % params
+            )
+
+        executed = self.client.execute(get_query(width=100))
+        self.assertIsNone(executed["data"]["image"]["rendition"])
+
+        executed = self.client.execute(get_query(width=200))
+        self.assertIsNotNone(executed["data"]["image"]["rendition"])
+        self.assertIn("width-200", executed["data"]["image"]["rendition"]["url"])
+
+    @override_settings(GRAPPLE_ALLOWED_IMAGE_FILTERS=["width-200"])
+    def test_src_set(self):
+        query = """
+        {
+            image(id: 1) {
+                srcSet(sizes: [100, 200])
+            }
+        }
+        """
+
+        executed = self.client.execute(query)
+
+        # only the width-200 rendition is allowed
+        self.assertNotIn("width-100", executed["data"]["image"]["srcSet"])
+        self.assertIn("width-200", executed["data"]["image"]["srcSet"])
+
+    def test_rendition_allowed_method(self):
+        self.assertTrue(rendition_allowed("width-100"))
+        with override_settings(GRAPPLE_ALLOWED_IMAGE_FILTERS=["width-200"]):
+            self.assertFalse(rendition_allowed("width-100"))
+            self.assertTrue(rendition_allowed("width-200"))
+
+        with override_settings(GRAPPLE_ALLOWED_IMAGE_FILTERS=[]):
+            self.assertFalse(rendition_allowed("width-100"))
+            self.assertFalse(rendition_allowed("fill-100x100"))
+
     def tearDown(self):
         example_image_path = self.example_image.file.path
         self.example_image.delete()
@@ -382,6 +522,7 @@ class DocumentsTest(BaseGrappleTest):
         {
             documents {
                 id
+                customDocumentProperty
             }
         }
         """
@@ -393,6 +534,10 @@ class DocumentsTest(BaseGrappleTest):
         self.assertEquals(len(executed["data"]["documents"]), documents.count())
         self.assertEquals(
             executed["data"]["documents"][0]["id"], str(self.example_document.id)
+        )
+        self.assertEquals(
+            executed["data"]["documents"][0]["customDocumentProperty"],
+            "Document Model!",
         )
 
     def test_query_file_field(self):

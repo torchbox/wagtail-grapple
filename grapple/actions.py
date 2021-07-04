@@ -348,11 +348,11 @@ def streamfield_resolver(self, instance, info, **kwargs):
     if hasattr(instance, "block"):
         field_name = convert_to_underscore(info.field_name)
         block = instance.block.child_blocks[field_name]
-        value = get_field_value(instance, field_name)
 
-        if not block or not value:
+        if not block:
             return None
 
+        value = get_field_value(instance, field_name)
         if issubclass(type(block), ImageChooserBlock) and isinstance(value, int):
             return block.to_python(value)
 

@@ -173,6 +173,8 @@ CORS_ORIGIN_ALLOW_ALL = True
 GRAPHENE = {"SCHEMA": "grapple.schema.schema"}
 GRAPPLE_APPS = {"images": "", "home": "", "documents": ""}
 GRAPPLE_ADD_SEARCH_HIT = True
+GRAPPLE_PAGE_SIZE = 10
+GRAPPLE_PAGE_SIZE_MAX = 50
 
 HEADLESS_PREVIEW_CLIENT_URLS = {"default": "http://localhost:8001/preview"}
 HEADLESS_PREVIEW_LIVE = True

@@ -174,6 +174,10 @@ You can now query your adverts with the following query:
         }
     }
 
+The default ``per_page`` value is 10 and can be changed with the ``GRAPPLE_PAGE_SIZE`` setting.
+
+The ``per_page`` has a maximum value of 100 by default and can be changed with the ``GRAPPLE_PAGE_SIZE_MAX`` setting.
+
 You can add custom query parameters like so:
 
 ::

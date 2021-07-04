@@ -10,6 +10,9 @@ from wagtail.search.backends import get_search_backend
 
 from .types.structures import BasePaginatedType, PaginationType
 
+GRAPPLE_PAGE_SIZE = getattr(settings, "GRAPPLE_PAGE_SIZE", 10)
+GRAPPLE_PAGE_SIZE_MAX = getattr(settings, "GRAPPLE_PAGE_SIZE_MAX", 100)
+
 
 def resolve_queryset(
     qs,
@@ -63,12 +66,16 @@ def resolve_queryset(
     if order is not None:
         qs = qs.order_by(*map(lambda x: x.strip(), order.split(",")))
 
-    if limit is not None:
-        limit = int(limit)
-        qs = qs[offset : limit + offset]
-
     if collection is not None:
-        qs = qs.filter(collection=collection)
+        try:
+            qs.model._meta.get_field("collection")
+            qs = qs.filter(collection=collection)
+        except:
+            pass
+
+    if limit is not None:
+        limit = min(int(limit or GRAPPLE_PAGE_SIZE), GRAPPLE_PAGE_SIZE_MAX)
+        qs = qs[offset : limit + offset]
 
     return qs
 
@@ -127,7 +134,8 @@ def resolve_paginated_queryset(
     :param order: Order the query set using the Django QuerySet order_by format.
     :type order: str
     """
-    per_page = int(per_page or 10)
+    page = int(page or 1)
+    per_page = min(int(per_page or GRAPPLE_PAGE_SIZE), GRAPPLE_PAGE_SIZE_MAX)
 
     if id is not None:
         qs = qs.filter(pk=id)

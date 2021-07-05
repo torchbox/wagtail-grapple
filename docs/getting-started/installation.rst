@@ -54,16 +54,8 @@ Add the GraphQL urls to your ``urls.py``:
         ...
     ]
 
-By default, Grapple will add ``/graphql`` url to where you can make GET/POST GraphQL requests.
-When ``DEBUG`` is enabled on the settings or ``GRAPPLE["EXPOSE_GRAPHIQL"]`` is set to ``True``,
-the ``/graphiql`` url is also added to provide access to GraphiQL (a graphical interactive in-browser GraphQL IDE).
-
 Done! Now you can proceed onto configuring your models to generate
 GraphQL types that adopt their structure.
-
-By default, all field and argument names will be converted from ``snake_case``
-to ``camelCase``. To disable this behavior, set the ``GRAPPLE["AUTO_CAMELCASE"]``
-setting to `False` on your project settings.
 
 * **Next Steps**
 

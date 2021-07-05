@@ -151,28 +151,6 @@ the ``ImageRenditionObjectType`` provides the following fields:
     image: ImageObjectType!
 
 
-To prevent arbitrary renditions from being generated, set ``GRAPPLE["ALLOWED_IMAGE_FILTERS"]`` in your settings to a
-list of allowed filters. Read more about generating renditions in the Wagtail docs
-(`Generating renditions in Python <https://docs.wagtail.io/en/stable/advanced_topics/images/renditions.html#generating-renditions-in-python>` and
-`Using images in templates <https://docs.wagtail.io/en/stable/topics/images.html#image-tag>`
-
-For example:
-
-::
-
-GRAPPLE = {
-    # ...
-    "ALLOWED_IMAGE_FILTERS": [
-        "width-1000",
-        "fill-300x150|jpegquality-60",
-        "width-700|format-webp",
-    ]
-}
-
-Note that the ``srcSet`` attribute on ``ImageObjectType`` generates ``width-*`` filters, so if in use consider adding
-the relevant filters to the allowed list.
-
-
 DocumentObjectType
 ^^^^^^^^^^^^^^^^^^
 

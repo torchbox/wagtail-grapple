@@ -74,6 +74,30 @@ class PagesTest(BaseGrappleTest):
         pages = Page.objects.filter(depth__gt=1)
         self.assertEquals(len(executed["data"]["pages"]), pages.count())
 
+    @override_settings(GRAPPLE={"PAGE_SIZE": 1, "MAX_PAGE_SIZE": 1})
+    def test_pages_limit(self):
+        query = """
+        {
+            pages(limit: 5) {
+                id
+                title
+                contentType
+                pageType
+            }
+        }
+        """
+
+        executed = self.client.execute(query)
+
+        self.assertEquals(type(executed["data"]), dict_type)
+        self.assertEquals(type(executed["data"]["pages"]), list)
+        self.assertEquals(type(executed["data"]["pages"][0]), dict_type)
+
+        pages_data = executed["data"]["pages"]
+        self.assertEquals(pages_data[0]["contentType"], "home.HomePage")
+        self.assertEquals(pages_data[0]["pageType"], "HomePage")
+        self.assertEquals(len(executed["data"]["pages"]), 1)
+
     def test_pages_in_site(self):
         query = """
         {

@@ -12,19 +12,8 @@ from wagtail.core.rich_text import RichText
 from wagtail.embeds.blocks import EmbedValue
 
 from example.tests.test_grapple import BaseGrappleTest
-from home.blocks import (
-    ButtonBlock,
-    CarouselBlock,
-    ImageGalleryImage,
-    ImageGalleryImages,
-    VideoBlock,
-)
-from home.factories import (
-    BlogPageFactory,
-    BlogPageRelatedLinkFactory,
-    ImageGalleryImageFactory,
-    AuthorPageFactory,
-)
+from home.blocks import CarouselBlock, ImageGalleryImages
+from home.factories import BlogPageFactory
 
 
 class BlogTest(BaseGrappleTest):
@@ -337,8 +326,8 @@ class BlogTest(BaseGrappleTest):
             title
             images {
                 image {
-                  id
-                  src
+                    id
+                    src
                 }
             }
             """,

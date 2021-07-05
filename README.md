@@ -123,8 +123,8 @@ Add the following to the bottom of the same settings file, where each key is the
 ```python
 # Grapple config:
 GRAPHENE = {"SCHEMA": "grapple.schema.schema"}
-GRAPPLE_APPS = {
-    "home": ""
+GRAPPLE = {
+  "APPS": ["home"],
 }
 ```
 

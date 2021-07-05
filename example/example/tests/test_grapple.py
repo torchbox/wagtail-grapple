@@ -350,7 +350,7 @@ class SitesTest(TestCase):
         self.assertEquals(data[0]["title"], blog.title)
 
 
-@override_settings(GRAPPLE_AUTO_CAMELCASE=False)
+@override_settings(GRAPPLE={**settings.GRAPPLE, "AUTO_CAMELCASE": False})
 class DisableAutoCamelCaseTest(TestCase):
     def setUp(self):
         schema = create_schema()
@@ -432,7 +432,9 @@ class ImagesTest(BaseGrappleTest):
         executed = self.client.execute(query)
         self.assertIn("width-100", executed["data"]["image"]["rendition"]["url"])
 
-    @override_settings(GRAPPLE_ALLOWED_IMAGE_FILTERS=["width-200"])
+    @override_settings(
+        GRAPPLE={**settings.GRAPPLE, "ALLOWED_IMAGE_FILTERS": ["width-200"]}
+    )
     def test_renditions_with_allowed_image_filters_restrictions(self):
         def get_query(**kwargs):
             params = ",".join([f"{key}: {value}" for key, value in kwargs.items()])
@@ -456,7 +458,9 @@ class ImagesTest(BaseGrappleTest):
         self.assertIsNotNone(executed["data"]["image"]["rendition"])
         self.assertIn("width-200", executed["data"]["image"]["rendition"]["url"])
 
-    @override_settings(GRAPPLE_ALLOWED_IMAGE_FILTERS=["width-200"])
+    @override_settings(
+        GRAPPLE={**settings.GRAPPLE, "ALLOWED_IMAGE_FILTERS": ["width-200"]}
+    )
     def test_src_set(self):
         query = """
         {
@@ -474,11 +478,15 @@ class ImagesTest(BaseGrappleTest):
 
     def test_rendition_allowed_method(self):
         self.assertTrue(rendition_allowed("width-100"))
-        with override_settings(GRAPPLE_ALLOWED_IMAGE_FILTERS=["width-200"]):
+        with override_settings(
+            GRAPPLE={**settings.GRAPPLE, "ALLOWED_IMAGE_FILTERS": ["width-200"]}
+        ):
             self.assertFalse(rendition_allowed("width-100"))
             self.assertTrue(rendition_allowed("width-200"))
 
-        with override_settings(GRAPPLE_ALLOWED_IMAGE_FILTERS=[]):
+        with override_settings(
+            GRAPPLE={**settings.GRAPPLE, "ALLOWED_IMAGE_FILTERS": []}
+        ):
             self.assertFalse(rendition_allowed("width-100"))
             self.assertFalse(rendition_allowed("fill-100x100"))
 

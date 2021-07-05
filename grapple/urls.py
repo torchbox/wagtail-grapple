@@ -16,13 +16,13 @@ except ImportError:
 
 def graphiql(request):
     graphiql_settings = {
-        "REACT_VERSION": "16.13.1",
-        "GRAPHIQL_VERSION": "0.17.5",
+        "REACT_VERSION": "16.14.0",
+        "GRAPHIQL_VERSION": "1.4.2",
         "endpointURL": "/graphql",
         "supports_subscriptions": has_channels,
     }
     if has_channels:
-        graphiql_settings["SUBSCRIPTIONS_TRANSPORT_VERSION"] = "0.9.16"
+        graphiql_settings["SUBSCRIPTIONS_TRANSPORT_VERSION"] = "0.9.19"
         graphiql_settings["subscriptionsEndpoint"] = "ws://localhost:8000/subscriptions"
 
     return render(request, "grapple/graphiql.html", graphiql_settings)
@@ -30,7 +30,7 @@ def graphiql(request):
 
 # Traditional URL routing
 SHOULD_EXPOSE_GRAPHIQL = settings.DEBUG or getattr(
-    settings, "GRAPPLE_EXPOSE_GRAPHIQL", False
+    settings.GRAPPLE, "EXPOSE_GRAPHIQL", False
 )
 urlpatterns = [url(r"^graphql", csrf_exempt(GraphQLView.as_view()))]
 

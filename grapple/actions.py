@@ -53,10 +53,15 @@ def import_apps():
     """
 
     # Register each app in the django project.
-    apps = settings.GRAPPLE_APPS.items()
-    for name, prefix in apps:
-        add_app(name, prefix)
-        registry.apps.append(name)
+    if isinstance(settings.GRAPPLE["APPS"], (list, tuple)):
+        for name in settings.GRAPPLE["APPS"]:
+            add_app(name)
+            registry.apps.append(name)
+    else:
+        apps = settings.GRAPPLE["APPS"].items()
+        for name, prefix in apps:
+            add_app(name, prefix)
+            registry.apps.append(name)
 
     # Register any 'decorated' streamfield structs.
     for streamfield_type in streamfield_types:

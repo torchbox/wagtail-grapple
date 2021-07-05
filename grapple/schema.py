@@ -51,7 +51,7 @@ def create_schema():
         query=Query,
         subscription=Subscription,
         types=list(registry.models.values()),
-        auto_camelcase=getattr(settings, "GRAPPLE_AUTO_CAMELCASE", True),
+        auto_camelcase=getattr(settings.GRAPPLE, "AUTO_CAMELCASE", True),
     )
 
 

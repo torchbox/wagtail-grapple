@@ -1,10 +1,10 @@
 import graphene
 
-from django.conf import settings
 from graphql.validation.rules import NoUnusedFragments, specified_rules
 from wagtail.core import hooks
 
 from .registry import registry
+from .settings import grapple_settings
 
 
 # HACK: Remove NoUnusedFragments validator
@@ -51,7 +51,7 @@ def create_schema():
         query=Query,
         subscription=Subscription,
         types=list(registry.models.values()),
-        auto_camelcase=getattr(settings.GRAPPLE, "AUTO_CAMELCASE", True),
+        auto_camelcase=grapple_settings.AUTO_CAMELCASE,
     )
 
 

@@ -1,6 +1,5 @@
 import graphene
 
-from django.conf import settings
 from graphene_django import DjangoObjectType
 from wagtail.images import get_image_model
 from wagtail.images.models import (
@@ -10,6 +9,7 @@ from wagtail.images.models import (
 
 from ..registry import registry
 from ..utils import resolve_queryset, get_media_item_url
+from ..settings import grapple_settings
 from .collections import CollectionObjectType
 from .structures import QuerySetList
 
@@ -62,7 +62,7 @@ def get_rendition_type():
 
 def rendition_allowed(rendition_filter):
     """Checks a given rendition filter is allowed"""
-    allowed_filters = getattr(settings.GRAPPLE, "ALLOWED_IMAGE_FILTERS", None)
+    allowed_filters = grapple_settings.ALLOWED_IMAGE_FILTERS
     if allowed_filters is None or not isinstance(allowed_filters, (list, tuple)):
         return True
 

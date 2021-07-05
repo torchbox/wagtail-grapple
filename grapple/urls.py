@@ -1,9 +1,10 @@
-from django.conf import settings
 from django.shortcuts import render
 from django.conf.urls import url
 from django.views.decorators.csrf import csrf_exempt
 
 from graphene_django.views import GraphQLView
+
+from .settings import grapple_settings
 
 try:
     from channels.routing import route_class
@@ -29,9 +30,7 @@ def graphiql(request):
 
 
 # Traditional URL routing
-SHOULD_EXPOSE_GRAPHIQL = settings.DEBUG or getattr(
-    settings.GRAPPLE, "EXPOSE_GRAPHIQL", False
-)
+SHOULD_EXPOSE_GRAPHIQL = grapple_settings.EXPOSE_GRAPHIQL
 urlpatterns = [url(r"^graphql", csrf_exempt(GraphQLView.as_view()))]
 
 if SHOULD_EXPOSE_GRAPHIQL:

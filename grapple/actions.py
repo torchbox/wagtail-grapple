@@ -5,7 +5,6 @@ from types import MethodType
 from collections.abc import Iterable
 
 from django.db import models
-from django.conf import settings
 from django.template.loader import render_to_string
 
 from graphene_django.types import DjangoObjectType
@@ -25,6 +24,7 @@ from .types.images import ImageObjectType
 from .types.pages import PageInterface, Page
 from .types.streamfield import generate_streamfield_union
 from .helpers import streamfield_types
+from .settings import grapple_settings
 
 try:
     from wagtailmedia.models import AbstractMedia
@@ -53,12 +53,12 @@ def import_apps():
     """
 
     # Register each app in the django project.
-    if isinstance(settings.GRAPPLE["APPS"], (list, tuple)):
-        for name in settings.GRAPPLE["APPS"]:
+    if isinstance(grapple_settings.APPS, (list, tuple)):
+        for name in grapple_settings.APPS:
             add_app(name)
             registry.apps.append(name)
     else:
-        apps = settings.GRAPPLE["APPS"].items()
+        apps = grapple_settings.APPS.items()
         for name, prefix in apps:
             add_app(name, prefix)
             registry.apps.append(name)

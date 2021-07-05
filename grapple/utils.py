@@ -9,9 +9,7 @@ from wagtail.search.models import Query
 from wagtail.search.backends import get_search_backend
 
 from .types.structures import BasePaginatedType, PaginationType
-
-PAGE_SIZE = getattr(settings.GRAPPLE, "PAGE_SIZE", 10)
-MAX_PAGE_SIZE = getattr(settings.GRAPPLE, "PAGE_SIZE_MAX", 100)
+from .settings import grapple_settings
 
 
 def resolve_queryset(
@@ -57,7 +55,7 @@ def resolve_queryset(
         if not class_is_indexed(qs.model):
             raise TypeError("This data type is not searchable by Wagtail.")
 
-        if getattr(settings.GRAPPLE, "ADD_SEARCH_HIT", False):
+        if grapple_settings.ADD_SEARCH_HIT:
             query = Query.get(search_query)
             query.add_hit()
 
@@ -74,7 +72,9 @@ def resolve_queryset(
             pass
 
     if limit is not None:
-        limit = min(int(limit or PAGE_SIZE), MAX_PAGE_SIZE)
+        limit = min(
+            int(limit or grapple_settings.PAGE_SIZE), grapple_settings.MAX_PAGE_SIZE
+        )
         qs = qs[offset : limit + offset]
 
     return qs
@@ -135,7 +135,9 @@ def resolve_paginated_queryset(
     :type order: str
     """
     page = int(page or 1)
-    per_page = min(int(per_page or PAGE_SIZE), MAX_PAGE_SIZE)
+    per_page = min(
+        int(per_page or grapple_settings.PAGE_SIZE), grapple_settings.MAX_PAGE_SIZE
+    )
 
     if id is not None:
         qs = qs.filter(pk=id)
@@ -147,7 +149,7 @@ def resolve_paginated_queryset(
         if not class_is_indexed(qs.model):
             raise TypeError("This data type is not searchable by Wagtail.")
 
-        if getattr(settings.GRAPPLE, "ADD_SEARCH_HIT", False):
+        if grapple_settings.ADD_SEARCH_HIT:
             query = Query.get(search_query)
             query.add_hit()
 

@@ -38,3 +38,18 @@ def register_schema_query(query_mixins):
         pass
 
     query_mixins += registry.schema
+
+
+@hooks.register("register_schema_mutation")
+def register_schema_mutation(mutation_mixins):
+    mutation_mixins += [ObjectType]
+
+
+@hooks.register("register_schema_subscription")
+def register_schema_subscription(subscription_mixins):
+    from .types.pages import has_channels
+
+    if has_channels:
+        from .types.pages import PagesSubscription
+
+        subscription_mixins += [ObjectType, PagesSubscription()]

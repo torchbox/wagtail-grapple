@@ -78,6 +78,7 @@ Grapple provides a ``register_schema_mutation`` hook that is called when it crea
 Subscription
 ^^^^^^^^^^^^
 
+Note: subscriptions are only enabled when Grapple is installed with Django Channels: ``pip install wagtail_grapple[channels]``.
 Grapple provides a ``register_schema_subscription`` hook that is called when it creates the schema. You can use it to add your custom ``Subscription`` mixins
 
 .. code-block:: python

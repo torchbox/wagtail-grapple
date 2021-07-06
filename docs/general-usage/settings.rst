@@ -42,7 +42,7 @@ APPS
 
 A list/tuple of the apps that Grapple will scan for models to generate GraphQL types that adopt their structure.
 
-Default: ``['home']``
+Default: ``[]``
 
 
 AUTO_CAMELCASE

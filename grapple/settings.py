@@ -14,7 +14,7 @@ from django.test.signals import setting_changed
 
 
 DEFAULTS = {
-    "APPS": ["home"],
+    "APPS": [],
     "AUTO_CAMELCASE": True,
     "ALLOWED_IMAGE_FILTERS": None,
     "EXPOSE_GRAPHIQL": False,

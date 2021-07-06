@@ -57,6 +57,8 @@ Add the GraphQL urls to your ``urls.py``:
 Done! Now you can proceed onto configuring your models to generate
 GraphQL types that adopt their structure.
 
+By default, Grapple uses :doc:`these settings <../general-usage/settings>`.
+
 * **Next Steps**
 
   * :doc:`examples`

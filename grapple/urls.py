@@ -30,10 +30,9 @@ def graphiql(request):
 
 
 # Traditional URL routing
-SHOULD_EXPOSE_GRAPHIQL = grapple_settings.EXPOSE_GRAPHIQL
 urlpatterns = [url(r"^graphql", csrf_exempt(GraphQLView.as_view()))]
 
-if SHOULD_EXPOSE_GRAPHIQL:
+if grapple_settings.EXPOSE_GRAPHIQL:
     urlpatterns.append(url(r"^graphiql", graphiql))
 
 if has_channels:

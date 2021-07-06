@@ -10,7 +10,7 @@ import wagtail_factories
 # that does not return the same type in queries.
 # If channels (subscriptions) is enabled, the returned type is an OrderedDict
 # whereas it is a dict without.
-if not has_channels:
+if sys.version_info >= (3, 7) and not has_channels:
     from builtins import dict as dict_type
 else:
     from collections import OrderedDict as dict_type

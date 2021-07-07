@@ -7,6 +7,7 @@ from django.conf import settings
 from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError
 from django.utils.safestring import SafeText
+from wagtail import VERSION as WAGTAIL_VERSION
 from wagtail.core.blocks import StreamValue
 from wagtail.core.rich_text import RichText
 from wagtail.embeds.blocks import EmbedValue
@@ -426,7 +427,10 @@ class BlogTest(BaseGrappleTest):
             if block["blockType"] == "VideoBlock":
                 embed = block["youtubeLink"]
                 self.assertTrue(isinstance(embed["url"], str))
-                self.assertEquals(embed["embed"], raw_embed["html"])
+                if WAGTAIL_VERSION >= (2, 11):
+                    self.assertEquals(embed["embed"], raw_embed["html"])
+                else:
+                    self.assertEquals(embed["embed"], None)
                 self.assertEquals(embed["rawEmbed"], json.dumps(raw_embed))
                 return
 

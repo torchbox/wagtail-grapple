@@ -345,8 +345,7 @@ def get_embed_url(instance):
 def get_embed_object(instance):
     try:
         return get_embed(get_embed_url(instance))
-    except Exception as err:
-        print("err", err)
+    except EmbedException:
         pass
 
 

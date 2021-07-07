@@ -171,7 +171,7 @@ class BlogTest(BaseGrappleTest):
 
         blocks = []
         for block in executed["data"]["page"]["body"]:
-            if block and block["blockType"] == block_type:
+            if block["blockType"] == block_type:
                 blocks.append(block)
         return blocks
 

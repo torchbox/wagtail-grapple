@@ -1,5 +1,6 @@
 import graphene
 from django.db import models
+from django.conf import settings
 from modelcluster.fields import ParentalKey
 from modelcluster.contrib.taggit import ClusterTaggableManager
 
@@ -14,11 +15,6 @@ from wagtail.snippets.models import register_snippet
 from wagtail.snippets.edit_handlers import SnippetChooserPanel
 from wagtail.images.edit_handlers import ImageChooserPanel
 from wagtail.documents.edit_handlers import DocumentChooserPanel
-
-try:
-    from wagtail.documents import get_document_model
-except:
-    from wagtail.documents.models import get_document_model
 
 from wagtail_headless_preview.models import HeadlessPreviewMixin
 from wagtailmedia.edit_handlers import MediaChooserPanel
@@ -43,6 +39,10 @@ from grapple.models import (
 )
 
 from home.blocks import StreamFieldBlock
+
+document_model_string = getattr(
+    settings, "WAGTAILDOCS_DOCUMENT_MODEL", "wagtaildocs.Document"
+)
 
 
 @register_singular_query_field("simpleModel")
@@ -88,7 +88,7 @@ class BlogPage(HeadlessPreviewMixin, Page):
         related_name="+",
     )
     book_file = models.ForeignKey(
-        get_document_model(),
+        document_model_string,
         null=True,
         blank=True,
         on_delete=models.SET_NULL,

@@ -4,12 +4,27 @@ from django.conf import settings
 from django.db import migrations, models
 import django.db.models.deletion
 import taggit.managers
-import wagtail
+from wagtail import VERSION as WAGTAIL_VERSION
 import wagtail.core.models
 import wagtail.search.index
 
 
-wagtail_version = tuple(map(int, wagtail.__version__.split(".")))
+EXTRA_FIELDS = (
+    [
+        (
+            "collection",
+            models.ForeignKey(
+                default=wagtail.core.models.get_root_collection_id,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="+",
+                to="wagtailcore.collection",
+                verbose_name="collection",
+            ),
+        )
+    ]
+    if WAGTAIL_VERSION >= (2, 11)
+    else []
+)
 
 
 class Migration(migrations.Migration):
@@ -22,7 +37,7 @@ class Migration(migrations.Migration):
             ("wagtailcore", "0059_apply_collection_ordering"),
             ("taggit", "0003_taggeditem_add_unique_index"),
         ]
-        if wagtail_version >= (2, 11)
+        if WAGTAIL_VERSION >= (2, 11)
         else [
             migrations.swappable_dependency(settings.AUTH_USER_MODEL),
             ("taggit", "0003_taggeditem_add_unique_index"),
@@ -54,16 +69,6 @@ class Migration(migrations.Migration):
                     models.CharField(blank=True, editable=False, max_length=40),
                 ),
                 (
-                    "collection",
-                    models.ForeignKey(
-                        default=wagtail.core.models.get_root_collection_id,
-                        on_delete=django.db.models.deletion.CASCADE,
-                        related_name="+",
-                        to="wagtailcore.collection",
-                        verbose_name="collection",
-                    ),
-                ),
-                (
                     "tags",
                     taggit.managers.TaggableManager(
                         blank=True,
@@ -84,7 +89,8 @@ class Migration(migrations.Migration):
                         verbose_name="uploaded by user",
                     ),
                 ),
-            ],
+            ]
+            + EXTRA_FIELDS,
             options={
                 "verbose_name": "document",
                 "verbose_name_plural": "documents",

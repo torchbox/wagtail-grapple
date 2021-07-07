@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.db import migrations
-import wagtail
-
-
-wagtail_version = tuple(map(int, wagtail.__version__.split(".")))
+from wagtail import VERSION as WAGTAIL_VERSION
 
 
 def create_homepage(apps, schema_editor):
@@ -56,7 +53,7 @@ class Migration(migrations.Migration):
         [
             ("wagtailcore", "0053_locale_model"),
         ]
-        if wagtail_version >= (2, 11)
+        if WAGTAIL_VERSION >= (2, 11)
         else []
     )
 

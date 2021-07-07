@@ -22,6 +22,7 @@ class Migration(migrations.Migration):
         if WAGTAIL_VERSION >= (2, 11)
         else [
             migrations.swappable_dependency(settings.AUTH_USER_MODEL),
+            ("wagtailcore", "0027_fix_collection_path_collation"),
             ("taggit", "0003_taggeditem_add_unique_index"),
         ]
     )

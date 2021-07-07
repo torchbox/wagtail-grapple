@@ -3,6 +3,9 @@ from django.db import migrations
 import wagtail
 
 
+wagtail_version = tuple(map(int, wagtail.__version__.split(".")))
+
+
 def create_homepage(apps, schema_editor):
     # Get models
     ContentType = apps.get_model("contenttypes.ContentType")
@@ -53,7 +56,7 @@ class Migration(migrations.Migration):
         [
             ("wagtailcore", "0053_locale_model"),
         ]
-        if wagtail.__version__ >= "2.11"
+        if wagtail_version >= (2, 11)
         else []
     )
 

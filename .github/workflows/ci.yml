@@ -26,10 +26,9 @@ jobs:
     needs: [lint]
     runs-on: ubuntu-latest
     strategy:
-      max-parallel: 1
+      max-parallel: 4
       matrix:
-        # python-version: ['3.6', '3.7', '3.8', '3.9']
-        python-version: ['3.6']
+        python-version: ['3.6', '3.7', '3.8', '3.9']
         wagtail-version: ['2.9', '2.10', '2.11', '2.12']
 
     steps:
@@ -54,7 +53,7 @@ jobs:
           python manage.py test
 
   test_channels:
-    needs: [lint]
+    needs: [test]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2

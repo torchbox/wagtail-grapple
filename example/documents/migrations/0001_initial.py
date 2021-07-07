@@ -4,19 +4,30 @@ from django.conf import settings
 from django.db import migrations, models
 import django.db.models.deletion
 import taggit.managers
+import wagtail
 import wagtail.core.models
 import wagtail.search.index
+
+
+wagtail_version = tuple(map(int, wagtail.__version__.split(".")))
 
 
 class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ("wagtailcore", "0059_apply_collection_ordering"),
-        ("taggit", "0003_taggeditem_add_unique_index"),
-    ]
+    dependencies = (
+        [
+            migrations.swappable_dependency(settings.AUTH_USER_MODEL),
+            ("wagtailcore", "0059_apply_collection_ordering"),
+            ("taggit", "0003_taggeditem_add_unique_index"),
+        ]
+        if wagtail_version >= (2, 11)
+        else [
+            migrations.swappable_dependency(settings.AUTH_USER_MODEL),
+            ("taggit", "0003_taggeditem_add_unique_index"),
+        ]
+    )
 
     operations = [
         migrations.CreateModel(

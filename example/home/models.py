@@ -14,7 +14,7 @@ from wagtail.snippets.models import register_snippet
 from wagtail.snippets.edit_handlers import SnippetChooserPanel
 from wagtail.images.edit_handlers import ImageChooserPanel
 from wagtail.documents.edit_handlers import DocumentChooserPanel
-from wagtail.documents import get_document_model_string
+from wagtail.documents import get_document_model
 
 from wagtail_headless_preview.models import HeadlessPreviewMixin
 from wagtailmedia.edit_handlers import MediaChooserPanel
@@ -84,7 +84,7 @@ class BlogPage(HeadlessPreviewMixin, Page):
         related_name="+",
     )
     book_file = models.ForeignKey(
-        get_document_model_string(),
+        get_document_model(),
         null=True,
         blank=True,
         on_delete=models.SET_NULL,

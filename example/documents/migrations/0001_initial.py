@@ -9,24 +9,6 @@ import wagtail.core.models
 import wagtail.search.index
 
 
-EXTRA_FIELDS = (
-    [
-        (
-            "collection",
-            models.ForeignKey(
-                default=wagtail.core.models.get_root_collection_id,
-                on_delete=django.db.models.deletion.CASCADE,
-                related_name="+",
-                to="wagtailcore.collection",
-                verbose_name="collection",
-            ),
-        )
-    ]
-    if WAGTAIL_VERSION >= (2, 11)
-    else []
-)
-
-
 class Migration(migrations.Migration):
 
     initial = True
@@ -69,6 +51,16 @@ class Migration(migrations.Migration):
                     models.CharField(blank=True, editable=False, max_length=40),
                 ),
                 (
+                    "collection",
+                    models.ForeignKey(
+                        default=wagtail.core.models.get_root_collection_id,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="+",
+                        to="wagtailcore.collection",
+                        verbose_name="collection",
+                    ),
+                ),
+                (
                     "tags",
                     taggit.managers.TaggableManager(
                         blank=True,
@@ -89,8 +81,7 @@ class Migration(migrations.Migration):
                         verbose_name="uploaded by user",
                     ),
                 ),
-            ]
-            + EXTRA_FIELDS,
+            ],
             options={
                 "verbose_name": "document",
                 "verbose_name_plural": "documents",

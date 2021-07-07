@@ -429,9 +429,10 @@ class BlogTest(BaseGrappleTest):
                 self.assertTrue(isinstance(embed["url"], str))
                 if WAGTAIL_VERSION >= (2, 11):
                     self.assertEquals(embed["embed"], raw_embed["html"])
+                    self.assertEquals(embed["rawEmbed"], json.dumps(raw_embed))
                 else:
                     self.assertEquals(embed["embed"], None)
-                self.assertEquals(embed["rawEmbed"], json.dumps(raw_embed))
+                    self.assertEquals(embed["rawEmbed"], None)
                 return
 
         self.fail("VideoBlock type not instantiated in Streamfield")

@@ -5,21 +5,7 @@ You can use ``middleware`` to affect the evaluation of fields in your schema.
 
 A middleware is any object or function that responds to ``resolve(next_middleware, *args).``
 
-Inside that method, it should either:
-
-    - Send ``resolve`` to the next middleware to continue the evaluation; or
-    - Return a value to end the evaluation early.
-
-
-Resolve arguments
------------------
-
-Middlewares ``resolve`` is invoked with several arguments:
-
-- ``next`` represents the execution chain. Call ``next`` to continue evaluation.
-- ``root`` is the root value object passed throughout the query.
-- ``info`` is the resolver info.
-- ``args`` is the dict of arguments passed to the field.
+You can read more about middleware on the `Graphene docs <https://docs.graphene-python.org/en/latest/execution/middleware/>`_.
 
 
 GrappleMiddleware
@@ -27,8 +13,9 @@ GrappleMiddleware
 .. module:: grapple.middleware
 .. class:: GrappleMiddleware(object)
 
-::
+.. code-block:: python
 
+    # settings.py
     GRAPHENE = {
         # ...
         'MIDDLEWARE': 'grapple.middleware.GrappleMiddleware',
@@ -46,7 +33,7 @@ Authenticated Middleware
 
 This middleware only continues evaluation if the request is authenticated.
 
-::
+.. code-block:: python
 
     class IsAuthenticatedMiddleware(object):
         def resolve(self, next, root, info, **args):
@@ -62,7 +49,7 @@ Anonymous Middleware
 
 This middleware only continues evaluation if the request is **not** authenticated.
 
-::
+.. code-block:: python
 
     class IsAnonymousMiddleware(object):
         def resolve(self, next, root, info, **args):

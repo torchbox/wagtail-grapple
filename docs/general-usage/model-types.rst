@@ -27,7 +27,8 @@ GraphQLString
         Represents the field as non-nullable in the schema. This promises the client that it will have a value returned.
 
     In your models.py:
-    ::
+
+    .. code-block:: python
 
         from grapple.types import GraphQLString
 
@@ -40,7 +41,8 @@ GraphQLString
 
 
     Example query:
-    ::
+
+    .. code-block:: python
 
         {
             page(slug: "example-blog-page") {
@@ -95,7 +97,8 @@ GraphQLCollection
         multiple models (example below).
 
     In your models.py:
-    ::
+
+    .. code-block:: python
 
         from grapple.types import GraphQLString
 
@@ -131,7 +134,8 @@ GraphQLCollection
 
 
     Example query:
-    ::
+
+    .. code-block:: python
 
         {
             page(slug: "example-blog-page") {
@@ -232,7 +236,7 @@ GraphQLStreamfield
 
         e.g.
 
-    ::
+    .. code-block:: python
 
         @register_streamfield_block
         class ButtonBlock(blocks.StructBlock):
@@ -263,7 +267,7 @@ GraphQLStreamfield
 
             graphql_fields = [GraphQLStreamfield("body")]
 
-    ::
+    .. code-block:: python
 
         # Example query, based on the above
         {
@@ -314,7 +318,7 @@ GraphQLSnippet
 
     In your models.py:
 
-    ::
+    .. code-block:: python
 
         class BookPage(Page):
             advert = models.ForeignKey(
@@ -352,7 +356,7 @@ GraphQLSnippet
                 return self.text
 
 
-    ::
+    .. code-block:: python
 
         # Example query
         {
@@ -386,7 +390,7 @@ GraphQLForeignKey
 
         Represents the field as non-nullable in the schema. This promises the client that it will have a value returned.
 
-    ::
+    .. code-block:: python
 
         class BookPage(Page):
             advert = models.ForeignKey(

@@ -6,8 +6,9 @@ named ``GRAPPLE``.
 
 For example your project's ``settings.py`` file might include something like this:
 
-::
+.. code-block:: python
 
+    # settings.py
     GRAPPLE = {
         'APPS': ['home'],
         'ADD_SEARCH_HIT': True,
@@ -20,7 +21,7 @@ Accessing settings
 If you need to access the values of Wagtail Grapple's settings in your project, you should use the
 ``grapple_settings`` object. For example.
 
-::
+.. code-block:: python
 
     from grapple.settings import grapple_settings
 
@@ -79,8 +80,9 @@ Default: ``None``
 
 Example:
 
-::
+.. code-block:: python
 
+    # settings.py
     GRAPPLE = {
         # ...
         'ALLOWED_IMAGE_FILTERS': [

@@ -9,9 +9,10 @@ Here are some useful decorators that allow you to expand your GraphQL schema fur
 ---------------------
 .. module:: grapple.helpers
 .. class:: register_query_field(field_name, plural_field_name=None, query_params=None, required=False, plural_required=False, plural_item_required=False)
+
 You can easily expose any Django model from your codebase by adding the ``@register_query_field`` decorator like so:
 
-::
+.. code-block:: python
 
     from grapple.helpers import register_query_field
 
@@ -48,11 +49,11 @@ You can now query your adverts with the following query:
 
 You can add custom query parameters like so:
 
-::
+.. code-block:: python
 
     @register_query_field('advert', 'adverts', {
-        "id": graphene.Int()
-        "url": graphene.String()
+        "id": graphene.Int(),
+        "url": graphene.String(),
     })
 
 and then use it in your queries:
@@ -69,7 +70,7 @@ and then use it in your queries:
 
 You can make the singular query return type required like so:
 
-::
+.. code-block:: python
 
     @register_query_field('advert', required=True)
 
@@ -87,7 +88,7 @@ instead of:
 
 You can can also make the plural query return list type required:
 
-::
+.. code-block:: python
 
     @register_query_field('advert', plural_required=True)
 
@@ -105,7 +106,7 @@ instead of the default:
 
 If you want to make the plural query return list item type required:
 
-::
+.. code-block:: python
 
     @register_query_field('advert', plural_item_required=True)
 
@@ -126,9 +127,10 @@ instead of the default:
 -------------------------------
 .. module:: grapple.helpers
 .. class:: register_paginated_query_field(field_name, plural_field_name=None, query_params=None, required=False, plural_required=False, plural_item_required=False)
+
 You can easily expose any Django model from your codebase by adding the ``@register_paginated_query_field`` decorator like so:
 
-::
+.. code-block:: python
 
     from grapple.helpers import register_paginated_query_field
 
@@ -177,7 +179,7 @@ You can now query your adverts with the following query:
 The default ``per_page`` value is 10 and can be changed with the ``GRAPPLE["PAGE_SIZE"]`` setting.
 The ``per_page`` has a maximum value of 100 by default and can be changed with the ``GRAPPLE["MAX_PAGE_SIZE"]`` setting.
 
-::
+.. code-block:: python
 
     GRAPPLE = {
         # ...
@@ -187,11 +189,11 @@ The ``per_page`` has a maximum value of 100 by default and can be changed with t
 
 You can add custom query parameters like so:
 
-::
+.. code-block:: python
 
     @register_paginated_query_field('advert', 'adverts', {
-        "id": graphene.Int()
-        "url": graphene.String()
+        "id": graphene.Int(),
+        "url": graphene.String(),
     })
 
 and then use it in your queries:
@@ -208,7 +210,7 @@ and then use it in your queries:
 
 You can make the singular query return type required like so:
 
-::
+.. code-block:: python
 
     @register_paginated_query_field('advert', required=True)
 
@@ -226,7 +228,7 @@ instead of:
 
 You can can also make the plural query return list type required:
 
-::
+.. code-block:: python
 
     @register_paginated_query_field('advert', plural_required=True)
 
@@ -254,7 +256,7 @@ instead of the default:
 
 If you want to make the plural query return list item type required:
 
-::
+.. code-block:: python
 
     @register_paginated_query_field('advert', plural_item_required=True)
 
@@ -291,7 +293,7 @@ You can expose any Django model by decorating it with ``@register_singular_query
 when you have Wagtail Pages with ``max_count`` of one(`Ref: Wagtail documentation <https://docs.wagtail.io/en/stable/reference/pages/model_reference.html#wagtail.core.models.Page.max_count>`_),
 thus there is no need to query by id.
 
-::
+.. code-block:: python
 
     from grapple.helpers import register_singular_query_field
 

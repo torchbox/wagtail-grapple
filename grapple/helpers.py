@@ -11,7 +11,7 @@ from .settings import grapple_settings
 from .types.streamfield import StreamFieldInterface
 
 streamfield_types = []
-fields_middlewares = {}
+field_middlewares = {}
 
 
 def register_streamfield_block(cls):
@@ -41,10 +41,10 @@ def register_field_middleware(field_name, middleware):
     if grapple_settings.AUTO_CAMELCASE:
         field_name = to_camel_case(field_name)
 
-    if field_name in fields_middlewares:
-        fields_middlewares[field_name] += middleware
+    if field_name in field_middlewares:
+        field_middlewares[field_name] += middleware
     else:
-        fields_middlewares[field_name] = middleware
+        field_middlewares[field_name] = middleware
 
 
 def register_query_field(

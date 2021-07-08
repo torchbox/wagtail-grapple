@@ -15,7 +15,7 @@ class Registry:
     streamfield_blocks = RegistryItem()
     django_models = RegistryItem()
     settings = RegistryItem()
-    middlewares = {}
+    field_middlewares = {}
 
     # The items in the registry that should be lazy loaded.
     lazy_types = (

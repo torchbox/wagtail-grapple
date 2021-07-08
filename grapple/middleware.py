@@ -26,11 +26,11 @@ class GrappleMiddleware(object):
     def resolve(self, next, root, info: ResolveInfo, **args):
         field_name = info.field_name
         parent_name = info.parent_type.name
-        if field_name in registry.middlewares and parent_name in ROOT_TYPES:
-            if not isinstance(registry.middlewares[field_name], list):
+        if field_name in registry.field_middlewares and parent_name in ROOT_TYPES:
+            if not isinstance(registry.field_middlewares[field_name], list):
                 return next(root, info, **args)
 
-            for middleware in registry.middlewares[field_name]:
+            for middleware in registry.field_middlewares[field_name]:
                 if isinstance(middleware, types.FunctionType):
                     return middleware(next, root, info, **args)
                 elif inspect.isclass(middleware):

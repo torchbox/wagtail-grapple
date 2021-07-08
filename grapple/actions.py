@@ -80,7 +80,7 @@ def import_apps():
 
         registry.streamfield_blocks[streamfield_type["cls"]] = node_type
 
-    registry.middlewares = field_middlewares
+    registry.field_middlewares = field_middlewares
 
 
 def add_app(app_label: str, prefix: str = ""):

@@ -28,7 +28,8 @@ jobs:
     strategy:
       max-parallel: 4
       matrix:
-        python-version: [3.6, 3.7, 3.8, 3.9]
+        python-version: ['3.6', '3.7', '3.8', '3.9']
+        wagtail-version: ['2.9', '2.10', '2.11', '2.12']
 
     steps:
       - uses: actions/checkout@v2
@@ -41,6 +42,7 @@ jobs:
         run: |
           pip install -r requirements.txt
           pip install .
+          pip install wagtail==${{ matrix.wagtail-version }}
 
       - name: Run Tests
         run: |
@@ -50,7 +52,7 @@ jobs:
           python manage.py test
 
   test_channels:
-    needs: [lint]
+    needs: [test]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2

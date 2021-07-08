@@ -163,6 +163,34 @@ WAGTAILIMAGES_IMAGE_MODEL = "images.CustomImage"
 WAGTAILDOCS_DOCUMENT_MODEL = "documents.CustomDocument"
 WAGTAILDOCS_SERVE_METHOD = "serve_view"
 
+# https://github.com/wagtail/wagtail/issues/6656#issuecomment-749711713
+if WAGTAIL_VERSION < (2, 11):
+    WAGTAILEMBEDS_FINDERS = [
+        {
+            "class": "wagtail.embeds.finders.oembed",
+            "providers": [
+                {
+                    "endpoint": "https://www.youtube.com/oembed",
+                    "urls": [
+                        r"^https?://(?:[-\w]+\.)?youtube\.com/watch.+$",
+                        r"^https?://(?:[-\w]+\.)?youtube\.com/v/.+$",
+                        r"^https?://youtu\.be/.+$",
+                        r"^https?://(?:[-\w]+\.)?youtube\.com/user/.+$",
+                        r"^https?://(?:[-\w]+\.)?youtube\.com/[^#?/]+#[^#?/]+/.+$",
+                        r"^https?://m\.youtube\.com/index.+$",
+                        r"^https?://(?:[-\w]+\.)?youtube\.com/profile.+$",
+                        r"^https?://(?:[-\w]+\.)?youtube\.com/view_play_list.+$",
+                        r"^https?://(?:[-\w]+\.)?youtube\.com/playlist.+$",
+                    ],
+                }
+            ],
+            "options": {"scheme": "https"},
+        },
+        {
+            "class": "wagtail.embeds.finders.oembed",
+        },
+    ]
+
 # Base URL to use when referring to full URLs within the Wagtail admin backend -
 # e.g. in notification emails. Don't include '/admin' or a trailing slash
 BASE_URL = "http://localhost:8000"

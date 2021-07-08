@@ -277,10 +277,7 @@ class BlogTest(BaseGrappleTest):
         for block in self.blog_page.body:
             if type(block.block).__name__ == block_type:
                 html = query_blocks[0]["text"]
-                if WAGTAIL_VERSION >= (2, 9):
-                    self.assertEquals(type(html), SafeText)
-                else:
-                    self.assertEquals(html, None)
+                self.assertEquals(type(html), SafeText)
 
     def test_blog_body_decimalblock(self):
         block_type = "DecimalBlock"

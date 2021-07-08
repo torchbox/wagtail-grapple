@@ -172,7 +172,6 @@ def PaginatedQuerySet(of_type, type_class, **kwargs):
     if "page" not in kwargs:
         kwargs["page"] = graphene.Argument(
             PositiveInt,
-            default_value=1,
             description=_("Page of resulting objects to return."),
         )
 
@@ -180,7 +179,6 @@ def PaginatedQuerySet(of_type, type_class, **kwargs):
     if "per_page" not in kwargs:
         kwargs["per_page"] = graphene.Argument(
             PositiveInt,
-            default_value=10,
             description=_("The maximum number of items to include on a page."),
         )
 

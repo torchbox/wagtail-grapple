@@ -84,6 +84,30 @@ class PagesTest(BaseGrappleTest):
         pages = Page.objects.filter(depth__gt=1)
         self.assertEquals(len(executed["data"]["pages"]), pages.count())
 
+    @override_settings(GRAPPLE={"PAGE_SIZE": 1, "MAX_PAGE_SIZE": 1})
+    def test_pages_limit(self):
+        query = """
+        {
+            pages(limit: 5) {
+                id
+                title
+                contentType
+                pageType
+            }
+        }
+        """
+
+        executed = self.client.execute(query)
+
+        self.assertEquals(type(executed["data"]), dict_type)
+        self.assertEquals(type(executed["data"]["pages"]), list)
+        self.assertEquals(type(executed["data"]["pages"][0]), dict_type)
+
+        pages_data = executed["data"]["pages"]
+        self.assertEquals(pages_data[0]["contentType"], "home.HomePage")
+        self.assertEquals(pages_data[0]["pageType"], "HomePage")
+        self.assertEquals(len(executed["data"]["pages"]), 1)
+
     def test_pages_in_site(self):
         query = """
         {
@@ -360,7 +384,7 @@ class SitesTest(TestCase):
         self.assertEquals(data[0]["title"], blog.title)
 
 
-@override_settings(GRAPPLE_AUTO_CAMELCASE=False)
+@override_settings(GRAPPLE={"AUTO_CAMELCASE": False})
 class DisableAutoCamelCaseTest(TestCase):
     def setUp(self):
         schema = create_schema()
@@ -442,7 +466,7 @@ class ImagesTest(BaseGrappleTest):
         executed = self.client.execute(query)
         self.assertIn("width-100", executed["data"]["image"]["rendition"]["url"])
 
-    @override_settings(GRAPPLE_ALLOWED_IMAGE_FILTERS=["width-200"])
+    @override_settings(GRAPPLE={"ALLOWED_IMAGE_FILTERS": ["width-200"]})
     def test_renditions_with_allowed_image_filters_restrictions(self):
         def get_query(**kwargs):
             params = ",".join([f"{key}: {value}" for key, value in kwargs.items()])
@@ -466,7 +490,7 @@ class ImagesTest(BaseGrappleTest):
         self.assertIsNotNone(executed["data"]["image"]["rendition"])
         self.assertIn("width-200", executed["data"]["image"]["rendition"]["url"])
 
-    @override_settings(GRAPPLE_ALLOWED_IMAGE_FILTERS=["width-200"])
+    @override_settings(GRAPPLE={"ALLOWED_IMAGE_FILTERS": ["width-200"]})
     def test_src_set(self):
         query = """
         {
@@ -484,11 +508,11 @@ class ImagesTest(BaseGrappleTest):
 
     def test_rendition_allowed_method(self):
         self.assertTrue(rendition_allowed("width-100"))
-        with override_settings(GRAPPLE_ALLOWED_IMAGE_FILTERS=["width-200"]):
+        with override_settings(GRAPPLE={"ALLOWED_IMAGE_FILTERS": ["width-200"]}):
             self.assertFalse(rendition_allowed("width-100"))
             self.assertTrue(rendition_allowed("width-200"))
 
-        with override_settings(GRAPPLE_ALLOWED_IMAGE_FILTERS=[]):
+        with override_settings(GRAPPLE={"ALLOWED_IMAGE_FILTERS": []}):
             self.assertFalse(rendition_allowed("width-100"))
             self.assertFalse(rendition_allowed("fill-100x100"))
 

@@ -1,3 +1,4 @@
+from django.test import override_settings
 from example.tests.test_grapple import BaseGrappleTest
 
 from home.factories import BlogPageFactory, SimpleModelFactory
@@ -129,7 +130,7 @@ class TestRegisterPaginatedQueryField(BaseGrappleTest):
                     id
                 }
                 pagination {
-                  totalPages
+                    totalPages
                 }
             }
         }
@@ -139,6 +140,50 @@ class TestRegisterPaginatedQueryField(BaseGrappleTest):
         self.assertEqual(len(data["items"]), 1)
         self.assertEqual(int(data["items"][0]["id"]), self.child_post.id)
         self.assertEqual(int(data["pagination"]["totalPages"]), 3)
+
+    @override_settings(GRAPPLE={"PAGE_SIZE": 2})
+    def test_query_field_plural_default_per_page(self):
+        query = """
+        {
+            blogPages {
+                items {
+                    id
+                }
+                pagination {
+                    perPage
+                    totalPages
+                }
+            }
+        }
+        """
+        results = self.client.execute(query)
+        data = results["data"]["blogPages"]
+        self.assertEqual(len(data["items"]), 2)
+        self.assertEqual(int(data["items"][0]["id"]), self.child_post.id)
+        self.assertEqual(int(data["pagination"]["perPage"]), 2)
+        self.assertEqual(int(data["pagination"]["totalPages"]), 2)
+
+    @override_settings(GRAPPLE={"MAX_PAGE_SIZE": 3})
+    def test_query_field_plural_default_max_per_page(self):
+        query = """
+        {
+            blogPages(perPage: 5) {
+                items {
+                    id
+                }
+                pagination {
+                    perPage
+                    totalPages
+                }
+            }
+        }
+        """
+        results = self.client.execute(query)
+        data = results["data"]["blogPages"]
+        self.assertEqual(len(data["items"]), 3)
+        self.assertEqual(int(data["items"][0]["id"]), self.child_post.id)
+        self.assertEqual(int(data["pagination"]["perPage"]), 3)
+        self.assertEqual(int(data["pagination"]["totalPages"]), 1)
 
     def test_query_field(self):
         def query(filters):

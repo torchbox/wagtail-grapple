@@ -10,3 +10,4 @@ General Usage
     decorators
     hooks
     usage-with-gatsby
+    settings

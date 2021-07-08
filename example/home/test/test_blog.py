@@ -326,8 +326,8 @@ class BlogTest(BaseGrappleTest):
             title
             images {
                 image {
-                  id
-                  src
+                    id
+                    src
                 }
             }
             """,

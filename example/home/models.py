@@ -37,6 +37,7 @@ from grapple.models import (
     GraphQLPage,
     GraphQLTag,
 )
+from grapple.middleware import IsAnonymousMiddleware
 
 from home.blocks import StreamFieldBlock
 
@@ -69,7 +70,7 @@ class BlogPageTag(TaggedItemBase):
 
 
 @register_singular_query_field("first_post")
-@register_paginated_query_field("blog_page")
+@register_paginated_query_field("blog_page", middleware=[IsAnonymousMiddleware])
 @register_query_field("post")
 class BlogPage(HeadlessPreviewMixin, Page):
     date = models.DateField("Post date")

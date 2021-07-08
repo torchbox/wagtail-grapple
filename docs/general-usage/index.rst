@@ -11,3 +11,4 @@ General Usage
     hooks
     usage-with-gatsby
     settings
+    middleware

@@ -5,6 +5,7 @@ from grapple.urls import has_channels
 from grapple.types.images import rendition_allowed
 
 import wagtail_factories
+from wagtail import VERSION as WAGTAIL_VERSION
 
 # This project uses various versions of graphql-core
 # that does not return the same type in queries.
@@ -26,7 +27,12 @@ from graphene.test import Client
 from wagtailmedia.models import get_media_model
 
 from wagtail.core.models import Page, Site
-from wagtail.documents import get_document_model
+
+if WAGTAIL_VERSION < (2, 9):
+    from wagtail.documents.models import get_document_model
+else:
+    from wagtail.documents import get_document_model
+
 from wagtail.images import get_image_model
 
 from grapple.schema import create_schema

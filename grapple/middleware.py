@@ -1,5 +1,4 @@
 import inspect
-import types
 
 from graphene import ResolveInfo
 
@@ -31,7 +30,7 @@ class GrappleMiddleware(object):
                 return next(root, info, **args)
 
             for middleware in registry.field_middlewares[field_name]:
-                if isinstance(middleware, types.FunctionType):
+                if inspect.isfunction(middleware):
                     return middleware(next, root, info, **args)
                 elif inspect.isclass(middleware):
                     return middleware().resolve(next, root, info, **args)

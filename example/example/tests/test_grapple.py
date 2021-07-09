@@ -1,3 +1,4 @@
+import inspect
 import os
 import sys
 from unittest.mock import patch
@@ -43,11 +44,17 @@ from home.models import HomePage
 
 
 SCHEMA = locate(settings.GRAPHENE["SCHEMA"])
+MIDDLEWARE = [locate(middleware) for middleware in settings.GRAPHENE["MIDDLEWARE"]]
 
 
 class BaseGrappleTest(TestCase):
     def setUp(self):
-        self.client = Client(SCHEMA)
+        self.client = Client(
+            SCHEMA,
+            middleware=[
+                item() if inspect.isclass(item) else item for item in MIDDLEWARE
+            ],
+        )
         self.home = HomePage.objects.first()
 
 

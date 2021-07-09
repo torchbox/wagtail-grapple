@@ -1,4 +1,5 @@
-from django.test import override_settings
+from django.contrib.auth.models import AnonymousUser
+from django.test import RequestFactory, override_settings
 from example.tests.test_grapple import BaseGrappleTest
 
 from home.factories import BlogPageFactory, SimpleModelFactory
@@ -118,6 +119,9 @@ class TestRegisterQueryField(BaseGrappleTest):
 class TestRegisterPaginatedQueryField(BaseGrappleTest):
     def setUp(self):
         super().setUp()
+        self.factory = RequestFactory()
+        self.request = self.factory.get("/")
+        self.request.user = AnonymousUser()
         self.blog_post = BlogPageFactory(parent=self.home, slug="post-one")
         self.another_post = BlogPageFactory(parent=self.home, slug="post-two")
         self.child_post = BlogPageFactory(parent=self.another_post, slug="post-one")
@@ -135,7 +139,7 @@ class TestRegisterPaginatedQueryField(BaseGrappleTest):
             }
         }
         """
-        results = self.client.execute(query)
+        results = self.client.execute(query, context_value=self.request)
         data = results["data"]["blogPages"]
         self.assertEqual(len(data["items"]), 1)
         self.assertEqual(int(data["items"][0]["id"]), self.child_post.id)
@@ -156,7 +160,7 @@ class TestRegisterPaginatedQueryField(BaseGrappleTest):
             }
         }
         """
-        results = self.client.execute(query)
+        results = self.client.execute(query, context_value=self.request)
         data = results["data"]["blogPages"]
         self.assertEqual(len(data["items"]), 2)
         self.assertEqual(int(data["items"][0]["id"]), self.child_post.id)
@@ -178,7 +182,7 @@ class TestRegisterPaginatedQueryField(BaseGrappleTest):
             }
         }
         """
-        results = self.client.execute(query)
+        results = self.client.execute(query, context_value=self.request)
         data = results["data"]["blogPages"]
         self.assertEqual(len(data["items"]), 3)
         self.assertEqual(int(data["items"][0]["id"]), self.child_post.id)
@@ -200,24 +204,34 @@ class TestRegisterPaginatedQueryField(BaseGrappleTest):
             )
 
         # filter by id
-        results = self.client.execute(query("id: %d" % self.blog_post.id))
+        results = self.client.execute(
+            query("id: %d" % self.blog_post.id), context_value=self.request
+        )
         data = results["data"]["blogPage"]
         self.assertEqual(int(data["id"]), self.blog_post.id)
 
         # filter by url path
-        results = self.client.execute(query('urlPath: "/post-one"'))
+        results = self.client.execute(
+            query('urlPath: "/post-one"'), context_value=self.request
+        )
         data = results["data"]["blogPage"]
         self.assertEqual(int(data["id"]), self.blog_post.id)
 
-        results = self.client.execute(query('urlPath: "/post-two/post-one"'))
+        results = self.client.execute(
+            query('urlPath: "/post-two/post-one"'), context_value=self.request
+        )
         data = results["data"]["blogPage"]
         self.assertEqual(int(data["id"]), self.child_post.id)
 
         # test query by slug.
         # Note: nothing should be returned if more than one page has the same slug
-        results = self.client.execute(query('slug: "post-one"'))
+        results = self.client.execute(
+            query('slug: "post-one"'), context_value=self.request
+        )
         self.assertIsNone(results["data"]["blogPage"])
-        results = self.client.execute(query('slug: "post-two"'))
+        results = self.client.execute(
+            query('slug: "post-two"'), context_value=self.request
+        )
         data = results["data"]["blogPage"]
         self.assertEqual(int(data["id"]), self.another_post.id)
 

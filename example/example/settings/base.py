@@ -205,6 +205,7 @@ GRAPHENE = {
 GRAPPLE = {
     "APPS": ["images", "home", "documents"],
     "ADD_SEARCH_HIT": True,
+    "EXPOSE_GRAPHIQL": True,
 }
 
 HEADLESS_PREVIEW_CLIENT_URLS = {"default": "http://localhost:8001/preview"}

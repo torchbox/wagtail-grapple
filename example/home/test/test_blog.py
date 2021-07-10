@@ -4,8 +4,10 @@ import json
 
 import wagtail_factories
 from django.conf import settings
+from django.contrib.auth.models import AnonymousUser
 from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError
+from django.test.client import RequestFactory
 from django.utils.safestring import SafeText
 from wagtail.core.blocks import StreamValue
 from wagtail.core.rich_text import RichText
@@ -95,25 +97,23 @@ class BlogTest(BaseGrappleTest):
 
     def test_blog_page(self):
         query = """
-        {
-            page(id:%s) {
+        query($id: Int) {
+            page(id: $id) {
                 ... on BlogPage {
                     title
                 }
             }
         }
-        """ % (
-            self.blog_page.id
-        )
-        executed = self.client.execute(query)
+        """
+        executed = self.client.execute(query, variables={"id": self.blog_page.id})
 
         # Check title.
         self.assertEquals(executed["data"]["page"]["title"], self.blog_page.title)
 
     def test_related_author_page(self):
         query = """
-        {
-            page(id:%s) {
+        query($id: Int) {
+            page(id: $id) {
                 ... on BlogPage {
                     author {
                         ... on AuthorPage {
@@ -123,10 +123,8 @@ class BlogTest(BaseGrappleTest):
                 }
             }
         }
-        """ % (
-            self.blog_page.id
-        )
-        executed = self.client.execute(query)
+        """
+        executed = self.client.execute(query, variables={"id": self.blog_page.id})
         page = executed["data"]["page"]["author"]
         self.assertTrue(
             isinstance(page["name"], str) and page["name"] == self.blog_page.author.name
@@ -134,8 +132,8 @@ class BlogTest(BaseGrappleTest):
 
     def get_blocks_from_body(self, block_type, block_query="rawValue", page_id=None):
         query = """
-        {
-            page(id:%s) {
+        query($id: Int) {
+            page(id: $id) {
                 ... on BlogPage {
                     body {
                         blockType
@@ -147,11 +145,12 @@ class BlogTest(BaseGrappleTest):
             }
         }
         """ % (
-            page_id or self.blog_page.id,
             block_type,
             block_query,
         )
-        executed = self.client.execute(query)
+        executed = self.client.execute(
+            query, variables={"id": page_id or self.blog_page.id}
+        )
 
         # Print the error response
         if not executed.get("data"):
@@ -379,8 +378,8 @@ class BlogTest(BaseGrappleTest):
 
     def test_blog_embed(self):
         query = """
-        {
-            page(id:%s) {
+        query($id: Int) {
+            page(id: $id) {
                 ... on BlogPage {
                     body {
                         blockType
@@ -395,10 +394,8 @@ class BlogTest(BaseGrappleTest):
                 }
             }
         }
-        """ % (
-            self.blog_page.id
-        )
-        executed = self.client.execute(query)
+        """
+        executed = self.client.execute(query, variables={"id": self.blog_page.id})
         body = executed["data"]["page"]["body"]
 
         raw_embed = {
@@ -460,8 +457,8 @@ class BlogTest(BaseGrappleTest):
     # Next 2 tests are used to test the Collection API, both ForeignKey and nested field extraction.
     def test_blog_page_related_links(self):
         query = """
-        {
-            page(id:%s) {
+        query($id: Int) {
+            page(id: $id) {
                 ... on BlogPage {
                     relatedLinks {
                         url
@@ -469,10 +466,8 @@ class BlogTest(BaseGrappleTest):
                 }
             }
         }
-        """ % (
-            self.blog_page.id
-        )
-        executed = self.client.execute(query)
+        """
+        executed = self.client.execute(query, variables={"id": self.blog_page.id})
 
         links = executed["data"]["page"]["relatedLinks"]
         self.assertEqual(len(links), 5)
@@ -482,17 +477,15 @@ class BlogTest(BaseGrappleTest):
 
     def test_blog_page_related_urls(self):
         query = """
-        {
-            page(id:%s) {
+        query($id: Int) {
+            page(id: $id) {
                 ... on BlogPage {
                     relatedUrls
                 }
             }
         }
-        """ % (
-            self.blog_page.id
-        )
-        executed = self.client.execute(query)
+        """
+        executed = self.client.execute(query, variables={"id": self.blog_page.id})
 
         links = executed["data"]["page"]["relatedUrls"]
         self.assertEqual(len(links), 5)
@@ -503,12 +496,11 @@ class BlogTest(BaseGrappleTest):
         page = 1
         per_page = 5
 
-        def query():
-            return """
-        {
-            page(id:%s) {
+        query = """
+        query ($id: Int, $page: PositiveInt, $perPage: PositiveInt) {
+            page(id: $id) {
                 ... on BlogPage {
-                    paginatedAuthors(page:%s, perPage:%s) {
+                    paginatedAuthors(page: $page, perPage: $perPage) {
                         items {
                             role
                             person {
@@ -529,13 +521,12 @@ class BlogTest(BaseGrappleTest):
                 }
             }
         }
-        """ % (
-                self.blog_page.id,
-                page,
-                per_page,
-            )
+        """
 
-        executed = self.client.execute(query())
+        executed = self.client.execute(
+            query,
+            variables={"id": self.blog_page.id, "page": page, "perPage": per_page},
+        )
 
         authors = executed["data"]["page"]["paginatedAuthors"]["items"]
         pagination = executed["data"]["page"]["paginatedAuthors"]["pagination"]
@@ -560,7 +551,10 @@ class BlogTest(BaseGrappleTest):
         self.assertEquals(pagination["totalPages"], 2)
 
         page = 2
-        executed = self.client.execute(query())
+        executed = self.client.execute(
+            query,
+            variables={"id": self.blog_page.id, "page": page, "perPage": per_page},
+        )
 
         authors = executed["data"]["page"]["paginatedAuthors"]["items"]
         pagination = executed["data"]["page"]["paginatedAuthors"]["pagination"]
@@ -649,8 +643,7 @@ class BlogTest(BaseGrappleTest):
         )
 
     def test_singular_blog_page_query(self):
-        def query():
-            return """
+        query = """
         {
             firstPost {
                 id
@@ -660,28 +653,30 @@ class BlogTest(BaseGrappleTest):
 
         # add a new blog post
         another_post = BlogPageFactory()
-        results = self.client.execute(query())
+        factory = RequestFactory()
+        request = factory.get("/")
+        request.user = AnonymousUser()
+        results = self.client.execute(query, context_value=request)
 
         self.assertTrue("firstPost" in results["data"])
         self.assertEqual(int(results["data"]["firstPost"]["id"]), self.blog_page.id)
 
-        results = self.client.execute(
-            """
-            {
-                firstPost(order: "-id") {
-                    id
-                }
+        query = """
+        {
+            firstPost(order: "-id") {
+                id
             }
-            """
-        )
+        }
+        """
+        results = self.client.execute(query, context_value=request)
 
         self.assertTrue("firstPost" in results["data"])
         self.assertEqual(int(results["data"]["firstPost"]["id"]), another_post.id)
 
     def test_blog_page_tags(self):
         query = """
-        {
-            page(id:%s) {
+        query($id: Int) {
+            page(id: $id) {
                 ... on BlogPage {
                     tags {
                         id
@@ -690,10 +685,8 @@ class BlogTest(BaseGrappleTest):
                 }
             }
         }
-        """ % (
-            self.blog_page.id
-        )
-        executed = self.client.execute(query)
+        """
+        executed = self.client.execute(query, variables={"id": self.blog_page.id})
 
         tags = executed["data"]["page"]["tags"]
         self.assertEqual(len(tags), 3)

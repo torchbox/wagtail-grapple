@@ -14,7 +14,7 @@ def get_middleware_resolvers(middlewares):
             yield middleware
         if not hasattr(middleware, MIDDLEWARE_RESOLVER_FUNCTION):
             raise Exception(
-                "Middleware must be either a class of a function but got: {}.\nYou can read more about middleware here: https://docs.graphene-python.org/en/latest/execution/middleware/".format(
+                "Middleware must be either a class or a function. Got: {}.\nYou can read more about middleware here: https://docs.graphene-python.org/en/latest/execution/middleware/".format(
                     type(middleware)
                 )
             )

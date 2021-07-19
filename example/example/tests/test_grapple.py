@@ -1,3 +1,4 @@
+import inspect
 import os
 import sys
 from unittest.mock import patch
@@ -43,11 +44,15 @@ from home.models import HomePage
 
 
 SCHEMA = locate(settings.GRAPHENE["SCHEMA"])
+MIDDLEWARE_OBJECTS = [
+    locate(middleware) for middleware in settings.GRAPHENE["MIDDLEWARE"]
+]
+MIDDLEWARE = [item() if inspect.isclass(item) else item for item in MIDDLEWARE_OBJECTS]
 
 
 class BaseGrappleTest(TestCase):
     def setUp(self):
-        self.client = Client(SCHEMA)
+        self.client = Client(SCHEMA, middleware=MIDDLEWARE)
         self.home = HomePage.objects.first()
 
 
@@ -132,35 +137,37 @@ class PagesTest(BaseGrappleTest):
         self.assertEquals(len(executed["data"]["pages"]), pages.count())
 
     def test_pages_content_type_filter(self):
-        def query(content_type):
-            return (
-                """
-            {
-                pages(contentType: "%s") {
-                    id
-                    title
-                    contentType
-                    pageType
-                }
+        query = """
+        query($content_type: String) {
+            pages(contentType: $content_type) {
+                id
+                title
+                contentType
+                pageType
             }
-            """
-                % content_type
-            )
+        }
+        """
 
-        results = self.client.execute(query("home.HomePage"))
+        results = self.client.execute(
+            query, variables={"content_type": "home.HomePage"}
+        )
         data = results["data"]["pages"]
         self.assertEquals(len(data), 1)
         self.assertEqual(int(data[0]["id"]), self.home.id)
 
         another_post = BlogPageFactory(parent=self.home)
-        results = self.client.execute(query("home.BlogPage"))
+        results = self.client.execute(
+            query, variables={"content_type": "home.BlogPage"}
+        )
         data = results["data"]["pages"]
         self.assertEqual(len(data), 2)
         self.assertListEqual(
             [int(p["id"]) for p in data], [self.blog_post.id, another_post.id]
         )
 
-        results = self.client.execute(query("bogus.ContentType"))
+        results = self.client.execute(
+            query, variables={"content_type": "bogus.ContentType"}
+        )
         self.assertListEqual(results["data"]["pages"], [])
 
     def test_page(self):
@@ -284,8 +291,7 @@ class SitesTest(TestCase):
 
     def test_site(self):
         query = """
-        query($hostname: String)
-        {
+        query($hostname: String) {
             site(hostname: $hostname) {
                 siteName
                 pages {
@@ -312,8 +318,7 @@ class SitesTest(TestCase):
 
     def test_site_pages_content_type_filter(self):
         query = """
-        query($hostname: String $content_type: String)
-        {
+        query($hostname: String $content_type: String) {
             site(hostname: $hostname) {
                 siteName
                 pages(contentType: $content_type) {

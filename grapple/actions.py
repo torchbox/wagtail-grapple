@@ -23,7 +23,7 @@ from .types.documents import DocumentObjectType
 from .types.images import ImageObjectType
 from .types.pages import PageInterface, Page
 from .types.streamfield import generate_streamfield_union
-from .helpers import streamfield_types
+from .helpers import streamfield_types, field_middlewares
 from .settings import grapple_settings
 
 try:
@@ -79,6 +79,8 @@ def import_apps():
         )
 
         registry.streamfield_blocks[streamfield_type["cls"]] = node_type
+
+    registry.field_middlewares = field_middlewares
 
 
 def add_app(app_label: str, prefix: str = ""):

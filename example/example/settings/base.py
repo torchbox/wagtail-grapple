@@ -198,10 +198,14 @@ BASE_URL = "http://localhost:8000"
 CORS_ORIGIN_ALLOW_ALL = True
 
 # Grapple Config:
-GRAPHENE = {"SCHEMA": "grapple.schema.schema"}
+GRAPHENE = {
+    "SCHEMA": "grapple.schema.schema",
+    "MIDDLEWARE": ["grapple.middleware.GrappleMiddleware"],
+}
 GRAPPLE = {
     "APPS": ["images", "home", "documents"],
     "ADD_SEARCH_HIT": True,
+    "EXPOSE_GRAPHIQL": True,
 }
 
 HEADLESS_PREVIEW_CLIENT_URLS = {"default": "http://localhost:8001/preview"}

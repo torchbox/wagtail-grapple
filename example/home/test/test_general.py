@@ -1,14 +1,31 @@
-from django.test import override_settings
+from django.contrib.auth.base_user import AbstractBaseUser
+from django.contrib.auth.models import AnonymousUser
+from django.test import RequestFactory, override_settings
 from example.tests.test_grapple import BaseGrappleTest
 
 from home.factories import BlogPageFactory, SimpleModelFactory
 import uuid
 
 
+class AuthenticatedUser(AnonymousUser):
+    @property
+    def is_anonymous(self):
+        return False
+
+    @property
+    def is_authenticated(self):
+        return True
+
+
 class TestRegisterSingularQueryField(BaseGrappleTest):
+    def setUp(self):
+        super().setUp()
+        self.factory = RequestFactory()
+        self.request = self.factory.get("/")
+        self.request.user = AnonymousUser()
+
     def test_singular_blog_page_query(self):
-        def query():
-            return """
+        query = """
         {
             firstPost {
                 id
@@ -18,27 +35,39 @@ class TestRegisterSingularQueryField(BaseGrappleTest):
 
         blog_post = BlogPageFactory()
         another_post = BlogPageFactory()
-        results = self.client.execute(query())
+        results = self.client.execute(query, context_value=self.request)
 
         self.assertTrue("firstPost" in results["data"])
         self.assertEqual(int(results["data"]["firstPost"]["id"]), blog_post.id)
 
-        results = self.client.execute(
-            """
-            {
-                firstPost(order: "-id") {
-                    id
-                }
+        query = """
+        {
+            firstPost(order: "-id") {
+                id
             }
-            """
-        )
+        }
+        """
+        results = self.client.execute(query, context_value=self.request)
 
         self.assertTrue("firstPost" in results["data"])
         self.assertEqual(int(results["data"]["firstPost"]["id"]), another_post.id)
 
+    def test_singular_blog_page_query_with_user(self):
+        query = """
+        {
+            firstPost {
+                id
+            }
+        }
+        """
+        self.request.user = AuthenticatedUser()
+        results = self.client.execute(query, context_value=self.request)
+
+        data = results["data"]["firstPost"]
+        self.assertEqual(data, None)
+
     def test_singular_django_model_query(self):
-        def query():
-            return """
+        query = """
         {
             simpleModel {
                 id
@@ -46,12 +75,12 @@ class TestRegisterSingularQueryField(BaseGrappleTest):
         }
         """
 
-        results = self.client.execute(query())
+        results = self.client.execute(query)
         self.assertTrue("simpleModel" in results["data"])
         self.assertIsNone(results["data"]["simpleModel"])
 
         instance = SimpleModelFactory()
-        results = self.client.execute(query())
+        results = self.client.execute(query)
 
         self.assertEqual(int(results["data"]["simpleModel"]["id"]), instance.id)
 
@@ -59,6 +88,9 @@ class TestRegisterSingularQueryField(BaseGrappleTest):
 class TestRegisterQueryField(BaseGrappleTest):
     def setUp(self):
         super().setUp()
+        self.factory = RequestFactory()
+        self.request = self.factory.get("/")
+        self.request.user = AnonymousUser()
         self.blog_post = BlogPageFactory(parent=self.home, slug="post-one")
         self.another_post = BlogPageFactory(parent=self.home, slug="post-two")
         self.child_post = BlogPageFactory(parent=self.another_post, slug="post-one")
@@ -71,53 +103,95 @@ class TestRegisterQueryField(BaseGrappleTest):
             }
         }
         """
-        results = self.client.execute(query)
+        results = self.client.execute(query, context_value=self.request)
         data = results["data"]["posts"]
         self.assertEqual(len(data), 3)
         self.assertEqual(int(data[0]["id"]), self.child_post.id)
         self.assertEqual(int(data[1]["id"]), self.another_post.id)
         self.assertEqual(int(data[2]["id"]), self.blog_post.id)
 
-    def test_query_field(self):
-        def query(filters):
-            return (
-                """
-            {
-                post(%s) {
-                    id
-                    urlPath
-                }
+    def test_query_field_plural_with_user(self):
+        query = """
+        {
+            posts {
+                id
             }
-            """
-                % filters
-            )
+        }
+        """
+        self.request.user = AuthenticatedUser()
+        results = self.client.execute(query, context_value=self.request)
+        data = results["data"]["posts"]
+        self.assertEqual(data, None)
+
+    def test_query_field(self):
+        query = """
+        query ($id: Int, $urlPath: String, $slug: String) {
+            post(id: $id, urlPath: $urlPath, slug: $slug) {
+                id
+                urlPath
+            }
+        }
+        """
 
         # filter by id
-        results = self.client.execute(query("id: %d" % self.blog_post.id))
+        results = self.client.execute(
+            query, variables={"id": self.blog_post.id}, context_value=self.request
+        )
         data = results["data"]["post"]
         self.assertEqual(int(data["id"]), self.blog_post.id)
 
         # filter by url path
-        results = self.client.execute(query('urlPath: "/post-one"'))
+        results = self.client.execute(
+            query, variables={"urlPath": "/post-one"}, context_value=self.request
+        )
         data = results["data"]["post"]
         self.assertEqual(int(data["id"]), self.blog_post.id)
 
-        results = self.client.execute(query('urlPath: "/post-two/post-one"'))
+        results = self.client.execute(
+            query,
+            variables={"urlPath": "/post-two/post-one"},
+            context_value=self.request,
+        )
         data = results["data"]["post"]
         self.assertEqual(int(data["id"]), self.child_post.id)
 
         # test query by slug.
         # Note: nothing should be returned if more than one page has the same slug
-        results = self.client.execute(query('slug: "post-one"'))
+        results = self.client.execute(
+            query, variables={"slug": "post-one"}, context_value=self.request
+        )
         self.assertIsNone(results["data"]["post"])
-        results = self.client.execute(query('slug: "post-two"'))
+        results = self.client.execute(
+            query, variables={"slug": "post-two"}, context_value=self.request
+        )
         data = results["data"]["post"]
         self.assertEqual(int(data["id"]), self.another_post.id)
+
+    def test_query_field_with_user(self):
+        query = """
+        query ($id: Int) {
+            post(id: $id) {
+                id
+                urlPath
+            }
+        }
+        """
+
+        self.request.user = AuthenticatedUser()
+        # filter by id
+        results = self.client.execute(
+            query, variables={"id": self.blog_post.id}, context_value=self.request
+        )
+        data = results["data"]["post"]
+        self.assertEqual(data, None)
 
 
 class TestRegisterPaginatedQueryField(BaseGrappleTest):
     def setUp(self):
         super().setUp()
+        self.factory = RequestFactory()
+        self.request = self.factory.get("/")
+        self.request.user = AnonymousUser()
         self.blog_post = BlogPageFactory(parent=self.home, slug="post-one")
         self.another_post = BlogPageFactory(parent=self.home, slug="post-two")
         self.child_post = BlogPageFactory(parent=self.another_post, slug="post-one")
@@ -135,11 +209,29 @@ class TestRegisterPaginatedQueryField(BaseGrappleTest):
             }
         }
         """
-        results = self.client.execute(query)
+        results = self.client.execute(query, context_value=self.request)
         data = results["data"]["blogPages"]
         self.assertEqual(len(data["items"]), 1)
         self.assertEqual(int(data["items"][0]["id"]), self.child_post.id)
         self.assertEqual(int(data["pagination"]["totalPages"]), 3)
+
+    def test_query_field_plural_with_user(self):
+        query = """
+        {
+            blogPages(perPage: 1) {
+                items {
+                    id
+                }
+                pagination {
+                    totalPages
+                }
+            }
+        }
+        """
+        self.request.user = AuthenticatedUser()
+        results = self.client.execute(query, context_value=self.request)
+        data = results["data"]["blogPages"]
+        self.assertEqual(data, None)
 
     @override_settings(GRAPPLE={"PAGE_SIZE": 2})
     def test_query_field_plural_default_per_page(self):
@@ -156,7 +248,7 @@ class TestRegisterPaginatedQueryField(BaseGrappleTest):
             }
         }
         """
-        results = self.client.execute(query)
+        results = self.client.execute(query, context_value=self.request)
         data = results["data"]["blogPages"]
         self.assertEqual(len(data["items"]), 2)
         self.assertEqual(int(data["items"][0]["id"]), self.child_post.id)
@@ -178,7 +270,7 @@ class TestRegisterPaginatedQueryField(BaseGrappleTest):
             }
         }
         """
-        results = self.client.execute(query)
+        results = self.client.execute(query, context_value=self.request)
         data = results["data"]["blogPages"]
         self.assertEqual(len(data["items"]), 3)
         self.assertEqual(int(data["items"][0]["id"]), self.child_post.id)
@@ -186,40 +278,66 @@ class TestRegisterPaginatedQueryField(BaseGrappleTest):
         self.assertEqual(int(data["pagination"]["totalPages"]), 1)
 
     def test_query_field(self):
-        def query(filters):
-            return (
-                """
-            {
-                blogPage(%s) {
-                    id
-                    urlPath
-                }
+        query = """
+        query ($id: Int, $urlPath: String, $slug: String) {
+            blogPage(id: $id, urlPath: $urlPath, slug: $slug) {
+                id
+                urlPath
             }
-            """
-                % filters
-            )
+        }
+        """
 
         # filter by id
-        results = self.client.execute(query("id: %d" % self.blog_post.id))
+        results = self.client.execute(
+            query, variables={"id": self.blog_post.id}, context_value=self.request
+        )
         data = results["data"]["blogPage"]
         self.assertEqual(int(data["id"]), self.blog_post.id)
 
         # filter by url path
-        results = self.client.execute(query('urlPath: "/post-one"'))
+        results = self.client.execute(
+            query, variables={"urlPath": "/post-one"}, context_value=self.request
+        )
         data = results["data"]["blogPage"]
         self.assertEqual(int(data["id"]), self.blog_post.id)
 
-        results = self.client.execute(query('urlPath: "/post-two/post-one"'))
+        results = self.client.execute(
+            query,
+            variables={"urlPath": "/post-two/post-one"},
+            context_value=self.request,
+        )
         data = results["data"]["blogPage"]
         self.assertEqual(int(data["id"]), self.child_post.id)
 
         # test query by slug.
         # Note: nothing should be returned if more than one page has the same slug
-        results = self.client.execute(query('slug: "post-one"'))
+        results = self.client.execute(
+            query, variables={"slug": "post-one"}, context_value=self.request
+        )
         self.assertIsNone(results["data"]["blogPage"])
-        results = self.client.execute(query('slug: "post-two"'))
+        results = self.client.execute(
+            query, variables={"slug": "post-two"}, context_value=self.request
+        )
         data = results["data"]["blogPage"]
         self.assertEqual(int(data["id"]), self.another_post.id)
+
+    def test_query_field_with_user(self):
+        query = """
+        query ($id: Int) {
+            blogPage(id: $id) {
+                id
+                urlPath
+            }
+        }
+        """
+
+        self.request.user = AuthenticatedUser()
+        # filter by id
+        results = self.client.execute(
+            query, variables={"id": self.blog_post.id}, context_value=self.request
+        )
+        data = results["data"]["blogPage"]
+        self.assertEqual(data, None)
 
 
 class TestRegisterMutation(BaseGrappleTest):
@@ -232,8 +350,8 @@ class TestRegisterMutation(BaseGrappleTest):
 
     def test_mutation(self):
         query = """
-        mutation {
-          createAuthor(name: "%s", parent: %s, slug: "%s") {
+        mutation($name: String, $parent: Int, $slug: String) {
+          createAuthor(name: $name, parent: $parent, slug: $slug) {
             author {
               id
               ...on AuthorPage {
@@ -244,13 +362,16 @@ class TestRegisterMutation(BaseGrappleTest):
             }
           }
         }
-        """ % (
-            self.name,
-            self.blog_post.id,
-            self.slug,
-        )
+        """
 
-        results = self.client.execute(query)
+        results = self.client.execute(
+            query,
+            variables={
+                "name": self.name,
+                "parent": self.blog_post.id,
+                "slug": self.slug,
+            },
+        )
         data = results["data"]["createAuthor"]
         self.assertIn("author", data)
 

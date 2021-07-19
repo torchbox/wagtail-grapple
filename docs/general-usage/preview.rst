@@ -17,15 +17,15 @@ Setup
 Make sure you installed Django Channels (version 1) when you installed Grapple.
 Your installed apps in your settings should look like so:
 
-::
+.. code-block:: python
 
     INSTALLED_APPS = [
-        ...
+        # ...
         "grapple",
         "graphene_django",
         "channels",
         "wagtail_headless_preview",
-        ...
+        # ...
     ]
 
 Now you need to run the migrations that come with Wagtail Headless Preview.
@@ -40,7 +40,7 @@ and you want to use the 'in-memory' backend. You will want to research different
 Channel backends to see which one works best for your production environment:
 https://channels.readthedocs.io/en/1.x/backends.html
 
-::
+.. code-block:: python
 
     ASGI_APPLICATION = "asgi.channel_layer"
     CHANNELS_WS_PROTOCOLS = ["graphql-ws"]
@@ -55,7 +55,7 @@ https://channels.readthedocs.io/en/1.x/backends.html
 You also want to add to your settings the URL you want to redirect to when the
 user clicks the 'Preview' button:
 
-::
+.. code-block:: python
 
     HEADLESS_PREVIEW_CLIENT_URLS = {
         "default": "http://localhost:8001/preview",
@@ -64,8 +64,8 @@ user clicks the 'Preview' button:
     HEADLESS_PREVIEW_LIVE = True
 
 Two HTTP params are also passed to this url:
- - content_type: The content type string of the Model you're viewing.
- - token: The preview token you need to retrieve the preview data.
+ - ``content_type``: The content type string of the Model you're viewing.
+ - ``token``: The preview token you need to retrieve the preview data.
 
 *Attention*: When the user clicks the "Preview" or "View Draft" button in the Wagtail admin the preview opens in a new tab. The URL in the preview tab will not reveal the actual preview URL set in the setting. It will rather show the admin URL of the page with an additional URL element ``/preview`` or ``/view_draft`` (e.g. ``http://localhost:8000/admin/pages/5/edit/preview/``).
 
@@ -73,7 +73,7 @@ Two HTTP params are also passed to this url:
 Your next step is to subclass any Page models you want headless preview on with
 ``wagtail_headless_preview.models.HeadlessPreviewMixin`` to override the original Wagtail preview methods:
 
-::
+.. code-block:: python
 
     from wagtail_headless_preview.models import HeadlessPreviewMixin
 

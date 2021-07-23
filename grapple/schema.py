@@ -1,10 +1,10 @@
 import graphene
 
-from django.conf import settings
 from graphql.validation.rules import NoUnusedFragments, specified_rules
 from wagtail.core import hooks
 
 from .registry import registry
+from .settings import grapple_settings
 
 
 # HACK: Remove NoUnusedFragments validator
@@ -38,20 +38,48 @@ def create_schema():
     class Query(*query_mixins):
         pass
 
-    if has_channels:
-        from .types.pages import PagesSubscription
+    mutation_mixins = []
+    for fn in hooks.get_hooks("register_schema_mutation"):
+        fn(mutation_mixins)
 
-        class Subscription(PagesSubscription(), graphene.ObjectType):
+    # ensure graphene.ObjectType is always present
+    if graphene.ObjectType not in mutation_mixins:
+        mutation_mixins.append(graphene.ObjectType)
+
+    if len(mutation_mixins) > 1:
+
+        class Mutation(*mutation_mixins):
             pass
+
+    else:
+        Mutation = None
+
+    if has_channels:
+        subscription_mixins = []
+        for fn in hooks.get_hooks("register_schema_subscription"):
+            fn(subscription_mixins)
+
+        # ensure graphene.ObjectType is always present
+        if graphene.ObjectType not in subscription_mixins:
+            subscription_mixins.append(graphene.ObjectType)
+
+        if len(subscription_mixins) > 1:
+
+            class Subscription(*subscription_mixins):
+                pass
+
+        else:
+            Subscription = None
 
     else:
         Subscription = None
 
     return graphene.Schema(
         query=Query,
+        mutation=Mutation,
         subscription=Subscription,
         types=list(registry.models.values()),
-        auto_camelcase=getattr(settings, "GRAPPLE_AUTO_CAMELCASE", True),
+        auto_camelcase=grapple_settings.AUTO_CAMELCASE,
     )
 
 

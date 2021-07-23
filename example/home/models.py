@@ -1,5 +1,6 @@
 import graphene
 from django.db import models
+from django.conf import settings
 from modelcluster.fields import ParentalKey
 from modelcluster.contrib.taggit import ClusterTaggableManager
 
@@ -14,7 +15,6 @@ from wagtail.snippets.models import register_snippet
 from wagtail.snippets.edit_handlers import SnippetChooserPanel
 from wagtail.images.edit_handlers import ImageChooserPanel
 from wagtail.documents.edit_handlers import DocumentChooserPanel
-from wagtail.documents import get_document_model_string
 
 from wagtail_headless_preview.models import HeadlessPreviewMixin
 from wagtailmedia.edit_handlers import MediaChooserPanel
@@ -37,8 +37,13 @@ from grapple.models import (
     GraphQLPage,
     GraphQLTag,
 )
+from grapple.middleware import IsAnonymousMiddleware
 
 from home.blocks import StreamFieldBlock
+
+document_model_string = getattr(
+    settings, "WAGTAILDOCS_DOCUMENT_MODEL", "wagtaildocs.Document"
+)
 
 
 @register_singular_query_field("simpleModel")
@@ -64,9 +69,9 @@ class BlogPageTag(TaggedItemBase):
     )
 
 
-@register_singular_query_field("first_post")
-@register_paginated_query_field("blog_page")
-@register_query_field("post")
+@register_singular_query_field("first_post", middleware=[IsAnonymousMiddleware])
+@register_paginated_query_field("blog_page", middleware=[IsAnonymousMiddleware])
+@register_query_field("post", middleware=[IsAnonymousMiddleware])
 class BlogPage(HeadlessPreviewMixin, Page):
     date = models.DateField("Post date")
     advert = models.ForeignKey(
@@ -84,7 +89,7 @@ class BlogPage(HeadlessPreviewMixin, Page):
         related_name="+",
     )
     book_file = models.ForeignKey(
-        get_document_model_string(),
+        document_model_string,
         null=True,
         blank=True,
         on_delete=models.SET_NULL,

@@ -13,12 +13,14 @@
     }
   </style>
   <link href="https://unpkg.com/graphiql@{{GRAPHIQL_VERSION}}/graphiql.min.css" rel="stylesheet" crossorigin="anonymous" />
-  <script src="https://unpkg.com/whatwg-fetch@3.0.0/dist/fetch.umd.js" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/whatwg-fetch@3.6.2/dist/fetch.umd.js" crossorigin="anonymous"></script>
   <script src="https://unpkg.com/react@{{REACT_VERSION}}/umd/react.production.min.js" crossorigin="anonymous"></script>
   <script src="https://unpkg.com/react-dom@{{REACT_VERSION}}/umd/react-dom.production.min.js" crossorigin="anonymous"></script>
   <script src="https://unpkg.com/graphiql@{{GRAPHIQL_VERSION}}/graphiql.min.js" crossorigin="anonymous"></script>
+  {% if supports_subscriptions %}
   <script src="https://unpkg.com/subscriptions-transport-ws@{{SUBSCRIPTIONS_TRANSPORT_VERSION}}/browser/client.js" crossorigin="anonymous"></script>
   <script src="https://unpkg.com/graphiql-subscriptions-fetcher@0.0.2/browser/client.js" crossorigin="anonymous"></script>
+  {% endif %}
 </head>
 <body>
   <div id="graphiql"></div>

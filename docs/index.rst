@@ -37,21 +37,6 @@ Features
 -  Advanced headless preview functionality built using GraphQL
    Subscriptions to enable Page previews on any device!
 
-
-* **Getting Started**
-
-  * :doc:`getting-started/installation`
-  * :doc:`getting-started/examples`
-
-
-* **General Usage**
-
-  * :doc:`general-usage/model-types`
-  * :doc:`general-usage/graphql-types`
-  * :doc:`general-usage/preview`
-  * :doc:`general-usage/decorators`
-  * :doc:`general-usage/usage-with-gatsby`
-
 Contents
 ^^^^^^^^
 

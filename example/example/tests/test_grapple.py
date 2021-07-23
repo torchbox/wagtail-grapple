@@ -1,12 +1,18 @@
+import inspect
 import os
 import sys
 from unittest.mock import patch
-
-import wagtail_factories
-
+from grapple.urls import has_channels
 from grapple.types.images import rendition_allowed
 
-if sys.version_info >= (3, 7):
+import wagtail_factories
+from wagtail import VERSION as WAGTAIL_VERSION
+
+# This project uses various versions of graphql-core
+# that does not return the same type in queries.
+# If channels (subscriptions) is enabled, the returned type is an OrderedDict
+# whereas it is a dict without.
+if sys.version_info >= (3, 7) and not has_channels:
     from builtins import dict as dict_type
 else:
     from collections import OrderedDict as dict_type
@@ -22,7 +28,12 @@ from graphene.test import Client
 from wagtailmedia.models import get_media_model
 
 from wagtail.core.models import Page, Site
-from wagtail.documents import get_document_model
+
+if WAGTAIL_VERSION < (2, 9):
+    from wagtail.documents.models import get_document_model
+else:
+    from wagtail.documents import get_document_model
+
 from wagtail.images import get_image_model
 
 from grapple.schema import create_schema
@@ -33,11 +44,15 @@ from home.models import HomePage
 
 
 SCHEMA = locate(settings.GRAPHENE["SCHEMA"])
+MIDDLEWARE_OBJECTS = [
+    locate(middleware) for middleware in settings.GRAPHENE["MIDDLEWARE"]
+]
+MIDDLEWARE = [item() if inspect.isclass(item) else item for item in MIDDLEWARE_OBJECTS]
 
 
 class BaseGrappleTest(TestCase):
     def setUp(self):
-        self.client = Client(SCHEMA)
+        self.client = Client(SCHEMA, middleware=MIDDLEWARE)
         self.home = HomePage.objects.first()
 
 
@@ -74,6 +89,30 @@ class PagesTest(BaseGrappleTest):
         pages = Page.objects.filter(depth__gt=1)
         self.assertEquals(len(executed["data"]["pages"]), pages.count())
 
+    @override_settings(GRAPPLE={"PAGE_SIZE": 1, "MAX_PAGE_SIZE": 1})
+    def test_pages_limit(self):
+        query = """
+        {
+            pages(limit: 5) {
+                id
+                title
+                contentType
+                pageType
+            }
+        }
+        """
+
+        executed = self.client.execute(query)
+
+        self.assertEquals(type(executed["data"]), dict_type)
+        self.assertEquals(type(executed["data"]["pages"]), list)
+        self.assertEquals(type(executed["data"]["pages"][0]), dict_type)
+
+        pages_data = executed["data"]["pages"]
+        self.assertEquals(pages_data[0]["contentType"], "home.HomePage")
+        self.assertEquals(pages_data[0]["pageType"], "HomePage")
+        self.assertEquals(len(executed["data"]["pages"]), 1)
+
     def test_pages_in_site(self):
         query = """
         {
@@ -98,35 +137,37 @@ class PagesTest(BaseGrappleTest):
         self.assertEquals(len(executed["data"]["pages"]), pages.count())
 
     def test_pages_content_type_filter(self):
-        def query(content_type):
-            return (
-                """
-            {
-                pages(contentType: "%s") {
-                    id
-                    title
-                    contentType
-                    pageType
-                }
+        query = """
+        query($content_type: String) {
+            pages(contentType: $content_type) {
+                id
+                title
+                contentType
+                pageType
             }
-            """
-                % content_type
-            )
+        }
+        """
 
-        results = self.client.execute(query("home.HomePage"))
+        results = self.client.execute(
+            query, variables={"content_type": "home.HomePage"}
+        )
         data = results["data"]["pages"]
         self.assertEquals(len(data), 1)
         self.assertEqual(int(data[0]["id"]), self.home.id)
 
         another_post = BlogPageFactory(parent=self.home)
-        results = self.client.execute(query("home.BlogPage"))
+        results = self.client.execute(
+            query, variables={"content_type": "home.BlogPage"}
+        )
         data = results["data"]["pages"]
         self.assertEqual(len(data), 2)
         self.assertListEqual(
             [int(p["id"]) for p in data], [self.blog_post.id, another_post.id]
         )
 
-        results = self.client.execute(query("bogus.ContentType"))
+        results = self.client.execute(
+            query, variables={"content_type": "bogus.ContentType"}
+        )
         self.assertListEqual(results["data"]["pages"], [])
 
     def test_page(self):
@@ -250,8 +291,7 @@ class SitesTest(TestCase):
 
     def test_site(self):
         query = """
-        query($hostname: String)
-        {
+        query($hostname: String) {
             site(hostname: $hostname) {
                 siteName
                 pages {
@@ -278,8 +318,7 @@ class SitesTest(TestCase):
 
     def test_site_pages_content_type_filter(self):
         query = """
-        query($hostname: String $content_type: String)
-        {
+        query($hostname: String $content_type: String) {
             site(hostname: $hostname) {
                 siteName
                 pages(contentType: $content_type) {
@@ -350,7 +389,7 @@ class SitesTest(TestCase):
         self.assertEquals(data[0]["title"], blog.title)
 
 
-@override_settings(GRAPPLE_AUTO_CAMELCASE=False)
+@override_settings(GRAPPLE={"AUTO_CAMELCASE": False})
 class DisableAutoCamelCaseTest(TestCase):
     def setUp(self):
         schema = create_schema()
@@ -432,7 +471,7 @@ class ImagesTest(BaseGrappleTest):
         executed = self.client.execute(query)
         self.assertIn("width-100", executed["data"]["image"]["rendition"]["url"])
 
-    @override_settings(GRAPPLE_ALLOWED_IMAGE_FILTERS=["width-200"])
+    @override_settings(GRAPPLE={"ALLOWED_IMAGE_FILTERS": ["width-200"]})
     def test_renditions_with_allowed_image_filters_restrictions(self):
         def get_query(**kwargs):
             params = ",".join([f"{key}: {value}" for key, value in kwargs.items()])
@@ -456,7 +495,7 @@ class ImagesTest(BaseGrappleTest):
         self.assertIsNotNone(executed["data"]["image"]["rendition"])
         self.assertIn("width-200", executed["data"]["image"]["rendition"]["url"])
 
-    @override_settings(GRAPPLE_ALLOWED_IMAGE_FILTERS=["width-200"])
+    @override_settings(GRAPPLE={"ALLOWED_IMAGE_FILTERS": ["width-200"]})
     def test_src_set(self):
         query = """
         {
@@ -474,11 +513,11 @@ class ImagesTest(BaseGrappleTest):
 
     def test_rendition_allowed_method(self):
         self.assertTrue(rendition_allowed("width-100"))
-        with override_settings(GRAPPLE_ALLOWED_IMAGE_FILTERS=["width-200"]):
+        with override_settings(GRAPPLE={"ALLOWED_IMAGE_FILTERS": ["width-200"]}):
             self.assertFalse(rendition_allowed("width-100"))
             self.assertTrue(rendition_allowed("width-200"))
 
-        with override_settings(GRAPPLE_ALLOWED_IMAGE_FILTERS=[]):
+        with override_settings(GRAPPLE={"ALLOWED_IMAGE_FILTERS": []}):
             self.assertFalse(rendition_allowed("width-100"))
             self.assertFalse(rendition_allowed("fill-100x100"))
 

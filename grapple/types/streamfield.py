@@ -108,16 +108,28 @@ class StructBlockItem:
 def serialize_struct_obj(obj):
     rtn_obj = {}
 
-    if isinstance(obj, blocks.StreamValue):
+    if hasattr(obj, "raw_data"):
         rtn_obj = []
         for field in obj[0]:
             rtn_obj.append(serialize_struct_obj(field.value))
+    # This conditionnal and below support both Wagtail >= 2.13 and <2.12 versions.
+    # The "stream_data" check can be dropped once 2.11 is not supported anymore.
+    # Cf: https://docs.wagtail.io/en/stable/releases/2.12.html#stream-data-on-streamfield-values-is-deprecated
+    elif hasattr(obj, "stream_data"):
+        rtn_obj = []
+        for field in obj.stream_data:
+            rtn_obj.append(serialize_struct_obj(field["value"]))
     else:
         for field in obj:
             value = obj[field]
-            if isinstance(value, blocks.StreamValue):
+            if hasattr(value, "raw_data"):
                 rtn_obj[field] = list(
                     map(lambda data: serialize_struct_obj(data.value), value[0])
+                )
+            elif hasattr(obj, "stream_data"):
+                map(
+                    lambda data: serialize_struct_obj(data["value"]),
+                    value.stream_data,
                 )
             elif hasattr(value, "value"):
                 rtn_obj[field] = value.value

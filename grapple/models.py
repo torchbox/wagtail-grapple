@@ -1,3 +1,4 @@
+from typing import Callable
 import graphene
 from django.apps import apps
 from django.contrib.contenttypes.models import ContentType
@@ -10,13 +11,16 @@ class GraphQLField:
     field_name: str
     field_type: str
     field_source: str
+    # A standard graphene resolver
+    resolver: Callable
 
     def __init__(
-        self, field_name: str, field_type: type = None, required=None, **kwargs
+        self, field_name: str, field_type: type = None, required=None, resolver=None, **kwargs
     ):
         # Initiate and get specific field info.
         self.field_name = field_name
         self.field_type = field_type
+        self.resolver = resolver
         self.field_source = kwargs.get("source", field_name)
 
         # Add support for NonNull/required fields

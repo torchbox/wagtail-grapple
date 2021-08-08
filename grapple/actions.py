@@ -166,8 +166,14 @@ def get_field_type(field):
         else:
             return field, graphene.Field(field_type)
 
+def get_wrapped_custom_resolver(field):
+    if not field.resolver:
+        return None
+    return lambda self, instance, info, **kwargs: field.resolver(instance, info, **kwargs)
 
 def model_resolver(field):
+    if field.resolver:
+        return get_wrapped_custom_resolver(field)
     def mixin(self, instance, info, **kwargs):
         from .utils import resolve_queryset
 
@@ -399,7 +405,7 @@ def build_streamfield_type(
             field, field_type = get_field_type(field)
 
             # Add support for `graphql_fields`
-            methods["resolve_" + field.field_name] = streamfield_resolver
+            methods["resolve_" + field.field_name] = get_wrapped_custom_resolver(field) or streamfield_resolver
 
             # Add field to GQL type with correct field-type
             type_meta[field.field_name] = field_type

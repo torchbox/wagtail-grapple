@@ -103,7 +103,7 @@ class ImageObjectType(DjangoObjectType, BaseImageObjectType):
 
                 rendition = rendition_type(
                     id=img.id,
-                    url=img.url,
+                    url=get_media_item_url(img),
                     width=img.width,
                     height=img.height,
                     file=img.file,

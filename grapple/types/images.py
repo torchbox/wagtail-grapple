@@ -10,7 +10,7 @@ from wagtail.images.models import (
 )
 from willow.plugins.pillow import PillowImage
 from willow.plugins.wand import WandImage
-from willow.registry import registry
+from willow.registry import registry as willow_registry
 
 from ..registry import registry
 from ..utils import resolve_queryset, get_media_item_url
@@ -215,5 +215,5 @@ def wand_blur(image):
 
 
 # Register the operations in Willow
-registry.register_operation(PillowImage, "blur", pillow_blur)
-registry.register_operation(WandImage, "blur", wand_blur)
+willow_registry.register_operation(PillowImage, "blur", pillow_blur)
+willow_registry.register_operation(WandImage, "blur", wand_blur)

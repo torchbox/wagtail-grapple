@@ -22,10 +22,7 @@ from ..registry import registry
 class GenericStreamFieldInterface(Scalar):
     @staticmethod
     def serialize(stream_value):
-        try
-            return stream_value.raw_data
-        except AttributeError:
-            return stream_value.stream_data
+        return stream_value.raw_data
 
 
 @convert_django_field.register(StreamField)

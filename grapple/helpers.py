@@ -3,13 +3,15 @@ import inspect
 from types import MethodType
 
 from django.utils.translation import ugettext_lazy
+from graphene.utils.str_converters import to_camel_case
 from wagtail.core.models import Page
 
 from .registry import registry
+from .settings import grapple_settings
 from .types.streamfield import StreamFieldInterface
 
-
 streamfield_types = []
+field_middlewares = {}
 
 
 def register_streamfield_block(cls):
@@ -35,6 +37,19 @@ def register_graphql_schema(schema_cls):
     return schema_cls
 
 
+def register_field_middleware(field_name: str, middleware):
+    assert isinstance(middleware, list), "middleware should be list but got {}.".format(
+        type(middleware)
+    )
+    if grapple_settings.AUTO_CAMELCASE:
+        field_name = to_camel_case(field_name)
+
+    if field_name in field_middlewares:
+        field_middlewares[field_name] += middleware
+    else:
+        field_middlewares[field_name] = middleware
+
+
 def register_query_field(
     field_name,
     plural_field_name=None,
@@ -42,6 +57,7 @@ def register_query_field(
     required=False,
     plural_required=False,
     plural_item_required=False,
+    middleware=None,
 ):
     from .types.structures import QuerySetList
     from .utils import resolve_queryset
@@ -77,13 +93,13 @@ def register_query_field(
                     if v is None:
                         del kwargs[k]
 
-                token = kwargs.pop("token", None)
-
                 try:
                     # If is a Page then only query live/public pages.
                     if issubclass(cls, Page):
-                        if token and hasattr(cls, "get_page_from_preview_token"):
-                            return cls.get_page_from_preview_token(token)
+                        if "token" in kwargs and hasattr(
+                            cls, "get_page_from_preview_token"
+                        ):
+                            return cls.get_page_from_preview_token(kwargs.get("token"))
 
                         qs = cls.objects.live().public()
                         url_path = kwargs.pop("url_path", None)
@@ -103,7 +119,9 @@ def register_query_field(
             def resolve_plural(self, _, info, **kwargs):
                 qs = cls.objects
                 if issubclass(cls, Page):
-                    qs = qs.live().public().order_by("-first_published_at")
+                    qs = qs.live().public()
+                    if "order" not in kwargs:
+                        kwargs["order"] = "-first_published_at"
 
                 return resolve_queryset(qs.all(), info, **kwargs)
 
@@ -145,6 +163,10 @@ def register_query_field(
         register_graphql_schema(Mixin())
         return cls
 
+    if middleware is not None:
+        register_field_middleware(field_name, middleware)
+        register_field_middleware(plural_field_name, middleware)
+
     return inner
 
 
@@ -155,6 +177,7 @@ def register_paginated_query_field(
     required=False,
     plural_required=False,
     plural_item_required=False,
+    middleware=None,
 ):
     from .types.structures import PaginatedQuerySet
     from .utils import resolve_paginated_queryset
@@ -186,7 +209,6 @@ def register_paginated_query_field(
                 if not kwargs:
                     return None
 
-                token = kwargs.pop("token", None)
                 for k, v in dict(kwargs).items():
                     if v is None:
                         del kwargs[k]
@@ -194,8 +216,10 @@ def register_paginated_query_field(
                 try:
                     # If is a Page then only query live/public pages.
                     if issubclass(cls, Page):
-                        if token and hasattr(cls, "get_page_from_preview_token"):
-                            return cls.get_page_from_preview_token(token)
+                        if "token" in kwargs and hasattr(
+                            cls, "get_page_from_preview_token"
+                        ):
+                            return cls.get_page_from_preview_token(kwargs.get("token"))
 
                         qs = cls.objects.live().public()
                         url_path = kwargs.pop("url_path", None)
@@ -214,7 +238,9 @@ def register_paginated_query_field(
             def resolve_plural(self, _, info, **kwargs):
                 qs = cls.objects
                 if issubclass(cls, Page):
-                    qs = qs.live().public().order_by("-first_published_at")
+                    qs = qs.live().public()
+                    if "order" not in kwargs:
+                        kwargs["order"] = "-first_published_at"
 
                 return resolve_paginated_queryset(qs.all(), info, **kwargs)
 
@@ -255,10 +281,16 @@ def register_paginated_query_field(
         register_graphql_schema(Mixin())
         return cls
 
+    if middleware is not None:
+        register_field_middleware(field_name, middleware)
+        register_field_middleware(plural_field_name, middleware)
+
     return inner
 
 
-def register_singular_query_field(field_name, query_params=None, required=False):
+def register_singular_query_field(
+    field_name, query_params=None, required=False, middleware=None
+):
     def inner(cls):
         field_type = lambda: registry.models[cls]
         field_query_params = query_params
@@ -282,15 +314,17 @@ def register_singular_query_field(field_name, query_params=None, required=False)
             def resolve_singular(self, _, info, **kwargs):
                 try:
                     qs = cls.objects
-                    order = kwargs.pop("order", None)
-                    token = kwargs.pop("token", None)
-                    if order:
-                        qs = qs.order_by(order)
+                    if "order" in kwargs:
+                        qs = qs.order_by(
+                            *map(lambda x: x.strip(), kwargs.pop("order").split(","))
+                        )
 
                     # If is a Page then only query live/public pages.
                     if issubclass(cls, Page):
-                        if token and hasattr(cls, "get_page_from_preview_token"):
-                            return cls.get_page_from_preview_token(token)
+                        if "token" in kwargs and hasattr(
+                            cls, "get_page_from_preview_token"
+                        ):
+                            return cls.get_page_from_preview_token(kwargs.get("token"))
 
                         return qs.live().public().filter(**kwargs).first()
 
@@ -319,5 +353,8 @@ def register_singular_query_field(field_name, query_params=None, required=False)
         # Send schema to Grapple schema.
         register_graphql_schema(Mixin())
         return cls
+
+    if middleware is not None:
+        register_field_middleware(field_name, middleware)
 
     return inner

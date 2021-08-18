@@ -9,6 +9,7 @@ from wagtail.search.models import Query
 from wagtail.search.backends import get_search_backend
 
 from .types.structures import BasePaginatedType, PaginationType
+from .settings import grapple_settings
 
 
 def resolve_queryset(
@@ -54,7 +55,7 @@ def resolve_queryset(
         if not class_is_indexed(qs.model):
             raise TypeError("This data type is not searchable by Wagtail.")
 
-        if settings.GRAPPLE_ADD_SEARCH_HIT is True:
+        if grapple_settings.ADD_SEARCH_HIT:
             query = Query.get(search_query)
             query.add_hit()
 
@@ -63,12 +64,18 @@ def resolve_queryset(
     if order is not None:
         qs = qs.order_by(*map(lambda x: x.strip(), order.split(",")))
 
-    if limit is not None:
-        limit = int(limit)
-        qs = qs[offset : limit + offset]
-
     if collection is not None:
-        qs = qs.filter(collection=collection)
+        try:
+            qs.model._meta.get_field("collection")
+            qs = qs.filter(collection=collection)
+        except:
+            pass
+
+    if limit is not None:
+        limit = min(
+            int(limit or grapple_settings.PAGE_SIZE), grapple_settings.MAX_PAGE_SIZE
+        )
+        qs = qs[offset : limit + offset]
 
     return qs
 
@@ -127,7 +134,10 @@ def resolve_paginated_queryset(
     :param order: Order the query set using the Django QuerySet order_by format.
     :type order: str
     """
-    per_page = int(per_page or 10)
+    page = int(page or 1)
+    per_page = min(
+        int(per_page or grapple_settings.PAGE_SIZE), grapple_settings.MAX_PAGE_SIZE
+    )
 
     if id is not None:
         qs = qs.filter(pk=id)
@@ -139,7 +149,7 @@ def resolve_paginated_queryset(
         if not class_is_indexed(qs.model):
             raise TypeError("This data type is not searchable by Wagtail.")
 
-        if settings.GRAPPLE_ADD_SEARCH_HIT is True:
+        if grapple_settings.ADD_SEARCH_HIT:
             query = Query.get(search_query)
             query.add_hit()
 

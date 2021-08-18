@@ -29,6 +29,7 @@ BASE_DIR = os.path.dirname(PROJECT_DIR)
 INSTALLED_APPS = [
     "home",
     "images",
+    "documents",
     "search",
     "wagtail.contrib.forms",
     "wagtail.contrib.redirects",
@@ -159,7 +160,36 @@ MEDIA_URL = "/media/"
 
 WAGTAIL_SITE_NAME = "example"
 WAGTAILIMAGES_IMAGE_MODEL = "images.CustomImage"
+WAGTAILDOCS_DOCUMENT_MODEL = "documents.CustomDocument"
 WAGTAILDOCS_SERVE_METHOD = "serve_view"
+
+# https://github.com/wagtail/wagtail/issues/6656#issuecomment-749711713
+if WAGTAIL_VERSION < (2, 11):
+    WAGTAILEMBEDS_FINDERS = [
+        {
+            "class": "wagtail.embeds.finders.oembed",
+            "providers": [
+                {
+                    "endpoint": "https://www.youtube.com/oembed",
+                    "urls": [
+                        r"^https?://(?:[-\w]+\.)?youtube\.com/watch.+$",
+                        r"^https?://(?:[-\w]+\.)?youtube\.com/v/.+$",
+                        r"^https?://youtu\.be/.+$",
+                        r"^https?://(?:[-\w]+\.)?youtube\.com/user/.+$",
+                        r"^https?://(?:[-\w]+\.)?youtube\.com/[^#?/]+#[^#?/]+/.+$",
+                        r"^https?://m\.youtube\.com/index.+$",
+                        r"^https?://(?:[-\w]+\.)?youtube\.com/profile.+$",
+                        r"^https?://(?:[-\w]+\.)?youtube\.com/view_play_list.+$",
+                        r"^https?://(?:[-\w]+\.)?youtube\.com/playlist.+$",
+                    ],
+                }
+            ],
+            "options": {"scheme": "https"},
+        },
+        {
+            "class": "wagtail.embeds.finders.oembed",
+        },
+    ]
 
 # Base URL to use when referring to full URLs within the Wagtail admin backend -
 # e.g. in notification emails. Don't include '/admin' or a trailing slash
@@ -168,9 +198,15 @@ BASE_URL = "http://localhost:8000"
 CORS_ORIGIN_ALLOW_ALL = True
 
 # Grapple Config:
-GRAPHENE = {"SCHEMA": "grapple.schema.schema"}
-GRAPPLE_APPS = {"images": "", "home": ""}
-GRAPPLE_ADD_SEARCH_HIT = True
+GRAPHENE = {
+    "SCHEMA": "grapple.schema.schema",
+    "MIDDLEWARE": ["grapple.middleware.GrappleMiddleware"],
+}
+GRAPPLE = {
+    "APPS": ["images", "home", "documents"],
+    "ADD_SEARCH_HIT": True,
+    "EXPOSE_GRAPHIQL": True,
+}
 
 HEADLESS_PREVIEW_CLIENT_URLS = {"default": "http://localhost:8001/preview"}
 HEADLESS_PREVIEW_LIVE = True

@@ -1,4 +1,6 @@
 import graphene
+import tempfile
+import base64
 
 from graphene_django import DjangoObjectType
 from wagtail.images import get_image_model
@@ -23,6 +25,20 @@ class BaseImageObjectType(graphene.ObjectType):
     aspect_ratio = graphene.Float(required=True)
     sizes = graphene.String(required=True)
     collection = graphene.Field(lambda: CollectionObjectType, required=True)
+    lqip = graphene.String(required=True)
+
+    @property
+    def lqip(self):
+        rendition = self.get_rendition("width-64|jpegquality-50")
+        with rendition.get_willow_image() as willow:
+            i = willow.blur()
+            tf = tempfile.SpooledTemporaryFile()
+            i.save_as_png(tf)
+            tf.seek(0)
+            hash = base64.b64encode(tf.read())
+            tf.close()
+
+        return "data:image/jpeg;base64,%s" % hash.decode("utf-8")
 
     def resolve_url(self, info, **kwargs):
         """

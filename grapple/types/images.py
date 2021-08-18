@@ -25,10 +25,13 @@ class BaseImageObjectType(graphene.ObjectType):
     aspect_ratio = graphene.Float(required=True)
     sizes = graphene.String(required=True)
     collection = graphene.Field(lambda: CollectionObjectType, required=True)
-    lqip = graphene.String(required=True)
+    lqip = graphene.String()
 
-    @property
-    def lqip(self):
+    def resolve_lqip(self, info, **kwargs):
+        """
+        Get a low quality image placeholder of the original image.
+        This can directly be use in frontend frameworks like next.js
+        """
         rendition = self.get_rendition("width-64|jpegquality-50")
         with rendition.get_willow_image() as willow:
             i = willow.blur()

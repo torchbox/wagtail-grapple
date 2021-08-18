@@ -8,6 +8,9 @@ from wagtail.images.models import (
     Image as WagtailImage,
     Rendition as WagtailImageRendition,
 )
+from willow.plugins.pillow import PillowImage
+from willow.plugins.wand import WandImage
+from willow.registry import registry
 
 from ..registry import registry
 from ..utils import resolve_queryset, get_media_item_url
@@ -194,3 +197,23 @@ def ImagesQuery():
             return get_image_type()
 
     return Mixin
+
+
+def pillow_blur(image):
+    from PIL import ImageFilter
+
+    blurred_image = image.image.filter(ImageFilter.BLUR)
+    return PillowImage(blurred_image)
+
+
+def wand_blur(image):
+    # Wand modifies images in place so clone it first to prevent
+    # altering the original image
+    blurred_image = image.image.clone()
+    blurred_image.gaussian_blur()
+    return WandImage(blurred_image)
+
+
+# Register the operations in Willow
+registry.register_operation(PillowImage, "blur", pillow_blur)
+registry.register_operation(WandImage, "blur", wand_blur)

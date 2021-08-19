@@ -9,6 +9,6 @@ django-cors-headers==3.4.0
 wagtail-headless-preview==0.1.4
 
 # Channels-specific requirements
-channels==1.1.8
-asgi_redis
+channels==3.0.4
+channels_redis==3.3.0
 graphql_ws

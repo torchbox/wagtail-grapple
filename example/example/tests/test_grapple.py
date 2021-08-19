@@ -521,6 +521,26 @@ class ImagesTest(BaseGrappleTest):
             self.assertFalse(rendition_allowed("width-100"))
             self.assertFalse(rendition_allowed("fill-100x100"))
 
+    def test_placeholder_blur(self):
+        query = """
+        {
+            image(id: 1) {
+                placeholderBlur
+            }
+        }
+        """
+
+        executed = self.client.execute(query)
+
+        self.assertIn("placeholderBlur", executed["data"]["image"])
+        # The django ImageField factory generates a blue square image.
+        # The base64 value was obtained empirically.
+        # It might changes if factory.django.ImageField() behaviour is modified.
+        self.assertEqual(
+            "data:image/jpeg;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAIAAAAlC+aJAAAAYElEQVR4nO3PwQkAIBDAsNP9VxYcwkcQmgnaNXPmZ1sHvGpAa0BrQGtAa0BrQGtAa0BrQGtAa0BrQGtAa0BrQGtAa0BrQGtAa0BrQGtAa0BrQGtAa0BrQGtAa0BrQGtAu+/+AX2CmtBJAAAAAElFTkSuQmCC",
+            executed["data"]["image"]["placeholderBlur"],
+        )
+
     def tearDown(self):
         example_image_path = self.example_image.file.path
         self.example_image.delete()

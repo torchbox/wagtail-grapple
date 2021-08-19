@@ -28,9 +28,9 @@ class BaseImageObjectType(graphene.ObjectType):
     aspect_ratio = graphene.Float(required=True)
     sizes = graphene.String(required=True)
     collection = graphene.Field(lambda: CollectionObjectType, required=True)
-    lqip = graphene.String()
+    placeholder_blur = graphene.String()
 
-    def resolve_lqip(self, info, **kwargs):
+    def resolve_placeholder_blur(self, info, **kwargs):
         """
         Get a low quality image placeholder of the original image.
         This can directly be use in frontend frameworks like next.js

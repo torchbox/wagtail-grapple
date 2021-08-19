@@ -33,5 +33,5 @@ class CustomImageRendition(AbstractRendition):
         GraphQLString("height", required=True),
         GraphQLImage("image", required=True),
         GraphQLString("file", required=True),
-        GraphQLString("lqip", required=True),
+        GraphQLString("placeholder_blur", required=True),
     )

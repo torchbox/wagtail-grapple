@@ -457,6 +457,27 @@ class ImagesTest(BaseGrappleTest):
             executed["data"]["images"][0]["url"], executed["data"]["images"][0]["src"]
         )
 
+    def test_query_rendition_url_field(self):
+        query = """
+        {
+            images {
+                id
+                rendition(width: 200) {
+                    url
+                }
+            }
+        }
+        """
+
+        executed = self.client.execute(query)
+
+        self.assertEquals(executed["data"]["images"][0]["id"], "1")
+        self.assertEquals(
+            executed["data"]["images"][0]["rendition"]["url"],
+            "http://localhost:8000"
+            + self.example_image.get_rendition("width-200").file.url,
+        )
+
     def test_renditions(self):
         query = """
         {

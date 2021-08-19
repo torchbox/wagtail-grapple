@@ -1,5 +1,6 @@
 import os
 import base64
+from contextlib import contextmanager
 
 from django.conf import settings
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
@@ -7,6 +8,9 @@ from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from wagtail.search.index import class_is_indexed
 from wagtail.search.models import Query
 from wagtail.search.backends import get_search_backend
+
+
+from willow.image import Image as WillowImage
 
 from .types.structures import BasePaginatedType, PaginationType
 from .settings import grapple_settings
@@ -190,3 +194,76 @@ def image_as_base64(image_file, format="png"):
         encoded_string = base64.b64encode(img_f.read())
 
     return "data:image/%s;base64,%s" % (format, encoded_string)
+
+
+class SourceImageIOError(IOError):
+    """
+    Custom exception to distinguish IOErrors that were thrown while opening the source image
+    """
+
+    pass
+
+
+@contextmanager
+def get_willow_image(rendition):
+    """
+    This method was borrowed from wagtail.images.models.
+
+    A PR is opened that will bring this to the AbstractRendition model https://github.com/wagtail/wagtail/pull/7444
+    Once it is merged, the method below can be removed and the code in grapple.types.images
+    can take advantage of rendition.get_willow_image() method.
+    """
+    with open_file(rendition) as image_file:
+        yield WillowImage.open(image_file)
+
+
+def is_stored_locally(rendition):
+    """
+    Returns True if the image is hosted on the local filesystem
+
+    This method was borrowed from wagtail.images.models.
+    See get_willow_image method comment for details.
+    """
+    try:
+        rendition.file.path
+        return True
+    except NotImplementedError:
+        return False
+
+
+@contextmanager
+def open_file(rendition):
+    """
+    This method was borrowed from wagtail.renditions.models.
+
+    See get_willow_rendition method comment for details.
+    """
+    # Open file if it is closed
+    close_file = False
+    try:
+        rendition_file = rendition.file
+
+        if rendition.file.closed:
+            # Reopen the file
+            if is_stored_locally(rendition):
+                rendition.file.open("rb")
+            else:
+                # Some external storage backends don't allow reopening
+                # the file. Get a fresh file instance. #1397
+                storage = rendition._meta.get_field("file").storage
+                rendition_file = storage.open(rendition.file.name, "rb")
+
+            close_file = True
+    except IOError as e:
+        # re-throw this as a SourceImageIOError so that calling code can distinguish
+        # these from IOErrors elsewhere in the process
+        raise SourceImageIOError(str(e))
+
+    # Seek to beginning
+    rendition_file.seek(0)
+
+    try:
+        yield rendition_file
+    finally:
+        if close_file:
+            rendition_file.close()

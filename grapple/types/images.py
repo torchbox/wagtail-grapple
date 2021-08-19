@@ -13,7 +13,7 @@ from willow.plugins.wand import WandImage
 from willow.registry import registry as willow_registry
 
 from ..registry import registry
-from ..utils import resolve_queryset, get_media_item_url
+from ..utils import resolve_queryset, get_media_item_url, get_willow_image
 from ..settings import grapple_settings
 from .collections import CollectionObjectType
 from .structures import QuerySetList
@@ -27,6 +27,7 @@ class BaseImageObjectType(graphene.ObjectType):
     url = graphene.String(required=True)
     aspect_ratio = graphene.Float(required=True)
     sizes = graphene.String(required=True)
+
     collection = graphene.Field(lambda: CollectionObjectType, required=True)
     placeholder_blur = graphene.String()
 
@@ -36,8 +37,8 @@ class BaseImageObjectType(graphene.ObjectType):
         This can directly be use in frontend frameworks like next.js
         """
         rendition = self.get_rendition("width-64|jpegquality-50")
-        with rendition.get_willow_image() as willow:
-            i = willow.blur()
+        with get_willow_image(rendition) as willow:
+            i = willow.grapple_blur()
             tf = tempfile.SpooledTemporaryFile()
             i.save_as_png(tf)
             tf.seek(0)
@@ -215,5 +216,5 @@ def wand_blur(image):
 
 
 # Register the operations in Willow
-willow_registry.register_operation(PillowImage, "blur", pillow_blur)
-willow_registry.register_operation(WandImage, "blur", wand_blur)
+willow_registry.register_operation(PillowImage, "grapple_blur", pillow_blur)
+willow_registry.register_operation(WandImage, "grapple_blur", wand_blur)

@@ -1,5 +1,5 @@
 Usage with frontend frameworks
-##################################
+##############################
 
 A few features of Wagtail Grapple are useful for specific frontend frameworks.
 

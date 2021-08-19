@@ -120,6 +120,7 @@ need for Gatsby Image features to work (see Handy Fragments page for more info):
     focalPointHeight: Int
     fileSize: Int
     fileHash: String!
+    placeholderBlur: String
     renditions: [ImageRenditionObjectType]
     src: String
     srcSet(sizes: [Int]): String
@@ -149,6 +150,9 @@ the ``ImageRenditionObjectType`` provides the following fields:
     aspectRatio: Float!
     sizes: String!
     image: ImageObjectType!
+
+placeholderBlur is a feature that can be used to obtain a blurred/base64 representation of an image.
+See :ref:`Usage with next.js<usage-with-nextjs>` for an example usage.
 
 
 DocumentObjectType

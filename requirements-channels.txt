@@ -1,6 +1,5 @@
 -r ./requirements.txt
 
 # Channels-specific requirements
-channels==3.0.4
-channels_redis==3.3.0
-git+git://github.com/fabienheureux/graphql-ws@fix/channels-3-compatibility#egg=graphql-ws
+git+https://github.com/graphql-python/graphql-ws.git#egg=graphql-ws
+channels==2.4.0

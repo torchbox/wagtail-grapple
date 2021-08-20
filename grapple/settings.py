@@ -15,11 +15,9 @@ from django.test.signals import setting_changed
 
 logger = logging.getLogger("grapple")
 
-try:
-    import channels
-
+if settings.ASGI_APPLICATION:
     has_channels = True
-except ImportError:
+else:
     has_channels = False
 
 

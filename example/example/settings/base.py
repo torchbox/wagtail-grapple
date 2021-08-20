@@ -212,15 +212,11 @@ HEADLESS_PREVIEW_CLIENT_URLS = {"default": "http://localhost:8001/preview"}
 HEADLESS_PREVIEW_LIVE = True
 
 try:
-    INSTALLED_APPS += ["channels"]
-    ASGI_APPLICATION = "grapple.asgi.application"
-    CHANNELS_WS_PROTOCOLS = ["graphql-ws"]
+    INSTALLED_APPS += [
+        "channels",
+        "graphql_ws.django",
+    ]
+    ASGI_APPLICATION = "graphql_ws.django.routing.application"
 
-    CHANNEL_LAYERS = {
-        "default": {
-            # "BACKEND": "channels_redis.core.RedisChannelLayer",
-            "BACKEND": "channels.layers.InMemoryChannelLayer",
-        }
-    }
 except ImportError:
     pass

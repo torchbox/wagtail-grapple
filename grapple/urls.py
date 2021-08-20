@@ -15,7 +15,7 @@ def graphiql(request):
         "supports_subscriptions": has_channels,
     }
     if has_channels:
-        graphiql_settings["SUBSCRIPTIONS_TRANSPORT_VERSION"] = "0.9.19"
+        graphiql_settings["SUBSCRIPTIONS_TRANSPORT_VERSION"] = "0.8.3"
         graphiql_settings["subscriptionsEndpoint"] = "ws://localhost:8000/subscriptions"
 
     return render(request, "grapple/graphiql.html", graphiql_settings)
@@ -26,8 +26,3 @@ urlpatterns = [url(r"^graphql", csrf_exempt(GraphQLView.as_view()))]
 
 if grapple_settings.EXPOSE_GRAPHIQL:
     urlpatterns.append(url(r"^graphiql", graphiql))
-
-if has_channels:
-    from graphql_ws.django_channels import GraphQLSubscriptionConsumer
-
-    channels_urls = [url(r"^subscriptions", GraphQLSubscriptionConsumer.as_asgi())]

@@ -42,14 +42,7 @@ https://channels.readthedocs.io/en/1.x/backends.html
 
 .. code-block:: python
 
-    ASGI_APPLICATION = "asgi.channel_layer"
-    CHANNELS_WS_PROTOCOLS = ["graphql-ws"]
-    CHANNEL_LAYERS = {
-        "default": {
-            "BACKEND": "asgiref.inmemory.ChannelLayer",
-            "ROUTING": "grapple.urls.channel_routing",
-        }
-    }
+    ASGI_APPLICATION = "graphql_ws.django.routing.application"
 
 
 You also want to add to your settings the URL you want to redirect to when the

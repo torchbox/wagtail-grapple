@@ -214,7 +214,6 @@ HEADLESS_PREVIEW_LIVE = True
 try:
     INSTALLED_APPS += [
         "channels",
-        "graphql_ws.django",
     ]
     ASGI_APPLICATION = "graphql_ws.django.routing.application"
 

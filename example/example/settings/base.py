@@ -220,8 +220,8 @@ try:
 
     CHANNEL_LAYERS = {
         "default": {
-            # "BACKEND": "asgi_redis.RedisChannelLayer",
-            "BACKEND": "asgiref.inmemory.ChannelLayer",
+            # "BACKEND": "channels_redis.core.RedisChannelLayer",
+            "BACKEND": "channels.layers.InMemoryChannelLayer",
             "ROUTING": "grapple.urls.channel_routing",
         }
     }

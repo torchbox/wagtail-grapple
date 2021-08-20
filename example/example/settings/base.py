@@ -212,6 +212,8 @@ HEADLESS_PREVIEW_CLIENT_URLS = {"default": "http://localhost:8001/preview"}
 HEADLESS_PREVIEW_LIVE = True
 
 try:
+    import channels
+
     INSTALLED_APPS += [
         "channels",
     ]

@@ -1,5 +1,5 @@
 from example.tests.test_grapple import BaseGrappleTest
-from grapple.urls import has_channels
+from grapple.settings import has_channels
 
 
 if has_channels:

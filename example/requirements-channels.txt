@@ -1,8 +1,5 @@
-# Test requirements.
-black==19.3b0
-
-# Your app requirements.
+# Project channel requirements
 -r ../requirements-channels.txt
 
-# Your app in editable mode.
--e ../
+# Local development requirements
+-r ./requirements.txt

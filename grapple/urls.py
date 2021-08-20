@@ -4,15 +4,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 from graphene_django.views import GraphQLView
 
-from .settings import grapple_settings
-
-try:
-    from channels.routing import route_class
-    from graphql_ws.django_channels import GraphQLSubscriptionConsumer
-
-    has_channels = True
-except ImportError:
-    has_channels = False
+from .settings import grapple_settings, has_channels
 
 
 def graphiql(request):
@@ -36,7 +28,6 @@ if grapple_settings.EXPOSE_GRAPHIQL:
     urlpatterns.append(url(r"^graphiql", graphiql))
 
 if has_channels:
-    # Django Channel (v1.x) routing for subscription support
-    channel_routing = [
-        route_class(GraphQLSubscriptionConsumer, path=r"^/subscriptions")
-    ]
+    from graphql_ws.django_channels import GraphQLSubscriptionConsumer
+
+    channels_urls = [url(r"^subscriptions", GraphQLSubscriptionConsumer.as_asgi())]

@@ -2,7 +2,7 @@ import inspect
 import os
 import sys
 from unittest.mock import patch
-from grapple.urls import has_channels
+from grapple.settings import has_channels
 from grapple.types.images import rendition_allowed
 
 import wagtail_factories

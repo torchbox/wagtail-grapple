@@ -7,13 +7,7 @@ from wagtail.core.models import Page as WagtailPage, Site
 from wagtail_headless_preview.signals import preview_update
 from graphene_django.types import DjangoObjectType
 from graphql.error import GraphQLLocatedError
-
-try:
-    from channels.routing import route_class
-
-    has_channels = True
-except ImportError:
-    has_channels = False
+from ..settings import has_channels
 
 from ..registry import registry
 from ..utils import resolve_queryset

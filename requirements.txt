@@ -1,4 +1,4 @@
-Django>=2.2,<3.2
+Django>=2.2
 wagtail>=2.11,<2.15
 wagtailmedia
 graphql-core>=2.2.1,<3

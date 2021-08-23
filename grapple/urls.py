@@ -15,6 +15,8 @@ def graphiql(request):
         "supports_subscriptions": has_channels,
     }
     if has_channels:
+        # TODO: The version below is fixed at 0.8.3 and could be upgraded, but
+        # this need to be done with caution as 0.9.x breaks GraphiQL 1.4.2.
         graphiql_settings["SUBSCRIPTIONS_TRANSPORT_VERSION"] = "0.8.3"
         graphiql_settings["subscriptionsEndpoint"] = "ws://localhost:8000/subscriptions"
 

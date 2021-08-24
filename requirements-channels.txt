@@ -1,5 +1,5 @@
 -r ./requirements.txt
 
 # Channels-specific requirements
-git+https://github.com/graphql-python/graphql-ws.git#egg=graphql-ws
+graphql-ws==0.4.0
 channels==2.4.0

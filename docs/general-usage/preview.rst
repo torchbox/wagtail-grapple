@@ -14,7 +14,7 @@ support to any client whether that be a SPA or Native App.
 Setup
 ^^^^^
 
-Make sure you installed Django Channels (version 1) when you installed Grapple.
+See :ref:`usage with subscriptions<usage-with-subscriptions>` first to make sure you installed Django Channels when you installed Grapple.
 Your installed apps in your settings should look like so:
 
 .. code-block:: python
@@ -34,15 +34,6 @@ Now you need to run the migrations that come with Wagtail Headless Preview.
 
    $ python manage.py migrate
 
-Add the following Django Channels configuration to your settings. This tells
-Django Channels that you want to add a channel layer that points to Grapple
-and you want to use the 'in-memory' backend. You will want to research different
-Channel backends to see which one works best for your production environment:
-https://channels.readthedocs.io/en/1.x/backends.html
-
-.. code-block:: python
-
-    ASGI_APPLICATION = "graphql_ws.django.routing.application"
 
 
 You also want to add to your settings the URL you want to redirect to when the

@@ -2,4 +2,4 @@
 
 # Channels-specific requirements
 graphql-ws==0.4.4
-channels==2.4.0
+channels>=3.0, <3.1

@@ -7,4 +7,4 @@ factory-boy==2.12.0
 wagtail-factories==2.0.0
 django-cors-headers==3.4.0
 wagtail-headless-preview==0.1.4
-pre-commit==2.6.0
+pre-commit==2.15.0

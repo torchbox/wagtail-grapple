@@ -1,1 +1,2 @@
 sphinx-wagtail-theme==5.0.4
+pygments-graphql==1.0.0

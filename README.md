@@ -122,7 +122,7 @@ Add the following to the bottom of the same settings file, where each key is the
 # Grapple config:
 GRAPHENE = {"SCHEMA": "grapple.schema.schema"}
 GRAPPLE = {
-  "APPS": ["home"],
+    "APPS": ["home"],
 }
 ```
 
@@ -130,6 +130,7 @@ Add the GraphQL URLs to your `urls.py`:
 
 ```python
 from grapple import urls as grapple_urls
+
 # ...
 urlpatterns = [
     # ...
@@ -148,6 +149,7 @@ Here is a GraphQL model configuration for the default page from the Wagtail docs
 ```python
 # ...
 from grapple.models import GraphQLString, GraphQLStreamfield
+
 
 class BlogPage(Page):
     author = models.CharField(max_length=255)

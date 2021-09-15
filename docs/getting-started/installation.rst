@@ -37,6 +37,7 @@ Add the GraphQL urls to your ``urls.py``:
 .. code-block:: python
 
     from grapple import urls as grapple_urls
+
     # ...
     urlpatterns = [
         # ...

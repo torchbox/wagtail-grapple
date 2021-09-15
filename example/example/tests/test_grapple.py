@@ -2,17 +2,13 @@ import inspect
 import os
 import sys
 from unittest.mock import patch
-from grapple.urls import has_channels
+from grapple.settings import has_channels
 from grapple.types.images import rendition_allowed
 
 import wagtail_factories
 from wagtail import VERSION as WAGTAIL_VERSION
 
-# This project uses various versions of graphql-core
-# that does not return the same type in queries.
-# If channels (subscriptions) is enabled, the returned type is an OrderedDict
-# whereas it is a dict without.
-if sys.version_info >= (3, 7) and not has_channels:
+if sys.version_info >= (3, 7):
     from builtins import dict as dict_type
 else:
     from collections import OrderedDict as dict_type

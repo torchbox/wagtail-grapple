@@ -18,7 +18,7 @@ GrappleMiddleware
     # settings.py
     GRAPHENE = {
         # ...
-        'MIDDLEWARE': 'grapple.middleware.GrappleMiddleware',
+        "MIDDLEWARE": ["grapple.middleware.GrappleMiddleware"],
     }
 
 

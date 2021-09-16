@@ -4,15 +4,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 from graphene_django.views import GraphQLView
 
-from .settings import grapple_settings
-
-try:
-    from channels.routing import route_class
-    from graphql_ws.django_channels import GraphQLSubscriptionConsumer
-
-    has_channels = True
-except ImportError:
-    has_channels = False
+from .settings import grapple_settings, has_channels
 
 
 def graphiql(request):
@@ -23,7 +15,9 @@ def graphiql(request):
         "supports_subscriptions": has_channels,
     }
     if has_channels:
-        graphiql_settings["SUBSCRIPTIONS_TRANSPORT_VERSION"] = "0.9.19"
+        # TODO: The version below is fixed at 0.8.3 and could be upgraded, but
+        # this need to be done with caution as 0.9.x breaks GraphiQL 1.4.2.
+        graphiql_settings["SUBSCRIPTIONS_TRANSPORT_VERSION"] = "0.8.3"
         graphiql_settings["subscriptionsEndpoint"] = "ws://localhost:8000/subscriptions"
 
     return render(request, "grapple/graphiql.html", graphiql_settings)
@@ -34,9 +28,3 @@ urlpatterns = [url(r"^graphql", csrf_exempt(GraphQLView.as_view()))]
 
 if grapple_settings.EXPOSE_GRAPHIQL:
     urlpatterns.append(url(r"^graphiql", graphiql))
-
-if has_channels:
-    # Django Channel (v1.x) routing for subscription support
-    channel_routing = [
-        route_class(GraphQLSubscriptionConsumer, path=r"^/subscriptions")
-    ]

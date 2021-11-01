@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.urls import re_path, reverse
+from django.urls import path, reverse
 from django.views.decorators.csrf import csrf_exempt
 
 from graphene_django.views import GraphQLView
@@ -25,8 +25,8 @@ def graphiql(request):
 
 # Traditional URL routing
 urlpatterns = [
-    re_path(r"^graphql", csrf_exempt(GraphQLView.as_view()), name="grapple_graphql")
+    path("graphql/", csrf_exempt(GraphQLView.as_view()), name="grapple_graphql")
 ]
 
 if grapple_settings.EXPOSE_GRAPHIQL:
-    urlpatterns.append(re_path(r"^graphiql", graphiql, name="grapple_graphiql"))
+    urlpatterns.append(path("graphiql/", graphiql, name="grapple_graphiql"))

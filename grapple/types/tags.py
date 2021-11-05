@@ -3,6 +3,7 @@ import graphene
 from graphene_django.converter import convert_django_field
 from grapple.utils import resolve_queryset
 
+from modelcluster.contrib.taggit import ClusterTaggableManager
 from taggit.managers import TaggableManager
 from taggit.models import Tag
 
@@ -10,6 +11,7 @@ from .structures import QuerySetList
 
 
 @convert_django_field.register(TaggableManager)
+@convert_django_field.register(ClusterTaggableManager)
 def convert_tag_manager_to_string(field, registry=None):
     return TagObjectType()
 

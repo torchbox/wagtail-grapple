@@ -12,17 +12,28 @@ from ..utils import resolve_queryset, get_media_item_url
 from ..settings import grapple_settings
 from .collections import CollectionObjectType
 from .structures import QuerySetList
+from .tags import TagObjectType
 
 
 class BaseImageObjectType(graphene.ObjectType):
     id = graphene.ID(required=True)
+    title = graphene.String(required=True)
+    file = graphene.String(required=True)
     width = graphene.Int(required=True)
     height = graphene.Int(required=True)
+    created_at = graphene.DateTime(required=True)
+    focal_point_x = graphene.Int()
+    focal_point_y = graphene.Int()
+    focal_point_width = graphene.Int()
+    focal_point_height = graphene.Int()
+    file_size = graphene.Int()
+    file_hash = graphene.String(required=True)
     src = graphene.String(required=True, deprecation_reason="Use the `url` attribute")
     url = graphene.String(required=True)
     aspect_ratio = graphene.Float(required=True)
     sizes = graphene.String(required=True)
     collection = graphene.Field(lambda: CollectionObjectType, required=True)
+    tags = graphene.List(graphene.NonNull(lambda: TagObjectType), required=True)
 
     def resolve_url(self, info, **kwargs):
         """
@@ -44,6 +55,9 @@ class BaseImageObjectType(graphene.ObjectType):
 
     def resolve_sizes(self, info, **kwargs):
         return "(max-width: {}px) 100vw, {}px".format(self.width, self.width)
+
+    def resolve_tags(self, info, **kwargs):
+        return self.tags.all()
 
 
 class ImageRenditionObjectType(DjangoObjectType, BaseImageObjectType):
@@ -86,7 +100,6 @@ class ImageObjectType(DjangoObjectType, BaseImageObjectType):
 
     class Meta:
         model = WagtailImage
-        exclude = ("tags",)
 
     def resolve_rendition(self, info, **kwargs):
         """

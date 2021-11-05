@@ -10,6 +10,7 @@ from ..registry import registry
 from ..utils import get_media_item_url, resolve_queryset
 from .collections import CollectionObjectType
 from .structures import QuerySetList
+from .tags import TagObjectType
 
 
 class DocumentObjectType(DjangoObjectType):
@@ -18,24 +19,27 @@ class DocumentObjectType(DjangoObjectType):
     All other node types extend this.
     """
 
-    class Meta:
-        model = WagtailDocument
-        exclude = ("tags",)
-
     id = graphene.ID(required=True)
     title = graphene.String(required=True)
     file = graphene.String(required=True)
     created_at = graphene.DateTime(required=True)
     file_size = graphene.Int()
-    file_hash = graphene.String()
+    file_hash = graphene.String(required=True)
     url = graphene.String(required=True)
     collection = graphene.Field(lambda: CollectionObjectType, required=True)
+    tags = graphene.List(graphene.NonNull(lambda: TagObjectType), required=True)
 
     def resolve_url(self, info, **kwargs):
         """
         Get document file url.
         """
         return get_media_item_url(self)
+
+    def resolve_tags(self, info, **kwargs):
+        return self.tags.all()
+
+    class Meta:
+        model = WagtailDocument
 
 
 def get_document_type():

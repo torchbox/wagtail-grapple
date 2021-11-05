@@ -38,6 +38,7 @@ Add the GraphQL urls to your ``urls.py``:
 
     from django.urls import path
     from grapple import urls as grapple_urls
+
     # ...
     urlpatterns = [
         # ...

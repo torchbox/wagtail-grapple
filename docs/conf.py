@@ -14,6 +14,9 @@ import os
 import sys
 import sphinx_wagtail_theme
 
+from sphinx.highlighting import lexers
+from pygments_graphql import GraphqlLexer
+
 from grapple import __version__
 
 sys.path.insert(0, os.path.abspath("./grapple"))
@@ -22,7 +25,7 @@ sys.path.insert(0, os.path.abspath("./grapple"))
 # -- Project information -----------------------------------------------------
 
 project = "Wagtail Grapple"
-copyright = "2019, Nathan Horrigan"
+copyright = "2019, Nathan Horrigan. 2020-present Dan Braghis and contributors"
 author = "Nathan Horrigan"
 
 # The full version, including alpha/beta/rc tags
@@ -62,3 +65,6 @@ html_theme_options = dict(
 html_static_path = ["_static"]
 
 master_doc = "index"
+
+
+lexers["graphql"] = GraphqlLexer()

@@ -18,6 +18,7 @@ Wagtail docs:
         GraphQLStreamfield,
     )
 
+
     class BlogPage(Page):
         author = models.CharField(max_length=255)
         date = models.DateField("Post date")

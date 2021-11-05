@@ -2,11 +2,9 @@ import inspect
 import os
 import sys
 from unittest.mock import patch
-from grapple.settings import has_channels
 from grapple.types.images import rendition_allowed
 
 import wagtail_factories
-from wagtail import VERSION as WAGTAIL_VERSION
 
 if sys.version_info >= (3, 7):
     from builtins import dict as dict_type
@@ -25,10 +23,7 @@ from wagtailmedia.models import get_media_model
 
 from wagtail.core.models import Page, Site
 
-if WAGTAIL_VERSION < (2, 9):
-    from wagtail.documents.models import get_document_model
-else:
-    from wagtail.documents import get_document_model
+from wagtail.documents import get_document_model
 
 from wagtail.images import get_image_model
 

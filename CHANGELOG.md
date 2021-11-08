@@ -137,6 +137,7 @@
 * Add conditional checks when resolving streamfield type ([#29](https://github.com/GrappleGQL/wagtail-grapple/pull/29))
 
 
+[0.12.0]: https://github.com/GrappleGQL/wagtail-grapple/releases/tag/v0.12.0
 [0.11.0]: https://github.com/GrappleGQL/wagtail-grapple/releases/tag/v0.11.0
 [0.10.2]: https://github.com/GrappleGQL/wagtail-grapple/releases/tag/v0.10.2
 [0.10.0]: https://github.com/GrappleGQL/wagtail-grapple/releases/tag/v0.10.0

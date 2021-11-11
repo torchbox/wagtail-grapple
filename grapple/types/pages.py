@@ -1,7 +1,7 @@
 import graphene
 from django.contrib.contenttypes.models import ContentType
 from django.dispatch import receiver
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from wagtail.core.models import Page as WagtailPage, Site
 from wagtail_headless_preview.signals import preview_update

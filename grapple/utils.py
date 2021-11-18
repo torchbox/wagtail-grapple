@@ -12,6 +12,18 @@ from .types.structures import BasePaginatedType, PaginationType
 from .settings import grapple_settings
 
 
+def _limit_ofset_queryset(qs, limit=None, offset=None):
+    offset = int(offset or 0)
+
+    if limit is not None:
+        limit = min(
+            int(limit or grapple_settings.PAGE_SIZE), grapple_settings.MAX_PAGE_SIZE
+        )
+        qs = qs[offset: limit + offset]
+    else:
+        qs[offset:]
+
+
 def resolve_queryset(
     qs,
     info,
@@ -59,7 +71,8 @@ def resolve_queryset(
             query = Query.get(search_query)
             query.add_hit()
 
-        return get_search_backend().search(search_query, qs)
+        return get_search_backend().search(
+            search_query, _limit_ofset_queryset(qs, limit, offset))
 
     if order is not None:
         qs = qs.order_by(*map(lambda x: x.strip(), order.split(",")))
@@ -71,13 +84,7 @@ def resolve_queryset(
         except:
             pass
 
-    if limit is not None:
-        limit = min(
-            int(limit or grapple_settings.PAGE_SIZE), grapple_settings.MAX_PAGE_SIZE
-        )
-        qs = qs[offset : limit + offset]
-
-    return qs
+    return _limit_ofset_queryset(qs, limit, offset)
 
 
 def get_paginated_result(qs, page, per_page):

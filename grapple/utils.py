@@ -19,7 +19,7 @@ def _sliced_queryset(qs, limit=None, offset=None):
         limit = min(
             int(limit or grapple_settings.PAGE_SIZE), grapple_settings.MAX_PAGE_SIZE
         )
-        return qs[offset: limit + offset]
+        return qs[offset : limit + offset]
     else:
         return qs[offset:]
 

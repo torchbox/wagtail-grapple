@@ -387,3 +387,70 @@ class TestRegisterMutation(BaseGrappleTest):
         # returned after the author has been saved to the database.
         self.assertEqual(data["author"]["name"], self.name)
         self.assertEqual(data["author"]["slug"], self.slug)
+
+
+class TestUtils(BaseGrappleTest):
+    def setUp(self):
+        super().setUp()
+        BlogPageFactory(parent=self.home, title="Test post 1", slug="post-one")
+        BlogPageFactory(parent=self.home, title="Test post 2", slug="post-two")
+        BlogPageFactory(parent=self.home, title="Test post 3", slug="post-three")
+
+    def test_pages_search(self):
+        query = """
+        query ($term: String, $limit: PositiveInt, $offset: PositiveInt) {
+            pages(searchQuery: $term, limit: $limit, offset: $offset) {
+                title
+            }
+        }
+        """
+
+        results = self.client.execute(
+            query,
+            variables={"term": "t", "limit": 1},
+        )
+        pages = results["data"]["pages"]
+        self.assertEqual(len(pages), 1)
+        self.assertEqual(pages[0]["title"], "Test post 1")
+
+        results = self.client.execute(
+            query,
+            variables={"term": "t", "limit": 2, "offset": 1},
+        )
+        pages = results["data"]["pages"]
+        self.assertEqual(len(pages), 2)
+        self.assertEqual(pages[0]["title"], "Test post 2")
+        self.assertEqual(pages[1]["title"], "Test post 3")
+
+    def test_pages_search_with_min_max_page_size_settings(self):
+        query = """
+        query ($term: String, $limit: PositiveInt, $offset: PositiveInt) {
+            pages(searchQuery: $term, limit: $limit, offset: $offset) {
+                title
+            }
+        }
+        """
+
+        # the max page size is 1 and we should get only one,
+        # even if default page size and the requested limit are higher
+        with override_settings(GRAPPLE={"PAGE_SIZE": 10, "MAX_PAGE_SIZE": 1}):
+            results = self.client.execute(
+                query,
+                variables={"term": "t", "limit": 2},
+            )
+
+        pages = results["data"]["pages"]
+        self.assertEqual(len(pages), 1)
+        self.assertEqual(pages[0]["title"], "Test post 1")
+
+        # Default page size is one, but we ask for two which is still less than max page size
+        with override_settings(GRAPPLE={"PAGE_SIZE": 1, "MAX_PAGE_SIZE": 5}):
+            results = self.client.execute(
+                query,
+                variables={"term": "t", "limit": 2},
+            )
+
+        pages = results["data"]["pages"]
+        self.assertEqual(len(pages), 2)
+        self.assertEqual(pages[0]["title"], "Test post 1")
+        self.assertEqual(pages[1]["title"], "Test post 2")

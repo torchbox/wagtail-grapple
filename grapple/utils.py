@@ -22,6 +22,8 @@ def _limit_ofset_queryset(qs, limit=None, offset=None):
         qs = qs[offset: limit + offset]
     else:
         qs[offset:]
+        
+    return qs
 
 
 def resolve_queryset(

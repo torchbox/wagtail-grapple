@@ -2,7 +2,7 @@ import graphene
 import inspect
 from types import MethodType
 
-from django.utils.translation import ugettext_lazy
+from django.utils.translation import gettext_lazy as _
 from graphene.utils.str_converters import to_camel_case
 from wagtail.core.models import Page
 
@@ -73,13 +73,13 @@ def register_query_field(
 
             if issubclass(cls, Page):
                 field_query_params["slug"] = graphene.Argument(
-                    graphene.String, description=ugettext_lazy("The page slug.")
+                    graphene.String, description=_("The page slug.")
                 )
                 field_query_params["url_path"] = graphene.Argument(
-                    graphene.String, description=ugettext_lazy("The url path.")
+                    graphene.String, description=_("The url path.")
                 )
                 field_query_params["token"] = graphene.Argument(
-                    graphene.String, description=ugettext_lazy("The preview token.")
+                    graphene.String, description=_("The preview token.")
                 )
 
         def Mixin():
@@ -188,13 +188,13 @@ def register_paginated_query_field(
 
             if issubclass(cls, Page):
                 field_query_params["slug"] = graphene.Argument(
-                    graphene.String, description=ugettext_lazy("The page slug.")
+                    graphene.String, description=_("The page slug.")
                 )
                 field_query_params["url_path"] = graphene.Argument(
-                    graphene.String, description=ugettext_lazy("The page url path.")
+                    graphene.String, description=_("The page url path.")
                 )
                 field_query_params["token"] = graphene.Argument(
-                    graphene.String, description=ugettext_lazy("The preview token.")
+                    graphene.String, description=_("The preview token.")
                 )
 
         def Mixin():
@@ -290,14 +290,12 @@ def register_singular_query_field(
             field_query_params = {
                 "order": graphene.Argument(
                     graphene.String,
-                    description=ugettext_lazy(
-                        "Use the Django QuerySet order_by format."
-                    ),
+                    description=_("Use the Django QuerySet order_by format."),
                 ),
             }
             if issubclass(cls, Page):
                 field_query_params["token"] = graphene.Argument(
-                    graphene.String, description=ugettext_lazy("The preview token.")
+                    graphene.String, description=_("The preview token.")
                 )
 
         def Mixin():

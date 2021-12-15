@@ -1,5 +1,8 @@
 Installation
-============
+#############
+
+Basic usage
+===========
 
 Add library to an existing Wagtail project:
 
@@ -14,19 +17,6 @@ settings file:
         # ...
         "grapple",
         "graphene_django",
-        # ...
-    ]
-
-For GraphQL Subscriptions with Django Channels, run ``pip install wagtail_grapple[channels]`` and add
-``channels`` to installed apps:
-
-.. code-block:: python
-
-    INSTALLED_APPS = [
-        # ...
-        "grapple",
-        "graphene_django",
-        "channels",
         # ...
     ]
 
@@ -46,11 +36,13 @@ Add the GraphQL urls to your ``urls.py``:
 
 .. code-block:: python
 
+    from django.urls import path
     from grapple import urls as grapple_urls
+
     # ...
     urlpatterns = [
         # ...
-        url(r"", include(grapple_urls)),
+        path("", include(grapple_urls)),
         # ...
     ]
 
@@ -66,3 +58,26 @@ By default, Grapple uses :doc:`these settings <../general-usage/settings>`.
 
 
 *Your GraphQL endpoint is available at http://localhost:8000/graphql/*
+
+ .. _usage-with-subscriptions:
+Usage with subscriptions
+========================
+
+To enable GraphQL Subscriptions, you need to install Grapple with Django Channels.
+Run ``pip install wagtail_grapple[channels]`` and add ``channels`` to installed apps:
+
+.. code-block:: python
+
+    INSTALLED_APPS = [
+        # ...
+        "grapple",
+        "graphene_django",
+        "channels",
+        # ...
+    ]
+
+Add the following Django Channels configuration to your settings.
+
+.. code-block:: python
+
+    ASGI_APPLICATION = "graphql_ws.django.routing.application"

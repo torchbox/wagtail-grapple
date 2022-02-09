@@ -201,9 +201,9 @@ Contributions are what make the open source community such an amazing place to b
 
 Wagtail Grapple supports:
 
-- Django 2.2.x, 3.0.x, 3.1.x, 3.2.x
+- Django 3.0.x, 3.1.x, 3.2.x
 - Python 3.6, 3.7, 3.8, 3.9, and 3.10
-- Wagtail >= 2.11, < 2.17
+- Wagtail >= 2.14, < 2.17
 
 ## License
 

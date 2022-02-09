@@ -2,17 +2,11 @@ import inspect
 import os
 import sys
 from unittest.mock import patch
-from grapple.urls import has_channels
 from grapple.types.images import rendition_allowed
 
 import wagtail_factories
-from wagtail import VERSION as WAGTAIL_VERSION
 
-# This project uses various versions of graphql-core
-# that does not return the same type in queries.
-# If channels (subscriptions) is enabled, the returned type is an OrderedDict
-# whereas it is a dict without.
-if sys.version_info >= (3, 7) and not has_channels:
+if sys.version_info >= (3, 7):
     from builtins import dict as dict_type
 else:
     from collections import OrderedDict as dict_type
@@ -29,10 +23,7 @@ from wagtailmedia.models import get_media_model
 
 from wagtail.core.models import Page, Site
 
-if WAGTAIL_VERSION < (2, 9):
-    from wagtail.documents.models import get_document_model
-else:
-    from wagtail.documents import get_document_model
+from wagtail.documents import get_document_model
 
 from wagtail.images import get_image_model
 
@@ -488,6 +479,27 @@ class ImagesTest(BaseGrappleTest):
         )
         self.assertEquals(
             executed["data"]["images"][0]["url"], executed["data"]["images"][0]["src"]
+        )
+
+    def test_query_rendition_url_field(self):
+        query = """
+        {
+            images {
+                id
+                rendition(width: 200) {
+                    url
+                }
+            }
+        }
+        """
+
+        executed = self.client.execute(query)
+
+        self.assertEquals(executed["data"]["images"][0]["id"], "1")
+        self.assertEquals(
+            executed["data"]["images"][0]["rendition"]["url"],
+            "http://localhost:8000"
+            + self.example_image.get_rendition("width-200").file.url,
         )
 
     def test_renditions(self):

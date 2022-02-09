@@ -31,7 +31,7 @@ def create_schema():
     It inherits its queries from each of the specific type mixins.
     """
 
-    from .types.pages import has_channels
+    from .settings import has_channels
 
     query_mixins = []
     for fn in hooks.get_hooks("register_schema_query"):

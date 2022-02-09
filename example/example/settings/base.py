@@ -13,8 +13,6 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 
-from wagtail import VERSION as WAGTAIL_VERSION
-
 
 PROJECT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BASE_DIR = os.path.dirname(PROJECT_DIR)
@@ -69,9 +67,6 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "django.middleware.security.SecurityMiddleware",
 ]
-
-if WAGTAIL_VERSION < (2, 9):
-    MIDDLEWARE += ["wagtail.core.middleware.SiteMiddleware"]
 
 MIDDLEWARE += ["wagtail.contrib.redirects.middleware.RedirectMiddleware"]
 
@@ -163,34 +158,6 @@ WAGTAILIMAGES_IMAGE_MODEL = "images.CustomImage"
 WAGTAILDOCS_DOCUMENT_MODEL = "documents.CustomDocument"
 WAGTAILDOCS_SERVE_METHOD = "serve_view"
 
-# https://github.com/wagtail/wagtail/issues/6656#issuecomment-749711713
-if WAGTAIL_VERSION < (2, 11):
-    WAGTAILEMBEDS_FINDERS = [
-        {
-            "class": "wagtail.embeds.finders.oembed",
-            "providers": [
-                {
-                    "endpoint": "https://www.youtube.com/oembed",
-                    "urls": [
-                        r"^https?://(?:[-\w]+\.)?youtube\.com/watch.+$",
-                        r"^https?://(?:[-\w]+\.)?youtube\.com/v/.+$",
-                        r"^https?://youtu\.be/.+$",
-                        r"^https?://(?:[-\w]+\.)?youtube\.com/user/.+$",
-                        r"^https?://(?:[-\w]+\.)?youtube\.com/[^#?/]+#[^#?/]+/.+$",
-                        r"^https?://m\.youtube\.com/index.+$",
-                        r"^https?://(?:[-\w]+\.)?youtube\.com/profile.+$",
-                        r"^https?://(?:[-\w]+\.)?youtube\.com/view_play_list.+$",
-                        r"^https?://(?:[-\w]+\.)?youtube\.com/playlist.+$",
-                    ],
-                }
-            ],
-            "options": {"scheme": "https"},
-        },
-        {
-            "class": "wagtail.embeds.finders.oembed",
-        },
-    ]
-
 # Base URL to use when referring to full URLs within the Wagtail admin backend -
 # e.g. in notification emails. Don't include '/admin' or a trailing slash
 BASE_URL = "http://localhost:8000"
@@ -212,18 +179,12 @@ HEADLESS_PREVIEW_CLIENT_URLS = {"default": "http://localhost:8001/preview"}
 HEADLESS_PREVIEW_LIVE = True
 
 try:
-    from channels.asgi import get_channel_layer  # noqa
+    import channels
 
-    INSTALLED_APPS += ["channels"]
-    ASGI_APPLICATION = "asgi.channel_layer"
-    CHANNELS_WS_PROTOCOLS = ["graphql-ws"]
+    INSTALLED_APPS += [
+        "channels",
+    ]
+    ASGI_APPLICATION = "graphql_ws.django.routing.application"
 
-    CHANNEL_LAYERS = {
-        "default": {
-            # "BACKEND": "asgi_redis.RedisChannelLayer",
-            "BACKEND": "asgiref.inmemory.ChannelLayer",
-            "ROUTING": "grapple.urls.channel_routing",
-        }
-    }
 except ImportError:
     pass

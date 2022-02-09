@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from django.db import migrations
-from wagtail import VERSION as WAGTAIL_VERSION
 
 
 def create_homepage(apps, schema_editor):
@@ -49,13 +48,9 @@ def remove_homepage(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-    run_before = (
-        [
-            ("wagtailcore", "0053_locale_model"),
-        ]
-        if WAGTAIL_VERSION >= (2, 11)
-        else []
-    )
+    run_before = [
+        ("wagtailcore", "0053_locale_model"),
+    ]
 
     dependencies = [("home", "0001_initial")]
 

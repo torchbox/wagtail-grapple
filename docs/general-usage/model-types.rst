@@ -32,6 +32,7 @@ GraphQLString
 
         from grapple.types import GraphQLString
 
+
         class BlogPage(Page):
             author = models.CharField(max_length=255)
 
@@ -42,7 +43,7 @@ GraphQLString
 
     Example query:
 
-    .. code-block:: python
+    .. code-block:: graphql
 
         {
             page(slug: "example-blog-page") {
@@ -102,6 +103,7 @@ GraphQLCollection
 
         from grapple.types import GraphQLString
 
+
         class BlogPage(Page):
             author = models.CharField(max_length=255)
 
@@ -111,31 +113,23 @@ GraphQLCollection
             graphql_fields = [
                 # Basic reference to Orderable model
                 GraphQLCollection(
-                    GraphQLForeignKey,
-                    "related_links",
-                    "home.BlogPageRelatedLink"
+                    GraphQLForeignKey, "related_links", "home.BlogPageRelatedLink"
                 ),
-
                 # Will return an array of just the url from each link
-                GraphQLCollection(
-                    GraphQLString,
-                    "related_urls",
-                    source="related_links.url"
-                ),
-
+                GraphQLCollection(GraphQLString, "related_urls", source="related_links.url"),
                 # Reference to Orderable model with pagination
                 GraphQLCollection(
                     GraphQLForeignKey,
                     "paginated_related_links",
                     "home.BlogPageRelatedLink",
-                    is_paginated_queryset=True
+                    is_paginated_queryset=True,
                 ),
             ]
 
 
     Example query:
 
-    .. code-block:: python
+    .. code-block:: graphql
 
         {
             page(slug: "example-blog-page") {
@@ -256,18 +250,23 @@ GraphQLStreamfield
                 GraphQLString("text"),
                 GraphQLImage("image"),
                 GraphQLStreamfield("buttons"),
-                GraphQLStreamfield("mainbutton", is_list=False),  # this is a direct StructBlock, not a list of sub-blocks
+                GraphQLStreamfield(
+                    "mainbutton", is_list=False
+                ),  # this is a direct StructBlock, not a list of sub-blocks
             ]
+
 
         @register_paginated_query_field("blog_page")
         class BlogPage(Page):
-            body = StreamField([
-                ("text_and_buttons", TextAndButtonsBlock()),
-            ])
+            body = StreamField(
+                [
+                    ("text_and_buttons", TextAndButtonsBlock()),
+                ]
+            )
 
             graphql_fields = [GraphQLStreamfield("body")]
 
-    .. code-block:: python
+    .. code-block:: graphql
 
         # Example query, based on the above
         {
@@ -322,20 +321,21 @@ GraphQLSnippet
 
         class BookPage(Page):
             advert = models.ForeignKey(
-                'demo.Advert',
+                "demo.Advert",
                 null=True,
                 blank=True,
                 on_delete=models.SET_NULL,
-                related_name='+'
+                related_name="+",
             )
 
             graphql_fields = [
-                GraphQLSnippet('advert', 'demo.Advert'),
+                GraphQLSnippet("advert", "demo.Advert"),
             ]
 
             content_panels = Page.content_panels + [
-                SnippetChooserPanel('advert'),
+                SnippetChooserPanel("advert"),
             ]
+
 
         @register_snippet
         class Advert(models.Model):
@@ -343,20 +343,20 @@ GraphQLSnippet
             text = models.CharField(max_length=255)
 
             graphql_fields = [
-                GraphQLString('url'),
-                GraphQLString('text'),
+                GraphQLString("url"),
+                GraphQLString("text"),
             ]
 
             panels = [
-                FieldPanel('url'),
-                FieldPanel('text'),
+                FieldPanel("url"),
+                FieldPanel("text"),
             ]
 
             def __str__(self):
                 return self.text
 
 
-    .. code-block:: python
+    .. code-block:: graphql
 
         # Example query
         {
@@ -394,19 +394,19 @@ GraphQLForeignKey
 
         class BookPage(Page):
             advert = models.ForeignKey(
-                'demo.Advert',
+                "demo.Advert",
                 null=True,
                 blank=True,
                 on_delete=models.SET_NULL,
-                related_name='+'
+                related_name="+",
             )
 
             graphql_fields = [
-                GraphQLSnippet('advert', 'demo.Advert'),
+                GraphQLSnippet("advert", "demo.Advert"),
             ]
 
             content_panels = Page.content_panels + [
-                SnippetChooserPanel('advert'),
+                SnippetChooserPanel("advert"),
             ]
 
 

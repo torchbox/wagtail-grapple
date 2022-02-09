@@ -47,7 +47,7 @@ def register_schema_mutation(mutation_mixins):
 
 @hooks.register("register_schema_subscription")
 def register_schema_subscription(subscription_mixins):
-    from .types.pages import has_channels
+    from .settings import has_channels
 
     if has_channels:
         from .types.pages import PagesSubscription

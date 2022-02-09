@@ -10,8 +10,8 @@ For example your project's ``settings.py`` file might include something like thi
 
     # settings.py
     GRAPPLE = {
-        'APPS': ['home'],
-        'ADD_SEARCH_HIT': True,
+        "APPS": ["home"],
+        "ADD_SEARCH_HIT": True,
     }
 
 
@@ -85,10 +85,10 @@ Example:
     # settings.py
     GRAPPLE = {
         # ...
-        'ALLOWED_IMAGE_FILTERS': [
-            'width-1000',
-            'fill-300x150|jpegquality-60',
-            'width-700|format-webp',
+        "ALLOWED_IMAGE_FILTERS": [
+            "width-1000",
+            "fill-300x150|jpegquality-60",
+            "width-700|format-webp",
         ]
     }
 

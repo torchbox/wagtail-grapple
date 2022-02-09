@@ -30,6 +30,10 @@ jobs:
       matrix:
         python-version: ['3.6', '3.7', '3.8', '3.9', '3.10']
         wagtail-version: ['2.14', '2.15', '2.16']
+        exclude:
+          # exclude python 3.6 from wagtail 2.16 as support dropped.
+          - python-version: '3.6'
+            wagtail-version: '2.16'
 
     steps:
       - uses: actions/checkout@v2

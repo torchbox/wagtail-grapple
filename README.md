@@ -82,7 +82,7 @@ Getting Grapple installed is designed to be as simple as possible!
 ### Prerequisites
 
 ```
-Django  >= 3.0
+Django  >= 3.0, <4.0
 Wagtail >= 2.14, <2.17
 ```
 
@@ -202,7 +202,7 @@ Contributions are what make the open source community such an amazing place to b
 Wagtail Grapple supports:
 
 - Django 3.0.x, 3.1.x, 3.2.x
-- Python 3.6, 3.7, 3.8, 3.9, and 3.10
+- Python 3.7, 3.8, 3.9, and 3.10
 - Wagtail >= 2.14, < 2.17
 
 ## License

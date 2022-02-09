@@ -82,8 +82,8 @@ Getting Grapple installed is designed to be as simple as possible!
 ### Prerequisites
 
 ```
-Django  >= 2.2
-Wagtail >= 2.11, <2.17
+Django  >= 3.0
+Wagtail >= 2.14, <2.17
 ```
 
 ### Installation

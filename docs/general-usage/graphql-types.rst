@@ -264,16 +264,16 @@ The singular ``site`` field accepts the following arguments:
 
 ::
 
-    # Either the `id` or `hostName` must be provided.
+    # Either the `id` or `hostname` must be provided.
     id: ID
-    hostName: String
+    hostname: String
 
 and is queryable like so:
 
 ::
 
     {
-        site(hostName: "my.domain") {
+        site(hostname: "my.domain") {
             pages {
                 title
             }

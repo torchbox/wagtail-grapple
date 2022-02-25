@@ -164,6 +164,8 @@ BASE_URL = "http://localhost:8000"
 # when testing with Wagtail 2.0
 WAGTAILADMIN_BASE_URL = "http://localhost:8000"
 
+WAGTAIL_I18N_ENABLED = True
+
 CORS_ORIGIN_ALLOW_ALL = True
 
 # Grapple Config:
@@ -192,7 +194,6 @@ SECRET_KEY = "this-is-not-a-secret"  # noqa: S105
 ALLOWED_HOSTS = ["*"]
 
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-
 
 try:
     from .local import *  # noqa: F403

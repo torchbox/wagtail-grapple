@@ -25,7 +25,7 @@ class QuerySetList(graphene.List):
     """
     List type with arguments used by Django's query sets.
 
-    This list setts the following arguments on itself:
+    This list sets the following arguments on itself:
 
     * ``id``
     * ``limit``

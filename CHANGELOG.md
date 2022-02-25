@@ -1,10 +1,29 @@
 ## Unreleased
 
+## [0.13.0] - 2022-02-25
+
+### Added
+
+* Support for Wagtail 2.16 ([#212](https://github.com/GrappleGQL/wagtail-grapple/pull/212)). Thanks @fabienheureux
+* Support for queryset slicing when using `searchQuery` ([#206](https://github.com/GrappleGQL/wagtail-grapple/pull/206)). Thanks @protasove
+* Tweak for GitHub to show dependents ([#216](https://github.com/GrappleGQL/wagtail-grapple/pull/216)). Thanks @thibaudcolas
+* Switched to the latest stable release of [black](https://github.com/psf/black)
+
+### Removed
+
+* Deprecated use of `ugettext_lazy` [#202](https://github.com/GrappleGQL/wagtail-grapple/pull/202). Thanks @13hakta
+* Support for Wagtail < 2.14, Python < 3.7
+
+### Fixed
+
+* Docker build ([#210](https://github.com/GrappleGQL/wagtail-grapple/pull/210)). Thanks @dopry
+
+
 ## [0.12.0] - 2021-11-08
 
 ### Fixed
 
-* Fix: custom document model not working with Wagtail grapple ([#153](https://github.com/GrappleGQL/wagtail-grapple/pull/153)). Thanks @ fabienheureux
+* Fix: custom document model not working with Wagtail grapple ([#153](https://github.com/GrappleGQL/wagtail-grapple/pull/153)). Thanks @fabienheureux
 * Fix/empty list in structblock ([#165](https://github.com/GrappleGQL/wagtail-grapple/pull/165)). Thanks @bbliem
 * Use absolute URL for renditions ([#181](https://github.com/GrappleGQL/wagtail-grapple/pull/181)). Thanks @fabienheureux
 * Fix channels versions solving issues introduced by Wagtail 2.14 support ([#184](https://github.com/GrappleGQL/wagtail-grapple/pull/184)). Thanks @fabienheureux
@@ -137,6 +156,7 @@
 * Add conditional checks when resolving streamfield type ([#29](https://github.com/GrappleGQL/wagtail-grapple/pull/29))
 
 
+[0.13.0]: https://github.com/GrappleGQL/wagtail-grapple/releases/tag/v0.13.0
 [0.12.0]: https://github.com/GrappleGQL/wagtail-grapple/releases/tag/v0.12.0
 [0.11.0]: https://github.com/GrappleGQL/wagtail-grapple/releases/tag/v0.11.0
 [0.10.2]: https://github.com/GrappleGQL/wagtail-grapple/releases/tag/v0.10.2

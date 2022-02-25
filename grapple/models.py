@@ -148,7 +148,7 @@ def GraphQLCollection(
     is_paginated_queryset=False,
     required=False,
     item_required=False,
-    **kwargs
+    **kwargs,
 ):
     def Mixin():
         from .types.structures import QuerySetList, PaginatedQuerySet

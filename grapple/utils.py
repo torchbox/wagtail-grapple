@@ -36,7 +36,7 @@ def resolve_queryset(
     id=None,
     order=None,
     collection=None,
-    **kwargs
+    **kwargs,
 ):
     """
     Add limit, offset and search capabilities to the query. This contains

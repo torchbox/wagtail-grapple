@@ -19,7 +19,7 @@ class CreateAuthor(graphene.Mutation):
     )
 
     def mutate(root, info, name, parent, slug):
-        # We use uuid here in order to ensure the slug will always be unique accross tests
+        # We use uuid here in order to ensure the slug will always be unique across tests
         author = AuthorPage(name=name, title=name, slug=slug)
         ok = True
         Page.objects.get(id=parent).add_child(instance=author)

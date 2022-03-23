@@ -3,7 +3,12 @@ import datetime
 import factory
 import wagtail_factories
 from factory import fuzzy
-from home.blocks import ImageGalleryBlock, ImageGalleryImage, ImageGalleryImages
+from home.blocks import (
+    ImageGalleryBlock,
+    ImageGalleryImage,
+    ImageGalleryImages,
+    TextWithCallableBlock,
+)
 from home.models import (
     BlogPage,
     BlogPageRelatedLink,
@@ -67,6 +72,13 @@ class ImageGalleryBlockFactory(wagtail_factories.StructBlockFactory):
         model = ImageGalleryBlock
 
 
+class TextWithCallableBlockFactory(wagtail_factories.StructBlockFactory):
+    text = factory.Sequence(lambda n: f"Text with callable {n}")
+
+    class Meta:
+        model = TextWithCallableBlock
+
+
 class BlogPageRelatedLinkFactory(factory.DjangoModelFactory):
     class Meta:
         model = BlogPageRelatedLink
@@ -107,6 +119,7 @@ class BlogPageFactory(wagtail_factories.PageFactory):
             "datetime": DateTimeBlockFactory,
             "gallery": ImageGalleryBlockFactory,
             "page": PageChooserBlockFactory,
+            "text_with_callable": TextWithCallableBlock,
         }
     )
 

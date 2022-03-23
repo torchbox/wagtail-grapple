@@ -1,3 +1,5 @@
+import graphene
+
 from wagtail.core import blocks
 from wagtail.images.blocks import ImageChooserBlock
 from wagtail.embeds.blocks import EmbedBlock
@@ -10,6 +12,7 @@ from grapple.models import (
     GraphQLCollection,
     GraphQLEmbed,
     GraphQLStreamfield,
+    GraphQLField,
 )
 
 
@@ -89,6 +92,19 @@ class TextAndButtonsBlock(blocks.StructBlock):
     ]
 
 
+@register_streamfield_block
+class TextWithCallableBlock(blocks.StructBlock):
+    text = blocks.CharBlock()
+
+    graphql_fields = [
+        GraphQLString("text"),
+        GraphQLField("simple_string", graphene.String, source="get_simple_string"),
+    ]
+
+    def get_simple_string(self, *args, **kargs):
+        return "oh, hi :)"
+
+
 class StreamFieldBlock(blocks.StreamBlock):
     heading = blocks.CharBlock(classname="full title")
     paragraph = blocks.RichTextBlock()
@@ -103,3 +119,4 @@ class StreamFieldBlock(blocks.StreamBlock):
     callout = CalloutBlock()
     text_and_buttons = TextAndButtonsBlock()
     page = blocks.PageChooserBlock()
+    text_with_callable = TextWithCallableBlock()

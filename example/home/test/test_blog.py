@@ -15,7 +15,7 @@ from wagtail.embeds.blocks import EmbedValue
 
 from example.tests.test_grapple import BaseGrappleTest
 from home.blocks import CarouselBlock, ImageGalleryImages
-from home.factories import BlogPageFactory
+from home.factories import BlogPageFactory, TextWithCallableBlockFactory
 
 
 class BlogTest(BaseGrappleTest):
@@ -91,6 +91,7 @@ class BlogTest(BaseGrappleTest):
                         },
                     },
                 ),
+                ("text_with_callable", TextWithCallableBlockFactory()),
             ],
             parent=self.home,
         )
@@ -694,3 +695,23 @@ class BlogTest(BaseGrappleTest):
             self.assertEqual(int(tag["id"]), idx)
             self.assertTrue(isinstance(tag["name"], str))
             self.assertEqual(tag["name"], "Tag " + str(idx))
+
+    def test_callable_in_structblock(self):
+        # Query stream block
+        block_type = "TextWithCallableBlock"
+        query_blocks = self.get_blocks_from_body(
+            block_type,
+            block_query="""
+                text,
+                simpleString
+            """,
+        )
+
+        # Check HTML is string
+        for block in self.blog_page.body:
+            if type(block.block).__name__ == block_type:
+                text = query_blocks[0]["text"]
+                self.assertEquals(type(text), str)
+
+                simple_string = query_blocks[0]["simpleString"]
+                self.assertEquals(simple_string, "oh, hi :)")

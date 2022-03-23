@@ -98,11 +98,16 @@ class TextWithCallableBlock(blocks.StructBlock):
 
     graphql_fields = [
         GraphQLString("text"),
-        GraphQLField("simple_string", graphene.String, source="get_simple_string"),
+        GraphQLField("string_property", graphene.String, source="get_string_property"),
+        GraphQLField("string_method", graphene.String, source="get_string_method"),
     ]
 
-    def get_simple_string(self, *args, **kargs):
-        return "oh, hi :)"
+    @property
+    def get_string_property(self, *args, **kwargs):
+        return "A simple string property."
+
+    def get_string_method(self, *args, **kwargs):
+        return "A simple string method."
 
 
 class StreamFieldBlock(blocks.StreamBlock):

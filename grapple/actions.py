@@ -366,6 +366,13 @@ def streamfield_resolver(self, instance, info, **kwargs):
     return value
 
 
+def get_custom_resolver(cls, source):
+    if isinstance(getattr(type(cls()), source), property):
+        return lambda self, instance, info, **kwargs: getattr(cls(), source)
+    else:
+        return lambda self, instance, info, **kwargs: getattr(cls(), source)()
+
+
 def build_streamfield_type(
     cls: type,
     type_prefix: str,
@@ -391,15 +398,22 @@ def build_streamfield_type(
 
     # Add any custom fields to node if they are defined.
     if hasattr(cls, "graphql_fields"):
-        for field in cls.graphql_fields:
-            if callable(field):
-                field = field()
+        for item in cls.graphql_fields:
+            has_custom_source: bool = hasattr(item, "field_source")
+
+            if all([not has_custom_source, callable(item)]):
+                item = item()
 
             # Get correct types from field
-            field, field_type = get_field_type(field)
+            field, field_type = get_field_type(item)
 
             # Add support for `graphql_fields`
-            methods["resolve_" + field.field_name] = streamfield_resolver
+            if has_custom_source:
+                methods["resolve_" + field.field_name] = get_custom_resolver(
+                    cls, item.field_source
+                )
+            else:
+                methods["resolve_" + field.field_name] = streamfield_resolver
 
             # Add field to GQL type with correct field-type
             type_meta[field.field_name] = field_type

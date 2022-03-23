@@ -703,15 +703,21 @@ class BlogTest(BaseGrappleTest):
             block_type,
             block_query="""
                 text,
-                simpleString
+                stringProperty,
+                stringMethod
             """,
         )
 
-        # Check HTML is string
         for block in self.blog_page.body:
             if type(block.block).__name__ == block_type:
+                # Check TextWithCallableBlock.text is OK.
                 text = query_blocks[0]["text"]
-                self.assertEquals(type(text), str)
+                self.assertIn("Text with callable", text)
 
-                simple_string = query_blocks[0]["simpleString"]
-                self.assertEquals(simple_string, "oh, hi :)")
+                # Check TextWithCallableBlock.get_string_property() is OK.
+                string_property = query_blocks[0]["stringProperty"]
+                self.assertEquals("A simple string property.", string_property)
+
+                # Check TextWithCallableBlock.get_string_method() is OK.
+                string_method = query_blocks[0]["stringMethod"]
+                self.assertEquals("A simple string method.", string_method)

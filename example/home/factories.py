@@ -119,7 +119,7 @@ class BlogPageFactory(wagtail_factories.PageFactory):
             "datetime": DateTimeBlockFactory,
             "gallery": ImageGalleryBlockFactory,
             "page": PageChooserBlockFactory,
-            "text_with_callable": TextWithCallableBlock,
+            "text_with_callable": TextWithCallableBlockFactory,
         }
     )
 

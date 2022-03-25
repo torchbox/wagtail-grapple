@@ -366,6 +366,35 @@ def streamfield_resolver(self, instance, info, **kwargs):
     return value
 
 
+def custom_cls_resolver(cls, item):
+    klass = cls()
+
+    # If we've defined a `source` kwarg: use it.
+    if hasattr(item, "field_source") and hasattr(klass, item.field_source):
+        if isinstance(getattr(type(cls()), item.field_source), property):
+            return lambda self, instance, info, **kwargs: getattr(
+                klass, item.field_source
+            )
+        else:
+            return lambda self, instance, info, **kwargs: getattr(
+                klass, item.field_source
+            )()
+
+    # If the `field_name` is a property or method of the class: use it.
+    if hasattr(item, "field_name") and hasattr(klass, item.field_name):
+        if isinstance(getattr(type(cls()), item.field_name), property):
+            return lambda self, instance, info, **kwargs: getattr(
+                klass, item.field_name
+            )
+        else:
+            return lambda self, instance, info, **kwargs: getattr(
+                klass, item.field_name
+            )()
+
+    # No match found - fall back to the streamfield_resolver() later.
+    return None
+
+
 def build_streamfield_type(
     cls: type,
     type_prefix: str,
@@ -391,15 +420,17 @@ def build_streamfield_type(
 
     # Add any custom fields to node if they are defined.
     if hasattr(cls, "graphql_fields"):
-        for field in cls.graphql_fields:
-            if callable(field):
-                field = field()
+        for item in cls.graphql_fields:
+            if callable(item):
+                item = item()
 
             # Get correct types from field
-            field, field_type = get_field_type(field)
+            field, field_type = get_field_type(item)
 
             # Add support for `graphql_fields`
-            methods["resolve_" + field.field_name] = streamfield_resolver
+            methods["resolve_" + field.field_name] = (
+                custom_cls_resolver(cls, item) or streamfield_resolver
+            )
 
             # Add field to GQL type with correct field-type
             type_meta[field.field_name] = field_type

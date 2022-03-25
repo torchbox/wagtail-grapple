@@ -1,3 +1,5 @@
+import graphene
+
 from wagtail.core import blocks
 from wagtail.images.blocks import ImageChooserBlock
 from wagtail.embeds.blocks import EmbedBlock
@@ -10,6 +12,7 @@ from grapple.models import (
     GraphQLCollection,
     GraphQLEmbed,
     GraphQLStreamfield,
+    GraphQLField,
 )
 
 
@@ -89,6 +92,37 @@ class TextAndButtonsBlock(blocks.StructBlock):
     ]
 
 
+@register_streamfield_block
+class TextWithCallableBlock(blocks.StructBlock):
+    text = blocks.CharBlock()
+
+    graphql_fields = [
+        GraphQLString("text"),
+        GraphQLString("simple_string"),
+        GraphQLString("simple_string_method", source="get_simple_string_method"),
+        GraphQLField("field_property", graphene.String, source="get_field_property"),
+        GraphQLField("field_method", graphene.String, source="get_field_method"),
+    ]
+
+    @property
+    def simple_string(self, *args, **kwargs):
+        return "A simple string property."
+
+    def simple_string_method(self, *args, **kwargs):
+        # Should not be used as we define `source="get_simple_string_method"`.
+        raise Exception
+
+    def get_simple_string_method(self, *args, **kwargs):
+        return "A simple string method."
+
+    @property
+    def get_field_property(self, *args, **kwargs):
+        return "A field property."
+
+    def get_field_method(self, *args, **kwargs):
+        return "A field method."
+
+
 class StreamFieldBlock(blocks.StreamBlock):
     heading = blocks.CharBlock(classname="full title")
     paragraph = blocks.RichTextBlock()
@@ -103,3 +137,4 @@ class StreamFieldBlock(blocks.StreamBlock):
     callout = CalloutBlock()
     text_and_buttons = TextAndButtonsBlock()
     page = blocks.PageChooserBlock()
+    text_with_callable = TextWithCallableBlock()

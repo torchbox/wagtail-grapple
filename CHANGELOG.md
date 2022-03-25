@@ -1,5 +1,12 @@
 ## Unreleased
 
+## [0.14.0] - 2022-03-25
+
+### Added
+
+* Support for attributes and callable sources within `StreamField`s ([#220](https://github.com/GrappleGQL/wagtail-grapple/pull/220)). Thanks @kbayliss
+* flake8/isort linting configuration
+
 ## [0.13.0] - 2022-02-25
 
 ### Added
@@ -48,19 +55,27 @@
 
 ## [0.11.0] - 2021-03-09
 
+### Added
+* 🚀 Introduced a new settings -`GRAPPLE_ALLOWED_IMAGE_FILTERS` - which accepts a list of filters (thus renditions) that are allowed to generate. Read more about generating renditions in [Wagtail docs](https://docs.wagtail.io/en/stable/advanced_topics/images/renditions.html#generating-renditions-in-python)
+
+### Changed
 * 🤖 Got deployed to PyPi automatically through the power of GitHub Actions! Yes to automation 🎉
 * 📜 Changed the license from MIT to BSD 3, for better alignment with Wagtail
-* 🚀 Introduced a new settings -`GRAPPLE_ALLOWED_IMAGE_FILTERS` - which accepts a list of filters (thus renditions) that are allowed to generate. Read more about generating renditions in [Wagtail docs](https://docs.wagtail.io/en/stable/advanced_topics/images/renditions.html#generating-renditions-in-python)
+
+
 
 ## [0.10.2]
 
+### Changed
 * Allow running alongside Wagtail 2.12
 * Tweak exclusion lists for pages [#148](https://github.com/GrappleGQL/wagtail-grapple/pull/148)
 
 ## [0.10.0]
 
-
+### Added
 * Query page via url path ([#52](https://github.com/GrappleGQL/wagtail-grapple/pull/52)). Thanks @NathHorrigan
+
+### Fixed
 * Fix filtering by content type in page/pages queries ([#147](https://github.com/GrappleGQL/wagtail-grapple/pull/147)). Thanks @isolationism for another PR that finally propted that fix
 * Fix "excluding custom field" warning with graphene-django>=2.8.1 ([#146](https://github.com/GrappleGQL/wagtail-grapple/pull/146))
 
@@ -69,15 +84,15 @@
 * Fix: use correct media type in GraphQLMedia [#142](https://github.com/GrappleGQL/wagtail-grapple/pull/142)
 * Fix @register_singular_query_field usage with non-Wagtail page models did not return any result
 
-## 0.9.2 - 2020-11-12
+## [0.9.2] - 2020-11-12
 
 * Fix a small bug for correct custom Media models support
 
-## 0.9.1 - 2020-11-06
+## [0.9.1] - 2020-11-06
 
-* Return spefic instances for `PageChooserBlock`s
+* Return specific instances for `PageChooserBlock`s
 
-## 0.9.0 - 2020-11-04
+## [0.9.0] - 2020-11-04
 
 ### Added
 * Support Wagtail 2.11. Further testing welcome!
@@ -89,7 +104,7 @@
 * Fix StubModel already registered RuntimeWarning ([#133](https://github.com/GrappleGQL/wagtail-grapple/pull/133)). @zerolab
 * Add .live().public() to all relevant methods ([#129](https://github.com/GrappleGQL/wagtail-grapple/pull/129)). Thanks @mmmente
 
-## 0.8.0 - 2020-10-07
+## [0.8.0] - 2020-10-07
 
 ### Added
 
@@ -106,19 +121,18 @@
 * Fix pageType returns null
 * Fix: use url instead of urlPath in redirections ([#109](https://github.com/GrappleGQL/wagtail-grapple/pull/109)) Thanks @fabienheureux
 
-
 ### Misc
 * Make wagtailmedia an optional dependency ([#106](https://github.com/GrappleGQL/wagtail-grapple/pull/106))
 * Add GraphQLPage to model types docs ([#119](https://github.com/GrappleGQL/wagtail-grapple/pull/119)) @zerolab
 * Remove unused imports and cleanup repeat queries ([#113](https://github.com/GrappleGQL/wagtail-grapple/pull/113))
 * Update supported versions Django (>=2.2, <3.2) and django-graphene ([#105](https://github.com/GrappleGQL/wagtail-grapple/pull/105))
 
-## 0.7.0 - 2020-09-02
+## [0.7.0] - 2020-09-02
 
 * Add pagination support (#101). Thanks @ruisaraiva19
 * Add contributors to README.md (#102) following the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Thanks @ruisaraiva19
 
-## 0.6.0 - 2020-08-21
+## [0.6.0] - 2020-08-21
 
 ### Added
 
@@ -150,7 +164,6 @@
 
 ## [0.4.0] - 2019-12-14
 
-
 * Bump minimum python version to 3.6
 * Improve field definition and under-the-hood implementation ([#28](https://github.com/GrappleGQL/wagtail-grapple/pull/28))
 * Add conditional checks when resolving streamfield type ([#29](https://github.com/GrappleGQL/wagtail-grapple/pull/29))
@@ -169,3 +182,5 @@
 [0.7.0]: https://github.com/GrappleGQL/wagtail-grapple/releases/tag/v0.7.0
 [0.6.0]: https://github.com/GrappleGQL/wagtail-grapple/releases/tag/v0.6.0
 [0.4.8]: https://github.com/GrappleGQL/wagtail-grapple/releases/tag/v0.4.8
+[0.4.7]: https://github.com/GrappleGQL/wagtail-grapple/releases/tag/v0.4.7
+[0.4.0]: https://github.com/GrappleGQL/wagtail-grapple/releases/tag/v0.4.0

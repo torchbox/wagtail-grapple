@@ -369,7 +369,7 @@ def streamfield_resolver(self, instance, info, **kwargs):
 def custom_cls_resolver(cls, item):
     klass = cls()
 
-    # If we've defined a `source` kwarg, use it.
+    # If we've defined a `source` kwarg: use it.
     if hasattr(item, "field_source") and hasattr(klass, item.field_source):
         if isinstance(getattr(type(cls()), item.field_source), property):
             return lambda self, instance, info, **kwargs: getattr(
@@ -380,6 +380,7 @@ def custom_cls_resolver(cls, item):
                 klass, item.field_source
             )()
 
+    # If the `field_name` is a property or method of the class: use it.
     if hasattr(item, "field_name") and hasattr(klass, item.field_name):
         if isinstance(getattr(type(cls()), item.field_name), property):
             return lambda self, instance, info, **kwargs: getattr(
@@ -390,6 +391,7 @@ def custom_cls_resolver(cls, item):
                 klass, item.field_name
             )()
 
+    # No match found - fall back to the streamfield_resolver() later.
     return None
 
 

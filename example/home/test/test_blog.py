@@ -696,45 +696,10 @@ class BlogTest(BaseGrappleTest):
             self.assertTrue(isinstance(tag["name"], str))
             self.assertEqual(tag["name"], "Tag " + str(idx))
 
-    def test_string_property_in_structblock(self):
-        # Query stream block
-        block_type = "TextWithCallableBlock"
-        query_blocks = self.get_blocks_from_body(
-            block_type,
-            block_query="""
-                simpleString
-            """,
-        )
-
-        for block in self.blog_page.body:
-            if type(block.block).__name__ == block_type:
-                result = query_blocks[0]["simpleString"]
-                self.assertEquals("A simple string property.", result)
-
-    def test_string_method_in_structblock(self):
-        # Query stream block
-        block_type = "TextWithCallableBlock"
-        query_blocks = self.get_blocks_from_body(
-            block_type,
-            block_query="""
-                simpleStringMethod
-            """,
-        )
-
-        for block in self.blog_page.body:
-            if type(block.block).__name__ == block_type:
-                result = query_blocks[0]["simpleStringMethod"]
-                self.assertEquals("A simple string method.", result)
-
     def test_graphqlstring_property_in_structblock(self):
         # Query stream block
         block_type = "TextWithCallableBlock"
-        query_blocks = self.get_blocks_from_body(
-            block_type,
-            block_query="""
-                simpleString
-            """,
-        )
+        query_blocks = self.get_blocks_from_body(block_type, block_query="simpleString")
 
         for block in self.blog_page.body:
             if type(block.block).__name__ == block_type:
@@ -745,10 +710,7 @@ class BlogTest(BaseGrappleTest):
         # Query stream block
         block_type = "TextWithCallableBlock"
         query_blocks = self.get_blocks_from_body(
-            block_type,
-            block_query="""
-                simpleStringMethod
-            """,
+            block_type, block_query="simpleStringMethod"
         )
 
         for block in self.blog_page.body:
@@ -763,10 +725,7 @@ class BlogTest(BaseGrappleTest):
         # Query stream block
         block_type = "TextWithCallableBlock"
         query_blocks = self.get_blocks_from_body(
-            block_type,
-            block_query="""
-                fieldProperty
-            """,
+            block_type, block_query="fieldProperty"
         )
 
         for block in self.blog_page.body:
@@ -777,12 +736,7 @@ class BlogTest(BaseGrappleTest):
     def test_graphqlfield_method_in_structblock(self):
         # Query stream block
         block_type = "TextWithCallableBlock"
-        query_blocks = self.get_blocks_from_body(
-            block_type,
-            block_query="""
-                fieldMethod
-            """,
-        )
+        query_blocks = self.get_blocks_from_body(block_type, block_query="fieldMethod")
 
         for block in self.blog_page.body:
             if type(block.block).__name__ == block_type:

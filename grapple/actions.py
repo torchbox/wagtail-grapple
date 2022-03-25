@@ -366,11 +366,31 @@ def streamfield_resolver(self, instance, info, **kwargs):
     return value
 
 
-def get_custom_resolver(cls, source):
-    if isinstance(getattr(type(cls()), source), property):
-        return lambda self, instance, info, **kwargs: getattr(cls(), source)
-    else:
-        return lambda self, instance, info, **kwargs: getattr(cls(), source)()
+def custom_cls_resolver(cls, item):
+    klass = cls()
+
+    # If we've defined a `source` kwarg, use it.
+    if hasattr(item, "field_source") and hasattr(klass, item.field_source):
+        if isinstance(getattr(type(cls()), item.field_source), property):
+            return lambda self, instance, info, **kwargs: getattr(
+                klass, item.field_source
+            )
+        else:
+            return lambda self, instance, info, **kwargs: getattr(
+                klass, item.field_source
+            )()
+
+    if hasattr(item, "field_name") and hasattr(klass, item.field_name):
+        if isinstance(getattr(type(cls()), item.field_name), property):
+            return lambda self, instance, info, **kwargs: getattr(
+                klass, item.field_name
+            )
+        else:
+            return lambda self, instance, info, **kwargs: getattr(
+                klass, item.field_name
+            )()
+
+    return None
 
 
 def build_streamfield_type(
@@ -399,14 +419,7 @@ def build_streamfield_type(
     # Add any custom fields to node if they are defined.
     if hasattr(cls, "graphql_fields"):
         for item in cls.graphql_fields:
-            has_custom_source: bool = hasattr(item, "field_source")
-
-            if all(
-                [
-                    not has_custom_source,
-                    callable(item),
-                ]
-            ):
+            if callable(item):
                 item = item()
 
             # Get correct types from field
@@ -414,9 +427,7 @@ def build_streamfield_type(
 
             # Add support for `graphql_fields`
             methods["resolve_" + field.field_name] = (
-                get_custom_resolver(cls, item.field_source)
-                if has_custom_source
-                else streamfield_resolver
+                custom_cls_resolver(cls, item) or streamfield_resolver
             )
 
             # Add field to GQL type with correct field-type

@@ -98,16 +98,29 @@ class TextWithCallableBlock(blocks.StructBlock):
 
     graphql_fields = [
         GraphQLString("text"),
-        GraphQLField("string_property", graphene.String, source="get_string_property"),
-        GraphQLField("string_method", graphene.String, source="get_string_method"),
+        GraphQLString("simple_string"),
+        GraphQLString("simple_string_method", source="get_simple_string_method"),
+        GraphQLField("field_property", graphene.String, source="get_field_property"),
+        GraphQLField("field_method", graphene.String, source="get_field_method"),
     ]
 
     @property
-    def get_string_property(self, *args, **kwargs):
+    def simple_string(self, *args, **kwargs):
         return "A simple string property."
 
-    def get_string_method(self, *args, **kwargs):
+    def simple_string_method(self, *args, **kwargs):
+        # Should not be used as we define `source="get_simple_string_method"`.
+        raise Exception
+
+    def get_simple_string_method(self, *args, **kwargs):
         return "A simple string method."
+
+    @property
+    def get_field_property(self, *args, **kwargs):
+        return "A field property."
+
+    def get_field_method(self, *args, **kwargs):
+        return "A field method."
 
 
 class StreamFieldBlock(blocks.StreamBlock):

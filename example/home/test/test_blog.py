@@ -696,28 +696,95 @@ class BlogTest(BaseGrappleTest):
             self.assertTrue(isinstance(tag["name"], str))
             self.assertEqual(tag["name"], "Tag " + str(idx))
 
-    def test_callable_in_structblock(self):
+    def test_string_property_in_structblock(self):
         # Query stream block
         block_type = "TextWithCallableBlock"
         query_blocks = self.get_blocks_from_body(
             block_type,
             block_query="""
-                text,
-                stringProperty,
-                stringMethod
+                simpleString
             """,
         )
 
         for block in self.blog_page.body:
             if type(block.block).__name__ == block_type:
-                # Check TextWithCallableBlock.text is OK.
-                text = query_blocks[0]["text"]
-                self.assertIn("Text with callable", text)
+                result = query_blocks[0]["simpleString"]
+                self.assertEquals("A simple string property.", result)
 
-                # Check TextWithCallableBlock.get_string_property() is OK.
-                string_property = query_blocks[0]["stringProperty"]
-                self.assertEquals("A simple string property.", string_property)
+    def test_string_method_in_structblock(self):
+        # Query stream block
+        block_type = "TextWithCallableBlock"
+        query_blocks = self.get_blocks_from_body(
+            block_type,
+            block_query="""
+                simpleStringMethod
+            """,
+        )
 
-                # Check TextWithCallableBlock.get_string_method() is OK.
-                string_method = query_blocks[0]["stringMethod"]
-                self.assertEquals("A simple string method.", string_method)
+        for block in self.blog_page.body:
+            if type(block.block).__name__ == block_type:
+                result = query_blocks[0]["simpleStringMethod"]
+                self.assertEquals("A simple string method.", result)
+
+    def test_graphqlstring_property_in_structblock(self):
+        # Query stream block
+        block_type = "TextWithCallableBlock"
+        query_blocks = self.get_blocks_from_body(
+            block_type,
+            block_query="""
+                simpleString
+            """,
+        )
+
+        for block in self.blog_page.body:
+            if type(block.block).__name__ == block_type:
+                result = query_blocks[0]["simpleString"]
+                self.assertEquals("A simple string property.", result)
+
+    def test_graphqlstring_method_in_structblock(self):
+        # Query stream block
+        block_type = "TextWithCallableBlock"
+        query_blocks = self.get_blocks_from_body(
+            block_type,
+            block_query="""
+                simpleStringMethod
+            """,
+        )
+
+        for block in self.blog_page.body:
+            if type(block.block).__name__ == block_type:
+                # Ensure TextWithCallableBlock.simple_string_method not called.
+                result = query_blocks[0]["simpleStringMethod"]
+
+                # Ensure TextWithCallableBlock.get_simple_string_method called.
+                self.assertEquals("A simple string method.", result)
+
+    def test_graphqlfield_property_in_structblock(self):
+        # Query stream block
+        block_type = "TextWithCallableBlock"
+        query_blocks = self.get_blocks_from_body(
+            block_type,
+            block_query="""
+                fieldProperty
+            """,
+        )
+
+        for block in self.blog_page.body:
+            if type(block.block).__name__ == block_type:
+                result = query_blocks[0]["fieldProperty"]
+                self.assertEquals("A field property.", result)
+
+    def test_graphqlfield_method_in_structblock(self):
+        # Query stream block
+        block_type = "TextWithCallableBlock"
+        query_blocks = self.get_blocks_from_body(
+            block_type,
+            block_query="""
+                fieldMethod
+            """,
+        )
+
+        for block in self.blog_page.body:
+            if type(block.block).__name__ == block_type:
+                result = query_blocks[0]["fieldMethod"]
+                self.assertEquals("A field method.", result)

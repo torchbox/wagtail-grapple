@@ -1,10 +1,9 @@
 import graphene
-
-from django.utils.translation import gettext_lazy as _
 from django.contrib.contenttypes.models import ContentType
-
-from wagtail.core.models import Page as WagtailPage, Site
+from django.utils.translation import gettext_lazy as _
 from graphene_django.types import DjangoObjectType
+from wagtail.core.models import Page as WagtailPage
+from wagtail.core.models import Site
 
 from ..utils import resolve_queryset
 from .pages import PageInterface, get_specific_page

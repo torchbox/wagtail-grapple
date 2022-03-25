@@ -2,9 +2,10 @@ import inspect
 import os
 import sys
 from unittest.mock import patch
-from grapple.types.images import rendition_allowed
 
 import wagtail_factories
+
+from grapple.types.images import rendition_allowed
 
 if sys.version_info >= (3, 7):
     from builtins import dict as dict_type
@@ -16,23 +17,15 @@ from pydoc import locate
 from django.conf import settings
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import RequestFactory, TestCase, override_settings
-
 from graphene.test import Client
-
-from wagtailmedia.models import get_media_model
-
-from wagtail.core.models import Page, Site
-
-from wagtail.documents import get_document_model
-
-from wagtail.images import get_image_model
-
-from grapple.schema import create_schema
-
-
 from home.factories import BlogPageFactory
 from home.models import HomePage
+from wagtail.core.models import Page, Site
+from wagtail.documents import get_document_model
+from wagtail.images import get_image_model
+from wagtailmedia.models import get_media_model
 
+from grapple.schema import create_schema
 
 SCHEMA = locate(settings.GRAPHENE["SCHEMA"])
 MIDDLEWARE_OBJECTS = [

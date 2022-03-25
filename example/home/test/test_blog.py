@@ -5,17 +5,17 @@ import json
 import wagtail_factories
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
-from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError
+from django.core.validators import URLValidator
 from django.test.client import RequestFactory
 from django.utils.safestring import SafeText
+from home.blocks import CarouselBlock, ImageGalleryImages
+from home.factories import BlogPageFactory, TextWithCallableBlockFactory
 from wagtail.core.blocks import StreamValue
 from wagtail.core.rich_text import RichText
 from wagtail.embeds.blocks import EmbedValue
 
 from example.tests.test_grapple import BaseGrappleTest
-from home.blocks import CarouselBlock, ImageGalleryImages
-from home.factories import BlogPageFactory, TextWithCallableBlockFactory
 
 
 class BlogTest(BaseGrappleTest):
@@ -224,7 +224,7 @@ class BlogTest(BaseGrappleTest):
         # Check that we test all blocks that were returned.
         self.assertEquals(len(query_blocks), count)
 
-    def test_blog_body_imagechooserblock(self):
+    def test_blog_body_imagechooserblock_in_streamblock(self):
         # Query stream block
         block_type = "CarouselBlock"
         query_blocks = self.get_blocks_from_body(

@@ -10,13 +10,14 @@ Wagtail Grapple settings, checking for user settings first, then falling
 back to the defaults.
 """
 import logging
+
 from django.conf import settings
 from django.test.signals import setting_changed
 
 logger = logging.getLogger("grapple")
 
 try:
-    import channels
+    import channels  # noqa: F401
 
     has_channels = True
 except ImportError:

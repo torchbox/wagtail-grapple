@@ -1,10 +1,8 @@
-from wagtail.core import hooks
-from django.utils.crypto import get_random_string
-from wagtail.core.models import Page
 import graphene
+from home.models import AuthorPage
+from wagtail.core.models import Page
 
 from grapple.types.pages import PageInterface
-from home.models import AuthorPage
 
 
 class CreateAuthor(graphene.Mutation):

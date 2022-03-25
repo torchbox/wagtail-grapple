@@ -1,7 +1,6 @@
 from example.tests.test_grapple import BaseGrappleTest
 from grapple.settings import has_channels
 
-
 if has_channels:
 
     class TestRegisterSubscription(BaseGrappleTest):

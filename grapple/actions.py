@@ -1,33 +1,32 @@
-import graphene
 import inspect
-from typing import Type
-from types import MethodType
 from collections.abc import Iterable
+from types import MethodType
+from typing import Type
 
+import graphene
 from django.db import models
 from django.template.loader import render_to_string
-
 from graphene_django.types import DjangoObjectType
-
 from wagtail.contrib.settings.models import BaseSetting
+from wagtail.core.blocks import StructValue, stream_block
 from wagtail.core.models import Page as WagtailPage
 from wagtail.core.rich_text import RichText, expand_db_html
-from wagtail.core.blocks import stream_block, StructValue
 from wagtail.documents.models import AbstractDocument
-from wagtail.images.models import AbstractImage, AbstractRendition
 from wagtail.images.blocks import ImageChooserBlock
+from wagtail.images.models import AbstractImage, AbstractRendition
 from wagtail.snippets.models import get_snippet_models
 
+from .helpers import field_middlewares, streamfield_types
 from .registry import registry
+from .settings import grapple_settings
 from .types.documents import DocumentObjectType
 from .types.images import ImageObjectType
-from .types.pages import PageInterface, Page
+from .types.pages import Page, PageInterface
 from .types.streamfield import generate_streamfield_union
-from .helpers import streamfield_types, field_middlewares
-from .settings import grapple_settings
 
 try:
     from wagtailmedia.models import AbstractMedia
+
     from .types.media import MediaObjectType
 
     has_wagtail_media = True
@@ -93,7 +92,7 @@ def add_app(app_label: str, prefix: str = ""):
     app = apps.get_app_config(app_label)
 
     # Create a collection of models of standard models (Pages, Images, Documents).
-    models = [mdl for mdl in app.get_models()]
+    models = list(app.get_models())
 
     # Add snippet models to model collection.
     for snippet in get_snippet_models():
@@ -272,7 +271,7 @@ def load_type_fields():
                 # Recreate the graphene type with the fields set
                 class Meta:
                     model = cls
-                    interfaces = (interface,) if interface is not None else tuple()
+                    interfaces = (interface,) if interface is not None else ()
 
                 type_meta = {"Meta": Meta, "id": graphene.ID(), "name": type_name}
 
@@ -412,7 +411,7 @@ def build_streamfield_type(
                 registry.streamfield_blocks.get(block) for block in cls.graphql_types
             ]
         else:
-            interfaces = (interface,) if interface is not None else tuple()
+            interfaces = (interface,) if interface is not None else ()
 
     methods = {}
     type_name = type_prefix + cls.__name__

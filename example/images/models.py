@@ -1,8 +1,7 @@
 from django.db import models
+from wagtail.images.models import AbstractImage, AbstractRendition, Image
 
-from wagtail.images.models import Image, AbstractImage, AbstractRendition
-
-from grapple.models import GraphQLString, GraphQLInt, GraphQLImage
+from grapple.models import GraphQLImage, GraphQLInt, GraphQLString
 
 
 class CustomImage(AbstractImage):

@@ -10,11 +10,11 @@ from home.blocks import (
     TextWithCallableBlock,
 )
 from home.models import (
-    BlogPage,
-    BlogPageRelatedLink,
-    AuthorPage,
     Advert,
     Author,
+    AuthorPage,
+    BlogPage,
+    BlogPageRelatedLink,
     Person,
     SimpleModel,
 )

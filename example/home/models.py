@@ -1,45 +1,40 @@
 import graphene
-from django.db import models
 from django.conf import settings
-from modelcluster.fields import ParentalKey
+from django.db import models
+from home.blocks import StreamFieldBlock
 from modelcluster.contrib.taggit import ClusterTaggableManager
-
+from modelcluster.fields import ParentalKey
 from taggit.models import TaggedItemBase
-
-from wagtail.core.models import Page, Orderable
-from wagtail.core.fields import StreamField
+from wagtail.admin.edit_handlers import FieldPanel, InlinePanel, StreamFieldPanel
 from wagtail.contrib.settings.models import BaseSetting, register_setting
-
-from wagtail.admin.edit_handlers import FieldPanel, StreamFieldPanel, InlinePanel
-from wagtail.snippets.models import register_snippet
-from wagtail.snippets.edit_handlers import SnippetChooserPanel
-from wagtail.images.edit_handlers import ImageChooserPanel
+from wagtail.core.fields import StreamField
+from wagtail.core.models import Orderable, Page
 from wagtail.documents.edit_handlers import DocumentChooserPanel
-
+from wagtail.images.edit_handlers import ImageChooserPanel
+from wagtail.snippets.edit_handlers import SnippetChooserPanel
+from wagtail.snippets.models import register_snippet
 from wagtail_headless_preview.models import HeadlessPreviewMixin
 from wagtailmedia.edit_handlers import MediaChooserPanel
 
 from grapple.helpers import (
-    register_query_field,
     register_paginated_query_field,
+    register_query_field,
     register_singular_query_field,
 )
-from grapple.utils import resolve_paginated_queryset
+from grapple.middleware import IsAnonymousMiddleware
 from grapple.models import (
-    GraphQLString,
-    GraphQLSnippet,
-    GraphQLStreamfield,
+    GraphQLCollection,
+    GraphQLDocument,
     GraphQLForeignKey,
     GraphQLImage,
-    GraphQLDocument,
     GraphQLMedia,
-    GraphQLCollection,
     GraphQLPage,
+    GraphQLSnippet,
+    GraphQLStreamfield,
+    GraphQLString,
     GraphQLTag,
 )
-from grapple.middleware import IsAnonymousMiddleware
-
-from home.blocks import StreamFieldBlock
+from grapple.utils import resolve_paginated_queryset
 
 document_model_string = getattr(
     settings, "WAGTAILDOCS_DOCUMENT_MODEL", "wagtaildocs.Document"

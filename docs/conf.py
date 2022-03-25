@@ -12,10 +12,10 @@
 #
 import os
 import sys
-import sphinx_wagtail_theme
 
-from sphinx.highlighting import lexers
+import sphinx_wagtail_theme
 from pygments_graphql import GraphqlLexer
+from sphinx.highlighting import lexers
 
 from grapple import __version__
 
@@ -54,10 +54,11 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 # a list of builtin themes.
 #
 html_theme = "sphinx_wagtail_theme"
-html_theme_options = dict(
-    project_name="Wagtail Grapple Documentation",
-    github_url="https://github.com/GrappleGQL/wagtail-grapple/tree/main/docs/",
-)
+html_theme_path = [sphinx_wagtail_theme.get_html_theme_path()]
+html_theme_options = {
+    "project_name": "Wagtail Grapple Documentation",
+    "github_url": "https://github.com/GrappleGQL/wagtail-grapple/tree/main/docs/",
+}
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,

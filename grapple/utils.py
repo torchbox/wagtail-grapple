@@ -1,15 +1,14 @@
-import os
 import base64
+import os
 
 from django.conf import settings
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
-
+from wagtail.search.backends import get_search_backend
 from wagtail.search.index import class_is_indexed
 from wagtail.search.models import Query
-from wagtail.search.backends import get_search_backend
 
-from .types.structures import BasePaginatedType, PaginationType
 from .settings import grapple_settings
+from .types.structures import BasePaginatedType, PaginationType
 
 
 def _sliced_queryset(qs, limit=None, offset=None):
@@ -84,7 +83,7 @@ def resolve_queryset(
         try:
             qs.model._meta.get_field("collection")
             qs = qs.filter(collection=collection)
-        except:
+        except Exception:
             pass
 
     return _sliced_queryset(qs, limit, offset)

@@ -1,4 +1,5 @@
 from wagtail.core import hooks
+
 from .mutations import Mutations
 from .subscriptions import Subscription
 

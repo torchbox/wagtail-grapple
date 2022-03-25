@@ -6,11 +6,11 @@ from .types.collections import CollectionsQuery
 from .types.documents import DocumentsQuery
 from .types.images import ImagesQuery
 from .types.pages import PagesQuery
+from .types.redirects import RedirectsQuery
 from .types.search import SearchQuery
 from .types.settings import SettingsQuery
 from .types.sites import SitesQuery
 from .types.snippets import SnippetsQuery
-from .types.redirects import RedirectsQuery
 from .types.tags import TagsQuery
 
 

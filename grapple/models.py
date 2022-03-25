@@ -1,6 +1,5 @@
 import graphene
 from django.apps import apps
-from django.contrib.contenttypes.models import ContentType
 
 from .registry import registry
 
@@ -66,7 +65,7 @@ def GraphQLSnippet(field_name: str, snippet_model: str, **kwargs):
         mdl = apps.get_model(app_label, model)
 
         if mdl:
-            field_type = lambda: registry.snippets[mdl]
+            field_type = lambda: registry.snippets[mdl]  # noqa: E731
         else:
             field_type = graphene.String
 
@@ -82,9 +81,9 @@ def GraphQLForeignKey(field_name, content_type, is_list=False, **kwargs):
             app_label, model = content_type.lower().split(".")
             mdl = apps.get_model(app_label, model)
             if mdl:
-                field_type = lambda: registry.models.get(mdl)
+                field_type = lambda: registry.models.get(mdl)  # noqa: E731
         else:
-            field_type = lambda: registry.models.get(content_type)
+            field_type = lambda: registry.models.get(content_type)  # noqa: E731
 
         return GraphQLField(field_name, field_type, **kwargs)
 
@@ -151,7 +150,7 @@ def GraphQLCollection(
     **kwargs,
 ):
     def Mixin():
-        from .types.structures import QuerySetList, PaginatedQuerySet
+        from .types.structures import PaginatedQuerySet, QuerySetList
 
         # Check if using nested field extraction:
         source = kwargs.get("source", None)
@@ -167,7 +166,7 @@ def GraphQLCollection(
 
         if is_paginated_queryset:
             type_class = nested_type(field_name, *args)().field_type()
-            collection_type = lambda nested_type: PaginatedQuerySet(
+            collection_type = lambda nested_type: PaginatedQuerySet(  # noqa: E731
                 nested_type, type_class, required=required
             )
             return graphql_type, collection_type
@@ -183,8 +182,10 @@ def GraphQLCollection(
         # Add support for NonNull/required to wrapper field
         required_collection_type = None
         if required:
-            required_collection_type = lambda nested_type: collection_type(
-                nested_type, required=True
+            required_collection_type = (
+                lambda nested_type: collection_type(  # noqa: E731
+                    nested_type, required=True
+                )
             )
 
         return graphql_type, required_collection_type or collection_type

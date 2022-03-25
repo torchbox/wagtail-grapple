@@ -1,7 +1,7 @@
-import graphene
 import inspect
 from types import MethodType
 
+import graphene
 from django.utils.translation import gettext_lazy as _
 from graphene.utils.str_converters import to_camel_case
 from wagtail.core.models import Page
@@ -66,7 +66,7 @@ def register_query_field(
         plural_field_name = field_name + "s"
 
     def inner(cls):
-        field_type = lambda: registry.models[cls]
+        field_type = lambda: registry.models[cls]  # noqa: E731
         field_query_params = query_params
         if field_query_params is None:
             field_query_params = {"id": graphene.Int()}
@@ -109,7 +109,7 @@ def register_query_field(
                         return qs.get(**kwargs)
 
                     return cls.objects.get(**kwargs)
-                except Exception as e:
+                except Exception:
                     return None
 
             def resolve_plural(self, _, info, **kwargs):
@@ -181,7 +181,7 @@ def register_paginated_query_field(
         plural_field_name = field_name + "s"
 
     def inner(cls):
-        field_type = lambda: registry.models[cls]
+        field_type = lambda: registry.models[cls]  # noqa: E731
         field_query_params = query_params
         if field_query_params is None:
             field_query_params = {"id": graphene.Int()}
@@ -223,7 +223,7 @@ def register_paginated_query_field(
                         return qs.get(**kwargs)
 
                     return cls.objects.get(**kwargs)
-                except:
+                except Exception:
                     return None
 
             def resolve_plural(self, _, info, **kwargs):
@@ -283,7 +283,7 @@ def register_singular_query_field(
     field_name, query_params=None, required=False, middleware=None
 ):
     def inner(cls):
-        field_type = lambda: registry.models[cls]
+        field_type = lambda: registry.models[cls]  # noqa: E731
         field_query_params = query_params
 
         if field_query_params is None:
@@ -318,7 +318,7 @@ def register_singular_query_field(
                         return qs.live().public().filter(**kwargs).first()
 
                     return qs.filter(**kwargs).first()
-                except:
+                except Exception:
                     return None
 
             # Create schema and add resolve methods

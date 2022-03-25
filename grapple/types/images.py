@@ -1,15 +1,12 @@
 import graphene
-
 from graphene_django import DjangoObjectType
 from wagtail.images import get_image_model
-from wagtail.images.models import (
-    Image as WagtailImage,
-    Rendition as WagtailImageRendition,
-)
+from wagtail.images.models import Image as WagtailImage
+from wagtail.images.models import Rendition as WagtailImageRendition
 
 from ..registry import registry
-from ..utils import resolve_queryset, get_media_item_url
 from ..settings import grapple_settings
+from ..utils import get_media_item_url, resolve_queryset
 from .collections import CollectionObjectType
 from .structures import QuerySetList
 from .tags import TagObjectType
@@ -122,8 +119,10 @@ class ImageObjectType(DjangoObjectType, BaseImageObjectType):
                     file=img.file,
                     image=self,
                 )
-        finally:
-            return rendition
+        except Exception:
+            pass
+
+        return rendition
 
     def resolve_src_set(self, info, sizes, **kwargs):
         """
@@ -144,8 +143,10 @@ class ImageObjectType(DjangoObjectType, BaseImageObjectType):
                         for img in rendition_list
                     ]
                 )
-        finally:
-            return src_set
+        except Exception:
+            pass
+
+        return src_set
 
 
 def get_image_type():

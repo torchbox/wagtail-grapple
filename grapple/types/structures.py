@@ -1,11 +1,11 @@
 import inspect
+
 import graphene
 import graphene_django
-
 from django.utils.translation import gettext_lazy as _
-from wagtail.search.index import class_is_indexed
-from taggit.managers import _TaggableManager
 from graphene.types import Int
+from taggit.managers import _TaggableManager
+from wagtail.search.index import class_is_indexed
 
 
 class PositiveInt(Int):

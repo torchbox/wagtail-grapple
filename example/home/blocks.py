@@ -1,18 +1,17 @@
 import graphene
-
 from wagtail.core import blocks
-from wagtail.images.blocks import ImageChooserBlock
 from wagtail.embeds.blocks import EmbedBlock
+from wagtail.images.blocks import ImageChooserBlock
 
 from grapple.helpers import register_streamfield_block
 from grapple.models import (
-    GraphQLForeignKey,
-    GraphQLImage,
-    GraphQLString,
     GraphQLCollection,
     GraphQLEmbed,
-    GraphQLStreamfield,
     GraphQLField,
+    GraphQLForeignKey,
+    GraphQLImage,
+    GraphQLStreamfield,
+    GraphQLString,
 )
 
 

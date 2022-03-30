@@ -719,7 +719,7 @@ class BlogTest(BaseGrappleTest):
                 result = query_blocks[0]["simpleStringMethod"]
 
                 # Ensure TextWithCallableBlock.get_simple_string_method called.
-                self.assertEquals("A simple string method.", result)
+                self.assertIn("text-with-callable", result)
 
     def test_graphqlfield_property_in_structblock(self):
         # Query stream block
@@ -741,4 +741,4 @@ class BlogTest(BaseGrappleTest):
         for block in self.blog_page.body:
             if type(block.block).__name__ == block_type:
                 result = query_blocks[0]["fieldMethod"]
-                self.assertEquals("A field method.", result)
+                self.assertIn("text-with-callable", result)

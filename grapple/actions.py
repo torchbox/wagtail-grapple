@@ -1,7 +1,7 @@
 import inspect
 from collections.abc import Iterable
 from types import MethodType
-from typing import Type
+from typing import Any, Dict, Type
 
 import graphene
 from django.db import models
@@ -349,6 +349,23 @@ def get_field_value(instance, field_name: str):
         return instance.value[field_name]
 
 
+def get_all_field_values(*, instance, cls) -> Dict[str, Any]:
+    """
+    Returns a dictionary of all fields and their values within a given stream
+    block instance.
+    """
+
+    values: Dict[str, Any] = {}
+    for item in cls.base_blocks.items():
+        field_name: str = item[0]
+        values[field_name] = get_field_value(
+            instance=instance,
+            field_name=field_name,
+        )
+
+    return values
+
+
 def streamfield_resolver(self, instance, info, **kwargs):
     value = None
     if hasattr(instance, "block"):
@@ -365,30 +382,34 @@ def streamfield_resolver(self, instance, info, **kwargs):
     return value
 
 
-def custom_cls_resolver(cls, item):
+def custom_cls_resolver(*, cls, graphql_field):
     klass = cls()
 
     # If we've defined a `source` kwarg: use it.
-    if hasattr(item, "field_source") and hasattr(klass, item.field_source):
-        if isinstance(getattr(type(cls()), item.field_source), property):
+    if hasattr(graphql_field, "field_source") and hasattr(
+        klass, graphql_field.field_source
+    ):
+        if isinstance(getattr(type(cls()), graphql_field.field_source), property):
             return lambda self, instance, info, **kwargs: getattr(
-                klass, item.field_source
+                klass, graphql_field.field_source
             )
         else:
             return lambda self, instance, info, **kwargs: getattr(
-                klass, item.field_source
-            )()
+                klass, graphql_field.field_source
+            )(values=get_all_field_values(instance=instance, cls=cls))
 
     # If the `field_name` is a property or method of the class: use it.
-    if hasattr(item, "field_name") and hasattr(klass, item.field_name):
-        if isinstance(getattr(type(cls()), item.field_name), property):
+    if hasattr(graphql_field, "field_name") and hasattr(
+        klass, graphql_field.field_name
+    ):
+        if isinstance(getattr(type(cls()), graphql_field.field_name), property):
             return lambda self, instance, info, **kwargs: getattr(
-                klass, item.field_name
+                klass, graphql_field.field_name
             )
         else:
             return lambda self, instance, info, **kwargs: getattr(
-                klass, item.field_name
-            )()
+                klass, graphql_field.field_name
+            )(values=get_all_field_values(instance=instance, cls=cls))
 
     # No match found - fall back to the streamfield_resolver() later.
     return None
@@ -428,7 +449,7 @@ def build_streamfield_type(
 
             # Add support for `graphql_fields`
             methods["resolve_" + field.field_name] = (
-                custom_cls_resolver(cls, item) or streamfield_resolver
+                custom_cls_resolver(cls=cls, graphql_field=item) or streamfield_resolver
             )
 
             # Add field to GQL type with correct field-type

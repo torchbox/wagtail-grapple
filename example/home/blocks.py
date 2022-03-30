@@ -1,4 +1,5 @@
 import graphene
+from django.utils.text import slugify
 from wagtail.core import blocks
 from wagtail.embeds.blocks import EmbedBlock
 from wagtail.images.blocks import ImageChooserBlock
@@ -104,22 +105,22 @@ class TextWithCallableBlock(blocks.StructBlock):
     ]
 
     @property
-    def simple_string(self, *args, **kwargs):
+    def simple_string(self):
         return "A simple string property."
 
-    def simple_string_method(self, *args, **kwargs):
+    def simple_string_method(self, values):
         # Should not be used as we define `source="get_simple_string_method"`.
         raise Exception
 
-    def get_simple_string_method(self, *args, **kwargs):
-        return "A simple string method."
+    def get_simple_string_method(self, values):
+        return slugify(values.get("text"))
 
     @property
-    def get_field_property(self, *args, **kwargs):
+    def get_field_property(self):
         return "A field property."
 
-    def get_field_method(self, *args, **kwargs):
-        return "A field method."
+    def get_field_method(self, values):
+        return slugify(values.get("text"))
 
 
 class StreamFieldBlock(blocks.StreamBlock):

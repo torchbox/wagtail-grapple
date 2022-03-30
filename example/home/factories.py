@@ -74,6 +74,8 @@ class ImageGalleryBlockFactory(wagtail_factories.StructBlockFactory):
 
 class TextWithCallableBlockFactory(wagtail_factories.StructBlockFactory):
     text = factory.Sequence(lambda n: f"Text with callable {n}")
+    integer = factory.fuzzy.FuzzyInteger(low=1, high=10)
+    float = factory.fuzzy.FuzzyFloat(low=0.1, high=0.9)
 
     class Meta:
         model = TextWithCallableBlock

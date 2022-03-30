@@ -6,11 +6,14 @@ from wagtail.images.blocks import ImageChooserBlock
 
 from grapple.helpers import register_streamfield_block
 from grapple.models import (
+    GraphQLBoolean,
     GraphQLCollection,
     GraphQLEmbed,
     GraphQLField,
+    GraphQLFloat,
     GraphQLForeignKey,
     GraphQLImage,
+    GraphQLInt,
     GraphQLStreamfield,
     GraphQLString,
 )
@@ -95,31 +98,93 @@ class TextAndButtonsBlock(blocks.StructBlock):
 @register_streamfield_block
 class TextWithCallableBlock(blocks.StructBlock):
     text = blocks.CharBlock()
+    integer = blocks.IntegerBlock()
+    float = blocks.FloatBlock()
 
     graphql_fields = [
         GraphQLString("text"),
+        GraphQLInt("integer"),
+        GraphQLFloat("float"),
+        # GraphQLString test attributes
         GraphQLString("simple_string"),
         GraphQLString("simple_string_method", source="get_simple_string_method"),
+        # GraphQLInt test attributes
+        GraphQLInt("simple_int"),
+        GraphQLInt("simple_int_method", source="get_simple_int_method"),
+        # GraphQLFloat test attributes
+        GraphQLFloat("simple_float"),
+        GraphQLFloat("simple_float_method", source="get_simple_float_method"),
+        # GraphQLBoolean test attributes
+        GraphQLBoolean("simple_boolean"),
+        GraphQLBoolean("simple_boolean_method", source="get_simple_boolean_method"),
+        # GraphQLField test attributes
         GraphQLField("field_property", graphene.String, source="get_field_property"),
         GraphQLField("field_method", graphene.String, source="get_field_method"),
     ]
 
+    # GraphQLString test attributes
+
     @property
-    def simple_string(self):
+    def simple_string(self) -> str:
         return "A simple string property."
 
     def simple_string_method(self, values):
         # Should not be used as we define `source="get_simple_string_method"`.
         raise Exception
 
-    def get_simple_string_method(self, values):
+    def get_simple_string_method(self, values) -> str:
         return slugify(values.get("text"))
 
+    # GraphQLInt test attributes
+
     @property
-    def get_field_property(self):
+    def simple_int(self) -> int:
+        return 5
+
+    def simple_int_method(self, values):
+        # Should not be used as we define `source="get_simple_int_method"`.
+        raise Exception
+
+    def get_simple_int_method(self, values) -> int:
+        return values.get("integer") * 2
+
+    # GraphQLFloat test attributes
+
+    @property
+    def simple_float(self) -> float:
+        return 0.1
+
+    def simple_float_method(self, values):
+        # Should not be used as we define `source="get_simple_float_method"`.
+        raise Exception
+
+    def get_simple_float_method(self, values) -> float:
+        return values.get("float") * 2
+
+    # GraphQLBoolean test attributes
+
+    @property
+    def simple_boolean(self) -> bool:
+        return 1
+
+    def simple_boolean_method(self, values):
+        # Should not be used as we define `source="get_simple_boolean_method"`.
+        raise Exception
+
+    def get_simple_boolean_method(self, values) -> bool:
+        return bool(values.get("text"))
+
+    # GraphQLField test attributes
+
+    @property
+    def get_field_property(self) -> str:
         return "A field property."
 
-    def get_field_method(self, values):
+    def field_method(self, values):
+        # Should not be used as we define `source="get_field_method"`.
+        raise Exception
+
+    def get_field_method(self, values) -> str:
         return slugify(values.get("text"))
 
 

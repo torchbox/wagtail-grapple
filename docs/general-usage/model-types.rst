@@ -9,11 +9,39 @@ We created a number of built-in types for general use, but you can create your o
 using `Graphene <https://github.com/graphql-python/graphene/>`_ (Grapple's underlying library)
 and take advantage of Grapple's generic ``GraphQLField`` type.
 
+GraphQLField
+-------------
+.. module:: grapple.models
+.. class:: GraphQLField(field_name: str, field_type: type = None, required=None, **kwargs)
+
+    .. attribute:: field_name (str)
+
+        This is the name of the class property used in your model definition.
+
+    .. attribute:: field_type (type)
+
+        A Grapple model type such as ``GraphQLString`` or ``GraphQLBoolean``.
+
+    .. attribute:: required (bool=None)
+
+        Represents the field as non-nullable in the schema. This promises the client that it will have a value returned.
+
+    .. attribute:: kwargs
+
+        Useful keyword arguments:
+
+        * ``source`` (string)
+            You can pass a source string that is an attribute or method on the
+            class itself. If pointing to a method, all values from the instance
+            will be available within the `values` kwarg (`example <https://github.com/GrappleGQL/wagtail-grapple/blob/main/example/home/blocks.py#L99>`_).
+
+
+
 
 GraphQLString
 -------------
 .. module:: grapple.models
-.. class:: GraphQLString(field_name, required=False)
+.. class:: GraphQLString(field_name, required=False, **kwargs)
 
     A basic field type is string. Commonly used for CharField, TextField,
     UrlField or any other Django field that returns a string as it's value.
@@ -25,6 +53,15 @@ GraphQLString
     .. attribute:: required (bool=False)
 
         Represents the field as non-nullable in the schema. This promises the client that it will have a value returned.
+
+    .. attribute:: kwargs
+
+        Useful keyword arguments:
+
+        * ``source`` (string)
+            You can pass a source string that is an attribute or method on the
+            class itself. If pointing to a method, all values from the instance
+            will be available within the `values` kwarg (`example <https://github.com/GrappleGQL/wagtail-grapple/blob/main/example/home/blocks.py#L99>`_).
 
     In your models.py:
 
@@ -158,7 +195,7 @@ GraphQLCollection
 GraphQLInt
 ----------
 .. module:: grapple.models
-.. class:: GraphQLInt(field_name, required=False)
+.. class:: GraphQLInt(field_name, required=False, **kwargs)
 
     Used to serialize integer-based Django fields such as ``IntegerField``
     or ``PositiveSmallIntegerField``.
@@ -171,11 +208,19 @@ GraphQLInt
 
         Represents the field as non-nullable in the schema. This promises the client that it will have a value returned.
 
+    .. attribute:: kwargs
+
+        Useful keyword arguments:
+
+        * ``source`` (string)
+            You can pass a source string that is an attribute or method on the
+            class itself. If pointing to a method, all values from the instance
+            will be available within the `values` kwarg (`example <https://github.com/GrappleGQL/wagtail-grapple/blob/main/example/home/blocks.py#L99>`_).
 
 GraphQLFloat
 ------------
 .. module:: grapple.models
-.. class:: GraphQLFloat(field_name, required=False)
+.. class:: GraphQLFloat(field_name, required=False, **kwargs)
 
     Like ``GraphQLInt``, this field is used to serialize ``Float`` and ``Decimal`` fields.
 
@@ -187,11 +232,19 @@ GraphQLFloat
 
         Represents the field as non-nullable in the schema. This promises the client that it will have a value returned.
 
+    .. attribute:: kwargs
+
+        Useful keyword arguments:
+
+        * ``source`` (string)
+            You can pass a source string that is an attribute or method on the
+            class itself. If pointing to a method, all values from the instance
+            will be available within the `values` kwarg (`example <https://github.com/GrappleGQL/wagtail-grapple/blob/main/example/home/blocks.py#L99>`_).
 
 GraphQLBoolean
 --------------
 .. module:: grapple.models
-.. class:: GraphQLBoolean(field_name, required=False)
+.. class:: GraphQLBoolean(field_name, required=False, **kwargs)
 
     Used to serialize ``Boolean`` fields.
 
@@ -203,6 +256,14 @@ GraphQLBoolean
 
         Represents the field as non-nullable in the schema. This promises the client that it will have a value returned.
 
+    .. attribute:: kwargs
+
+        Useful keyword arguments:
+
+        * ``source`` (string)
+            You can pass a source string that is an attribute or method on the
+            class itself. If pointing to a method, all values from the instance
+            will be available within the `values` kwarg (`example <https://github.com/GrappleGQL/wagtail-grapple/blob/main/example/home/blocks.py#L99>`_).
 
 GraphQLStreamfield
 ------------------
@@ -466,8 +527,9 @@ GraphQLPage
         * ``required`` (bool=False)
             Represents the field as non-nullable in the schema. This promises the client that it will have a value returned.
         * ``source`` (string)
-            You can pass a source string that is an attribute or method on the model itself. It can also be several
-            layers deep and Grapple will handle the querying for you through multiple models.
+            You can pass a source string that is an attribute or method on the
+            model itself. It can also be several layers deep and Grapple will
+            handle the querying for you through multiple models.
 
 
 GraphQLTag

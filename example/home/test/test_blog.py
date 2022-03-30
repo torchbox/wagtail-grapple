@@ -719,7 +719,85 @@ class BlogTest(BaseGrappleTest):
                 result = query_blocks[0]["simpleStringMethod"]
 
                 # Ensure TextWithCallableBlock.get_simple_string_method called.
+                self.assertIsInstance(result, str)
                 self.assertIn("text-with-callable", result)
+
+    def test_graphqlint_property_in_structblock(self):
+        # Query stream block
+        block_type = "TextWithCallableBlock"
+        query_blocks = self.get_blocks_from_body(block_type, block_query="simpleInt")
+
+        for block in self.blog_page.body:
+            if type(block.block).__name__ == block_type:
+                result = query_blocks[0]["simpleInt"]
+                self.assertEquals(5, result)
+
+    def test_graphqlint_method_in_structblock(self):
+        # Query stream block
+        block_type = "TextWithCallableBlock"
+        query_blocks = self.get_blocks_from_body(
+            block_type, block_query="simpleIntMethod"
+        )
+
+        for block in self.blog_page.body:
+            if type(block.block).__name__ == block_type:
+                # Ensure TextWithCallableBlock.simple_int_method not called.
+                result = query_blocks[0]["simpleIntMethod"]
+
+                # Ensure TextWithCallableBlock.get_simple_int_method called.
+                self.assertIsInstance(result, int)
+
+    def test_graphqlfloat_property_in_structblock(self):
+        # Query stream block
+        block_type = "TextWithCallableBlock"
+        query_blocks = self.get_blocks_from_body(block_type, block_query="simpleFloat")
+
+        for block in self.blog_page.body:
+            if type(block.block).__name__ == block_type:
+                result = query_blocks[0]["simpleFloat"]
+                self.assertEquals(0.1, result)
+
+    def test_graphqlfloat_method_in_structblock(self):
+        # Query stream block
+        block_type = "TextWithCallableBlock"
+        query_blocks = self.get_blocks_from_body(
+            block_type, block_query="simpleFloatMethod"
+        )
+
+        for block in self.blog_page.body:
+            if type(block.block).__name__ == block_type:
+                # Ensure TextWithCallableBlock.simple_float_method not called.
+                result = query_blocks[0]["simpleFloatMethod"]
+
+                # Ensure TextWithCallableBlock.get_simple_float_method called.
+                self.assertIsInstance(result, float)
+
+    def test_graphqlboolean_property_in_structblock(self):
+        # Query stream block
+        block_type = "TextWithCallableBlock"
+        query_blocks = self.get_blocks_from_body(
+            block_type, block_query="simpleBoolean"
+        )
+
+        for block in self.blog_page.body:
+            if type(block.block).__name__ == block_type:
+                result = query_blocks[0]["simpleBoolean"]
+                self.assertEquals(1, result)
+
+    def test_graphqlboolean_method_in_structblock(self):
+        # Query stream block
+        block_type = "TextWithCallableBlock"
+        query_blocks = self.get_blocks_from_body(
+            block_type, block_query="simpleBooleanMethod"
+        )
+
+        for block in self.blog_page.body:
+            if type(block.block).__name__ == block_type:
+                # Ensure TextWithCallableBlock.simple_boolean_method not called.
+                result = query_blocks[0]["simpleBooleanMethod"]
+
+                # Ensure TextWithCallableBlock.get_simple_boolean_method called.
+                self.assertIsInstance(result, bool)
 
     def test_graphqlfield_property_in_structblock(self):
         # Query stream block
@@ -740,5 +818,8 @@ class BlogTest(BaseGrappleTest):
 
         for block in self.blog_page.body:
             if type(block.block).__name__ == block_type:
+                # Ensure TextWithCallableBlock.field_method not called.
                 result = query_blocks[0]["fieldMethod"]
+
+                # Ensure TextWithCallableBlock.get_field_method called.
                 self.assertIn("text-with-callable", result)

@@ -11,7 +11,7 @@ class GraphQLField:
     field_source: str
 
     def __init__(
-        self, field_name: str, field_type: type = None, required=None, **kwargs
+        self, field_name: str, field_type: type = None, required: bool = None, **kwargs
     ):
         # Initiate and get specific field info.
         self.field_name = field_name

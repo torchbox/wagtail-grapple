@@ -9,6 +9,7 @@ We created a number of built-in types for general use, but you can create your o
 using `Graphene <https://github.com/graphql-python/graphene/>`_ (Grapple's underlying library)
 and take advantage of Grapple's generic ``GraphQLField`` type.
 
+
 GraphQLField
 -------------
 .. module:: grapple.models
@@ -32,10 +33,26 @@ GraphQLField
 
         * ``source`` (string)
             You can pass a source string that is an attribute or method on the
-            class itself. If pointing to a method, all values from the instance
-            will be available within the `values` kwarg (`example <https://github.com/GrappleGQL/wagtail-grapple/blob/main/example/home/blocks.py#L99>`_).
+            class itself.
 
+            If used within a `StreamField`, the method will receive all values
+            from the instance via the `values` kwarg, e.g.:
 
+            .. code-block:: python
+
+                class SomeStructBlock(blocks.StructBlock):
+                    text = blocks.CharBlock()
+
+                    graphql_fields = [
+                        GraphQLField(
+                            field_name="some_name",
+                            field_type=graphene.String,
+                            source="some_method",
+                        )
+                    ]
+
+                    def some_method(self, values) -> str:
+                        return values.get("text")
 
 
 GraphQLString
@@ -60,8 +77,25 @@ GraphQLString
 
         * ``source`` (string)
             You can pass a source string that is an attribute or method on the
-            class itself. If pointing to a method, all values from the instance
-            will be available within the `values` kwarg (`example <https://github.com/GrappleGQL/wagtail-grapple/blob/main/example/home/blocks.py#L99>`_).
+            class itself.
+
+            If used within a `StreamField`, the method will receive all values
+            from the instance via the `values` kwarg, e.g.:
+
+            .. code-block:: python
+
+                class SomeStructBlock(blocks.StructBlock):
+                    text = blocks.CharBlock()
+
+                    graphql_fields = [
+                        GraphQLString(
+                            field_name="some_name",
+                            source="some_method",
+                        )
+                    ]
+
+                    def some_method(self, values) -> str:
+                        return values.get("text")
 
     In your models.py:
 
@@ -163,7 +197,6 @@ GraphQLCollection
                 ),
             ]
 
-
     Example query:
 
     .. code-block:: graphql
@@ -214,8 +247,26 @@ GraphQLInt
 
         * ``source`` (string)
             You can pass a source string that is an attribute or method on the
-            class itself. If pointing to a method, all values from the instance
-            will be available within the `values` kwarg (`example <https://github.com/GrappleGQL/wagtail-grapple/blob/main/example/home/blocks.py#L99>`_).
+            class itself.
+
+            If used within a `StreamField`, the method will receive all values
+            from the instance via the `values` kwarg, e.g.:
+
+            .. code-block:: python
+
+                class SomeStructBlock(blocks.StructBlock):
+                    integer = blocks.IntegerBlock()
+
+                    graphql_fields = [
+                        GraphQLInt(
+                            field_name="some_name",
+                            source="some_method",
+                        )
+                    ]
+
+                    def some_method(self, values) -> int:
+                        return values.get("integer")
+
 
 GraphQLFloat
 ------------
@@ -238,8 +289,26 @@ GraphQLFloat
 
         * ``source`` (string)
             You can pass a source string that is an attribute or method on the
-            class itself. If pointing to a method, all values from the instance
-            will be available within the `values` kwarg (`example <https://github.com/GrappleGQL/wagtail-grapple/blob/main/example/home/blocks.py#L99>`_).
+            class itself.
+
+            If used within a `StreamField`, the method will receive all values
+            from the instance via the `values` kwarg, e.g.:
+
+            .. code-block:: python
+
+                class SomeStructBlock(blocks.StructBlock):
+                    float = blocks.FloatBlock()
+
+                    graphql_fields = [
+                        GraphQLFloat(
+                            field_name="some_name",
+                            source="some_method",
+                        )
+                    ]
+
+                    def some_method(self, values) -> float:
+                        return values.get("float")
+
 
 GraphQLBoolean
 --------------
@@ -262,8 +331,26 @@ GraphQLBoolean
 
         * ``source`` (string)
             You can pass a source string that is an attribute or method on the
-            class itself. If pointing to a method, all values from the instance
-            will be available within the `values` kwarg (`example <https://github.com/GrappleGQL/wagtail-grapple/blob/main/example/home/blocks.py#L99>`_).
+            class itself.
+
+            If used within a `StreamField`, the method will receive all values
+            from the instance via the `values` kwarg, e.g.:
+
+            .. code-block:: python
+
+                class SomeStructBlock(blocks.StructBlock):
+                    text = blocks.CharBlock()
+
+                    graphql_fields = [
+                        GraphQLBoolean(
+                            field_name="some_name",
+                            source="some_method",
+                        )
+                    ]
+
+                    def some_method(self, values) -> bool:
+                        return bool(values.get("text"))
+
 
 GraphQLStreamfield
 ------------------
@@ -350,6 +437,7 @@ GraphQLStreamfield
                 }
             }
         }
+
 
 GraphQLSnippet
 --------------

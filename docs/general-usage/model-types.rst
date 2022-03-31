@@ -51,8 +51,8 @@ GraphQLField
                         )
                     ]
 
-                    def some_method(self, values) -> str:
-                        return values.get("text")
+                    def some_method(self, values: Dict[str, Any] = None) -> Optional[str]:
+                        return values.get("text") if values else None
 
 
 GraphQLString
@@ -94,8 +94,8 @@ GraphQLString
                         )
                     ]
 
-                    def some_method(self, values) -> str:
-                        return values.get("text")
+                    def some_method(self, values: Dict[str, Any] = None) -> Optional[str]:
+                        return values.get("text") if values else None
 
     In your models.py:
 
@@ -264,8 +264,8 @@ GraphQLInt
                         )
                     ]
 
-                    def some_method(self, values) -> int:
-                        return values.get("integer")
+                    def some_method(self, values: Dict[str, Any] = None) -> Optional[int]:
+                        return values.get("integer") if values else None
 
 
 GraphQLFloat
@@ -306,8 +306,8 @@ GraphQLFloat
                         )
                     ]
 
-                    def some_method(self, values) -> float:
-                        return values.get("float")
+                    def some_method(self, values: Dict[str, Any] = None) -> Optional[float]:
+                        return values.get("float") if values else None
 
 
 GraphQLBoolean
@@ -348,8 +348,8 @@ GraphQLBoolean
                         )
                     ]
 
-                    def some_method(self, values) -> bool:
-                        return bool(values.get("text"))
+                    def some_method(self, values: Dict[str, Any] = None) -> Optional[bool]:
+                        return bool(values.get("text")) if values else None
 
 
 GraphQLStreamfield

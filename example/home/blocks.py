@@ -1,3 +1,5 @@
+from typing import Any, Dict, Optional
+
 import graphene
 from django.utils.text import slugify
 from wagtail.core import blocks
@@ -99,12 +101,12 @@ class TextAndButtonsBlock(blocks.StructBlock):
 class TextWithCallableBlock(blocks.StructBlock):
     text = blocks.CharBlock()
     integer = blocks.IntegerBlock()
-    float = blocks.FloatBlock()
+    decimal = blocks.FloatBlock()
 
     graphql_fields = [
         GraphQLString("text"),
         GraphQLInt("integer"),
-        GraphQLFloat("float"),
+        GraphQLFloat("decimal"),
         # GraphQLString test attributes
         GraphQLString("simple_string"),
         GraphQLString("simple_string_method", source="get_simple_string_method"),
@@ -128,12 +130,18 @@ class TextWithCallableBlock(blocks.StructBlock):
     def simple_string(self) -> str:
         return "A simple string property."
 
-    def simple_string_method(self, values):
+    def simple_string_method(
+        self,
+        values: Dict[str, Any] = None,
+    ):
         # Should not be used as we define `source="get_simple_string_method"`.
         raise Exception
 
-    def get_simple_string_method(self, values) -> str:
-        return slugify(values.get("text"))
+    def get_simple_string_method(
+        self,
+        values: Dict[str, Any] = None,
+    ) -> Optional[str]:
+        return slugify(values.get("text")) if values else None
 
     # GraphQLInt test attributes
 
@@ -141,12 +149,18 @@ class TextWithCallableBlock(blocks.StructBlock):
     def simple_int(self) -> int:
         return 5
 
-    def simple_int_method(self, values):
+    def simple_int_method(
+        self,
+        values: Dict[str, Any] = None,
+    ):
         # Should not be used as we define `source="get_simple_int_method"`.
         raise Exception
 
-    def get_simple_int_method(self, values) -> int:
-        return values.get("integer") * 2
+    def get_simple_int_method(
+        self,
+        values: Dict[str, Any] = None,
+    ) -> Optional[int]:
+        return values.get("integer") * 2 if values else None
 
     # GraphQLFloat test attributes
 
@@ -154,12 +168,18 @@ class TextWithCallableBlock(blocks.StructBlock):
     def simple_float(self) -> float:
         return 0.1
 
-    def simple_float_method(self, values):
+    def simple_float_method(
+        self,
+        values: Dict[str, Any] = None,
+    ):
         # Should not be used as we define `source="get_simple_float_method"`.
         raise Exception
 
-    def get_simple_float_method(self, values) -> float:
-        return values.get("float") * 2
+    def get_simple_float_method(
+        self,
+        values: Dict[str, Any] = None,
+    ) -> Optional[float]:
+        return values.get("decimal") * 2 if values else None
 
     # GraphQLBoolean test attributes
 
@@ -167,12 +187,18 @@ class TextWithCallableBlock(blocks.StructBlock):
     def simple_boolean(self) -> bool:
         return 1
 
-    def simple_boolean_method(self, values):
+    def simple_boolean_method(
+        self,
+        values: Dict[str, Any] = None,
+    ):
         # Should not be used as we define `source="get_simple_boolean_method"`.
         raise Exception
 
-    def get_simple_boolean_method(self, values) -> bool:
-        return bool(values.get("text"))
+    def get_simple_boolean_method(
+        self,
+        values: Dict[str, Any] = None,
+    ) -> Optional[bool]:
+        return bool(values.get("text")) if values else None
 
     # GraphQLField test attributes
 
@@ -180,12 +206,18 @@ class TextWithCallableBlock(blocks.StructBlock):
     def get_field_property(self) -> str:
         return "A field property."
 
-    def field_method(self, values):
+    def field_method(
+        self,
+        values: Dict[str, Any] = None,
+    ):
         # Should not be used as we define `source="get_field_method"`.
         raise Exception
 
-    def get_field_method(self, values) -> str:
-        return slugify(values.get("text"))
+    def get_field_method(
+        self,
+        values: Dict[str, Any] = None,
+    ) -> Optional[str]:
+        return slugify(values.get("text")) if values else None
 
 
 class StreamFieldBlock(blocks.StreamBlock):

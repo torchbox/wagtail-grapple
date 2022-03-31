@@ -17,23 +17,6 @@ A library to build GraphQL endpoints easily so you can grapple your Wagtail data
 [Report Bug](https://github.com/GrappleGQL/wagtail-grapple/issues) ·
 [Request Feature](https://github.com/GrappleGQL/wagtail-grapple/issues)
 
-## Table of Contents
-
-- [About The Project](#about-the-project)
-  - [Features](#features)
-  - [Built With](#built-with)
-- [Getting Started](#getting-started)
-  - [Prerequisites](#prerequisites)
-  - [Installation](#installation)
-- [Usage](#usage)
-- [Contributing](#contributing)
-  - [Local development](#local-development)
-- [Compatibility](#compatibility)
-- [License](#license)
-- [Contact](#contact)
-- [Inspired by](#inspired-by)
-- [Contributors ✨](#contributors-)
-
 ## About The Project
 
 ![GraphQL Preview Demo](docs/demo.gif)
@@ -201,22 +184,13 @@ Contributions are what make the open source community such an amazing place to b
 
 Wagtail Grapple supports:
 
-- Django 3.0.x, 3.1.x, 3.2.x
+- Django >= 3.0, < 4.0
 - Python 3.7, 3.8, 3.9, and 3.10
 - Wagtail >= 2.14, < 2.17
 
 ## License
 
 Distributed under the MIT License. See `LICENSE` for more information.
-
-## Contact
-
-Nathan Horrigan
-
-- [@NathHorrigan](https://github.com/NathHorrigan)
-- nathan.horrigan@torchbox.com
-
-Project Link: [https://github.com/GrappleGQL/wagtail-grapple](https://github.com/GrappleGQL/wagtail-grapple)
 
 <!-- ACKNOWLEDGEMENTS -->
 ## Inspired by

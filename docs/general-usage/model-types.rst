@@ -307,7 +307,7 @@ GraphQLFloat
                     ]
 
                     def some_method(self, values: Dict[str, Any] = None) -> Optional[float]:
-                        return values.get("float") if values else None
+                        return values.get("decimal") if values else None
 
 
 GraphQLBoolean

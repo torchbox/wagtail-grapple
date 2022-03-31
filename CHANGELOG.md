@@ -1,5 +1,12 @@
 ## Unreleased
 
+## [0.14.1] - 2022-03-31
+
+### Changed
+
+-   StreamField block values are passed to callables ([#222](https://github.com/GrappleGQL/wagtail-grapple/pull/222)). Thanks @kbayliss
+-   README and linting tidy up. Thanks @kbayliss
+
 ## [0.14.0] - 2022-03-25
 
 ### Added
@@ -175,18 +182,21 @@
 -   Improve field definition and under-the-hood implementation ([#28](https://github.com/GrappleGQL/wagtail-grapple/pull/28))
 -   Add conditional checks when resolving streamfield type ([#29](https://github.com/GrappleGQL/wagtail-grapple/pull/29))
 
-[0.13.0]: https://github.com/GrappleGQL/wagtail-grapple/releases/tag/v0.13.0
-[0.12.0]: https://github.com/GrappleGQL/wagtail-grapple/releases/tag/v0.12.0
-[0.11.0]: https://github.com/GrappleGQL/wagtail-grapple/releases/tag/v0.11.0
-[0.10.2]: https://github.com/GrappleGQL/wagtail-grapple/releases/tag/v0.10.2
-[0.10.0]: https://github.com/GrappleGQL/wagtail-grapple/releases/tag/v0.10.0
-[0.9.3]: https://github.com/GrappleGQL/wagtail-grapple/releases/tag/v0.9.3
-[0.9.2]: https://github.com/GrappleGQL/wagtail-grapple/releases/tag/v0.9.2
-[0.9.1]: https://github.com/GrappleGQL/wagtail-grapple/releases/tag/v0.9.1
-[0.9.0]: https://github.com/GrappleGQL/wagtail-grapple/releases/tag/v0.9.0
-[0.8.0]: https://github.com/GrappleGQL/wagtail-grapple/releases/tag/v0.8.0
-[0.7.0]: https://github.com/GrappleGQL/wagtail-grapple/releases/tag/v0.7.0
-[0.6.0]: https://github.com/GrappleGQL/wagtail-grapple/releases/tag/v0.6.0
-[0.4.8]: https://github.com/GrappleGQL/wagtail-grapple/releases/tag/v0.4.8
-[0.4.7]: https://github.com/GrappleGQL/wagtail-grapple/releases/tag/v0.4.7
+[unreleased]: https://github.com/GrappleGQL/wagtail-grapple/compare/v1.14.1...HEAD
+[0.14.1]: https://github.com/GrappleGQL/wagtail-grapple/compare/v1.14.0...v0.14.1
+[0.14.0]: https://github.com/GrappleGQL/wagtail-grapple/compare/v1.13.0...v0.14.0
+[0.13.0]: https://github.com/GrappleGQL/wagtail-grapple/compare/v1.12.0...v0.13.0
+[0.12.0]: https://github.com/GrappleGQL/wagtail-grapple/compare/v1.11.0...v0.12.0
+[0.11.0]: https://github.com/GrappleGQL/wagtail-grapple/compare/v1.10.2...v0.11.0
+[0.10.2]: https://github.com/GrappleGQL/wagtail-grapple/compare/v1.10.0...v0.10.2
+[0.10.0]: https://github.com/GrappleGQL/wagtail-grapple/compare/v0.9.3...v0.10.0
+[0.9.3]: https://github.com/GrappleGQL/wagtail-grapple/compare/v0.9.2...v0.9.3
+[0.9.2]: https://github.com/GrappleGQL/wagtail-grapple/compare/v0.9.1...v0.9.2
+[0.9.1]: https://github.com/GrappleGQL/wagtail-grapple/compare/v0.9.0...v0.9.1
+[0.9.0]: https://github.com/GrappleGQL/wagtail-grapple/compare/v0.8.0...v0.9.0
+[0.8.0]: https://github.com/GrappleGQL/wagtail-grapple/compare/v0.7.0...v0.8.0
+[0.7.0]: https://github.com/GrappleGQL/wagtail-grapple/compare/v0.6.0...v0.7.0
+[0.6.0]: https://github.com/GrappleGQL/wagtail-grapple/compare/v0.4.8...v0.6.0
+[0.4.8]: https://github.com/GrappleGQL/wagtail-grapple/compare/v0.4.7...v0.4.8
+[0.4.7]: https://github.com/GrappleGQL/wagtail-grapple/compare/v0.4.0...v0.4.7
 [0.4.0]: https://github.com/GrappleGQL/wagtail-grapple/releases/tag/v0.4.0

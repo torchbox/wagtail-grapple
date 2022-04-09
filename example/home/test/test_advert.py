@@ -31,22 +31,6 @@ class AdvertTest(BaseGrappleTest):
         # Check all the fields
         self.validate_advert(advert)
 
-    def test_advert_all_query_fields(self):
-        query = """
-        query($url: String) {
-            adverts(url: $url) {
-                id
-                url
-                text
-            }
-        }
-        """
-        executed = self.client.execute(query, variables={"url": self.advert.url})
-        advert = executed["data"]["adverts"][0]
-
-        # Check all the fields
-        self.validate_advert(advert)
-
     def test_advert_single_query(self):
         query = """
         query($url: String) {

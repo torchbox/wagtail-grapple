@@ -18,6 +18,7 @@ from wagtailmedia.edit_handlers import MediaChooserPanel
 
 from grapple.helpers import (
     register_paginated_query_field,
+    register_plural_query_field,
     register_query_field,
     register_singular_query_field,
 )
@@ -162,6 +163,11 @@ class BlogPageRelatedLink(Orderable):
 
 
 @register_snippet
+@register_singular_query_field("person", {"name": graphene.String()})
+@register_plural_query_field("people", {"job": graphene.String()})
+@register_plural_query_field(
+    "people_paginated", {"job": graphene.String()}, paginated=True
+)
 class Person(models.Model):
     name = models.CharField(max_length=255)
     job = models.CharField(max_length=255)

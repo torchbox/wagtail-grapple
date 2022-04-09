@@ -268,7 +268,7 @@ def PagesQuery():
         )
 
         # Return all pages in site, ideally specific.
-        def resolve_pages(self, info, in_site=False, **kwargs):
+        def resolve_pages(self, info, *, in_site=False, content_type=None, **kwargs):
             pages = (
                 WagtailPage.objects.live().public().filter(depth__gt=1).specific()
             )  # no need to the root page
@@ -277,7 +277,6 @@ def PagesQuery():
                 site = Site.find_for_request(info.context)
                 pages = pages.in_site(site)
 
-            content_type = kwargs.pop("content_type", None)
             if content_type:
                 app_label, model = content_type.strip().lower().split(".")
                 try:

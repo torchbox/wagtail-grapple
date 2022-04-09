@@ -57,11 +57,11 @@ def resolve_queryset(
     :param collection: Use Wagtail's collection id to filter images or documents
     :type collection: int
     """
-
+    filters = kwargs.copy()
     if id is not None:
-        qs = qs.filter(pk=id)
-    else:
-        qs = qs.all()
+        filters["pk"] = id
+
+    qs = qs.filter(**filters) if filters else qs.all()
 
     if id is None and search_query:
         # Check if the queryset is searchable using Wagtail search.
@@ -77,7 +77,7 @@ def resolve_queryset(
         return _sliced_queryset(qs, limit, offset)
 
     if order is not None:
-        qs = qs.order_by(*map(lambda x: x.strip(), order.split(",")))
+        qs = qs.order_by(*[x.strip() for x in order.split(",")])
 
     if collection is not None:
         try:
@@ -148,10 +148,11 @@ def resolve_paginated_queryset(
         int(per_page or grapple_settings.PAGE_SIZE), grapple_settings.MAX_PAGE_SIZE
     )
 
+    filters = kwargs.copy()
     if id is not None:
-        qs = qs.filter(pk=id)
-    else:
-        qs = qs.all()
+        filters["pk"] = id
+
+    qs = qs.filter(**filters) if filters else qs.all()
 
     if id is None and search_query:
         # Check if the queryset is searchable using Wagtail search.
@@ -167,7 +168,7 @@ def resolve_paginated_queryset(
         return get_paginated_result(results, page, per_page)
 
     if order is not None:
-        qs = qs.order_by(*map(lambda x: x.strip(), order.split(",")))
+        qs = qs.order_by(*[x.strip() for x in order.split(",")])
 
     return get_paginated_result(qs, page, per_page)
 

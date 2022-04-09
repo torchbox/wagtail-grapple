@@ -14,6 +14,32 @@ streamfield_types = []
 field_middlewares = {}
 
 
+def _add_default_query_params(cls, query_params):
+    query_params.update(
+        {
+            "id": graphene.Int(),
+            "order": graphene.Argument(
+                graphene.String,
+                description=_("Use the Django QuerySet order_by format."),
+            ),
+        }
+    )
+    if issubclass(cls, Page):
+        query_params.update(
+            {
+                "slug": graphene.Argument(
+                    graphene.String, description=_("The page slug.")
+                ),
+                "url_path": graphene.Argument(
+                    graphene.String, description=_("The url path.")
+                ),
+                "token": graphene.Argument(
+                    graphene.String, description=_("The preview token.")
+                ),
+            }
+        )
+
+
 def register_streamfield_block(cls):
     base_block = None
     for block_class in inspect.getmro(cls):
@@ -280,23 +306,19 @@ def register_paginated_query_field(
 
 
 def register_singular_query_field(
-    field_name, query_params=None, required=False, middleware=None
+    field_name,
+    query_params=None,
+    required=False,
+    middleware=None,
+    keep_default_query_params=False,
 ):
     def inner(cls):
-        field_type = lambda: registry.models[cls]  # noqa: E731
-        field_query_params = query_params
+        nonlocal query_params
+        if query_params is None or keep_default_query_params:
+            query_params = query_params.copy() if query_params else {}
+            _add_default_query_params(cls, query_params)
 
-        if field_query_params is None:
-            field_query_params = {
-                "order": graphene.Argument(
-                    graphene.String,
-                    description=_("Use the Django QuerySet order_by format."),
-                ),
-            }
-            if issubclass(cls, Page):
-                field_query_params["token"] = graphene.Argument(
-                    graphene.String, description=_("The preview token.")
-                )
+        field_type = lambda: registry.models[cls]  # noqa: E731
 
         def Mixin():
             # Generic methods to get all and query one model instance.
@@ -331,7 +353,7 @@ def register_singular_query_field(
             setattr(
                 schema,
                 field_name,
-                graphene.Field(singular_field_type, **field_query_params),
+                graphene.Field(singular_field_type, **query_params),
             )
 
             setattr(
@@ -345,5 +367,77 @@ def register_singular_query_field(
 
     if middleware is not None:
         register_field_middleware(field_name, middleware)
+
+    return inner
+
+
+def register_plural_query_field(
+    plural_field_name,
+    query_params=None,
+    required=False,
+    item_required=False,
+    middleware=None,
+    paginated=False,
+    keep_default_query_params=False,
+):
+    if paginated:
+        from .types.structures import PaginatedQuerySet
+        from .utils import resolve_paginated_queryset
+    else:
+        from .types.structures import QuerySetList
+        from .utils import resolve_queryset
+
+    def inner(cls):
+        nonlocal query_params
+        if query_params is None or keep_default_query_params:
+            query_params = query_params.copy() if query_params else {}
+            _add_default_query_params(cls, query_params)
+
+        field_type = lambda: registry.models[cls]  # noqa: E731
+
+        def Mixin():
+            # Generic methods to get all model instances.
+            def resolve_plural(self, _, info, **kwargs):
+                qs = cls.objects
+                if issubclass(cls, Page):
+                    qs = qs.live().public()
+                    if "order" not in kwargs:
+                        kwargs["order"] = "-first_published_at"
+                elif "order" not in kwargs:
+                    kwargs["order"] = "pk"
+
+                if paginated:
+                    return resolve_paginated_queryset(qs.all(), info, **kwargs)
+                else:
+                    return resolve_queryset(qs.all(), info, **kwargs)
+
+            # Create schema and add resolve methods
+            schema = type(cls.__name__ + "Query", (), {})
+
+            plural_field_type = field_type
+            if item_required:
+                plural_field_type = graphene.NonNull(field_type)
+
+            if paginated:
+                qsl = PaginatedQuerySet(
+                    plural_field_type, cls, required=required, **query_params
+                )
+            else:
+                qsl = QuerySetList(plural_field_type, required=required, **query_params)
+            setattr(schema, plural_field_name, qsl)
+
+            setattr(
+                schema,
+                "resolve_" + plural_field_name,
+                MethodType(resolve_plural, schema),
+            )
+            return schema
+
+        # Send schema to Grapple schema.
+        register_graphql_schema(Mixin())
+        return cls
+
+    if middleware is not None:
+        register_field_middleware(plural_field_name, middleware)
 
     return inner

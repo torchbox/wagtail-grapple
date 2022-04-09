@@ -141,7 +141,9 @@ def register_query_field(
             setattr(
                 schema,
                 plural_field_name,
-                QuerySetList(plural_field_type, required=plural_required),
+                QuerySetList(
+                    plural_field_type, required=plural_required, **field_query_params
+                ),
             )
 
             setattr(

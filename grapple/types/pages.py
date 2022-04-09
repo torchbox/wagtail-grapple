@@ -268,12 +268,12 @@ def PagesQuery():
         )
 
         # Return all pages in site, ideally specific.
-        def resolve_pages(self, info, **kwargs):
+        def resolve_pages(self, info, in_site=False, **kwargs):
             pages = (
                 WagtailPage.objects.live().public().filter(depth__gt=1).specific()
             )  # no need to the root page
 
-            if kwargs.get("in_site", False):
+            if in_site:
                 site = Site.find_for_request(info.context)
                 pages = pages.in_site(site)
 

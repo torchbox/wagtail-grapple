@@ -58,10 +58,10 @@ def resolve_queryset(
     :type collection: int
     """
 
+    if kwargs:
+        qs = qs.filter(**kwargs)
     if id is not None:
         qs = qs.filter(pk=id)
-    else:
-        qs = qs.all()
 
     if id is None and search_query:
         # Check if the queryset is searchable using Wagtail search.

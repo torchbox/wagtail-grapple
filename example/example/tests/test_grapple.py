@@ -213,6 +213,9 @@ class PagesTest(BaseGrappleTest):
         self.assertEquals(pages_data[0]["contentType"], "home.HomePage")
         self.assertEquals(pages_data[1]["contentType"], "home.BlogPage")
 
+        pages = Page.objects.filter(depth__gt=1)
+        self.assertEquals(len(executed["data"]["pages"]), pages.count())
+
 
 class PageUrlPathTest(BaseGrappleTest):
     def _query_by_path(self, path, in_site=False):

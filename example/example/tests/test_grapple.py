@@ -168,13 +168,50 @@ class PagesTest(BaseGrappleTest):
         """
 
         executed = self.client.execute(query, variables={"id": self.blog_post.id})
-
         self.assertEquals(type(executed["data"]), dict_type)
         self.assertEquals(type(executed["data"]["page"]), dict_type)
 
         page_data = executed["data"]["page"]
         self.assertEquals(page_data["contentType"], "home.BlogPage")
         self.assertEquals(page_data["parent"]["contentType"], "home.HomePage")
+
+    @override_settings(GRAPPLE={"APPS": []})
+    def test_pages_with_no_apps(self):
+        query = """
+        {
+            pages {
+                id
+                title
+                contentType
+            }
+        }
+        """
+
+        executed = self.client.execute(query)
+        self.assertEquals(type(executed["data"]), dict_type)
+        self.assertEquals(type(executed["data"]["pages"]), list)
+        self.assertEquals(len(executed["data"]["pages"]), 0)
+
+    @override_settings(GRAPPLE={"APPS": ["home"]})
+    def test_pages_with_home_app(self):
+        query = """
+        {
+            pages {
+                id
+                title
+                contentType
+            }
+        }
+        """
+
+        executed = self.client.execute(query)
+
+        self.assertEquals(type(executed["data"]), dict_type)
+        self.assertEquals(type(executed["data"]["pages"]), list)
+
+        pages_data = executed["data"]["pages"]
+        self.assertEquals(pages_data[0]["contentType"], "home.HomePage")
+        self.assertEquals(pages_data[1]["contentType"], "home.BlogPage")
 
 
 class PageUrlPathTest(BaseGrappleTest):

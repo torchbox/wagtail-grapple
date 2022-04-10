@@ -74,7 +74,9 @@ class PagesTest(BaseGrappleTest):
         pages = Page.objects.filter(depth__gt=1)
         self.assertEquals(len(executed["data"]["pages"]), pages.count())
 
-    @override_settings(GRAPPLE={"PAGE_SIZE": 1, "MAX_PAGE_SIZE": 1, "APPS": DEFAULT_APPS})
+    @override_settings(
+        GRAPPLE={"PAGE_SIZE": 1, "MAX_PAGE_SIZE": 1, "APPS": DEFAULT_APPS}
+    )
     def test_pages_limit(self):
         query = """
         {
@@ -517,7 +519,9 @@ class ImagesTest(BaseGrappleTest):
         executed = self.client.execute(query)
         self.assertIn("width-100", executed["data"]["image"]["rendition"]["url"])
 
-    @override_settings(GRAPPLE={"ALLOWED_IMAGE_FILTERS": ["width-200"], "APPS": DEFAULT_APPS})
+    @override_settings(
+        GRAPPLE={"ALLOWED_IMAGE_FILTERS": ["width-200"], "APPS": DEFAULT_APPS}
+    )
     def test_renditions_with_allowed_image_filters_restrictions(self):
         def get_query(**kwargs):
             params = ",".join([f"{key}: {value}" for key, value in kwargs.items()])
@@ -541,7 +545,9 @@ class ImagesTest(BaseGrappleTest):
         self.assertIsNotNone(executed["data"]["image"]["rendition"])
         self.assertIn("width-200", executed["data"]["image"]["rendition"]["url"])
 
-    @override_settings(GRAPPLE={"ALLOWED_IMAGE_FILTERS": ["width-200"], "APPS": DEFAULT_APPS})
+    @override_settings(
+        GRAPPLE={"ALLOWED_IMAGE_FILTERS": ["width-200"], "APPS": DEFAULT_APPS}
+    )
     def test_src_set(self):
         query = """
         {

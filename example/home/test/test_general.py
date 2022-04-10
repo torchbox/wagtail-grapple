@@ -434,7 +434,9 @@ class TestUtils(BaseGrappleTest):
 
         # the max page size is 1 and we should get only one,
         # even if default page size and the requested limit are higher
-        with override_settings(GRAPPLE={"PAGE_SIZE": 10, "MAX_PAGE_SIZE": 1, "APPS": exposed_apps}):
+        with override_settings(
+            GRAPPLE={"PAGE_SIZE": 10, "MAX_PAGE_SIZE": 1, "APPS": exposed_apps}
+        ):
             results = self.client.execute(
                 query,
                 variables={"term": "t", "limit": 2},
@@ -445,7 +447,9 @@ class TestUtils(BaseGrappleTest):
         self.assertEqual(pages[0]["title"], "Test post 1")
 
         # Default page size is one, but we ask for two which is still less than max page size
-        with override_settings(GRAPPLE={"PAGE_SIZE": 1, "MAX_PAGE_SIZE": 5, "APPS": exposed_apps}):
+        with override_settings(
+            GRAPPLE={"PAGE_SIZE": 1, "MAX_PAGE_SIZE": 5, "APPS": exposed_apps}
+        ):
             results = self.client.execute(
                 query,
                 variables={"term": "t", "limit": 2},

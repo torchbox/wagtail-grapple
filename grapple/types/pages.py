@@ -9,7 +9,7 @@ from wagtail.core.models import Site
 from wagtail_headless_preview.signals import preview_update
 
 from ..registry import registry
-from ..settings import has_channels, grapple_settings
+from ..settings import grapple_settings, has_channels
 from ..utils import resolve_queryset
 from .structures import QuerySetList
 
@@ -274,7 +274,9 @@ def PagesQuery():
             )  # no need to the root page
 
             # Retrieve only the pages that are registered in the settings
-            content_types = ContentType.objects.filter(app_label__in=grapple_settings.APPS)
+            content_types = ContentType.objects.filter(
+                app_label__in=grapple_settings.APPS
+            )
             pages = pages.filter(content_type__in=content_types)
 
             if kwargs.get("in_site", False):

@@ -20,6 +20,7 @@ from django.test import RequestFactory, TestCase, override_settings
 from graphene.test import Client
 from home.factories import BlogPageFactory
 from home.models import HomePage
+from news.factories import NewsPageFactory
 from wagtail.core.models import Page, Site
 from wagtail.documents import get_document_model
 from wagtail.images import get_image_model
@@ -217,6 +218,33 @@ class PagesTest(BaseGrappleTest):
 
         pages = Page.objects.filter(depth__gt=1)
         self.assertEquals(len(executed["data"]["pages"]), pages.count())
+
+    @override_settings(GRAPPLE={"APPS": ["home", "news"]})
+    def test_pages_with_news_app(self):
+        news_post = NewsPageFactory(parent=self.home)
+        query = """
+        {
+            pages {
+                id
+                title
+                contentType
+            }
+        }
+        """
+
+        executed = self.client.execute(query)
+
+        self.assertEquals(type(executed["data"]), dict_type)
+        self.assertEquals(type(executed["data"]["pages"]), list)
+
+        pages_data = executed["data"]["pages"]
+        self.assertEquals(pages_data[0]["contentType"], "home.HomePage")
+        self.assertEquals(pages_data[1]["contentType"], "home.BlogPage")
+        self.assertEquals(pages_data[2]["contentType"], "news.NewsPage")
+
+        pages = Page.objects.filter(depth__gt=1)
+        self.assertEquals(len(executed["data"]["pages"]), pages.count())
+        self.assertEquals(int(pages_data[2]["id"]), news_post.id)
 
 
 class PageUrlPathTest(BaseGrappleTest):

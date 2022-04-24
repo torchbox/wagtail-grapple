@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     "images",
     "documents",
     "search",
+    "news",
     "wagtail.contrib.forms",
     "wagtail.contrib.redirects",
     "wagtail.embeds",
@@ -169,7 +170,7 @@ GRAPHENE = {
     "MIDDLEWARE": ["grapple.middleware.GrappleMiddleware"],
 }
 GRAPPLE = {
-    "APPS": ["images", "home", "documents"],
+    "APPS": ["images", "home", "documents", "news"],
     "ADD_SEARCH_HIT": True,
     "EXPOSE_GRAPHIQL": True,
 }

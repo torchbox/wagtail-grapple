@@ -20,6 +20,7 @@ from django.test import RequestFactory, TestCase, override_settings
 from graphene.test import Client
 from home.factories import BlogPageFactory
 from home.models import HomePage
+from news.factories import NewsPageFactory
 from wagtail.core.models import Page, Site
 from wagtail.documents import get_document_model
 from wagtail.images import get_image_model
@@ -32,6 +33,7 @@ MIDDLEWARE_OBJECTS = [
     locate(middleware) for middleware in settings.GRAPHENE["MIDDLEWARE"]
 ]
 MIDDLEWARE = [item() if inspect.isclass(item) else item for item in MIDDLEWARE_OBJECTS]
+DEFAULT_APPS = ["images", "home", "documents"]
 
 
 class BaseGrappleTest(TestCase):
@@ -73,7 +75,9 @@ class PagesTest(BaseGrappleTest):
         pages = Page.objects.filter(depth__gt=1)
         self.assertEquals(len(executed["data"]["pages"]), pages.count())
 
-    @override_settings(GRAPPLE={"PAGE_SIZE": 1, "MAX_PAGE_SIZE": 1})
+    @override_settings(
+        GRAPPLE={"PAGE_SIZE": 1, "MAX_PAGE_SIZE": 1, "APPS": DEFAULT_APPS}
+    )
     def test_pages_limit(self):
         query = """
         {
@@ -167,13 +171,80 @@ class PagesTest(BaseGrappleTest):
         """
 
         executed = self.client.execute(query, variables={"id": self.blog_post.id})
-
         self.assertEquals(type(executed["data"]), dict_type)
         self.assertEquals(type(executed["data"]["page"]), dict_type)
 
         page_data = executed["data"]["page"]
         self.assertEquals(page_data["contentType"], "home.BlogPage")
         self.assertEquals(page_data["parent"]["contentType"], "home.HomePage")
+
+    @override_settings(GRAPPLE={"APPS": []})
+    def test_pages_with_no_apps(self):
+        query = """
+        {
+            pages {
+                id
+                title
+                contentType
+            }
+        }
+        """
+
+        executed = self.client.execute(query)
+        self.assertEquals(type(executed["data"]), dict_type)
+        self.assertEquals(type(executed["data"]["pages"]), list)
+        self.assertEquals(len(executed["data"]["pages"]), 0)
+
+    @override_settings(GRAPPLE={"APPS": ["home"]})
+    def test_pages_with_home_app(self):
+        query = """
+        {
+            pages {
+                id
+                title
+                contentType
+            }
+        }
+        """
+
+        executed = self.client.execute(query)
+
+        self.assertEquals(type(executed["data"]), dict_type)
+        self.assertEquals(type(executed["data"]["pages"]), list)
+
+        pages_data = executed["data"]["pages"]
+        self.assertEquals(pages_data[0]["contentType"], "home.HomePage")
+        self.assertEquals(pages_data[1]["contentType"], "home.BlogPage")
+
+        pages = Page.objects.filter(depth__gt=1)
+        self.assertEquals(len(executed["data"]["pages"]), pages.count())
+
+    @override_settings(GRAPPLE={"APPS": ["home", "news"]})
+    def test_pages_with_news_app(self):
+        news_post = NewsPageFactory(parent=self.home)
+        query = """
+        {
+            pages {
+                id
+                title
+                contentType
+            }
+        }
+        """
+
+        executed = self.client.execute(query)
+
+        self.assertEquals(type(executed["data"]), dict_type)
+        self.assertEquals(type(executed["data"]["pages"]), list)
+
+        pages_data = executed["data"]["pages"]
+        self.assertEquals(pages_data[0]["contentType"], "home.HomePage")
+        self.assertEquals(pages_data[1]["contentType"], "home.BlogPage")
+        self.assertEquals(pages_data[2]["contentType"], "news.NewsPage")
+
+        pages = Page.objects.filter(depth__gt=1)
+        self.assertEquals(len(executed["data"]["pages"]), pages.count())
+        self.assertEquals(int(pages_data[2]["id"]), news_post.id)
 
 
 class PageUrlPathTest(BaseGrappleTest):
@@ -373,7 +444,7 @@ class SitesTest(TestCase):
         self.assertEquals(data[0]["title"], blog.title)
 
 
-@override_settings(GRAPPLE={"AUTO_CAMELCASE": False})
+@override_settings(GRAPPLE={"AUTO_CAMELCASE": False, "APPS": DEFAULT_APPS})
 class DisableAutoCamelCaseTest(TestCase):
     def setUp(self):
         schema = create_schema()
@@ -476,7 +547,9 @@ class ImagesTest(BaseGrappleTest):
         executed = self.client.execute(query)
         self.assertIn("width-100", executed["data"]["image"]["rendition"]["url"])
 
-    @override_settings(GRAPPLE={"ALLOWED_IMAGE_FILTERS": ["width-200"]})
+    @override_settings(
+        GRAPPLE={"ALLOWED_IMAGE_FILTERS": ["width-200"], "APPS": DEFAULT_APPS}
+    )
     def test_renditions_with_allowed_image_filters_restrictions(self):
         def get_query(**kwargs):
             params = ",".join([f"{key}: {value}" for key, value in kwargs.items()])
@@ -500,7 +573,9 @@ class ImagesTest(BaseGrappleTest):
         self.assertIsNotNone(executed["data"]["image"]["rendition"])
         self.assertIn("width-200", executed["data"]["image"]["rendition"]["url"])
 
-    @override_settings(GRAPPLE={"ALLOWED_IMAGE_FILTERS": ["width-200"]})
+    @override_settings(
+        GRAPPLE={"ALLOWED_IMAGE_FILTERS": ["width-200"], "APPS": DEFAULT_APPS}
+    )
     def test_src_set(self):
         query = """
         {

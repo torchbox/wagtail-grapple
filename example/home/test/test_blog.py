@@ -96,6 +96,12 @@ class BlogTest(BaseGrappleTest):
                         },
                     },
                 ),
+                (
+                    "block_with_name",
+                    {
+                        "name": "Test Name",
+                    },
+                ),
                 ("text_with_callable", TextWithCallableBlockFactory()),
             ],
             parent=self.home,
@@ -623,6 +629,16 @@ class BlogTest(BaseGrappleTest):
                 button = query_blocks[0]["mainbutton"]
                 self.assertEquals(button["buttonText"], "Take me to the source")
                 self.assertEquals(button["buttonLink"], "https://wagtail.io/")
+
+    def test_block_with_name(self):
+        block_type = "BlockWithName"
+        block_query = "name"
+        query_blocks = self.get_blocks_from_body(block_type, block_query=block_query)
+
+        for block in self.blog_page.body:
+            if type(block.block).__name__ == block_type:
+                result = query_blocks[0][block_query]
+                self.assertEquals("Test Name", result)
 
     def test_empty_list_in_structblock(self):
         another_blog_post = BlogPageFactory(

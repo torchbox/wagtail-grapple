@@ -393,7 +393,7 @@ def custom_cls_resolver(*, cls, graphql_field):
             return lambda self, instance, info, **kwargs: getattr(
                 klass, graphql_field.field_source
             )
-        else:
+        elif callable(getattr(cls, graphql_field.field_source)):
             return lambda self, instance, info, **kwargs: getattr(
                 klass, graphql_field.field_source
             )(values=get_all_field_values(instance=instance, cls=cls))
@@ -406,7 +406,7 @@ def custom_cls_resolver(*, cls, graphql_field):
             return lambda self, instance, info, **kwargs: getattr(
                 klass, graphql_field.field_name
             )
-        else:
+        elif callable(getattr(cls, graphql_field.field_name)):
             return lambda self, instance, info, **kwargs: getattr(
                 klass, graphql_field.field_name
             )(values=get_all_field_values(instance=instance, cls=cls))

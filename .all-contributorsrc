@@ -103,6 +103,18 @@
         "bug",
         "doc"
       ]
+    },
+    {
+      "login": "kbayliss",
+      "name": "Kyle Bayliss",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/3009233?v=4",
+      "profile": "https://github.com/kbayliss",
+      "contributions": [
+        "code",
+        "bug",
+        "doc",
+        "maintenance"
+      ]
     }
   ],
   "contributorsPerLine": 7

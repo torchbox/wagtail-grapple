@@ -1,7 +1,5 @@
 import graphene
-
 from graphene_django import DjangoObjectType
-
 from wagtailmedia.models import Media, get_media_model
 
 from ..registry import registry

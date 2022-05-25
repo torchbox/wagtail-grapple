@@ -1,8 +1,9 @@
 include LICENSE *.rst *.txt *.md
 
-recursive-include grapple/templates *
-recursive-include grapple/static *
+graft grapple
 
-global-exclude __pycache__
+prune **/__pycache__
+prune **/.DS_Store
+
 global-exclude *.py[co]
-global-exclude .DS_Store
+global-exclude .gitignore

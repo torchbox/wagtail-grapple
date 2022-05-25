@@ -5,17 +5,17 @@ import json
 import wagtail_factories
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
-from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError
+from django.core.validators import URLValidator
 from django.test.client import RequestFactory
 from django.utils.safestring import SafeText
+from home.blocks import CarouselBlock, ImageGalleryImages
+from home.factories import BlogPageFactory, TextWithCallableBlockFactory
 from wagtail.core.blocks import StreamValue
 from wagtail.core.rich_text import RichText
 from wagtail.embeds.blocks import EmbedValue
 
 from example.tests.test_grapple import BaseGrappleTest
-from home.blocks import CarouselBlock, ImageGalleryImages
-from home.factories import BlogPageFactory
 
 
 class BlogTest(BaseGrappleTest):
@@ -91,6 +91,7 @@ class BlogTest(BaseGrappleTest):
                         },
                     },
                 ),
+                ("text_with_callable", TextWithCallableBlockFactory()),
             ],
             parent=self.home,
         )
@@ -223,8 +224,7 @@ class BlogTest(BaseGrappleTest):
         # Check that we test all blocks that were returned.
         self.assertEquals(len(query_blocks), count)
 
-    def test_blog_body_imagechooserblock(self):
-        # Query stream block
+    def test_blog_body_imagechooserblock_in_streamblock(self):
         block_type = "CarouselBlock"
         query_blocks = self.get_blocks_from_body(
             block_type,
@@ -251,7 +251,6 @@ class BlogTest(BaseGrappleTest):
             self.fail(f"{url} is not a valid url")
 
     def test_blog_body_calloutblock(self):
-        # Query stream block
         block_type = "CalloutBlock"
         query_blocks = self.get_blocks_from_body(
             block_type,
@@ -579,7 +578,6 @@ class BlogTest(BaseGrappleTest):
         self.assertEquals(pagination["totalPages"], 2)
 
     def test_structvalue_block(self):
-        # Query stream block
         block_type = "TextAndButtonsBlock"
         query_blocks = self.get_blocks_from_body(
             block_type,
@@ -601,7 +599,6 @@ class BlogTest(BaseGrappleTest):
                 self.assertEquals(buttons[0]["buttonLink"], "https://www.graphql.com/")
 
     def test_nested_structvalue_block(self):
-        # Query stream block
         block_type = "TextAndButtonsBlock"
         query_blocks = self.get_blocks_from_body(
             block_type,
@@ -694,3 +691,119 @@ class BlogTest(BaseGrappleTest):
             self.assertEqual(int(tag["id"]), idx)
             self.assertTrue(isinstance(tag["name"], str))
             self.assertEqual(tag["name"], "Tag " + str(idx))
+
+    def test_graphqlstring_property_in_structblock(self):
+        block_type = "TextWithCallableBlock"
+        block_query = "simpleString"
+        query_blocks = self.get_blocks_from_body(block_type, block_query=block_query)
+
+        for block in self.blog_page.body:
+            if type(block.block).__name__ == block_type:
+                result = query_blocks[0][block_query]
+                self.assertEquals("A simple string property.", result)
+
+    def test_graphqlstring_method_in_structblock(self):
+        block_type = "TextWithCallableBlock"
+        block_query = "simpleStringMethod"
+        query_blocks = self.get_blocks_from_body(block_type, block_query=block_query)
+
+        for block in self.blog_page.body:
+            if type(block.block).__name__ == block_type:
+                # Ensure TextWithCallableBlock.simple_string_method not called.
+                result = query_blocks[0][block_query]
+
+                # Ensure TextWithCallableBlock.get_simple_string_method called.
+                self.assertIsInstance(result, str)
+                self.assertIn("text-with-callable", result)
+
+    def test_graphqlint_property_in_structblock(self):
+        block_type = "TextWithCallableBlock"
+        block_query = "simpleInt"
+        query_blocks = self.get_blocks_from_body(block_type, block_query=block_query)
+
+        for block in self.blog_page.body:
+            if type(block.block).__name__ == block_type:
+                result = query_blocks[0][block_query]
+                self.assertEquals(5, result)
+
+    def test_graphqlint_method_in_structblock(self):
+        block_type = "TextWithCallableBlock"
+        block_query = "simpleIntMethod"
+        query_blocks = self.get_blocks_from_body(block_type, block_query=block_query)
+
+        for block in self.blog_page.body:
+            if type(block.block).__name__ == block_type:
+                # Ensure TextWithCallableBlock.simple_int_method not called.
+                result = query_blocks[0][block_query]
+
+                # Ensure TextWithCallableBlock.get_simple_int_method called.
+                self.assertIsInstance(result, int)
+
+    def test_graphqlfloat_property_in_structblock(self):
+        block_type = "TextWithCallableBlock"
+        block_query = "simpleFloat"
+        query_blocks = self.get_blocks_from_body(block_type, block_query=block_query)
+
+        for block in self.blog_page.body:
+            if type(block.block).__name__ == block_type:
+                result = query_blocks[0][block_query]
+                self.assertEquals(0.1, result)
+
+    def test_graphqlfloat_method_in_structblock(self):
+        block_type = "TextWithCallableBlock"
+        block_query = "simpleFloatMethod"
+        query_blocks = self.get_blocks_from_body(block_type, block_query=block_query)
+
+        for block in self.blog_page.body:
+            if type(block.block).__name__ == block_type:
+                # Ensure TextWithCallableBlock.simple_float_method not called.
+                result = query_blocks[0][block_query]
+
+                # Ensure TextWithCallableBlock.get_simple_float_method called.
+                self.assertIsInstance(result, float)
+
+    def test_graphqlboolean_property_in_structblock(self):
+        block_type = "TextWithCallableBlock"
+        block_query = "simpleBoolean"
+        query_blocks = self.get_blocks_from_body(block_type, block_query=block_query)
+
+        for block in self.blog_page.body:
+            if type(block.block).__name__ == block_type:
+                result = query_blocks[0][block_query]
+                self.assertEquals(1, result)
+
+    def test_graphqlboolean_method_in_structblock(self):
+        block_type = "TextWithCallableBlock"
+        block_query = "simpleBooleanMethod"
+        query_blocks = self.get_blocks_from_body(block_type, block_query=block_query)
+
+        for block in self.blog_page.body:
+            if type(block.block).__name__ == block_type:
+                # Ensure TextWithCallableBlock.simple_boolean_method not called.
+                result = query_blocks[0][block_query]
+
+                # Ensure TextWithCallableBlock.get_simple_boolean_method called.
+                self.assertIsInstance(result, bool)
+
+    def test_graphqlfield_property_in_structblock(self):
+        block_type = "TextWithCallableBlock"
+        block_query = "fieldProperty"
+        query_blocks = self.get_blocks_from_body(block_type, block_query=block_query)
+
+        for block in self.blog_page.body:
+            if type(block.block).__name__ == block_type:
+                result = query_blocks[0][block_query]
+                self.assertEquals("A field property.", result)
+
+    def test_graphqlfield_method_in_structblock(self):
+        block_type = "TextWithCallableBlock"
+        block_query = "fieldMethod"
+        query_blocks = self.get_blocks_from_body(block_type, block_query=block_query)
+
+        for block in self.blog_page.body:
+            if type(block.block).__name__ == block_type:
+                # Ensure TextWithCallableBlock.field_method not called.
+                result = query_blocks[0][block_query]
+
+                # Ensure TextWithCallableBlock.get_field_method called.
+                self.assertIn("text-with-callable", result)

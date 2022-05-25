@@ -17,23 +17,6 @@ A library to build GraphQL endpoints easily so you can grapple your Wagtail data
 [Report Bug](https://github.com/GrappleGQL/wagtail-grapple/issues) ·
 [Request Feature](https://github.com/GrappleGQL/wagtail-grapple/issues)
 
-## Table of Contents
-
-- [About The Project](#about-the-project)
-  - [Features](#features)
-  - [Built With](#built-with)
-- [Getting Started](#getting-started)
-  - [Prerequisites](#prerequisites)
-  - [Installation](#installation)
-- [Usage](#usage)
-- [Contributing](#contributing)
-  - [Local development](#local-development)
-- [Compatibility](#compatibility)
-- [License](#license)
-- [Contact](#contact)
-- [Inspired by](#inspired-by)
-- [Contributors ✨](#contributors-)
-
 ## About The Project
 
 ![GraphQL Preview Demo](docs/demo.gif)
@@ -50,30 +33,30 @@ to your model and away you go (although if you want to go deeper you can!).
 
 ### Features
 
-- Easily create GraphQL types by adding a small annotation in your models.
-- Supports traditional Wagtail models:
-  - Pages (including Streamfield & Orderables)
-  - Snippets
-  - Images
-  - Documents
-  - Media
-  - Settings
-  - Redirects
-  - Search (on all models)
-- Custom Image & Document model support
-- Pagination support
-- Middleware support
-- Advanced headless preview functionality built using GraphQL Subscriptions to enable Page previews on any device!
+-   Easily create GraphQL types by adding a small annotation in your models.
+-   Supports traditional Wagtail models:
+    -   Pages (including Streamfield & Orderables)
+    -   Snippets
+    -   Images
+    -   Documents
+    -   Media
+    -   Settings
+    -   Redirects
+    -   Search (on all models)
+-   Custom Image & Document model support
+-   Pagination support
+-   Middleware support
+-   Advanced headless preview functionality built using GraphQL Subscriptions to enable Page previews on any device!
 
 ### Built With
 
 This library is an abstraction upon and relies heavily on Graphene & Graphene Django.
 We also use Django Channels and the Potrace image library.
 
-- [Graphene](https://github.com/graphql-python/graphene)
-- [Graphene Django](https://github.com/graphql-python/graphene)
-- [Potrace](https://github.com/skyrpex/potrace)
-- [Django Channels](https://github.com/django/channels) when installed with `wagtail_grapple[channels]`
+-   [Graphene](https://github.com/graphql-python/graphene)
+-   [Graphene Django](https://github.com/graphql-python/graphene)
+-   [Potrace](https://github.com/skyrpex/potrace)
+-   [Django Channels](https://github.com/django/channels) when installed with `wagtail_grapple[channels]`
 
 ## Getting Started
 
@@ -82,8 +65,8 @@ Getting Grapple installed is designed to be as simple as possible!
 ### Prerequisites
 
 ```
-Django  >= 2.2
-Wagtail >= 2.11, <2.16
+Django  >= 3.0, <4.0
+Wagtail >= 2.14, <2.17
 ```
 
 ### Installation
@@ -103,7 +86,7 @@ INSTALLED_APPS = [
 ]
 ```
 
-For GraphQL Subscriptions with Django Channels, run `pip install wagtail_grapple[channels]`  and add
+For GraphQL Subscriptions with Django Channels, run `pip install wagtail_grapple[channels]` and add
 `channels` to installed apps:
 
 ```python
@@ -191,38 +174,30 @@ Contributions are what make the open source community such an amazing place to b
 
 ### Local development
 
-- In the python environment of your choice, navigate to `/example`
-- Run `pip install -r requirements.txt`
-- Delete the `db.sqlite3` file and run `./manage.py migrate`
-- Run server `./manage.py runserver`
-- Run tests `./manage.py test`
+-   In the python environment of your choice, navigate to `/example`
+-   Run `pip install -r requirements.txt`
+-   Delete the `db.sqlite3` file and run `./manage.py migrate`
+-   Run server `./manage.py runserver`
+-   Run tests `./manage.py test`
 
 ## Compatibility
 
 Wagtail Grapple supports:
 
-- Django 2.2.x, 3.0.x, 3.1.x, 3.2.x
-- Python 3.6, 3.7, 3.8, 3.9, and 3.10
-- Wagtail >= 2.11, < 2.16
+-   Django >= 3.0, < 4.0
+-   Python 3.7, 3.8, 3.9, and 3.10
+-   Wagtail >= 2.14, < 2.17
 
 ## License
 
 Distributed under the MIT License. See `LICENSE` for more information.
 
-## Contact
-
-Nathan Horrigan
-
-- [@NathHorrigan](https://github.com/NathHorrigan)
-- nathan.horrigan@torchbox.com
-
-Project Link: [https://github.com/GrappleGQL/wagtail-grapple](https://github.com/GrappleGQL/wagtail-grapple)
-
 <!-- ACKNOWLEDGEMENTS -->
+
 ## Inspired by
 
-- [@tr11](https://github.com/tr11)
-- [@tmkn](https://github.com/tmkn)
+-   [@tr11](https://github.com/tr11)
+-   [@tmkn](https://github.com/tmkn)
 
 ## Contributors ✨
 
@@ -248,6 +223,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 
 <!-- markdownlint-restore -->
 <!-- prettier-ignore-end -->
+
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!

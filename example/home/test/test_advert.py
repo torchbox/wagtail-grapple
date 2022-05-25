@@ -1,6 +1,8 @@
 from example.tests.test_grapple import BaseGrappleTestWithIntrospection
 from home.factories import AdvertFactory
 
+from example.tests.test_grapple import BaseGrappleTest
+
 
 class AdvertTest(BaseGrappleTestWithIntrospection):
     def setUp(self):

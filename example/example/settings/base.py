@@ -13,7 +13,6 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 
-
 PROJECT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BASE_DIR = os.path.dirname(PROJECT_DIR)
 
@@ -178,8 +177,10 @@ GRAPPLE = {
 HEADLESS_PREVIEW_CLIENT_URLS = {"default": "http://localhost:8001/preview"}
 HEADLESS_PREVIEW_LIVE = True
 
+DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
+
 try:
-    import channels
+    import channels  # noqa: F401
 
     INSTALLED_APPS += [
         "channels",

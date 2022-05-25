@@ -2,14 +2,14 @@ import graphene
 from django.contrib.contenttypes.models import ContentType
 from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
-
-from wagtail.core.models import Page as WagtailPage, Site
-from wagtail_headless_preview.signals import preview_update
 from graphene_django.types import DjangoObjectType
 from graphql.error import GraphQLLocatedError
-from ..settings import has_channels
+from wagtail.core.models import Page as WagtailPage
+from wagtail.core.models import Site
+from wagtail_headless_preview.signals import preview_update
 
 from ..registry import registry
+from ..settings import has_channels
 from ..utils import resolve_queryset
 from .structures import QuerySetList
 

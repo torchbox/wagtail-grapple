@@ -1,0 +1,9 @@
+# See https://prettier.io/docs/en/options.html.
+# Prettier also reads .editorconfig.
+printWidth = 80
+singleQuote = true
+quoteProps = 'consistent'
+trailingComma = 'es5'
+arrowParens = 'always'
+proseWrap = 'preserve'
+bracketSpacing = true

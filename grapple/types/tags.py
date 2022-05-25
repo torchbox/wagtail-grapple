@@ -1,11 +1,10 @@
 import graphene
-
 from graphene_django.converter import convert_django_field
-from grapple.utils import resolve_queryset
-
 from modelcluster.contrib.taggit import ClusterTaggableManager
 from taggit.managers import TaggableManager
 from taggit.models import Tag
+
+from grapple.utils import resolve_queryset
 
 from .structures import QuerySetList
 

@@ -7,7 +7,6 @@ from graphql.pyutils.frozen_error import FrozenError
 from .registry import registry
 from .settings import grapple_settings
 
-
 # HACK: Remove NoUnusedFragments validator
 # Due to the way previews work on the frontend, we need to pass all
 # fragments into the query even if they're not used.

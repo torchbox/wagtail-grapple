@@ -1,15 +1,29 @@
-import os
 import base64
+import os
 
 from django.conf import settings
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
-
+from wagtail.search.backends import get_search_backend
 from wagtail.search.index import class_is_indexed
 from wagtail.search.models import Query
-from wagtail.search.backends import get_search_backend
 
-from .types.structures import BasePaginatedType, PaginationType
 from .settings import grapple_settings
+from .types.structures import BasePaginatedType, PaginationType
+
+
+def _sliced_queryset(qs, limit=None, offset=None):
+    offset = int(offset or 0)
+
+    if limit is not None:
+        limit = min(
+            int(limit or grapple_settings.PAGE_SIZE), grapple_settings.MAX_PAGE_SIZE
+        )
+        return qs[offset : limit + offset]
+
+    if offset:
+        return qs[offset:]
+
+    return qs
 
 
 def resolve_queryset(
@@ -21,7 +35,7 @@ def resolve_queryset(
     id=None,
     order=None,
     collection=None,
-    **kwargs
+    **kwargs,
 ):
     """
     Add limit, offset and search capabilities to the query. This contains
@@ -43,7 +57,6 @@ def resolve_queryset(
     :param collection: Use Wagtail's collection id to filter images or documents
     :type collection: int
     """
-    offset = int(offset or 0)
 
     if id is not None:
         qs = qs.filter(pk=id)
@@ -59,7 +72,9 @@ def resolve_queryset(
             query = Query.get(search_query)
             query.add_hit()
 
-        return get_search_backend().search(search_query, qs)
+        qs = get_search_backend().search(search_query, qs)
+
+        return _sliced_queryset(qs, limit, offset)
 
     if order is not None:
         qs = qs.order_by(*map(lambda x: x.strip(), order.split(",")))
@@ -68,16 +83,10 @@ def resolve_queryset(
         try:
             qs.model._meta.get_field("collection")
             qs = qs.filter(collection=collection)
-        except:
+        except Exception:
             pass
 
-    if limit is not None:
-        limit = min(
-            int(limit or grapple_settings.PAGE_SIZE), grapple_settings.MAX_PAGE_SIZE
-        )
-        qs = qs[offset : limit + offset]
-
-    return qs
+    return _sliced_queryset(qs, limit, offset)
 
 
 def get_paginated_result(qs, page, per_page):

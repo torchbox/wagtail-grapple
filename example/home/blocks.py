@@ -1,15 +1,23 @@
+from typing import Any, Dict, Optional
+
+import graphene
+from django.utils.text import slugify
 from wagtail.core import blocks
-from wagtail.images.blocks import ImageChooserBlock
 from wagtail.embeds.blocks import EmbedBlock
+from wagtail.images.blocks import ImageChooserBlock
 
 from grapple.helpers import register_streamfield_block
 from grapple.models import (
-    GraphQLForeignKey,
-    GraphQLImage,
-    GraphQLString,
+    GraphQLBoolean,
     GraphQLCollection,
     GraphQLEmbed,
+    GraphQLField,
+    GraphQLFloat,
+    GraphQLForeignKey,
+    GraphQLImage,
+    GraphQLInt,
     GraphQLStreamfield,
+    GraphQLString,
 )
 
 
@@ -89,6 +97,129 @@ class TextAndButtonsBlock(blocks.StructBlock):
     ]
 
 
+@register_streamfield_block
+class TextWithCallableBlock(blocks.StructBlock):
+    text = blocks.CharBlock()
+    integer = blocks.IntegerBlock()
+    decimal = blocks.FloatBlock()
+
+    graphql_fields = [
+        GraphQLString("text"),
+        GraphQLInt("integer"),
+        GraphQLFloat("decimal"),
+        # GraphQLString test attributes
+        GraphQLString("simple_string"),
+        GraphQLString("simple_string_method", source="get_simple_string_method"),
+        # GraphQLInt test attributes
+        GraphQLInt("simple_int"),
+        GraphQLInt("simple_int_method", source="get_simple_int_method"),
+        # GraphQLFloat test attributes
+        GraphQLFloat("simple_float"),
+        GraphQLFloat("simple_float_method", source="get_simple_float_method"),
+        # GraphQLBoolean test attributes
+        GraphQLBoolean("simple_boolean"),
+        GraphQLBoolean("simple_boolean_method", source="get_simple_boolean_method"),
+        # GraphQLField test attributes
+        GraphQLField("field_property", graphene.String, source="get_field_property"),
+        GraphQLField("field_method", graphene.String, source="get_field_method"),
+    ]
+
+    # GraphQLString test attributes
+
+    @property
+    def simple_string(self) -> str:
+        return "A simple string property."
+
+    def simple_string_method(
+        self,
+        values: Dict[str, Any] = None,
+    ):
+        # Should not be used as we define `source="get_simple_string_method"`.
+        raise Exception
+
+    def get_simple_string_method(
+        self,
+        values: Dict[str, Any] = None,
+    ) -> Optional[str]:
+        return slugify(values.get("text")) if values else None
+
+    # GraphQLInt test attributes
+
+    @property
+    def simple_int(self) -> int:
+        return 5
+
+    def simple_int_method(
+        self,
+        values: Dict[str, Any] = None,
+    ):
+        # Should not be used as we define `source="get_simple_int_method"`.
+        raise Exception
+
+    def get_simple_int_method(
+        self,
+        values: Dict[str, Any] = None,
+    ) -> Optional[int]:
+        return values.get("integer") * 2 if values else None
+
+    # GraphQLFloat test attributes
+
+    @property
+    def simple_float(self) -> float:
+        return 0.1
+
+    def simple_float_method(
+        self,
+        values: Dict[str, Any] = None,
+    ):
+        # Should not be used as we define `source="get_simple_float_method"`.
+        raise Exception
+
+    def get_simple_float_method(
+        self,
+        values: Dict[str, Any] = None,
+    ) -> Optional[float]:
+        return values.get("decimal") * 2 if values else None
+
+    # GraphQLBoolean test attributes
+
+    @property
+    def simple_boolean(self) -> bool:
+        return 1
+
+    def simple_boolean_method(
+        self,
+        values: Dict[str, Any] = None,
+    ):
+        # Should not be used as we define `source="get_simple_boolean_method"`.
+        raise Exception
+
+    def get_simple_boolean_method(
+        self,
+        values: Dict[str, Any] = None,
+    ) -> Optional[bool]:
+        return bool(values.get("text")) if values else None
+
+    # GraphQLField test attributes
+
+    @property
+    def get_field_property(self) -> str:
+        return "A field property."
+
+    def field_method(
+        self,
+        values: Dict[str, Any] = None,
+    ):
+        # Should not be used as we define `source="get_field_method"`.
+        raise Exception
+
+    def get_field_method(
+        self,
+        values: Dict[str, Any] = None,
+    ) -> Optional[str]:
+        return slugify(values.get("text")) if values else None
+
+
 class StreamFieldBlock(blocks.StreamBlock):
     heading = blocks.CharBlock(classname="full title")
     paragraph = blocks.RichTextBlock()
@@ -103,3 +234,4 @@ class StreamFieldBlock(blocks.StreamBlock):
     callout = CalloutBlock()
     text_and_buttons = TextAndButtonsBlock()
     page = blocks.PageChooserBlock()
+    text_with_callable = TextWithCallableBlock()

@@ -1,7 +1,6 @@
-from example.tests.test_grapple import BaseGrappleTestWithIntrospection
 from home.factories import AdvertFactory
 
-from example.tests.test_grapple import BaseGrappleTest
+from example.tests.test_grapple import BaseGrappleTestWithIntrospection
 
 
 class AdvertTest(BaseGrappleTestWithIntrospection):

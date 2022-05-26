@@ -29,7 +29,7 @@ jobs:
       max-parallel: 4
       matrix:
         python-version: ['3.7', '3.8', '3.9', '3.10']
-        wagtail-version: ['2.14', '2.15', '2.16']
+        wagtail-version: ['2.14', '2.15', '2.16', '3.0']
 
     steps:
       - uses: actions/checkout@v2

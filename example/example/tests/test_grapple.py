@@ -44,31 +44,31 @@ class BaseGrappleTestWithIntrospection(BaseGrappleTest):
     def setUp(self):
         super().setUp()
         query = """
-		query availableQueries {
-		  __schema {
-			queryType {
-			  fields{
-				name
-				type {
-				  kind
-				  ofType {
-					name
-					kind
-					ofType {
-						kind
-						name
-						ofType {
-							kind
-							name
-						}
-					}
-				  }
-				}
-			  }
-			}
-		  }
-		}
-		"""
+        query availableQueries {
+          __schema {
+            queryType {
+              fields{
+                name
+                type {
+                  kind
+                  ofType {
+                    name
+                    kind
+                    ofType {
+                        kind
+                        name
+                        ofType {
+                            kind
+                            name
+                        }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+        """
         executed = self.client.execute(query)
         self.available_queries = executed["data"]["__schema"]["queryType"]["fields"]
 

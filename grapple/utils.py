@@ -77,7 +77,7 @@ def resolve_queryset(
         return _sliced_queryset(qs, limit, offset)
 
     if order is not None:
-        qs = qs.order_by(*map(lambda x: x.strip(), order.split(",")))
+        qs = qs.order_by(*(x.strip() for x in order.split(",")))
 
     if collection is not None:
         try:
@@ -167,7 +167,7 @@ def resolve_paginated_queryset(
         return get_paginated_result(results, page, per_page)
 
     if order is not None:
-        qs = qs.order_by(*map(lambda x: x.strip(), order.split(",")))
+        qs = qs.order_by(*(x.strip() for x in order.split(",")))
 
     return get_paginated_result(qs, page, per_page)
 

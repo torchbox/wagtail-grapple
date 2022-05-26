@@ -407,7 +407,7 @@ class TestUtils(BaseGrappleTest):
 
         results = self.client.execute(
             query,
-            variables={"term": "t", "limit": 1},
+            variables={"term": "Test", "limit": 1},
         )
         pages = results["data"]["pages"]
         self.assertEqual(len(pages), 1)
@@ -415,7 +415,7 @@ class TestUtils(BaseGrappleTest):
 
         results = self.client.execute(
             query,
-            variables={"term": "t", "limit": 2, "offset": 1},
+            variables={"term": "Test", "limit": 2, "offset": 1},
         )
         pages = results["data"]["pages"]
         self.assertEqual(len(pages), 2)
@@ -436,7 +436,7 @@ class TestUtils(BaseGrappleTest):
         with override_settings(GRAPPLE={"PAGE_SIZE": 10, "MAX_PAGE_SIZE": 1}):
             results = self.client.execute(
                 query,
-                variables={"term": "t", "limit": 2},
+                variables={"term": "Test", "limit": 2},
             )
 
         pages = results["data"]["pages"]
@@ -447,7 +447,7 @@ class TestUtils(BaseGrappleTest):
         with override_settings(GRAPPLE={"PAGE_SIZE": 1, "MAX_PAGE_SIZE": 5}):
             results = self.client.execute(
                 query,
-                variables={"term": "t", "limit": 2},
+                variables={"term": "Test", "limit": 2},
             )
 
         pages = results["data"]["pages"]

@@ -314,7 +314,7 @@ def register_singular_query_field(
                     qs = cls.objects
                     if "order" in kwargs:
                         qs = qs.order_by(
-                            *map(lambda x: x.strip(), kwargs.pop("order").split(","))
+                            *(x.strip() for x in kwargs.pop("order").split(","))
                         )
 
                     # If is a Page then only query live/public pages.

@@ -11,8 +11,13 @@ from django.test.client import RequestFactory
 from django.utils.safestring import SafeText
 from home.blocks import CarouselBlock, ImageGalleryImages
 from home.factories import BlogPageFactory, TextWithCallableBlockFactory
-from wagtail.core.blocks import StreamValue
-from wagtail.core.rich_text import RichText
+
+try:
+    from wagtail.blocks import StreamValue
+    from wagtail.rich_text import RichText
+except ImportError:
+    from wagtail.core.blocks import StreamValue
+    from wagtail.core.rich_text import RichText
 from wagtail.embeds.blocks import EmbedValue
 
 from example.tests.test_grapple import BaseGrappleTest

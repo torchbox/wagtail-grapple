@@ -1,5 +1,9 @@
 from graphene import ObjectType
-from wagtail.core import hooks
+
+try:
+    from wagtail import hooks
+except ImportError:
+    from wagtail.core import hooks
 
 from .registry import registry
 from .types.collections import CollectionsQuery

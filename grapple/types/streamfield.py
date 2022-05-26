@@ -10,9 +10,15 @@ from django.conf import settings
 from django.template.loader import render_to_string
 from graphene.types import Scalar
 from graphene_django.converter import convert_django_field
-from wagtail.core import blocks
-from wagtail.core.fields import StreamField
-from wagtail.core.rich_text import expand_db_html
+
+try:
+    from wagtail import blocks
+    from wagtail.fields import StreamField
+    from wagtail.rich_text import expand_db_html
+except ImportError:
+    from wagtail.core import blocks
+    from wagtail.core.fields import StreamField
+    from wagtail.core.rich_text import expand_db_html
 from wagtail.embeds.blocks import EmbedValue
 from wagtail.embeds.embeds import get_embed
 from wagtail.embeds.exceptions import EmbedException
@@ -127,14 +133,11 @@ def serialize_struct_obj(obj):
         for field in obj:
             value = obj[field]
             if hasattr(value, "raw_data"):
-                rtn_obj[field] = list(
-                    map(lambda data: serialize_struct_obj(data.value), value[0])
-                )
+                rtn_obj[field] = [serialize_struct_obj(data.value) for data in value[0]]
             elif hasattr(obj, "stream_data"):
-                map(
-                    lambda data: serialize_struct_obj(data["value"]),
-                    value.stream_data,
-                )
+                rtn_obj[field] = [
+                    serialize_struct_obj(data["value"]) for data in value.stream_data
+                ]
             elif hasattr(value, "value"):
                 rtn_obj[field] = value.value
             elif hasattr(value, "src"):

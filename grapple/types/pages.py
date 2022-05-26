@@ -4,8 +4,13 @@ from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
 from graphene_django.types import DjangoObjectType
 from graphql.error import GraphQLLocatedError
-from wagtail.core.models import Page as WagtailPage
-from wagtail.core.models import Site
+
+try:
+    from wagtail.models import Page as WagtailPage
+    from wagtail.models import Site
+except ImportError:
+    from wagtail.core.models import Page as WagtailPage
+    from wagtail.core.models import Site
 from wagtail_headless_preview.signals import preview_update
 
 from ..registry import registry
@@ -75,7 +80,7 @@ class PageInterface(graphene.Interface):
     def resolve_parent(self, info, **kwargs):
         """
         Resolves the parent node of current page node.
-        Docs: https://docs.wagtail.io/en/stable/reference/pages/model_reference.html#wagtail.core.models.Page.get_parent
+        Docs: https://docs.wagtail.io/en/stable/reference/pages/model_reference.html#wagtail.models.Page.get_parent
         """
         try:
             return self.get_parent().specific
@@ -94,7 +99,7 @@ class PageInterface(graphene.Interface):
     def resolve_siblings(self, info, **kwargs):
         """
         Resolves a list of sibling nodes to this page.
-        Docs: https://docs.wagtail.io/en/stable/reference/pages/queryset_reference.html?highlight=get_siblings#wagtail.core.query.PageQuerySet.sibling_of
+        Docs: https://docs.wagtail.io/en/stable/reference/pages/queryset_reference.html?highlight=get_siblings#wagtail.query.PageQuerySet.sibling_of
         """
         return resolve_queryset(
             self.get_siblings().exclude(pk=self.pk).live().public().specific(),

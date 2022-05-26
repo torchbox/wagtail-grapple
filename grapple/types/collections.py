@@ -1,6 +1,10 @@
 import graphene
 from graphene_django.types import DjangoObjectType
-from wagtail.core.models import Collection
+
+try:
+    from wagtail.models import Collection
+except ImportError:
+    from wagtail.core.models import Collection
 
 from ..registry import registry
 from ..utils import resolve_queryset

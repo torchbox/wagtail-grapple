@@ -8,9 +8,15 @@ from django.db import models
 from django.template.loader import render_to_string
 from graphene_django.types import DjangoObjectType
 from wagtail.contrib.settings.models import BaseSetting
-from wagtail.core.blocks import StructValue, stream_block
-from wagtail.core.models import Page as WagtailPage
-from wagtail.core.rich_text import RichText, expand_db_html
+
+try:
+    from wagtail.blocks import StructValue, stream_block
+    from wagtail.models import Page as WagtailPage
+    from wagtail.rich_text import RichText, expand_db_html
+except ImportError:
+    from wagtail.core.blocks import StructValue, stream_block
+    from wagtail.core.models import Page as WagtailPage
+    from wagtail.core.rich_text import RichText, expand_db_html
 from wagtail.documents.models import AbstractDocument
 from wagtail.images.blocks import ImageChooserBlock
 from wagtail.images.models import AbstractImage, AbstractRendition

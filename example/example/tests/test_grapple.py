@@ -20,7 +20,11 @@ from django.test import RequestFactory, TestCase, override_settings
 from graphene.test import Client
 from home.factories import BlogPageFactory
 from home.models import HomePage
-from wagtail.core.models import Page, Site
+
+try:
+    from wagtail.models import Page, Site
+except ImportError:
+    from wagtail.core.models import Page, Site
 from wagtail.documents import get_document_model
 from wagtail.images import get_image_model
 from wagtailmedia.models import get_media_model
@@ -232,7 +236,8 @@ class PageUrlPathTest(BaseGrappleTest):
         self.assertEquals(int(page_data["id"]), home_child.id)
 
         with patch(
-            "wagtail.core.models.Site.find_for_request", return_value=another_site
+            f"{settings.WAGTAIL_CORE}.models.Site.find_for_request",
+            return_value=another_site,
         ):
             page_data = self._query_by_path("/child/", in_site=True)
             self.assertEquals(int(page_data["id"]), another_child.id)

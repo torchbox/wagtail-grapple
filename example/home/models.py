@@ -5,10 +5,16 @@ from home.blocks import StreamFieldBlock
 from modelcluster.contrib.taggit import ClusterTaggableManager
 from modelcluster.fields import ParentalKey
 from taggit.models import TaggedItemBase
-from wagtail.admin.edit_handlers import FieldPanel, InlinePanel, StreamFieldPanel
+
+try:
+    from wagtail.admin.panels import FieldPanel, InlinePanel
+    from wagtail.fields import StreamField
+    from wagtail.models import Orderable, Page
+except ImportError:
+    from wagtail.admin.edit_handlers import FieldPanel, InlinePanel, StreamFieldPanel
+    from wagtail.core.fields import StreamField
+    from wagtail.core.models import Orderable, Page
 from wagtail.contrib.settings.models import BaseSetting, register_setting
-from wagtail.core.fields import StreamField
-from wagtail.core.models import Orderable, Page
 from wagtail.documents.edit_handlers import DocumentChooserPanel
 from wagtail.images.edit_handlers import ImageChooserPanel
 from wagtail.snippets.edit_handlers import SnippetChooserPanel
@@ -35,6 +41,11 @@ from grapple.models import (
     GraphQLTag,
 )
 from grapple.utils import resolve_paginated_queryset
+
+try:
+    StreamFieldPanel
+except NameError:
+    StreamFieldPanel = FieldPanel
 
 document_model_string = getattr(
     settings, "WAGTAILDOCS_DOCUMENT_MODEL", "wagtaildocs.Document"

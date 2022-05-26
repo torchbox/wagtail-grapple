@@ -1,4 +1,7 @@
-from wagtail.core import hooks
+try:
+    from wagtail import hooks
+except ImportError:
+    from wagtail.core import hooks
 
 from .mutations import Mutations
 from .subscriptions import Subscription

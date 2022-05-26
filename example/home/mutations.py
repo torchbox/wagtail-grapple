@@ -1,6 +1,10 @@
 import graphene
 from home.models import AuthorPage
-from wagtail.core.models import Page
+
+try:
+    from wagtail.models import Page
+except ImportError:
+    from wagtail.core.models import Page
 
 from grapple.types.pages import PageInterface
 

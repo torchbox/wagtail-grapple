@@ -66,7 +66,7 @@ Getting Grapple installed is designed to be as simple as possible!
 
 ```
 Django  >= 3.0, <4.0
-Wagtail >= 2.14, <2.17
+Wagtail >= 2.15, <4.0
 ```
 
 ### Installation
@@ -186,7 +186,7 @@ Wagtail Grapple supports:
 
 -   Django >= 3.0, < 4.0
 -   Python 3.7, 3.8, 3.9, and 3.10
--   Wagtail >= 2.14, < 2.17
+-   Wagtail >= 2.15, < 4.0
 
 ## License
 

@@ -42,11 +42,6 @@ from grapple.models import (
 )
 from grapple.utils import resolve_paginated_queryset
 
-try:
-    StreamFieldPanel
-except NameError:
-    StreamFieldPanel = FieldPanel
-
 document_model_string = getattr(
     settings, "WAGTAILDOCS_DOCUMENT_MODEL", "wagtaildocs.Document"
 )
@@ -117,7 +112,9 @@ class BlogPage(HeadlessPreviewMixin, Page):
     content_panels = Page.content_panels + [
         FieldPanel("date"),
         ImageChooserPanel("hero_image"),
-        StreamFieldPanel("body"),
+        FieldPanel("body")
+        if settings.WAGTAIL_VERSION >= (3, 0)
+        else StreamFieldPanel("body"),
         FieldPanel("tags"),
         InlinePanel("related_links", label="Related links"),
         InlinePanel("authors", label="Authors"),

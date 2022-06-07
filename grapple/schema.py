@@ -1,7 +1,11 @@
 import graphene
 from graphql.pyutils.frozen_error import FrozenError
 from graphql.validation import NoUnusedFragmentsRule, specified_rules
-from wagtail.core import hooks
+
+try:
+    from wagtail import hooks
+except ImportError:
+    from wagtail.core import hooks
 
 from .registry import registry
 from .settings import grapple_settings

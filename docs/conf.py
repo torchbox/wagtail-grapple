@@ -57,7 +57,7 @@ html_theme = "sphinx_wagtail_theme"
 html_theme_path = [sphinx_wagtail_theme.get_html_theme_path()]
 html_theme_options = {
     "project_name": "Wagtail Grapple Documentation",
-    "github_url": "https://github.com/GrappleGQL/wagtail-grapple/tree/main/docs/",
+    "github_url": "https://github.com/torchbox/wagtail-grapple/tree/main/docs/",
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,

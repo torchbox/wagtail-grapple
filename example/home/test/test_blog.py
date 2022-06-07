@@ -11,8 +11,13 @@ from django.test.client import RequestFactory
 from django.utils.safestring import SafeText
 from home.blocks import CarouselBlock, ImageGalleryImages
 from home.factories import BlogPageFactory, TextWithCallableBlockFactory
-from wagtail.core.blocks import StreamValue
-from wagtail.core.rich_text import RichText
+
+try:
+    from wagtail.blocks import StreamValue
+    from wagtail.rich_text import RichText
+except ImportError:
+    from wagtail.core.blocks import StreamValue
+    from wagtail.core.rich_text import RichText
 from wagtail.embeds.blocks import EmbedValue
 
 from example.tests.test_grapple import BaseGrappleTest
@@ -89,6 +94,12 @@ class BlogTest(BaseGrappleTest):
                             "button_text": "Take me to the source",
                             "button_link": "https://wagtail.io/",
                         },
+                    },
+                ),
+                (
+                    "block_with_name",
+                    {
+                        "name": "Test Name",
                     },
                 ),
                 ("text_with_callable", TextWithCallableBlockFactory()),
@@ -618,6 +629,16 @@ class BlogTest(BaseGrappleTest):
                 button = query_blocks[0]["mainbutton"]
                 self.assertEquals(button["buttonText"], "Take me to the source")
                 self.assertEquals(button["buttonLink"], "https://wagtail.io/")
+
+    def test_block_with_name(self):
+        block_type = "BlockWithName"
+        block_query = "name"
+        query_blocks = self.get_blocks_from_body(block_type, block_query=block_query)
+
+        for block in self.blog_page.body:
+            if type(block.block).__name__ == block_type:
+                result = query_blocks[0][block_query]
+                self.assertEquals("Test Name", result)
 
     def test_empty_list_in_structblock(self):
         another_blog_post = BlogPageFactory(

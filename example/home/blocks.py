@@ -98,6 +98,21 @@ class TextAndButtonsBlock(blocks.StructBlock):
 
 
 @register_streamfield_block
+class BlockWithName(blocks.StructBlock):
+    """
+    wagtail.core.blocks.Block defines a name property inherited by all blocks.
+    Ensure that when we bind a block to "name" that the block's value is
+    returned in GraphQL queries.
+    """
+
+    name = blocks.TextBlock()
+
+    graphql_fields = [
+        GraphQLString("name"),
+    ]
+
+
+@register_streamfield_block
 class TextWithCallableBlock(blocks.StructBlock):
     text = blocks.CharBlock()
     integer = blocks.IntegerBlock()
@@ -235,3 +250,4 @@ class StreamFieldBlock(blocks.StreamBlock):
     text_and_buttons = TextAndButtonsBlock()
     page = blocks.PageChooserBlock()
     text_with_callable = TextWithCallableBlock()
+    block_with_name = BlockWithName()

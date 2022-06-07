@@ -5,10 +5,16 @@ from home.blocks import StreamFieldBlock
 from modelcluster.contrib.taggit import ClusterTaggableManager
 from modelcluster.fields import ParentalKey
 from taggit.models import TaggedItemBase
-from wagtail.admin.edit_handlers import FieldPanel, InlinePanel, StreamFieldPanel
+
+try:
+    from wagtail.admin.panels import FieldPanel, InlinePanel
+    from wagtail.fields import StreamField
+    from wagtail.models import Orderable, Page
+except ImportError:
+    from wagtail.admin.edit_handlers import FieldPanel, InlinePanel, StreamFieldPanel
+    from wagtail.core.fields import StreamField
+    from wagtail.core.models import Orderable, Page
 from wagtail.contrib.settings.models import BaseSetting, register_setting
-from wagtail.core.fields import StreamField
-from wagtail.core.models import Orderable, Page
 from wagtail.documents.edit_handlers import DocumentChooserPanel
 from wagtail.images.edit_handlers import ImageChooserPanel
 from wagtail.snippets.edit_handlers import SnippetChooserPanel
@@ -106,7 +112,9 @@ class BlogPage(HeadlessPreviewMixin, Page):
     content_panels = Page.content_panels + [
         FieldPanel("date"),
         ImageChooserPanel("hero_image"),
-        StreamFieldPanel("body"),
+        FieldPanel("body")
+        if settings.WAGTAIL_VERSION >= (3, 0)
+        else StreamFieldPanel("body"),
         FieldPanel("tags"),
         InlinePanel("related_links", label="Related links"),
         InlinePanel("authors", label="Authors"),

@@ -10,9 +10,15 @@ from django.conf import settings
 from django.template.loader import render_to_string
 from graphene.types import Scalar
 from graphene_django.converter import convert_django_field
-from wagtail.core import blocks
-from wagtail.core.fields import StreamField
-from wagtail.core.rich_text import expand_db_html
+
+try:
+    from wagtail import blocks
+    from wagtail.fields import StreamField
+    from wagtail.rich_text import expand_db_html
+except ImportError:
+    from wagtail.core import blocks
+    from wagtail.core.fields import StreamField
+    from wagtail.core.rich_text import expand_db_html
 from wagtail.embeds.blocks import EmbedValue
 from wagtail.embeds.embeds import get_embed
 from wagtail.embeds.exceptions import EmbedException

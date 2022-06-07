@@ -1,5 +1,20 @@
 ## Unreleased
 
+## [0.15.0] - 2022-06-07
+
+### Added
+
+-   Support for Wagtail 3.0 ([#229](https://github.com/torchbox/wagtail-grapple/pull/229)) @fabienheureux
+-   Additional linting to improve consistency between contributors ([#223](https://github.com/torchbox/wagtail-grapple/pull/223)) @kbayliss
+
+### Fixed
+
+-   Check callable field sources before execution ([#228](https://github.com/torchbox/wagtail-grapple/pull/228)) Thanks @danbentley
+
+### Removed
+
+-   Support for Wagtail < 2.15 ([#229](https://github.com/torchbox/wagtail-grapple/pull/229)) @fabienheureux
+
 ## [0.14.1] - 2022-03-31
 
 ### Changed
@@ -182,7 +197,8 @@
 -   Improve field definition and under-the-hood implementation ([#28](https://github.com/torchbox/wagtail-grapple/pull/28))
 -   Add conditional checks when resolving streamfield type ([#29](https://github.com/torchbox/wagtail-grapple/pull/29))
 
-[unreleased]: https://github.com/torchbox/wagtail-grapple/compare/v1.14.1...HEAD
+[unreleased]: https://github.com/torchbox/wagtail-grapple/compare/v1.15.0...HEAD
+[0.15.0]: https://github.com/torchbox/wagtail-grapple/compare/v1.14.1...v0.15.0
 [0.14.1]: https://github.com/torchbox/wagtail-grapple/compare/v1.14.0...v0.14.1
 [0.14.0]: https://github.com/torchbox/wagtail-grapple/compare/v1.13.0...v0.14.0
 [0.13.0]: https://github.com/torchbox/wagtail-grapple/compare/v1.12.0...v0.13.0

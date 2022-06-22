@@ -377,6 +377,151 @@ class SitesTest(TestCase):
         self.assertEquals(data[0]["contentType"], "home.BlogPage")
         self.assertEquals(data[0]["title"], blog.title)
 
+    def test_site_page_slug_filter(self):
+        query = """
+        query($hostname: String $slug: String) {
+            site(hostname: $hostname) {
+                siteName
+                page(slug: $slug) {
+                    title
+                }
+            }
+        }
+        """
+        # Blog page under grapple test site
+        blog = BlogPageFactory(
+            parent=self.site.root_page,
+            title="blog on grapple test site",
+            slug="blog-page-1",
+        )
+        # grapple test SiteObjectType page field
+        results = self.client.execute(
+            query,
+            variables={
+                "hostname": self.site.hostname,
+                "slug": blog.slug,
+            },
+        )
+        data = results["data"]["site"]["page"]
+        self.assertIsNotNone(data)
+        self.assertEquals(data["title"], blog.title)
+        # Shouldn't return any data
+        results = self.client.execute(
+            query,
+            variables={
+                "hostname": self.site.hostname,
+                "slug": "not-a-page-slug",
+            },
+        )
+        data = results["data"]["site"]["page"]
+        self.assertIsNone(data)
+
+        # Blog page under localhost
+        blog = BlogPageFactory(
+            parent=self.home, title="blog on localhost", slug="blog-page-2"
+        )
+        results = self.client.execute(
+            query,
+            variables={
+                "hostname": self.home.get_site().hostname,
+                "slug": blog.slug,
+            },
+        )
+        data = results["data"]["site"]["page"]
+        self.assertIsNotNone(data)
+        self.assertEquals(data["title"], blog.title)
+
+    def test_site_page_url_path_filter(self):
+        query = """
+        query($hostname: String $urlPath: String) {
+            site(hostname: $hostname) {
+                siteName
+                page(urlPath: $urlPath) {
+                    title
+                }
+            }
+        }
+        """
+        # Blog page under grapple test site
+        blog = BlogPageFactory(
+            parent=self.site.root_page,
+            title="blog on grapple test site",
+            slug="blog-page-1",
+        )
+        results = self.client.execute(
+            query,
+            variables={
+                "hostname": self.site.hostname,
+                "urlPath": blog.relative_url(current_site=self.site),
+            },
+        )
+        data = results["data"]["site"]["page"]
+        self.assertIsNotNone(data)
+        self.assertEquals(data["title"], blog.title)
+        # Shouldn't return any data
+        results = self.client.execute(
+            query,
+            variables={
+                "hostname": self.site.hostname,
+                "urlPath": "/not-a-page-slug",
+            },
+        )
+        data = results["data"]["site"]["page"]
+        self.assertIsNone(data)
+
+        # Blog page under localhost
+        blog = BlogPageFactory(
+            parent=self.home, title="blog on localhost", slug="blog-page-2"
+        )
+        results = self.client.execute(
+            query,
+            variables={
+                "hostname": self.home.get_site().hostname,
+                "urlPath": blog.relative_url(current_site=self.home.get_site()),
+            },
+        )
+        data = results["data"]["site"]["page"]
+        self.assertIsNotNone(data)
+        self.assertEquals(data["title"], blog.title)
+
+    def test_site_page_content_type_filter(self):
+        query = """
+        query($hostname: String $slug: String $content_type: String) {
+            site(hostname: $hostname) {
+                siteName
+                page(slug: $slug, contentType: $content_type) {
+                    title
+                }
+            }
+        }
+        """
+        # Blog page under grapple test site
+        blog = BlogPageFactory(
+            parent=self.site.root_page, title="blog on grapple test site"
+        )
+        results = self.client.execute(
+            query,
+            variables={
+                "hostname": self.site.hostname,
+                "slug": blog.slug,
+                "content_type": "home.BlogPage",
+            },
+        )
+        data = results["data"]["site"]["page"]
+        self.assertIsNotNone(data)
+        self.assertEquals(data["title"], blog.title)
+        # Shouldn't return any data
+        results = self.client.execute(
+            query,
+            variables={
+                "hostname": self.site.hostname,
+                "slug": blog.slug,
+                "content_type": "home.HomePage",
+            },
+        )
+        data = results["data"]["site"]["page"]
+        self.assertIsNone(data)
+
 
 @override_settings(GRAPPLE={"AUTO_CAMELCASE": False})
 class DisableAutoCamelCaseTest(TestCase):

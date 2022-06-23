@@ -245,7 +245,7 @@ the ``sites`` or ``site`` field on the root query type. Available fields for the
     hostname: String
     isDefaultSite: Boolean
     rootPage: PageInterface
-    page(id: Int, slug: String, urlPath: String, contentType: String, token: String, inSite: Boolean): PageInterface
+    page(id: Int, slug: String, urlPath: String, contentType: String, token: String): PageInterface
     pages(limit: PositiveInt, offset: PositiveInt, order: String, searchQuery: String, id: ID): [PageInterface]
 
 

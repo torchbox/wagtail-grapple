@@ -29,6 +29,7 @@ class SiteObjectType(DjangoObjectType):
         PageInterface,
         id=graphene.Int(),
         slug=graphene.String(),
+        url_path=graphene.String(),
         token=graphene.String(),
         content_type=graphene.String(),
     )
@@ -54,6 +55,7 @@ class SiteObjectType(DjangoObjectType):
         return get_specific_page(
             id=kwargs.get("id"),
             slug=kwargs.get("slug"),
+            url_path=kwargs.get("url_path"),
             token=kwargs.get("token"),
             content_type=kwargs.get("content_type"),
             site=self,

@@ -1,5 +1,11 @@
 ## Unreleased
 
+## [0.15.1] - 2022-06-23
+
+### Added
+
+-   Add missing `urlPath` to page field under `SiteObjectType` ([#230](https://github.com/torchbox/wagtail-grapple/pull/230)) Thanks @Morsey187
+
 ## [0.15.0] - 2022-06-07
 
 ### Added
@@ -197,14 +203,15 @@
 -   Improve field definition and under-the-hood implementation ([#28](https://github.com/torchbox/wagtail-grapple/pull/28))
 -   Add conditional checks when resolving streamfield type ([#29](https://github.com/torchbox/wagtail-grapple/pull/29))
 
-[unreleased]: https://github.com/torchbox/wagtail-grapple/compare/v1.15.0...HEAD
-[0.15.0]: https://github.com/torchbox/wagtail-grapple/compare/v1.14.1...v0.15.0
-[0.14.1]: https://github.com/torchbox/wagtail-grapple/compare/v1.14.0...v0.14.1
-[0.14.0]: https://github.com/torchbox/wagtail-grapple/compare/v1.13.0...v0.14.0
-[0.13.0]: https://github.com/torchbox/wagtail-grapple/compare/v1.12.0...v0.13.0
-[0.12.0]: https://github.com/torchbox/wagtail-grapple/compare/v1.11.0...v0.12.0
-[0.11.0]: https://github.com/torchbox/wagtail-grapple/compare/v1.10.2...v0.11.0
-[0.10.2]: https://github.com/torchbox/wagtail-grapple/compare/v1.10.0...v0.10.2
+[unreleased]: https://github.com/torchbox/wagtail-grapple/compare/v0.15.1...HEAD
+[0.15.1]: https://github.com/torchbox/wagtail-grapple/compare/v0.15.0...v0.15.1
+[0.15.0]: https://github.com/torchbox/wagtail-grapple/compare/v0.14.1...v0.15.0
+[0.14.1]: https://github.com/torchbox/wagtail-grapple/compare/v0.14.0...v0.14.1
+[0.14.0]: https://github.com/torchbox/wagtail-grapple/compare/v0.13.0...v0.14.0
+[0.13.0]: https://github.com/torchbox/wagtail-grapple/compare/v0.12.0...v0.13.0
+[0.12.0]: https://github.com/torchbox/wagtail-grapple/compare/v0.11.0...v0.12.0
+[0.11.0]: https://github.com/torchbox/wagtail-grapple/compare/v0.10.2...v0.11.0
+[0.10.2]: https://github.com/torchbox/wagtail-grapple/compare/v0.10.0...v0.10.2
 [0.10.0]: https://github.com/torchbox/wagtail-grapple/compare/v0.9.3...v0.10.0
 [0.9.3]: https://github.com/torchbox/wagtail-grapple/compare/v0.9.2...v0.9.3
 [0.9.2]: https://github.com/torchbox/wagtail-grapple/compare/v0.9.1...v0.9.2

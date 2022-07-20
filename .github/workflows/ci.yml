@@ -29,7 +29,7 @@ jobs:
       max-parallel: 4
       matrix:
         python-version: ['3.7', '3.8', '3.9', '3.10']
-        wagtail-version: ['2.15', '2.16', '3.0']
+        wagtail-version: ['2.15', '2.16', '3.0', 'main']
 
     steps:
       - uses: actions/checkout@v2
@@ -42,7 +42,17 @@ jobs:
         run: |
           pip install -r requirements.txt
           pip install .
+
+      - name: Install Wagtail package
+        if: ${{ matrix.wagtail-version != 'main' }}
+        run: |
           pip install wagtail==${{ matrix.wagtail-version }}
+
+      - name: Install Wagtail main
+        if: ${{ matrix.wagtail-version == 'main' }}
+        run: |
+          git clone https://github.com/wagtail/wagtail.git
+          pip install ./wagtail
 
       - name: Run Tests
         run: |

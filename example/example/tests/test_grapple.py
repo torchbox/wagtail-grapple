@@ -1,6 +1,7 @@
 import inspect
 import os
 import sys
+import unittest
 from unittest.mock import patch
 
 import wagtail_factories
@@ -19,12 +20,14 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import RequestFactory, TestCase, override_settings
 from graphene.test import Client
 from home.factories import BlogPageFactory
-from home.models import HomePage
+from home.models import GlobalSocialMediaSettings, HomePage, SocialMediaSettings
+from wagtail import VERSION as WAGTAIL_VERSION
 
 try:
     from wagtail.models import Page, Site
 except ImportError:
     from wagtail.core.models import Page, Site
+
 from wagtail.documents import get_document_model
 from wagtail.images import get_image_model
 from wagtailmedia.models import get_media_model
@@ -880,3 +883,161 @@ class MediaTest(BaseGrappleTest):
 
     def tearDown(self):
         self.media_item.file.delete()
+
+
+class SettingsTest(BaseGrappleTest):
+    def setUp(self):
+        super().setUp()
+
+        self.site_a = Site.objects.get()
+        self.site_a.hostname = "a"
+        self.site_a.save()
+
+        self.site_b = Site.objects.create(
+            hostname="b", port=80, root_page_id=self.site_a.root_page_id
+        )
+
+        self.site_a_settings = SocialMediaSettings.objects.create(
+            site=self.site_a,
+            facebook="https://facebook.com/site-a",
+            instagram="site-a",
+            trip_advisor="https://tripadvisor.com/site-a",
+            youtube="https://youtube.com/site-a",
+        )
+
+        self.site_b_settings = SocialMediaSettings.objects.create(
+            site=self.site_b,
+            facebook="https://facebook.com/site-b",
+            instagram="site-b",
+            trip_advisor="https://tripadvisor.com/site-b",
+            youtube="https://youtube.com/site-b",
+        )
+
+        self.global_settings = GlobalSocialMediaSettings.objects.create(
+            facebook="https://facebook.com/global",
+            instagram="global",
+            trip_advisor="https://tripadvisor.com/global",
+            youtube="https://youtube.com/global",
+        )
+
+    def test_query_single_setting(self):
+        query = """
+        {
+            setting(name: "SocialMediaSettings") {
+                ... on SocialMediaSettings {
+                    facebook
+                    instagram
+                    tripAdvisor
+                    youtube
+                }
+            }
+        }
+        """
+
+        response = self.client.execute(query)
+
+        self.assertEqual(
+            response,
+            {
+                "data": {
+                    "setting": {
+                        "facebook": "https://facebook.com/site-a",
+                        "instagram": "site-a",
+                        "tripAdvisor": "https://tripadvisor.com/site-a",
+                        "youtube": "https://youtube.com/site-a",
+                    }
+                }
+            },
+        )
+
+    @unittest.expectedFailure  # Can't filter the list endpoint by class
+    def test_query_site_settings(self):
+        query = """
+        {
+            settings(name: "SocialMediaSettings") {
+                ... on SocialMediaSettings {
+                    facebook
+                    instagram
+                    tripAdvisor
+                    youtube
+                }
+            }
+        }
+        """
+
+        response = self.client.execute(query)
+
+        self.assertEqual(
+            response,
+            {
+                "data": {
+                    "settings": [
+                        {
+                            "facebook": "https://facebook.com/site-a",
+                            "instagram": "site-a",
+                            "tripAdvisor": "https://tripadvisor.com/site-a",
+                            "youtube": "https://youtube.com/site-a",
+                        },
+                        {
+                            "facebook": "https://facebook.com/site-b",
+                            "instagram": "site-b",
+                            "tripAdvisor": "https://tripadvisor.com/site-b",
+                            "youtube": "https://youtube.com/site-b",
+                        },
+                    ]
+                }
+            },
+        )
+
+    @unittest.skipIf(
+        WAGTAIL_VERSION < (4, 0), "Generic settings are not supported on Wagtail < 4.0"
+    )
+    def test_query_all_settings(self):
+        query = """
+        {
+            settings {
+                ... on SocialMediaSettings {
+                    facebook
+                    instagram
+                    tripAdvisor
+                    youtube
+                }
+                ... on GlobalSocialMediaSettings {
+                    facebook
+                    instagram
+                    tripAdvisor
+                    youtube
+                }
+            }
+        }
+        """
+
+        response = self.client.execute(query)
+
+        self.assertEqual(
+            response,
+            {
+                "data": {
+                    "settings": [
+                        {
+                            "facebook": "https://facebook.com/site-a",
+                            "instagram": "site-a",
+                            "tripAdvisor": "https://tripadvisor.com/site-a",
+                            "youtube": "https://youtube.com/site-a",
+                        },
+                        {
+                            "facebook": "https://facebook.com/site-b",
+                            "instagram": "site-b",
+                            "tripAdvisor": "https://tripadvisor.com/site-b",
+                            "youtube": "https://youtube.com/site-b",
+                        },
+                        {
+                            "facebook": "https://facebook.com/global",
+                            "instagram": "global",
+                            "tripAdvisor": "https://tripadvisor.com/global",
+                            "youtube": "https://youtube.com/global",
+                        },
+                    ]
+                }
+            },
+        )

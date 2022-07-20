@@ -1,14 +1,21 @@
 import inspect
 from collections.abc import Iterable
 from types import MethodType
-from typing import Any, Dict, Type
+from typing import Any, Dict, Type, Union
 
 import graphene
 from django.apps import apps
 from django.db import models
 from django.template.loader import render_to_string
 from graphene_django.types import DjangoObjectType
-from wagtail.contrib.settings.models import BaseSetting
+
+try:
+    from wagtail.contrib.settings.models import BaseGenericSetting, BaseSiteSetting
+except ImportError:
+    # Wagtail < 4.0
+    from wagtail.contrib.settings.models import BaseSetting as BaseGenericSetting
+    from wagtail.contrib.settings.models import BaseSetting as BaseSiteSetting
+
 
 try:
     from wagtail.blocks import StructValue, stream_block
@@ -18,6 +25,7 @@ except ImportError:
     from wagtail.core.blocks import StructValue, stream_block
     from wagtail.core.models import Page as WagtailPage
     from wagtail.core.rich_text import RichText, expand_db_html
+
 from wagtail.documents.models import AbstractDocument
 from wagtail.images.blocks import ImageChooserBlock
 from wagtail.images.models import AbstractImage, AbstractRendition
@@ -129,7 +137,7 @@ def register_model(cls: type, type_prefix: str):
             register_image_model(cls, type_prefix)
         elif has_wagtail_media and issubclass(cls, AbstractMedia):
             register_media_model(cls, type_prefix)
-        elif issubclass(cls, BaseSetting):
+        elif issubclass(cls, (BaseSiteSetting, BaseGenericSetting)):
             register_settings_model(cls, type_prefix)
         elif cls in get_snippet_models():
             register_snippet_model(cls, type_prefix)
@@ -565,7 +573,9 @@ def register_media_model(cls: Type[AbstractMedia], type_prefix: str):
         registry.media[cls] = media_node_type
 
 
-def register_settings_model(cls: Type[BaseSetting], type_prefix: str):
+def register_settings_model(
+    cls: Union[Type[BaseSiteSetting], Type[BaseGenericSetting]], type_prefix: str
+):
     """
     Create a graphene node type for a settings page.
     """

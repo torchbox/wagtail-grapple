@@ -14,7 +14,20 @@ except ImportError:
     from wagtail.admin.edit_handlers import FieldPanel, InlinePanel, StreamFieldPanel
     from wagtail.core.fields import StreamField
     from wagtail.core.models import Orderable, Page
-from wagtail.contrib.settings.models import BaseSetting, register_setting
+
+try:
+    from wagtail.contrib.settings.models import (
+        BaseGenericSetting,
+        BaseSiteSetting,
+        register_setting,
+    )
+except ImportError:
+    # Wagtail < 4.0
+    from wagtail.contrib.settings.models import BaseSetting as BaseSiteSetting
+    from wagtail.contrib.settings.models import register_setting
+
+    BaseGenericSetting = models.Model
+
 from wagtail.documents.edit_handlers import DocumentChooserPanel
 from wagtail.images.edit_handlers import ImageChooserPanel
 from wagtail.snippets.edit_handlers import SnippetChooserPanel
@@ -216,7 +229,7 @@ class Advert(models.Model):
 
 
 @register_setting
-class SocialMediaSettings(BaseSetting):
+class SocialMediaSettings(BaseSiteSetting):
     facebook = models.URLField(help_text="Your Facebook page URL")
     instagram = models.CharField(
         max_length=255, help_text="Your Instagram username, without the @"
@@ -230,3 +243,27 @@ class SocialMediaSettings(BaseSetting):
         GraphQLString("trip_advisor"),
         GraphQLString("youtube"),
     ]
+
+
+# BaseGenericSetting is not supported in Wagtail < 4.0
+# For older versions of Wagtail, we swap BaseGenericSetting with models.Model
+# BaseGenericSetting doesn't add any fields, so the migrations should be the same
+class GlobalSocialMediaSettings(BaseGenericSetting):
+    facebook = models.URLField(help_text="Your Facebook page URL")
+    instagram = models.CharField(
+        max_length=255, help_text="Your Instagram username, without the @"
+    )
+    trip_advisor = models.URLField(help_text="Your Trip Advisor page URL")
+    youtube = models.URLField(help_text="Your YouTube channel or user account URL")
+
+    graphql_fields = [
+        GraphQLString("facebook"),
+        GraphQLString("instagram"),
+        GraphQLString("trip_advisor"),
+        GraphQLString("youtube"),
+    ]
+
+
+# Only register it as a setting if BaseGenericSetting exists (on Wagtail 4.0+)
+if BaseGenericSetting is not models.Model:
+    register_setting(GlobalSocialMediaSettings)

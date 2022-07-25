@@ -1050,7 +1050,6 @@ class SettingsTest(BaseGrappleTest):
             },
         )
 
-    @unittest.expectedFailure  # Can't filter the list endpoint by class
     def test_query_site_settings(self):
         query = """
         {

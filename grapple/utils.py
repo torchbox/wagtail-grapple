@@ -82,9 +82,10 @@ def resolve_queryset(
     if collection is not None:
         try:
             qs.model._meta.get_field("collection")
-            qs = qs.filter(collection=collection)
-        except Exception:
+        except LookupError:
             pass
+        else:
+            qs = qs.filter(collection=collection)
 
     return _sliced_queryset(qs, limit, offset)
 

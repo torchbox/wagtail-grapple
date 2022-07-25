@@ -950,6 +950,106 @@ class SettingsTest(BaseGrappleTest):
             },
         )
 
+    def test_query_single_setting_with_site_filter(self):
+        query = """
+        {
+            setting(site: "b", name: "SocialMediaSettings") {
+                ... on SocialMediaSettings {
+                    facebook
+                    instagram
+                    tripAdvisor
+                    youtube
+                }
+            }
+        }
+        """
+
+        response = self.client.execute(query)
+
+        self.assertEqual(
+            response,
+            {
+                "data": {
+                    "setting": {
+                        "facebook": "https://facebook.com/site-b",
+                        "instagram": "site-b",
+                        "tripAdvisor": "https://tripadvisor.com/site-b",
+                        "youtube": "https://youtube.com/site-b",
+                    }
+                }
+            },
+        )
+
+    def test_query_single_setting_with_site_filter_clashing_port(self):
+        # Create another site with the hostname "b" but a different port
+        self.site_b_8080 = Site.objects.create(
+            hostname="b", port=8080, root_page_id=self.site_a.root_page_id
+        )
+
+        query = """
+        {
+            setting(site: "b", name: "SocialMediaSettings") {
+                ... on SocialMediaSettings {
+                    facebook
+                    instagram
+                    tripAdvisor
+                    youtube
+                }
+            }
+        }
+        """
+
+        response = self.client.execute(query)
+
+        self.assertEqual(
+            response,
+            {
+                "errors": [
+                    {
+                        "message": "Your 'site' filter value of 'b' returned multiple sites. Try adding a port number (for example: 'b:80').",
+                        "locations": [{"line": 3, "column": 13}],
+                        "path": ["setting"],
+                    }
+                ],
+                "data": {"setting": None},
+            },
+        )
+
+    def test_query_single_setting_with_site_filter_with_port(self):
+        # Create another site with the hostname "b" but a different port
+        self.site_b_8080 = Site.objects.create(
+            hostname="b", port=8080, root_page_id=self.site_a.root_page_id
+        )
+
+        query = """
+        {
+            setting(site: "b:80", name: "SocialMediaSettings") {
+                ... on SocialMediaSettings {
+                    facebook
+                    instagram
+                    tripAdvisor
+                    youtube
+                }
+            }
+        }
+        """
+
+        response = self.client.execute(query)
+
+        self.assertEqual(
+            response,
+            {
+                "data": {
+                    "setting": {
+                        "facebook": "https://facebook.com/site-b",
+                        "instagram": "site-b",
+                        "tripAdvisor": "https://tripadvisor.com/site-b",
+                        "youtube": "https://youtube.com/site-b",
+                    }
+                }
+            },
+        )
+
     @unittest.expectedFailure  # Can't filter the list endpoint by class
     def test_query_site_settings(self):
         query = """
@@ -1025,6 +1125,54 @@ class SettingsTest(BaseGrappleTest):
                             "tripAdvisor": "https://tripadvisor.com/site-a",
                             "youtube": "https://youtube.com/site-a",
                         },
+                        {
+                            "facebook": "https://facebook.com/site-b",
+                            "instagram": "site-b",
+                            "tripAdvisor": "https://tripadvisor.com/site-b",
+                            "youtube": "https://youtube.com/site-b",
+                        },
+                        {
+                            "facebook": "https://facebook.com/global",
+                            "instagram": "global",
+                            "tripAdvisor": "https://tripadvisor.com/global",
+                            "youtube": "https://youtube.com/global",
+                        },
+                    ]
+                }
+            },
+        )
+
+    @unittest.skipIf(
+        WAGTAIL_VERSION < (4, 0), "Generic settings are not supported on Wagtail < 4.0"
+    )
+    def test_query_all_settings_with_site_filter(self):
+        query = """
+        {
+            settings(site: "b") {
+                ... on SocialMediaSettings {
+                    facebook
+                    instagram
+                    tripAdvisor
+                    youtube
+                }
+                ... on GlobalSocialMediaSettings {
+                    facebook
+                    instagram
+                    tripAdvisor
+                    youtube
+                }
+            }
+        }
+        """
+
+        response = self.client.execute(query)
+
+        # Should return site-specific settings for site b and global settings
+        self.assertEqual(
+            response,
+            {
+                "data": {
+                    "settings": [
                         {
                             "facebook": "https://facebook.com/site-b",
                             "instagram": "site-b",

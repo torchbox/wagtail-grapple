@@ -3,6 +3,7 @@ from graphene_django import DjangoObjectType
 from wagtail.images import get_image_model
 from wagtail.images.models import Image as WagtailImage
 from wagtail.images.models import Rendition as WagtailImageRendition
+from wagtail.images.models import SourceImageIOError
 
 from ..registry import registry
 from ..settings import grapple_settings
@@ -102,51 +103,46 @@ class ImageObjectType(DjangoObjectType, BaseImageObjectType):
         """
         Render a custom rendition of the current image.
         """
-        rendition = None
-        try:
-            filters = "|".join([f"{key}-{val}" for key, val in kwargs.items()])
+        filters = "|".join([f"{key}-{val}" for key, val in kwargs.items()])
 
-            # Only allowed the defined filters (thus renditions)
-            if rendition_allowed(filters):
+        # Only allowed the defined filters (thus renditions)
+        if rendition_allowed(filters):
+            try:
                 img = self.get_rendition(filters)
-                rendition_type = get_rendition_type()
+            except SourceImageIOError:
+                return
 
-                rendition = rendition_type(
-                    id=img.id,
-                    url=get_media_item_url(img),
-                    width=img.width,
-                    height=img.height,
-                    file=img.file,
-                    image=self,
-                )
-        except Exception:
-            pass
+            rendition_type = get_rendition_type()
 
-        return rendition
+            return rendition_type(
+                id=img.id,
+                url=get_media_item_url(img),
+                width=img.width,
+                height=img.height,
+                file=img.file,
+                image=self,
+            )
 
     def resolve_src_set(self, info, sizes, **kwargs):
         """
         Generate src set of renditions.
         """
-        src_set = ""
-        try:
-            if self.file.name is not None:
-                rendition_list = [
-                    ImageObjectType.resolve_rendition(self, info, width=width)
-                    for width in sizes
-                    if rendition_allowed(f"width-{width}")
+        if self.file.name is not None:
+            rendition_list = [
+                ImageObjectType.resolve_rendition(self, info, width=width)
+                for width in sizes
+                if rendition_allowed(f"width-{width}")
+            ]
+
+            return ", ".join(
+                [
+                    f"{get_media_item_url(img)} {img.width}w"
+                    for img in rendition_list
+                    if img is not None
                 ]
+            )
 
-                src_set = ", ".join(
-                    [
-                        f"{get_media_item_url(img)} {img.width}w"
-                        for img in rendition_list
-                    ]
-                )
-        except Exception:
-            pass
-
-        return src_set
+        return ""
 
 
 def get_image_type():

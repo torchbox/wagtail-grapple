@@ -109,7 +109,7 @@ def register_query_field(
                         return qs.get(**kwargs)
 
                     return cls.objects.get(**kwargs)
-                except Exception:
+                except (cls.DoesNotExist, cls.MultipleObjectsReturned):
                     return None
 
             def resolve_plural(self, _, info, **kwargs):
@@ -223,7 +223,7 @@ def register_paginated_query_field(
                         return qs.get(**kwargs)
 
                     return cls.objects.get(**kwargs)
-                except Exception:
+                except (cls.DoesNotExist, cls.MultipleObjectsReturned):
                     return None
 
             def resolve_plural(self, _, info, **kwargs):
@@ -301,25 +301,22 @@ def register_singular_query_field(
         def Mixin():
             # Generic methods to get all and query one model instance.
             def resolve_singular(self, _, info, **kwargs):
-                try:
-                    qs = cls.objects
-                    if "order" in kwargs:
-                        qs = qs.order_by(
-                            *(x.strip() for x in kwargs.pop("order").split(","))
-                        )
+                qs = cls.objects.all()
+                if "order" in kwargs:
+                    qs = qs.order_by(
+                        *(x.strip() for x in kwargs.pop("order").split(","))
+                    )
 
-                    # If is a Page then only query live/public pages.
-                    if issubclass(cls, Page):
-                        if "token" in kwargs and hasattr(
-                            cls, "get_page_from_preview_token"
-                        ):
-                            return cls.get_page_from_preview_token(kwargs.get("token"))
+                # If is a Page then only query live/public pages.
+                if issubclass(cls, Page):
+                    if "token" in kwargs and hasattr(
+                        cls, "get_page_from_preview_token"
+                    ):
+                        return cls.get_page_from_preview_token(kwargs.get("token"))
 
-                        return qs.live().public().filter(**kwargs).first()
+                    return qs.live().public().filter(**kwargs).first()
 
-                    return qs.filter(**kwargs).first()
-                except Exception:
-                    return None
+                return qs.filter(**kwargs).first()
 
             # Create schema and add resolve methods
             schema = type(cls.__name__ + "Query", (), {})

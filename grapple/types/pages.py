@@ -11,6 +11,7 @@ try:
 except ImportError:
     from wagtail.core.models import Page as WagtailPage
     from wagtail.core.models import Site
+
 from wagtail_headless_preview.signals import preview_update
 
 from ..registry import registry
@@ -285,14 +286,9 @@ def PagesQuery():
             content_type = kwargs.pop("content_type", None)
             if content_type:
                 app_label, model = content_type.strip().lower().split(".")
-                try:
-                    ctype = ContentType.objects.get(app_label=app_label, model=model)
-                except:  # noqa
-                    return (
-                        WagtailPage.objects.none()
-                    )  # something not quite right here, bail out early
-                else:
-                    pages = pages.filter(content_type=ctype)
+                pages = pages.filter(
+                    content_type__app_label=app_label, content_type__model=model
+                )
 
             return resolve_queryset(pages, info, **kwargs)
 

@@ -4,6 +4,7 @@ from types import MethodType
 from typing import Any, Dict, Type
 
 import graphene
+from django.apps import apps
 from django.db import models
 from django.template.loader import render_to_string
 from graphene_django.types import DjangoObjectType
@@ -30,13 +31,14 @@ from .types.images import ImageObjectType
 from .types.pages import Page, PageInterface
 from .types.streamfield import generate_streamfield_union
 
-try:
+if apps.is_installed("wagtailmedia"):
     from wagtailmedia.models import AbstractMedia
 
     from .types.media import MediaObjectType
 
     has_wagtail_media = True
-except ModuleNotFoundError:
+
+else:
     # TODO: find a better way to have this as an optional dependency
     class AbstractMedia:
         def __init__(self):

@@ -50,6 +50,7 @@ def SettingsQuery():
             settings = graphene.List(
                 graphene.NonNull(SettingsObjectType),
                 required=True,
+                name=graphene.String(),
                 site=graphene.String(),
             )
 
@@ -78,8 +79,13 @@ def SettingsQuery():
                 site_hostname = kwargs.pop("site", None)
                 site = resolve_site(site_hostname) if site_hostname else None
 
+                name = kwargs.get("name")
                 settings_objects = []
                 for setting in registry.settings:
+                    # If 'name' filter used, ignore any models that don't match the filter
+                    if name and setting._meta.model_name != name.lower():
+                        continue
+
                     if site and issubclass(setting._meta.model, BaseSiteSetting):
                         settings_objects.extend(
                             setting._meta.model.objects.filter(site=site)

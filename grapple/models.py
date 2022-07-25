@@ -121,15 +121,6 @@ def GraphQLDocument(field_name: str, **kwargs):
     return Mixin
 
 
-def GraphQLMedia(field_name: str, **kwargs):
-    def Mixin():
-        from .types.media import get_media_type
-
-        return GraphQLField(field_name, get_media_type, **kwargs)
-
-    return Mixin
-
-
 def GraphQLPage(field_name: str, **kwargs):
     def Mixin():
         from .types.pages import PageInterface
@@ -211,3 +202,14 @@ def GraphQLTag(field_name: str, **kwargs):
         return GraphQLField(field_name, TagObjectType, **kwargs)
 
     return Mixin
+
+
+if apps.is_installed("wagtailmedia"):
+
+    def GraphQLMedia(field_name: str, **kwargs):
+        def Mixin():
+            from .types.media import get_media_type
+
+            return GraphQLField(field_name, get_media_type, **kwargs)
+
+        return Mixin

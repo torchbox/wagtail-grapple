@@ -1,3 +1,4 @@
+from django.apps import apps
 from graphene import ObjectType
 
 try:
@@ -34,12 +35,10 @@ def register_schema_query(query_mixins):
         RedirectsQuery,
     ]
 
-    try:
+    if apps.is_installed("wagtailmedia"):
         from .types.media import MediaQuery
 
         query_mixins.append(MediaQuery())
-    except ModuleNotFoundError:
-        pass
 
     query_mixins += registry.schema
 

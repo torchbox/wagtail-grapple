@@ -66,7 +66,7 @@ Getting Grapple installed is designed to be as simple as possible!
 
 ```
 Django  >= 3.0, <4.0
-Wagtail >= 2.15, <4.0
+Wagtail >= 2.15, <4.1
 ```
 
 ### Installation

@@ -1,5 +1,21 @@
 ## Unreleased
 
+## [0.16.0] - 2022-08-03
+
+### Added
+
+-   Support for Generic Settings models ([#233](https://github.com/torchbox/wagtail-grapple/pull/233)) Thanks @kaedroho
+-   Support for Wagtail 4.0 ([#232](https://github.com/torchbox/wagtail-grapple/pull/232)) Thanks @kaedroho
+
+### Fixed
+
+-   [wagtailmedia](https://github.org/torchbox/wagtailmedia/) import error when package installed,
+    but not used in `INSTALLED_APPS` ([#235](https://github.com/torchbox/wagtail-grapple/pull/235)) Thanks @kaedroho
+
+### Removed
+
+-   All blind `except:` clauses ([#236](https://github.com/torchbox/wagtail-grapple/pull/236)) Thanks @kaedroho
+
 ## [0.15.1] - 2022-06-23
 
 ### Added
@@ -203,7 +219,8 @@
 -   Improve field definition and under-the-hood implementation ([#28](https://github.com/torchbox/wagtail-grapple/pull/28))
 -   Add conditional checks when resolving streamfield type ([#29](https://github.com/torchbox/wagtail-grapple/pull/29))
 
-[unreleased]: https://github.com/torchbox/wagtail-grapple/compare/v0.15.1...HEAD
+[unreleased]: https://github.com/torchbox/wagtail-grapple/compare/v0.16.0...HEAD
+[0.16.0]: https://github.com/torchbox/wagtail-grapple/compare/v0.15.1...v0.16.0
 [0.15.1]: https://github.com/torchbox/wagtail-grapple/compare/v0.15.0...v0.15.1
 [0.15.0]: https://github.com/torchbox/wagtail-grapple/compare/v0.14.1...v0.15.0
 [0.14.1]: https://github.com/torchbox/wagtail-grapple/compare/v0.14.0...v0.14.1

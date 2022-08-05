@@ -192,6 +192,78 @@ class PagesTest(BaseGrappleTest):
         self.assertEquals(page_data["contentType"], "home.BlogPage")
         self.assertEquals(page_data["parent"]["contentType"], "home.HomePage")
 
+    def test_pages_ancestor_filter(self):
+        p1_1 = BlogPageFactory(slug="D1-1", parent=self.home)
+        p1_1_1 = BlogPageFactory(slug="D1-1-1", parent=p1_1)
+        BlogPageFactory(slug="D1-1-1-1", parent=p1_1_1)
+        BlogPageFactory(slug="D1-1-1-2", parent=p1_1_1)
+        p1_1_2 = BlogPageFactory(slug="D1-1-2", parent=p1_1)
+        BlogPageFactory(slug="D1-1-2-1", parent=p1_1_2)
+        BlogPageFactory(slug="D1-1-2-2", parent=p1_1_2)
+        p1_2 = BlogPageFactory(slug="D1-2", parent=self.home)
+        p1_2_1 = BlogPageFactory(slug="D1-2-1", parent=p1_2)
+        BlogPageFactory(slug="D1-2-1-1", parent=p1_2_1)
+        BlogPageFactory(slug="D1-2-1-2", parent=p1_2_1)
+        p1_2_2 = BlogPageFactory(slug="D1-2-2", parent=p1_2)
+        BlogPageFactory(slug="D1-2-2-1", parent=p1_2_2)
+        BlogPageFactory(slug="D1-2-2-2", parent=p1_2_2)
+
+        query = """
+        query($ancestor: ID) {
+            pages(ancestor: $ancestor) {
+                id
+                urlPath
+                depth
+                live
+                contentType
+                pageType
+            }
+        }
+        """
+
+        executed = self.client.execute(query, variables={"ancestor": p1_2.id})
+        page_data = executed["data"].get("pages")
+        self.assertEquals(len(page_data), 6)
+        for page in page_data:
+            self.assertTrue(page["urlPath"].startswith(p1_2.url_path))
+
+    def test_pages_parent_filter(self):
+        p1_1 = BlogPageFactory(slug="D1-1", parent=self.home)
+        p1_1_1 = BlogPageFactory(slug="D1-1-1", parent=p1_1)
+        BlogPageFactory(slug="D1-1-1-1", parent=p1_1_1)
+        BlogPageFactory(slug="D1-1-1-2", parent=p1_1_1)
+        p1_1_2 = BlogPageFactory(slug="D1-1-2", parent=p1_1)
+        BlogPageFactory(slug="D1-1-2-1", parent=p1_1_2)
+        BlogPageFactory(slug="D1-1-2-2", parent=p1_1_2)
+        p1_2 = BlogPageFactory(slug="D1-2", parent=self.home)
+        p1_2_1 = BlogPageFactory(slug="D1-2-1", parent=p1_2)
+        BlogPageFactory(slug="D1-2-1-1", parent=p1_2_1)
+        BlogPageFactory(slug="D1-2-1-2", parent=p1_2_1)
+        p1_2_2 = BlogPageFactory(slug="D1-2-2", parent=p1_2)
+        BlogPageFactory(slug="D1-2-2-1", parent=p1_2_2)
+        BlogPageFactory(slug="D1-2-2-2", parent=p1_2_2)
+
+        query = """
+        query($parent: ID) {
+            pages(parent: $parent) {
+                id
+                urlPath
+                depth
+                live
+                contentType
+                pageType
+            }
+        }
+        """
+
+        executed = self.client.execute(query, variables={"parent": p1_2.id})
+        page_data = executed["data"].get("pages")
+
+        self.assertEquals(len(page_data), 2)
+        for page in page_data:
+            self.assertTrue(page["urlPath"].startswith(p1_2.url_path))
+            self.assertEquals(page["depth"], p1_2.depth + 1)
+
 
 class PageUrlPathTest(BaseGrappleTest):
     def _query_by_path(self, path, in_site=False):

@@ -72,6 +72,8 @@ accepts the following arguments:
     searchQuery: String
     contentType: String           #  comma separated list of content types in app.Model notation
     inSite: Boolean
+    ancestor: PositiveInt         # ID of ancestor page to restrict results to
+    parent: PositiveInt           # ID of parent page to restrict results to
 
 
 The singular ``page`` field accepts the following arguments:

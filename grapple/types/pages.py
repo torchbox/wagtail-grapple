@@ -243,6 +243,20 @@ def PagesQuery():
                 description=_("Filter to pages in the current site only."),
                 default_value=False,
             ),
+            ancestor=graphene.Argument(
+                graphene.ID,
+                description=_(
+                    "Filter to pages that are descendants of the given page."
+                ),
+                required=False,
+            ),
+            parent=graphene.Argument(
+                graphene.ID,
+                description=_(
+                    "Filter to pages that are children of the given page. Parent will supersede ancestor."
+                ),
+                required=False,
+            ),
             enable_search=True,
             required=True,
         )
@@ -278,8 +292,17 @@ def PagesQuery():
 
         # Return all pages in site, ideally specific.
         def resolve_pages(self, info, **kwargs):
+            root = WagtailPage.objects
+            if kwargs.get("ancestor"):
+                page = get_specific_page(id=kwargs.get("ancestor"))
+                root = page.get_descendants()
+
+            if kwargs.get("parent"):
+                page = get_specific_page(id=kwargs.get("parent"))
+                root = page.get_children()
+
             pages = (
-                WagtailPage.objects.live().public().filter(depth__gt=1).specific()
+                root.live().public().filter(depth__gt=1).specific()
             )  # no need to the root page
 
             if kwargs.get("in_site", False):

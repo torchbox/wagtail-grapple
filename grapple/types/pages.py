@@ -1,5 +1,6 @@
 import graphene
 from django.contrib.contenttypes.models import ContentType
+from django.db.models import Q
 from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
 from graphene_django.types import DjangoObjectType
@@ -233,7 +234,9 @@ def PagesQuery():
             graphene.NonNull(lambda: PageInterface),
             content_type=graphene.Argument(
                 graphene.String,
-                description=_("Filter by content type. Uses the `app.Model` notation."),
+                description=_(
+                    "Filter by content type. Uses the `app.Model` notation. Accepts a comma separated list of content types."
+                ),
             ),
             in_site=graphene.Argument(
                 graphene.Boolean,
@@ -284,11 +287,15 @@ def PagesQuery():
                 pages = pages.in_site(site)
 
             content_type = kwargs.pop("content_type", None)
-            if content_type:
-                app_label, model = content_type.strip().lower().split(".")
-                pages = pages.filter(
-                    content_type__app_label=app_label, content_type__model=model
-                )
+            content_types = content_type.split(",") if content_type else None
+            if content_types:
+                filters = Q()
+                for content_type in content_types:
+                    app_label, model = content_type.strip().lower().split(".")
+                    filters |= Q(
+                        content_type__app_label=app_label, content_type__model=model
+                    )
+                pages = pages.filter(filters)
 
             return resolve_queryset(pages, info, **kwargs)
 

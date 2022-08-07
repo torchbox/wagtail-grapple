@@ -157,6 +157,16 @@ class PagesTest(BaseGrappleTest):
         )
 
         results = self.client.execute(
+            query, variables={"content_type": "home.HomePage,home.BlogPage"}
+        )
+        data = results["data"]["pages"]
+        self.assertEquals(len(data), 3)
+        self.assertListEqual(
+            [int(p["id"]) for p in data],
+            [self.home.id, self.blog_post.id, another_post.id],
+        )
+
+        results = self.client.execute(
             query, variables={"content_type": "bogus.ContentType"}
         )
         self.assertListEqual(results["data"]["pages"], [])

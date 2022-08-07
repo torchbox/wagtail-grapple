@@ -5,6 +5,7 @@
 __pycache__/
 local_settings.py
 media
+*.sqlite3
 
 ### Django.Python Stack ###
 # Byte-compiled / optimized / DLL files

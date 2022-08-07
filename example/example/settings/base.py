@@ -163,7 +163,11 @@ WAGTAILDOCS_SERVE_METHOD = "serve_view"
 
 # Base URL to use when referring to full URLs within the Wagtail admin backend -
 # e.g. in notification emails. Don't include '/admin' or a trailing slash
+# BASE_URL is removed as of WAGTAIL 3.0, remove once WAGTAIL 2.0 is no longer supported
 BASE_URL = "http://localhost:8000"
+# as of Wagtail 3.0 BASE_URL was renamed to WAGTAILADMIN_BASE_URL, both are provided here for compatibility
+# when testing with Wagtail 2.0
+WAGTAILADMIN_BASE_URL = "http://localhost:8000"
 
 CORS_ORIGIN_ALLOW_ALL = True
 

@@ -176,7 +176,7 @@ Contributions are what make the open source community such an amazing place to b
 
 -   In the python environment of your choice, navigate to `/example`
 -   Run `pip install -r requirements.txt`
--   Delete the `db.sqlite3` file and run `./manage.py migrate`
+-   Run `./manage.py migrate`
 -   Run server `./manage.py runserver`
 -   Run tests `./manage.py test`
 

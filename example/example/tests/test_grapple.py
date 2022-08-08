@@ -706,10 +706,9 @@ class DocumentsTest(BaseGrappleTest):
 
         self.assertEqual(example_doc.id, 1)
         self.assertEqual(example_doc.title, "Example File")
-
-        example_doc.file.seek(0)
-
-        self.assertEqual(example_doc.file.readline(), b"Hello world!")
+        with example_doc.open_file() as file:
+            file.seek(0)
+            self.assertEqual(file.readline(), b"Hello world!")
 
         self.assertNotEqual(example_doc.file_hash, "")
         self.assertNotEqual(example_doc.file_size, None)

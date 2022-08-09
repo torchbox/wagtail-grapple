@@ -70,7 +70,7 @@ accepts the following arguments:
     offset: PositiveInt
     order: String
     searchQuery: String
-    contentType: String
+    contentType: String           #  comma separated list of content types in app.Model notation
     inSite: Boolean
 
 

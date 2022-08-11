@@ -8,11 +8,11 @@ from taggit.models import TaggedItemBase
 
 try:
     from wagtail.admin.panels import FieldPanel, InlinePanel
-    from wagtail.fields import StreamField
+    from wagtail.fields import StreamField, RichTextField
     from wagtail.models import Orderable, Page
 except ImportError:
     from wagtail.admin.edit_handlers import FieldPanel, InlinePanel, StreamFieldPanel
-    from wagtail.core.fields import StreamField
+    from wagtail.core.fields import StreamField, RichTextField
     from wagtail.core.models import Orderable, Page
 
 try:
@@ -119,6 +119,7 @@ class BlogPage(HeadlessPreviewMixin, Page):
     author = models.ForeignKey(
         AuthorPage, null=True, blank=True, on_delete=models.SET_NULL, related_name="+"
     )
+    summary = RichTextField(blank=True)
     body = StreamField(StreamFieldBlock())
     tags = ClusterTaggableManager(through=BlogPageTag, blank=True)
 
@@ -146,6 +147,7 @@ class BlogPage(HeadlessPreviewMixin, Page):
 
     graphql_fields = [
         GraphQLString("date", required=True),
+        GraphQLString("summary"),
         GraphQLStreamfield("body"),
         GraphQLTag("tags"),
         GraphQLCollection(

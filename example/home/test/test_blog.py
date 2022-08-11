@@ -105,6 +105,7 @@ class BlogTest(BaseGrappleTest):
                 ("text_with_callable", TextWithCallableBlockFactory()),
             ],
             parent=self.home,
+            summary=f'Text with a link to <a linktype="page" id="{self.home.id}">Home</a>',
         )
 
     def test_blog_page(self):
@@ -121,6 +122,22 @@ class BlogTest(BaseGrappleTest):
 
         # Check title.
         self.assertEquals(executed["data"]["page"]["title"], self.blog_page.title)
+
+    def test_blog_page_summary(self):
+        query = """
+        query($id: Int) {
+            page(id: $id) {
+                ... on BlogPage {
+                    summary
+                }
+            }
+        }
+        """
+        executed = self.client.execute(query, variables={"id": self.blog_page.id})
+
+        # Check summary.
+        summary = f'Text with a link to <a href="{self.home.url}">Home</a>\n'
+        self.assertEquals(executed["data"]["page"]["summary"], summary)
 
     def test_related_author_page(self):
         query = """

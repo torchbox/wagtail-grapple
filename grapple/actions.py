@@ -11,10 +11,12 @@ from graphene_django.types import DjangoObjectType
 
 try:
     from wagtail.contrib.settings.models import BaseGenericSetting, BaseSiteSetting
+    from wagtail.fields import RichTextField
 except ImportError:
     # Wagtail < 4.0
     from wagtail.contrib.settings.models import BaseSetting as BaseGenericSetting
     from wagtail.contrib.settings.models import BaseSetting as BaseSiteSetting
+    from wagtail.core.fields import RichTextField
 
 
 try:
@@ -226,6 +228,17 @@ def model_resolver(field):
         # If method then call and return result
         if callable(cls_field):
             return cls_field(info, **kwargs)
+
+        # Expand HTML if the value's field is richtext
+        if hasattr(instance._meta, "get_field"):
+            field_model = instance._meta.get_field(field.field_name)
+        else:
+            field_model = instance._meta.fields[field.field_name]
+
+        if type(field_model) is RichTextField:
+            return render_to_string(
+                "wagtailcore/richtext.html", {"html": expand_db_html(cls_field)}
+            )
 
         # If none of those then just return field
         return cls_field

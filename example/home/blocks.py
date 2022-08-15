@@ -5,6 +5,7 @@ from django.utils.text import slugify
 from wagtail.core import blocks
 from wagtail.embeds.blocks import EmbedBlock
 from wagtail.images.blocks import ImageChooserBlock
+from wagtail.snippets.blocks import SnippetChooserBlock
 
 from grapple.helpers import register_streamfield_block
 from grapple.models import (
@@ -251,3 +252,5 @@ class StreamFieldBlock(blocks.StreamBlock):
     page = blocks.PageChooserBlock()
     text_with_callable = TextWithCallableBlock()
     block_with_name = BlockWithName()
+    advert = SnippetChooserBlock("home.Advert")
+    person = SnippetChooserBlock("home.Person")

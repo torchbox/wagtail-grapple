@@ -10,7 +10,12 @@ from django.core.validators import URLValidator
 from django.test.client import RequestFactory
 from django.utils.safestring import SafeText
 from home.blocks import CarouselBlock, ImageGalleryImages
-from home.factories import BlogPageFactory, TextWithCallableBlockFactory
+from home.factories import (
+    AdvertFactory,
+    BlogPageFactory,
+    PersonFactory,
+    TextWithCallableBlockFactory,
+)
 
 try:
     from wagtail.blocks import StreamValue
@@ -463,6 +468,56 @@ class BlogTest(BaseGrappleTest):
             count += 1
         # Check that we test all blocks that were returned.
         self.assertEquals(len(query_blocks), count)
+
+    def test_blog_body_snippetchooserblock_advert(self):
+        url = "https://http.cat"
+        text = "cats"
+        blog_page = BlogPageFactory(
+            parent=self.home,
+            body=[
+                ("advert", AdvertFactory(url=url, text=text)),
+            ],
+        )
+        block_type = "SnippetChooserBlock"
+        block_query = """
+        snippet {
+            ... on Advert {
+                url
+                text
+            }
+        }
+        """
+        query_blocks = self.get_blocks_from_body(
+            block_type, block_query=block_query, page_id=blog_page.id
+        )
+        block = query_blocks[0]
+        self.assertEqual(block["snippet"]["url"], url)
+        self.assertEqual(block["snippet"]["text"], text)
+
+    def test_blog_body_snippetchooserblock_person(self):
+        name = "Jane Citizen"
+        job = "Frobnicator"
+        blog_page = BlogPageFactory(
+            parent=self.home,
+            body=[
+                ("person", PersonFactory(name=name, job=job)),
+            ],
+        )
+        block_type = "SnippetChooserBlock"
+        block_query = """
+        snippet {
+            ... on Person {
+                name
+                job
+            }
+        }
+        """
+        query_blocks = self.get_blocks_from_body(
+            block_type, block_query=block_query, page_id=blog_page.id
+        )
+        block = query_blocks[0]
+        self.assertEqual(block["snippet"]["name"], name)
+        self.assertEqual(block["snippet"]["job"], job)
 
     # Next 2 tests are used to test the Collection API, both ForeignKey and nested field extraction.
     def test_blog_page_related_links(self):

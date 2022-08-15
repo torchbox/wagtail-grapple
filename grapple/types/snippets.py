@@ -3,12 +3,29 @@ import graphene
 from ..registry import registry
 
 
-def SnippetsQuery():
-    if registry.snippets:
+class SnippetTypes:
+    # SnippetObjectType class can only be created if
+    # registry.snippets.types is non-empty, and should only be created
+    # once (graphene complains if we register multiple type classes
+    # with identical names)
+    _SnippetObjectType = None
 
-        class SnippetObjectType(graphene.Union):
-            class Meta:
-                types = registry.snippets.types
+    @classmethod
+    def get_object_type(cls):
+        if cls._SnippetObjectType is None and registry.snippets:
+
+            class SnippetObjectType(graphene.Union):
+                class Meta:
+                    types = registry.snippets.types
+
+            cls._SnippetObjectType = SnippetObjectType
+        return cls._SnippetObjectType
+
+
+def SnippetsQuery():
+    SnippetObjectType = SnippetTypes.get_object_type()
+
+    if SnippetObjectType is not None:
 
         class Mixin:
             snippets = graphene.List(graphene.NonNull(SnippetObjectType), required=True)

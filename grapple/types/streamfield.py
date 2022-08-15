@@ -435,6 +435,7 @@ def register_streamfield_blocks():
     from .documents import get_document_type
     from .images import get_image_type
     from .pages import PageInterface
+    from .snippets import SnippetTypes
 
     class PageChooserBlock(graphene.ObjectType):
         page = graphene.Field(PageInterface, required=True)
@@ -463,20 +464,28 @@ def register_streamfield_blocks():
         def resolve_image(self, info, **kwargs):
             return self.value
 
-    class SnippetChooserBlock(graphene.ObjectType):
-        snippet = graphene.String(required=True)
-
-        class Meta:
-            interfaces = (StreamFieldInterface,)
-
-        def resolve_snippet(self, info, **kwargs):
-            return self.value
-
     registry.streamfield_blocks.update(
         {
             blocks.PageChooserBlock: PageChooserBlock,
             wagtail.documents.blocks.DocumentChooserBlock: DocumentChooserBlock,
             wagtail.images.blocks.ImageChooserBlock: ImageChooserBlock,
-            wagtail.snippets.blocks.SnippetChooserBlock: SnippetChooserBlock,
         }
     )
+
+    SnippetObjectType = SnippetTypes.get_object_type()
+    if SnippetObjectType is not None:
+
+        class SnippetChooserBlock(graphene.ObjectType):
+            snippet = graphene.Field(SnippetObjectType, required=True)
+
+            class Meta:
+                interfaces = (StreamFieldInterface,)
+
+            def resolve_snippet(self, info, **kwargs):
+                return self.value
+
+        registry.streamfield_blocks.update(
+            {
+                wagtail.snippets.blocks.SnippetChooserBlock: SnippetChooserBlock,
+            }
+        )

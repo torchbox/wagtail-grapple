@@ -954,6 +954,54 @@ class ImagesTest(BaseGrappleTest):
         self.assertNotIn("width-100", executed["data"]["image"]["srcSet"])
         self.assertIn("width-200", executed["data"]["image"]["srcSet"])
 
+    def test_src_set_with_format(self):
+        query = """
+        {
+            image(id: 1) {
+                srcSet(sizes: [100, 300], format: "webp")
+            }
+        }
+        """
+        executed = self.client.execute(query)
+        self.assertIn("width-100.format-webp.webp", executed["data"]["image"]["srcSet"])
+        self.assertIn("width-300.format-webp.webp", executed["data"]["image"]["srcSet"])
+
+    def test_src_set_invalid_format(self):
+        query = """
+        {
+            image(id: 1) {
+                srcSet(sizes: [100, 300], format: "foobar")
+            }
+        }
+        """
+        executed = self.client.execute(query)
+        self.assertEqual(len(executed["errors"]), 1)
+        self.assertIn("Format must be either 'jpeg'", executed["errors"][0]["message"])
+
+    @override_settings(GRAPPLE={"ALLOWED_IMAGE_FILTERS": ["width-200"]})
+    def test_src_set_disallowed_filter(self):
+        query = """
+        {
+            image(id: 1) {
+                srcSet(sizes: [200], format: "webp")
+            }
+        }
+        """
+        executed = self.client.execute(query)
+        self.assertEqual("", executed["data"]["image"]["srcSet"])
+
+    @override_settings(GRAPPLE={"ALLOWED_IMAGE_FILTERS": ["width-200|format-webp"]})
+    def test_src_set_allowed_filter(self):
+        query = """
+        {
+            image(id: 1) {
+                srcSet(sizes: [200], format: "webp")
+            }
+        }
+        """
+        executed = self.client.execute(query)
+        self.assertIn("width-200.format-webp.webp", executed["data"]["image"]["srcSet"])
+
     def test_rendition_allowed_method(self):
         self.assertTrue(rendition_allowed("width-100"))
         with override_settings(GRAPPLE={"ALLOWED_IMAGE_FILTERS": ["width-200"]}):

@@ -122,7 +122,10 @@ need for Gatsby Image features to work (see Handy Fragments page for more info):
     fileHash: String!
     renditions: [ImageRenditionObjectType]
     src: String
-    srcSet(sizes: [Int]): String
+    srcSet(
+        sizes: [Int]
+        format: String
+    ): String
     rendition(
         max: String
         min: String

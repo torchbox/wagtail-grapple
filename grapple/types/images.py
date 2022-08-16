@@ -94,7 +94,9 @@ class ImageObjectType(DjangoObjectType, BaseImageObjectType):
         jpegquality=graphene.Int(),
         webpquality=graphene.Int(),
     )
-    src_set = graphene.String(sizes=graphene.List(graphene.Int))
+    src_set = graphene.String(
+        sizes=graphene.List(graphene.Int), format=graphene.String()
+    )
 
     class Meta:
         model = WagtailImage
@@ -123,15 +125,19 @@ class ImageObjectType(DjangoObjectType, BaseImageObjectType):
                 image=self,
             )
 
-    def resolve_src_set(self, info, sizes, **kwargs):
+    def resolve_src_set(self, info, sizes, format=None, **kwargs):
         """
         Generate src set of renditions.
         """
+        filter_suffix = f"|format-{format}" if format else ""
+        format_kwarg = {"format": format} if format else {}
         if self.file.name is not None:
             rendition_list = [
-                ImageObjectType.resolve_rendition(self, info, width=width)
+                ImageObjectType.resolve_rendition(
+                    self, info, width=width, **format_kwarg
+                )
                 for width in sizes
-                if rendition_allowed(f"width-{width}")
+                if rendition_allowed(f"width-{width}{filter_suffix}")
             ]
 
             return ", ".join(

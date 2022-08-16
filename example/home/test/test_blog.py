@@ -490,9 +490,7 @@ class BlogTest(BaseGrappleTest):
         query_blocks = self.get_blocks_from_body(
             block_type, block_query=block_query, page_id=blog_page.id
         )
-        self.assertEqual(len(query_blocks), 1)
         block = query_blocks[0]
-        self.assertEqual(block["blockType"], block_type)
         self.assertEqual(block["snippet"]["url"], url)
         self.assertEqual(block["snippet"]["text"], text)
 
@@ -517,9 +515,7 @@ class BlogTest(BaseGrappleTest):
         query_blocks = self.get_blocks_from_body(
             block_type, block_query=block_query, page_id=blog_page.id
         )
-        self.assertEqual(len(query_blocks), 1)
         block = query_blocks[0]
-        self.assertEqual(block["blockType"], block_type)
         self.assertEqual(block["snippet"]["name"], name)
         self.assertEqual(block["snippet"]["job"], job)
 

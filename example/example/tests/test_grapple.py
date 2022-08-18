@@ -53,6 +53,17 @@ class PagesTest(BaseGrappleTest):
         self.factory = RequestFactory()
         self.blog_post = BlogPageFactory(parent=self.home)
 
+        self.site_different_hostname = wagtail_factories.SiteFactory(
+            hostname="different-hostname.localhost",
+            site_name="Grapple test site (different hostname)",
+        )
+
+        self.site_different_hostname_different_port = wagtail_factories.SiteFactory(
+            hostname="different-hostname.localhost",
+            port=8000,
+            site_name="Grapple test site (different hostname/port)",
+        )
+
     def test_pages(self):
         query = """
         {
@@ -123,9 +134,133 @@ class PagesTest(BaseGrappleTest):
         self.assertEquals(type(executed["data"]["pages"][0]), dict_type)
 
         site = Site.find_for_request(request)
-        pages = Page.objects.in_site(site)
+        pages = Page.objects.in_site(site).live().public().filter(depth__gt=1)
 
         self.assertEquals(len(executed["data"]["pages"]), pages.count())
+
+    def test_pages_site(self):
+        site = Site.objects.get(is_default_site=True)
+
+        query = """
+        query($site: String) {
+            pages(site: $site) {
+                title
+                contentType
+                pageType
+            }
+        }
+        """
+
+        request = self.factory.get("/")
+        executed = self.client.execute(
+            query,
+            context_value=request,
+            variables={
+                "site": site.hostname,
+            },
+        )
+
+        self.assertEquals(type(executed["data"]), dict_type)
+        self.assertEquals(type(executed["data"]["pages"]), list)
+        self.assertEquals(type(executed["data"]["pages"][0]), dict_type)
+
+        pages = Page.objects.in_site(site).live().public().filter(depth__gt=1)
+
+        self.assertEquals(len(executed["data"]["pages"]), pages.count())
+
+    def test_pages_site_errors_when_multiple_sites_match_hostname_and_port_unspecified(
+        self,
+    ):
+        query = """
+        query($site: String) {
+            pages(site: $site) {
+                title
+                contentType
+                pageType
+            }
+        }
+        """
+
+        executed = self.client.execute(
+            query, variables={"site": self.site_different_hostname.hostname}
+        )
+
+        self.assertEquals(
+            executed,
+            {
+                "errors": [
+                    {
+                        "message": "Your 'site' filter value of "
+                        "'different-hostname.localhost' returned multiple "
+                        "sites. Try adding a port number (for example: "
+                        "'different-hostname.localhost:80').",
+                        "locations": [{"line": 3, "column": 13}],
+                        "path": ["pages"],
+                    }
+                ],
+                "data": None,
+            },
+        )
+
+    def test_pages_site_with_different_port(self):
+        query = """
+        query($site: String) {
+            pages(site: $site) {
+                title
+                contentType
+                pageType
+            }
+        }
+        """
+
+        executed = self.client.execute(
+            query,
+            variables={"site": self.site_different_hostname.hostname + ":8000"},
+        )
+
+        self.assertEquals(type(executed["data"]), dict_type)
+        self.assertEquals(type(executed["data"]["pages"]), list)
+
+        pages = (
+            Page.objects.in_site(self.site_different_hostname)
+            .live()
+            .public()
+            .filter(depth__gt=1)
+        )
+
+        self.assertEquals(len(executed["data"]["pages"]), pages.count())
+
+    def test_pages_site_and_in_site_cannot_be_used_together(
+        self,
+    ):
+        query = """
+        query($site: String) {
+            pages(site: $site, inSite: true) {
+                title
+                contentType
+                pageType
+            }
+        }
+        """
+
+        executed = self.client.execute(
+            query, variables={"site": self.site_different_hostname.hostname}
+        )
+
+        self.assertEquals(
+            executed,
+            {
+                "errors": [
+                    {
+                        "message": "The 'site' and 'in_site' filters cannot be used at "
+                        "the same time.",
+                        "locations": [{"line": 3, "column": 13}],
+                        "path": ["pages"],
+                    }
+                ],
+                "data": None,
+            },
+        )
 
     def test_pages_content_type_filter(self):
         query = """

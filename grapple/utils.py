@@ -3,7 +3,6 @@ import os
 
 from django.conf import settings
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
-from graphql.error import GraphQLError
 from wagtail.search.backends import get_search_backend
 from wagtail.search.index import class_is_indexed
 from wagtail.search.models import Query
@@ -32,7 +31,7 @@ def resolve_site(hostname):
 
     May raise one of the following exceptions:
      - Site.DoesNotExist: If the site is not found
-     - GraphQLError: If multiple sites are found for a given hostname
+     - Site.MultipleObjectsReturned: If multiple sites are found for a given hostname
 
     :param hostname: The hostname of the site to look up
     :type hostname: str
@@ -49,14 +48,7 @@ def resolve_site(hostname):
             "hostname": hostname,
         }
 
-    try:
-        return Site.objects.get(**query)
-    except Site.MultipleObjectsReturned:
-        raise GraphQLError(
-            "Your 'site' filter value of '{}' returned multiple sites. Try adding a port number (for example: '{}:80').".format(
-                hostname, hostname
-            )
-        )
+    return Site.objects.get(**query)
 
 
 def _sliced_queryset(qs, limit=None, offset=None):

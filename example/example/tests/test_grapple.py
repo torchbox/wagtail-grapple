@@ -336,6 +336,18 @@ class SitesTest(TestCase):
         self.site = wagtail_factories.SiteFactory(
             hostname="grapple.localhost", site_name="Grapple test site"
         )
+
+        self.site_different_hostname = wagtail_factories.SiteFactory(
+            hostname="different-hostname.localhost",
+            site_name="Grapple test site (different hostname)",
+        )
+
+        self.site_different_hostname_different_port = wagtail_factories.SiteFactory(
+            hostname="different-hostname.localhost",
+            port=8000,
+            site_name="Grapple test site (different hostname/port)",
+        )
+
         self.client = Client(SCHEMA)
         self.home = HomePage.objects.first()
 
@@ -383,11 +395,62 @@ class SitesTest(TestCase):
         self.assertEquals(type(executed["data"]["site"]), dict_type)
         self.assertEquals(type(executed["data"]["site"]["pages"]), list)
 
+        self.assertEquals(executed["data"]["site"]["siteName"], "Grapple test site")
+
         pages = Page.objects.in_site(self.site)
 
         self.assertEquals(len(executed["data"]["site"]["pages"]), pages.count())
         self.assertNotEqual(
             len(executed["data"]["site"]["pages"]), Page.objects.count()
+        )
+
+    def test_site_errors_when_multiple_sites_match_hostname_and_port_unspecified(self):
+        query = """
+        query($hostname: String) {
+            site(hostname: $hostname) {
+                siteName
+            }
+        }
+        """
+
+        executed = self.client.execute(
+            query, variables={"hostname": self.site_different_hostname.hostname}
+        )
+
+        self.assertEquals(
+            executed,
+            {
+                "errors": [
+                    {
+                        "message": "Your 'hostname' filter value of "
+                        "'different-hostname.localhost' returned multiple "
+                        "sites. Try adding a port number (for example: "
+                        "'different-hostname.localhost:80').",
+                        "locations": [{"line": 3, "column": 13}],
+                        "path": ["site"],
+                    }
+                ],
+                "data": {"site": None},
+            },
+        )
+
+    def test_site_with_different_port(self):
+        query = """
+        query($hostname: String) {
+            site(hostname: $hostname) {
+                siteName
+            }
+        }
+        """
+
+        executed = self.client.execute(
+            query,
+            variables={"hostname": self.site_different_hostname.hostname + ":8000"},
+        )
+
+        self.assertEquals(
+            executed["data"]["site"]["siteName"],
+            "Grapple test site (different hostname/port)",
         )
 
     def test_site_pages_content_type_filter(self):
@@ -517,6 +580,11 @@ class SitesTest(TestCase):
         self.assertEquals(data["title"], blog.title)
 
     def test_site_page_url_path_filter(self):
+        # These additional sites prevent the .relative_url() call below from returning a relative URL
+        # They're not needed for this particular test
+        self.site_different_hostname.delete()
+        self.site_different_hostname_different_port.delete()
+
         query = """
         query($hostname: String $urlPath: String) {
             site(hostname: $hostname) {

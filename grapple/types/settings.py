@@ -1,4 +1,10 @@
 import graphene
+from graphql.error import GraphQLError
+
+try:
+    from wagtail.models import Site
+except ImportError:
+    from wagtail.core.models import Site
 
 from ..registry import registry
 from ..utils import resolve_site
@@ -35,7 +41,18 @@ def SettingsQuery():
                 # Site filter
                 # Only applies to settings that inherit from BaseSiteSetting
                 site_hostname = kwargs.pop("site", None)
-                site = resolve_site(site_hostname) if site_hostname else None
+
+                if site_hostname is not None:
+                    try:
+                        site = resolve_site(site_hostname)
+                    except Site.MultipleObjectsReturned:
+                        raise GraphQLError(
+                            "Your 'site' filter value of '{}' returned multiple sites. Try adding a port number (for example: '{}:80').".format(
+                                site_hostname, site_hostname
+                            )
+                        )
+                else:
+                    site = None
 
                 name = kwargs.get("name")
                 for setting in registry.settings:
@@ -53,7 +70,18 @@ def SettingsQuery():
                 # Site filter
                 # Only applies to settings that inherit from BaseSiteSetting
                 site_hostname = kwargs.pop("site", None)
-                site = resolve_site(site_hostname) if site_hostname else None
+
+                if site_hostname is not None:
+                    try:
+                        site = resolve_site(site_hostname)
+                    except Site.MultipleObjectsReturned:
+                        raise GraphQLError(
+                            "Your 'site' filter value of '{}' returned multiple sites. Try adding a port number (for example: '{}:80').".format(
+                                site_hostname, site_hostname
+                            )
+                        )
+                else:
+                    site = None
 
                 name = kwargs.get("name")
                 settings_objects = []

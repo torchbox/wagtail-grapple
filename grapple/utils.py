@@ -3,12 +3,60 @@ import os
 
 from django.conf import settings
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
+from graphql.error import GraphQLError
 from wagtail.search.backends import get_search_backend
 from wagtail.search.index import class_is_indexed
 from wagtail.search.models import Query
 
+try:
+    from wagtail.models import Site
+except ImportError:
+    from wagtail.core.models import Site
+
 from .settings import grapple_settings
 from .types.structures import BasePaginatedType, PaginationType
+
+
+def resolve_site(hostname):
+    """
+    Looks up a Site record from a hostname.
+
+    If two site records exist with the same hostname, you must specify a port
+    to disambiguate the by appending a colon followed by the port number to the
+    end of the hostname.
+
+    For example:
+
+    >>> resolve_site("wagtail.org")
+    >>> resolve_site("wagtail.org:443")
+
+    May raise one of the following exceptions:
+     - Site.DoesNotExist: If the site is not found
+     - GraphQLError: If multiple sites are found for a given hostname
+
+    :param hostname: The hostname of the site to look up
+    :type hostname: str
+    """
+    # Optionally allow querying by port
+    if ":" in hostname:
+        (hostname, port) = hostname.split(":", 1)
+        query = {
+            "hostname": hostname,
+            "port": port,
+        }
+    else:
+        query = {
+            "hostname": hostname,
+        }
+
+    try:
+        return Site.objects.get(**query)
+    except Site.MultipleObjectsReturned:
+        raise GraphQLError(
+            "Your 'site' filter value of '{}' returned multiple sites. Try adding a port number (for example: '{}:80').".format(
+                hostname, hostname
+            )
+        )
 
 
 def _sliced_queryset(qs, limit=None, offset=None):

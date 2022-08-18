@@ -1,37 +1,13 @@
 import graphene
-from graphql.error import GraphQLError
-from wagtail.core.models import Site
 
 from ..registry import registry
+from ..utils import resolve_site
 
 try:
     from wagtail.contrib.settings.models import BaseSiteSetting
 except ImportError:
     # Wagtail < 4.0
     from wagtail.contrib.settings.models import BaseSetting as BaseSiteSetting
-
-
-def resolve_site(hostname):
-    # Optionally allow querying by port
-    if ":" in hostname:
-        (hostname, port) = hostname.split(":", 1)
-        query = {
-            "hostname": hostname,
-            "port": port,
-        }
-    else:
-        query = {
-            "hostname": hostname,
-        }
-
-    try:
-        return Site.objects.get(**query)
-    except Site.MultipleObjectsReturned:
-        raise GraphQLError(
-            "Your 'site' filter value of '{}' returned multiple sites. Try adding a port number (for example: '{}:80').".format(
-                hostname, hostname
-            )
-        )
 
 
 def SettingsQuery():

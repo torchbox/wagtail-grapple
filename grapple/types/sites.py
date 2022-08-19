@@ -84,7 +84,7 @@ def SitesQuery():
             id, hostname = kwargs.get("id"), kwargs.get("hostname")
 
             if id:
-                return Site.objects.filter(pk=id)
+                return Site.objects.get(pk=id)
             elif hostname:
                 try:
                     return resolve_site(hostname)

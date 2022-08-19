@@ -36,7 +36,12 @@ class BlogTest(BaseGrappleTest):
         self.blog_page = BlogPageFactory(
             body=[
                 ("heading", "Test heading 1"),
-                ("paragraph", RichText("This is a paragraph.")),
+                (
+                    "paragraph",
+                    RichText(
+                        f'Text with a link to <a linktype="page" id="{self.home.id}">Home</a>'
+                    ),
+                ),
                 ("heading", "Test heading 2"),
                 ("image", wagtail_factories.ImageFactory()),
                 ("decimal", decimal.Decimal(1.2)),
@@ -220,9 +225,7 @@ class BlogTest(BaseGrappleTest):
         for block in self.blog_page.body:
             if type(block.block).__name__ == block_type:
                 # Test the values
-                self.assertEquals(
-                    query_blocks[count]["rawValue"], block.value.__html__()
-                )
+                self.assertEquals(query_blocks[count]["rawValue"], block.value.source)
                 # Increment the count
                 count += 1
         # Check that we test all blocks that were returned.

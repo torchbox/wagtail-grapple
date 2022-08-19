@@ -42,9 +42,12 @@ MIDDLEWARE = [item() if inspect.isclass(item) else item for item in MIDDLEWARE_O
 
 
 class BaseGrappleTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.home = HomePage.objects.first()
+
     def setUp(self):
         self.client = Client(SCHEMA, middleware=MIDDLEWARE)
-        self.home = HomePage.objects.first()
 
 
 class PagesTest(BaseGrappleTest):

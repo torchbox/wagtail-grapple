@@ -24,6 +24,7 @@ from wagtail.embeds.embeds import get_embed
 from wagtail.embeds.exceptions import EmbedException
 
 from ..registry import registry
+from ..settings import grapple_settings
 
 
 class GenericStreamFieldInterface(Scalar):
@@ -304,9 +305,11 @@ class RichTextBlock(graphene.ObjectType):
 
     def resolve_value(self, info, **kwargs):
         # Allow custom markup for RichText
-        return render_to_string(
-            "wagtailcore/richtext.html", {"html": expand_db_html(self.value.source)}
-        )
+        if grapple_settings.RICHTEXT_FORMAT == "html":
+            return render_to_string(
+                "wagtailcore/richtext.html", {"html": expand_db_html(self.value.source)}
+            )
+        return self.value.source
 
 
 class RawHTMLBlock(graphene.ObjectType):

@@ -1,8 +1,7 @@
 Settings
 ========
 
-Configuration for Wagtail Grapple is all namespaced inside a single Django setting,
-named ``GRAPPLE``.
+Wagtail Grapple configuration is namespaced inside a single ``GRAPPLE`` Django setting.
 
 For example your project's ``settings.py`` file might include something like this:
 
@@ -18,8 +17,7 @@ For example your project's ``settings.py`` file might include something like thi
 Accessing settings
 ------------------
 
-If you need to access the values of Wagtail Grapple's settings in your project, you should use the
-``grapple_settings`` object. For example.
+To access any Wagtail Grapple setting in your code, use the ``grapple_settings`` object. For example.
 
 .. code-block:: python
 
@@ -95,6 +93,19 @@ Example:
 Note that the ``srcSet`` attribute on ``ImageObjectType`` generates ``width-*`` filters, so if in use
 consider adding the relevant filters to the allowed list.
 
+Rich text settings
+^^^^^^^^^^^^^^^^^^
+
+RICHTEXT_FORMAT
+***************
+
+Controls the ``RichText`` field and the ``RichTextBlock`` StreamField block output. Read more about the Wagtail
+rich text data format in the Wagtail docs (`Rich text internals <https://docs.wagtail.io/en/stable/extending/rich_text_internals.html#data-format>`_).
+Set to ``raw`` to return the database representation.
+
+Note: the ``RichTextBlock`` ``rawValue`` output will always be the database representation.
+
+Default: ``html``
 
 Search settings
 ^^^^^^^^^^^^^^^

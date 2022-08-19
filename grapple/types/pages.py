@@ -227,30 +227,31 @@ def get_specific_page(
     return page
 
 
+def get_site_filter(info, **kwargs):
+    site_hostname = kwargs.pop("site", None)
+    in_current_site = kwargs.get("in_site", False)
+
+    if site_hostname is not None and in_current_site:
+        raise GraphQLError(
+            "The 'site' and 'in_site' filters cannot be used at the same time."
+        )
+
+    if site_hostname is not None:
+        try:
+            return resolve_site(site_hostname)
+        except Site.MultipleObjectsReturned:
+            raise GraphQLError(
+                "Your 'site' filter value of '{}' returned multiple sites. Try adding a port number (for example: '{}:80').".format(
+                    site_hostname, site_hostname
+                )
+            )
+    elif in_current_site:
+        return Site.find_for_request(info.context)
+
+
 def PagesQuery():
     # Add base type to registry
     registry.pages[type(WagtailPage)] = Page
-
-    def get_site_filter(info, **kwargs):
-        site_hostname = kwargs.pop("site", None)
-        in_current_site = kwargs.get("in_site", False)
-
-        if site_hostname is not None and in_current_site:
-            raise GraphQLError(
-                "The 'site' and 'in_site' filters cannot be used at the same time."
-            )
-
-        if site_hostname is not None:
-            try:
-                return resolve_site(site_hostname)
-            except Site.MultipleObjectsReturned:
-                raise GraphQLError(
-                    "Your 'site' filter value of '{}' returned multiple sites. Try adding a port number (for example: '{}:80').".format(
-                        site_hostname, site_hostname
-                    )
-                )
-        elif in_current_site:
-            return Site.find_for_request(info.context)
 
     class Mixin:
         pages = QuerySetList(
@@ -420,6 +421,10 @@ if has_channels:
                     description=_("Filter to pages in the current site only."),
                     default_value=False,
                 ),
+                site=graphene.Argument(
+                    graphene.String,
+                    description=_("Filter to pages in the give site."),
+                ),
             )
 
             def resolve_page(self, info, **kwargs):
@@ -429,9 +434,7 @@ if has_channels:
                     url_path=kwargs.get("url_path"),
                     token=kwargs.get("token"),
                     content_type=kwargs.get("content_type"),
-                    site=Site.find_for_request(info.context)
-                    if kwargs.get("in_site", False)
-                    else None,
+                    site=get_site_filter(info, **kwargs),
                 )
 
         return Mixin

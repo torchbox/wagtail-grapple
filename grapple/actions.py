@@ -235,7 +235,10 @@ def model_resolver(field):
         else:
             field_model = instance._meta.fields[field.field_name]
 
-        if type(field_model) is RichTextField:
+        if (
+            type(field_model) is RichTextField
+            and grapple_settings.RICHTEXT_FORMAT == "html"
+        ):
             return render_to_string(
                 "wagtailcore/richtext.html", {"html": expand_db_html(cls_field)}
             )
@@ -366,7 +369,10 @@ def get_field_value(instance, field_name: str):
     """
     if isinstance(instance, StructValue):
         return instance[field_name]
-    elif isinstance(instance.value, RichText):
+    elif (
+        isinstance(instance.value, RichText)
+        and grapple_settings.RICHTEXT_FORMAT == "html"
+    ):
         # Allow custom markup for RichText
         return render_to_string(
             "wagtailcore/richtext.html", {"html": expand_db_html(instance.value.source)}

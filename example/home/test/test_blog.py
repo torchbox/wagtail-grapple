@@ -7,6 +7,7 @@ from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import ValidationError
 from django.core.validators import URLValidator
+from django.test import override_settings
 from django.test.client import RequestFactory
 from django.utils.safestring import SafeText
 from home.blocks import CarouselBlock, ImageGalleryImages
@@ -29,18 +30,23 @@ from example.tests.test_grapple import BaseGrappleTest
 
 
 class BlogTest(BaseGrappleTest):
-    def setUp(self):
-        super().setUp()
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
 
-        # Create Blog
-        self.blog_page = BlogPageFactory(
+        cls.richtext_sample = (
+            f'Text with a \'link\' to <a linktype="page" id="{cls.home.id}">Home</a>'
+        )
+        cls.richtext_sample_rendered = (
+            f"Text with a 'link' to <a href=\"{cls.home.url}\">Home</a>\n"
+        )
+        # Add a Blog post
+        cls.blog_page = BlogPageFactory(
             body=[
                 ("heading", "Test heading 1"),
                 (
                     "paragraph",
-                    RichText(
-                        f'Text with a link to <a linktype="page" id="{self.home.id}">Home</a>'
-                    ),
+                    RichText(cls.richtext_sample),
                 ),
                 ("heading", "Test heading 2"),
                 ("image", wagtail_factories.ImageFactory()),
@@ -114,8 +120,8 @@ class BlogTest(BaseGrappleTest):
                 ),
                 ("text_with_callable", TextWithCallableBlockFactory()),
             ],
-            parent=self.home,
-            summary=f'Text with a link to <a linktype="page" id="{self.home.id}">Home</a>',
+            parent=cls.home,
+            summary=cls.richtext_sample,
         )
 
     def test_blog_page(self):
@@ -132,22 +138,6 @@ class BlogTest(BaseGrappleTest):
 
         # Check title.
         self.assertEquals(executed["data"]["page"]["title"], self.blog_page.title)
-
-    def test_blog_page_summary(self):
-        query = """
-        query($id: Int) {
-            page(id: $id) {
-                ... on BlogPage {
-                    summary
-                }
-            }
-        }
-        """
-        executed = self.client.execute(query, variables={"id": self.blog_page.id})
-
-        # Check summary.
-        summary = f'Text with a link to <a href="{self.home.url}">Home</a>\n'
-        self.assertEquals(executed["data"]["page"]["summary"], summary)
 
     def test_related_author_page(self):
         query = """
@@ -216,20 +206,60 @@ class BlogTest(BaseGrappleTest):
         # Check that we test all blocks that were returned.
         self.assertEquals(len(query_blocks), count)
 
-    def test_blog_body_richtextblock(self):
+    def test_streamfield_richtextblock(self):
         block_type = "RichTextBlock"
         query_blocks = self.get_blocks_from_body(block_type)
 
-        # Check output.
+        # Check the raw value.
         count = 0
-        for block in self.blog_page.body:
-            if type(block.block).__name__ == block_type:
-                # Test the values
-                self.assertEquals(query_blocks[count]["rawValue"], block.value.source)
-                # Increment the count
+        for streamfield_block in self.blog_page.body:
+            if type(streamfield_block.block).__name__ == block_type:
+                self.assertEquals(
+                    query_blocks[count]["rawValue"], streamfield_block.value.source
+                )
                 count += 1
         # Check that we test all blocks that were returned.
         self.assertEquals(len(query_blocks), count)
+
+        # Check value.
+        query_blocks = self.get_blocks_from_body(block_type, block_query="value")
+        count = 0
+        for streamfield_block in self.blog_page.body:
+            if type(streamfield_block.block).__name__ == block_type:
+                self.assertEquals(
+                    query_blocks[count]["value"], self.richtext_sample_rendered
+                )
+                count += 1
+
+        with override_settings(GRAPPLE={"RICHTEXT_FORMAT": "raw"}):
+            query_blocks = self.get_blocks_from_body(block_type, block_query="value")
+            count = 0
+            for streamfield_block in self.blog_page.body:
+                if type(streamfield_block.block).__name__ == block_type:
+                    self.assertEquals(
+                        query_blocks[count]["value"], self.richtext_sample
+                    )
+
+    def test_richtext(self):
+        query = """
+        query($id: Int) {
+            page(id: $id) {
+                ... on BlogPage {
+                    summary
+                }
+            }
+        }
+        """
+        executed = self.client.execute(query, variables={"id": self.blog_page.id})
+
+        # Check summary.
+        self.assertEquals(
+            executed["data"]["page"]["summary"], self.richtext_sample_rendered
+        )
+
+        with override_settings(GRAPPLE={"RICHTEXT_FORMAT": "raw"}):
+            executed = self.client.execute(query, variables={"id": self.blog_page.id})
+            self.assertEquals(executed["data"]["page"]["summary"], self.richtext_sample)
 
     def test_blog_body_imagechooserblock(self):
         block_type = "ImageChooserBlock"

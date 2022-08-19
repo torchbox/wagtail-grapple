@@ -6,7 +6,6 @@ import wagtail.documents.blocks
 import wagtail.embeds.blocks
 import wagtail.images.blocks
 import wagtail.snippets.blocks
-from django.conf import settings
 from django.template.loader import render_to_string
 from graphene.types import Scalar
 from graphene_django.converter import convert_django_field
@@ -338,12 +337,6 @@ class ChoiceBlock(graphene.ObjectType):
         return choices
 
 
-def get_media_url(url):
-    if url[0] == "/":
-        return settings.BASE_URL + url
-    return url
-
-
 def get_embed_url(instance):
     return instance.value.url if hasattr(instance, "value") else instance.url
 
@@ -365,7 +358,7 @@ class EmbedBlock(graphene.ObjectType):
         interfaces = (StreamFieldInterface,)
 
     def resolve_url(self, info, **kwargs):
-        return get_media_url(get_embed_url(self))
+        return get_embed_url(self)
 
     def resolve_raw_value(self, info, **kwargs):
         if isinstance(self, EmbedValue):

@@ -1,5 +1,22 @@
 ## Unreleased
 
+## [0.17.0] - 2022-08-19
+
+### Added
+
+-   Multi-site page query filters. ([#258](https://github.com/torchbox/wagtail-grapple/pull/258)) @kaedroho
+-   Ancestor, parent filter for the pages query. ([#240](https://github.com/torchbox/wagtail-grapple/pull/240)) dopry
+-   Proper snippet values in `SnippetChooserBlock`. ([#256](https://github.com/torchbox/wagtail-grapple/pull/256)) @jams2
+-   `RICHTEXT_FORMAT` setting for the rich text field. ([#259](https://github.com/torchbox/wagtail-grapple/pull/259)) @zerolab
+    Note: both now use the "html", rendered format. Set it to "raw" for the database representation.
+
+### Changed
+
+-   Removed unnecessary processing of embed urls. ([#252](https://github.com/torchbox/wagtail-grapple/pull/252)) @dopry
+-   Update graphiql version to fix XSS vulnerability. ([#248](https://github.com/torchbox/wagtail-grapple/pull/248)) @dopry
+-   `RichTextField` and `RichTextBlock` output now uses the `RICHTEXT_FORMAT` setting for consistent output. ([#259](https://github.com/torchbox/wagtail-grapple/pull/259)) @zerolab, @Tijani-Dia
+    Note: `RichTextBlock`'s `rawValue` output is always the non-rendered version. h/t @isolationism
+
 ## [0.16.0] - 2022-08-03
 
 ### Added
@@ -219,7 +236,8 @@
 -   Improve field definition and under-the-hood implementation ([#28](https://github.com/torchbox/wagtail-grapple/pull/28))
 -   Add conditional checks when resolving streamfield type ([#29](https://github.com/torchbox/wagtail-grapple/pull/29))
 
-[unreleased]: https://github.com/torchbox/wagtail-grapple/compare/v0.16.0...HEAD
+[unreleased]: https://github.com/torchbox/wagtail-grapple/compare/v0.17.0...HEAD
+[0.17.0]: https://github.com/torchbox/wagtail-grapple/compare/v0.16.0...v0.17.0
 [0.16.0]: https://github.com/torchbox/wagtail-grapple/compare/v0.15.1...v0.16.0
 [0.15.1]: https://github.com/torchbox/wagtail-grapple/compare/v0.15.0...v0.15.1
 [0.15.0]: https://github.com/torchbox/wagtail-grapple/compare/v0.14.1...v0.15.0

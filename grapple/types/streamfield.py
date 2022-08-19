@@ -13,11 +13,12 @@ from graphene_django.converter import convert_django_field
 try:
     from wagtail import blocks
     from wagtail.fields import StreamField
-    from wagtail.rich_text import expand_db_html
+    from wagtail.rich_text import RichText, expand_db_html
 except ImportError:
     from wagtail.core import blocks
     from wagtail.core.fields import StreamField
-    from wagtail.core.rich_text import expand_db_html
+    from wagtail.core.rich_text import expand_db_html, RichText
+
 from wagtail.embeds.blocks import EmbedValue
 from wagtail.embeds.embeds import get_embed
 from wagtail.embeds.exceptions import EmbedException
@@ -77,8 +78,13 @@ class StreamFieldInterface(graphene.Interface):
         if isinstance(self, blocks.StructValue):
             # This is the value for a nested StructBlock defined via GraphQLStreamfield
             return serialize_struct_obj(self)
-        if isinstance(self.value, dict):
+        elif isinstance(self.value, dict):
             return serialize_struct_obj(self.value)
+        elif isinstance(self.value, RichText):
+            # Ensure RichTextBlock raw value always returns the "internal format", rather than the conterted value
+            # as per https://docs.wagtail.io/en/stable/extending/rich_text_internals.html#data-format.
+            # Note that RichTextBlock.value will be rendered HTML by default.
+            return self.value.source
 
         return self.value
 

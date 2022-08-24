@@ -1,5 +1,11 @@
 ## Unreleased
 
+## [0.17.1] - 2022-08-24
+
+### Fixed
+
+-   Fix errors with attributes when checking for rich text fields (#261) @Tijani-Dia
+
 ## [0.17.0] - 2022-08-19
 
 ### Added
@@ -7,8 +13,10 @@
 -   Multi-site page query filters. ([#258](https://github.com/torchbox/wagtail-grapple/pull/258)) @kaedroho
 -   Ancestor, parent filter for the pages query. ([#240](https://github.com/torchbox/wagtail-grapple/pull/240)) dopry
 -   Proper snippet values in `SnippetChooserBlock`. ([#256](https://github.com/torchbox/wagtail-grapple/pull/256)) @jams2
+-   Support specifying format in image srcSet query. ([#257](https://github.com/torchbox/wagtail-grapple/pull/257)) @jams2
 -   `RICHTEXT_FORMAT` setting for the rich text field. ([#259](https://github.com/torchbox/wagtail-grapple/pull/259)) @zerolab
     Note: both now use the "html", rendered format. Set it to "raw" for the database representation.
+-   Support for comma separated list of `content_type`s in the `pages` query. ([#250](https://github.com/torchbox/wagtail-grapple/pull/250)) @dopry
 
 ### Changed
 
@@ -236,7 +244,8 @@
 -   Improve field definition and under-the-hood implementation ([#28](https://github.com/torchbox/wagtail-grapple/pull/28))
 -   Add conditional checks when resolving streamfield type ([#29](https://github.com/torchbox/wagtail-grapple/pull/29))
 
-[unreleased]: https://github.com/torchbox/wagtail-grapple/compare/v0.17.0...HEAD
+[unreleased]: https://github.com/torchbox/wagtail-grapple/compare/v0.17.1...HEAD
+[0.17.1]: https://github.com/torchbox/wagtail-grapple/compare/v0.17.0...v0.17.1
 [0.17.0]: https://github.com/torchbox/wagtail-grapple/compare/v0.16.0...v0.17.0
 [0.16.0]: https://github.com/torchbox/wagtail-grapple/compare/v0.15.1...v0.16.0
 [0.15.1]: https://github.com/torchbox/wagtail-grapple/compare/v0.15.0...v0.15.1

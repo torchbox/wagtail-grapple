@@ -5,6 +5,7 @@ from typing import Any, Dict, Type, Union
 
 import graphene
 from django.apps import apps
+from django.core.exceptions import FieldDoesNotExist
 from django.db import models
 from django.template.loader import render_to_string
 from graphene_django.types import DjangoObjectType
@@ -230,18 +231,22 @@ def model_resolver(field):
             return cls_field(info, **kwargs)
 
         # Expand HTML if the value's field is richtext
-        if hasattr(instance._meta, "get_field"):
-            field_model = instance._meta.get_field(field.field_name)
-        else:
-            field_model = instance._meta.fields[field.field_name]
+        try:
+            if hasattr(instance._meta, "get_field"):
+                field_model = instance._meta.get_field(field.field_name)
+            else:
+                field_model = instance._meta.fields[field.field_name]
+        except FieldDoesNotExist:
+            return cls_field
 
-        if (
-            type(field_model) is RichTextField
-            and grapple_settings.RICHTEXT_FORMAT == "html"
-        ):
-            return render_to_string(
-                "wagtailcore/richtext.html", {"html": expand_db_html(cls_field)}
-            )
+        else:
+            if (
+                type(field_model) is RichTextField
+                and grapple_settings.RICHTEXT_FORMAT == "html"
+            ):
+                return render_to_string(
+                    "wagtailcore/richtext.html", {"html": expand_db_html(cls_field)}
+                )
 
         # If none of those then just return field
         return cls_field

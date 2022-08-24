@@ -933,3 +933,21 @@ class BlogTest(BaseGrappleTest):
 
                 # Ensure TextWithCallableBlock.get_field_method called.
                 self.assertIn("text-with-callable", result)
+
+    def test_custom_property(self):
+        query = """
+        query($id: Int) {
+            page(id: $id) {
+                ... on BlogPage {
+                    customProperty
+                }
+            }
+        }
+        """
+        executed = self.client.execute(query, variables={"id": self.blog_page.id})
+
+        # Check custom property.
+        self.assertEquals(
+            json.loads(executed["data"]["page"]["customProperty"]),
+            self.blog_page.custom_property,
+        )

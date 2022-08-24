@@ -1,6 +1,7 @@
 import graphene
 from django.conf import settings
 from django.db import models
+from django.utils.functional import cached_property
 from home.blocks import StreamFieldBlock
 from modelcluster.contrib.taggit import ClusterTaggableManager
 from modelcluster.fields import ParentalKey
@@ -49,6 +50,7 @@ from grapple.middleware import IsAnonymousMiddleware
 from grapple.models import (
     GraphQLCollection,
     GraphQLDocument,
+    GraphQLField,
     GraphQLForeignKey,
     GraphQLImage,
     GraphQLMedia,
@@ -153,9 +155,21 @@ class BlogPage(HeadlessPreviewMixin, Page):
     def paginated_authors(self, info, **kwargs):
         return resolve_paginated_queryset(self.authors, info, **kwargs)
 
+    @cached_property
+    def custom_property(self):
+        return {
+            "path": self.url,
+            "author": self.author.name if self.author else "Unknown",
+        }
+
     graphql_fields = [
         GraphQLString("date", required=True),
         GraphQLString("summary"),
+        GraphQLField(
+            field_name="custom_property",
+            field_type=graphene.JSONString,
+            required=False,
+        ),
         GraphQLStreamfield("body"),
         GraphQLTag("tags"),
         GraphQLCollection(

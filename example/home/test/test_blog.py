@@ -949,5 +949,5 @@ class BlogTest(BaseGrappleTest):
         # Check custom property.
         self.assertEquals(
             json.loads(executed["data"]["page"]["customProperty"]),
-            self.blog_page.custom_property
+            self.blog_page.custom_property,
         )

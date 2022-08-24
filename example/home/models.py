@@ -50,6 +50,7 @@ from grapple.middleware import IsAnonymousMiddleware
 from grapple.models import (
     GraphQLCollection,
     GraphQLDocument,
+    GraphQLField,
     GraphQLForeignKey,
     GraphQLImage,
     GraphQLMedia,
@@ -58,7 +59,6 @@ from grapple.models import (
     GraphQLStreamfield,
     GraphQLString,
     GraphQLTag,
-    GraphQLField
 )
 from grapple.utils import resolve_paginated_queryset
 
@@ -157,7 +157,10 @@ class BlogPage(HeadlessPreviewMixin, Page):
 
     @cached_property
     def custom_property(self):
-        return {"path": self.url, "author": self.author.name if self.author else "Unknown"}
+        return {
+            "path": self.url,
+            "author": self.author.name if self.author else "Unknown",
+        }
 
     graphql_fields = [
         GraphQLString("date", required=True),

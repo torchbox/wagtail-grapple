@@ -5,8 +5,8 @@ from typing import Any, Dict, Type, Union
 
 import graphene
 from django.apps import apps
-from django.db import models
 from django.core.exceptions import FieldDoesNotExist
+from django.db import models
 from django.template.loader import render_to_string
 from graphene_django.types import DjangoObjectType
 

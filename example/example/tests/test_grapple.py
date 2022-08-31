@@ -1039,7 +1039,7 @@ class ImagesTest(BaseGrappleTest):
         """
 
         with self.assertNumQueries(N * M + 1):
-            executed = self.client.execute(query)
+            self.client.execute(query)
 
     def tearDown(self):
         example_image_path = self.example_image.file.path

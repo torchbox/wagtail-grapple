@@ -1015,6 +1015,32 @@ class ImagesTest(BaseGrappleTest):
             self.assertFalse(rendition_allowed("width-100"))
             self.assertFalse(rendition_allowed("fill-100x100"))
 
+    def test_src_set_num_queries(self):
+        sizes = [360, 720, 1024]
+        filters = [f"width-{size}" for size in sizes]
+        N = 5  # Number of images
+        M = len(sizes)  # Number of renditions to generate per image
+
+        def get_renditions(image):
+            for img_filter in filters:
+                image.get_rendition(img_filter)
+
+        # Generate renditions for each filter in the filters list for all images
+        get_renditions(self.example_image)
+        for i in range(N - 1):
+            get_renditions(wagtail_factories.ImageFactory(title=f"Image {i}"))
+
+        query = """
+        {
+            images {
+                srcSet(sizes: [360, 720, 1024])
+            }
+        }
+        """
+
+        with self.assertNumQueries(N * M + 1):
+            self.client.execute(query)
+
     def tearDown(self):
         example_image_path = self.example_image.file.path
         self.example_image.delete()

@@ -14,6 +14,7 @@ Wagtail docs:
 .. code-block:: python
 
     from grapple.models import (
+        GraphQLRichText,
         GraphQLString,
         GraphQLStreamfield,
     )
@@ -22,6 +23,7 @@ Wagtail docs:
     class BlogPage(Page):
         author = models.CharField(max_length=255)
         date = models.DateField("Post date")
+        summary = RichTextField()
         body = StreamField(
             [
                 ("heading", blocks.CharBlock(classname="full title")),
@@ -33,7 +35,8 @@ Wagtail docs:
         content_panels = Page.content_panels + [
             FieldPanel("author"),
             FieldPanel("date"),
-            StreamFieldPanel("body"),
+            FieldPanel("summary"),
+            FieldPanel("body"),
         ]
 
         # Note these fields below:
@@ -41,6 +44,7 @@ Wagtail docs:
             GraphQLString("heading"),
             GraphQLString("date"),
             GraphQLString("author"),
+            GraphQLRichText("summary"),
             GraphQLStreamfield("body"),
         ]
 
@@ -55,6 +59,7 @@ something like:
                 heading
                 date
                 author
+                summary
                 body {
                     rawValue
                     ...on ImageChooserBlock {

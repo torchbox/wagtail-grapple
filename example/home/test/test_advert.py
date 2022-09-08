@@ -1,13 +1,21 @@
+from django.test import override_settings
 from home.factories import AdvertFactory
 
 from example.tests.test_grapple import BaseGrappleTest
 
 
 class AdvertTest(BaseGrappleTest):
-    def setUp(self):
-        super().setUp()
-        # Create advert
-        self.advert = AdvertFactory()
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+
+        cls.richtext_sample = (
+            f'Text with a \'link\' to <a linktype="page" id="{cls.home.id}">Home</a>'
+        )
+        cls.richtext_sample_rendered = (
+            f"Text with a 'link' to <a href=\"{cls.home.url}\">Home</a>\n"
+        )
+        cls.advert = AdvertFactory(rich_text=cls.richtext_sample)
 
     def validate_advert(self, advert):
         # Check all the fields
@@ -68,3 +76,22 @@ class AdvertTest(BaseGrappleTest):
         self.assertTrue(advert_query_kind == "NON_NULL")
         self.assertTrue(advert_query_type["kind"] == "OBJECT")
         self.assertTrue(advert_query_type["name"] == "Advert")
+
+    def test_advert_single_query_rich_text(self):
+        query = """
+        query($url: String) {
+           advert(url: $url) {
+                richText
+            }
+        }
+        """
+        executed = self.client.execute(query, variables={"url": self.advert.url})
+        advert = executed["data"]["advert"]
+        self.assertIsInstance(advert["richText"], str)
+        self.assertEqual(advert["richText"], self.richtext_sample_rendered)
+
+        with override_settings(GRAPPLE={"RICHTEXT_FORMAT": "raw"}):
+            executed = self.client.execute(query, variables={"url": self.advert.url})
+            advert = executed["data"]["advert"]
+            self.assertIsInstance(advert["richText"], str)
+            self.assertEqual(advert["richText"], self.richtext_sample)

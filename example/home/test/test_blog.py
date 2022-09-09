@@ -556,7 +556,6 @@ class BlogTest(BaseGrappleTest):
             ... on Advert {
                 url
                 text
-                richText
             }
         }
         """
@@ -566,7 +565,47 @@ class BlogTest(BaseGrappleTest):
         block = query_blocks[0]
         self.assertEqual(block["snippet"]["url"], url)
         self.assertEqual(block["snippet"]["text"], text)
+
+    def test_blog_body_snippetchooserblock_advert_rich_text(self):
+        blog_page = BlogPageFactory(
+            parent=self.home,
+            body=[
+                (
+                    "advert",
+                    AdvertFactory(
+                        rich_text=self.richtext_sample,
+                        extra_rich_text=self.richtext_sample,
+                    ),
+                ),
+            ],
+        )
+        block_type = "SnippetChooserBlock"
+        block_query = """
+        snippet {
+            ... on Advert {
+                richText
+                stringRichText
+                extraRichText
+            }
+        }
+        """
+        query_blocks = self.get_blocks_from_body(
+            block_type, block_query=block_query, page_id=blog_page.id
+        )
+        block = query_blocks[0]
+
+        # Declared as GraphQLRichText
         self.assertEqual(block["snippet"]["richText"], self.richtext_sample_rendered)
+
+        # Declared as GraphQLString, custom name/source
+        self.assertEqual(
+            block["snippet"]["stringRichText"], self.richtext_sample_rendered
+        )
+
+        # Declared as GraphQLString, default name
+        self.assertEqual(
+            block["snippet"]["extraRichText"], self.richtext_sample_rendered
+        )
 
         with override_settings(GRAPPLE={"RICHTEXT_FORMAT": "raw"}):
             query_blocks = self.get_blocks_from_body(
@@ -574,6 +613,8 @@ class BlogTest(BaseGrappleTest):
             )
             block = query_blocks[0]
             self.assertEqual(block["snippet"]["richText"], self.richtext_sample)
+            self.assertEqual(block["snippet"]["stringRichText"], self.richtext_sample)
+            self.assertEqual(block["snippet"]["extraRichText"], self.richtext_sample)
 
     def test_blog_body_snippetchooserblock_person(self):
         name = "Jane Citizen"

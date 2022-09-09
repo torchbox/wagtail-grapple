@@ -17,3 +17,9 @@ class RichText(Scalar):
                 "wagtailcore/richtext.html", context={"html": expand_db_html(rich_text)}
             )
         return rich_text
+
+    parse_value = str
+
+    @staticmethod
+    def parse_literal(node):
+        return str(node.value)

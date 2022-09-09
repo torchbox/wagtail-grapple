@@ -15,7 +15,9 @@ class AdvertTest(BaseGrappleTest):
         cls.richtext_sample_rendered = (
             f"Text with a 'link' to <a href=\"{cls.home.url}\">Home</a>\n"
         )
-        cls.advert = AdvertFactory(rich_text=cls.richtext_sample)
+        cls.advert = AdvertFactory(
+            rich_text=cls.richtext_sample, extra_rich_text=cls.richtext_sample
+        )
 
     def validate_advert(self, advert):
         # Check all the fields
@@ -82,16 +84,26 @@ class AdvertTest(BaseGrappleTest):
         query($url: String) {
            advert(url: $url) {
                 richText
+                stringRichText
+                extraRichText
             }
         }
         """
         executed = self.client.execute(query, variables={"url": self.advert.url})
         advert = executed["data"]["advert"]
-        self.assertIsInstance(advert["richText"], str)
+
+        # Field declared with GraphQLRichText
         self.assertEqual(advert["richText"], self.richtext_sample_rendered)
+
+        # Declared with GraphQLString, custom field source
+        self.assertEqual(advert["stringRichText"], self.richtext_sample_rendered)
+
+        # Declared with GraphQLString, default field source
+        self.assertEqual(advert["extraRichText"], self.richtext_sample_rendered)
 
         with override_settings(GRAPPLE={"RICHTEXT_FORMAT": "raw"}):
             executed = self.client.execute(query, variables={"url": self.advert.url})
             advert = executed["data"]["advert"]
-            self.assertIsInstance(advert["richText"], str)
             self.assertEqual(advert["richText"], self.richtext_sample)
+            self.assertEqual(advert["stringRichText"], self.richtext_sample)
+            self.assertEqual(advert["extraRichText"], self.richtext_sample)

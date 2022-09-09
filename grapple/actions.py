@@ -5,16 +5,20 @@ from typing import Any, Dict, Type, Union
 
 import graphene
 from django.apps import apps
+from django.core.exceptions import FieldDoesNotExist
 from django.db import models
 from django.template.loader import render_to_string
 from graphene_django.types import DjangoObjectType
 
 try:
     from wagtail.contrib.settings.models import BaseGenericSetting, BaseSiteSetting
+    from wagtail.fields import RichTextField
 except ImportError:
     # Wagtail < 4.0
     from wagtail.contrib.settings.models import BaseSetting as BaseGenericSetting
     from wagtail.contrib.settings.models import BaseSetting as BaseSiteSetting
+    from wagtail.core.fields import RichTextField
+
 
 try:
     from wagtail.blocks import StructValue, stream_block
@@ -36,6 +40,7 @@ from .settings import grapple_settings
 from .types.documents import DocumentObjectType
 from .types.images import ImageObjectType
 from .types.pages import Page, PageInterface
+from .types.rich_text import RichText as RichTextType
 from .types.streamfield import generate_streamfield_union
 
 if apps.is_installed("wagtailmedia"):
@@ -225,6 +230,29 @@ def model_resolver(field):
         # If method then call and return result
         if callable(cls_field):
             return cls_field(info, **kwargs)
+
+        # Expand HTML if the value's field is richtext
+        if field.field_type is RichTextType:
+            # Rendering of html will be handled by the GraphQL executor calling
+            # RichText.serialize, due to being declared as GraphQLRichText rather than
+            # GraphQLString
+            return cls_field
+        try:
+            if hasattr(instance._meta, "get_field"):
+                field_model = instance._meta.get_field(field.field_source)
+            else:
+                field_model = instance._meta.fields[field.field_source]
+        except FieldDoesNotExist:
+            return cls_field
+
+        else:
+            if (
+                type(field_model) is RichTextField
+                and grapple_settings.RICHTEXT_FORMAT == "html"
+            ):
+                return render_to_string(
+                    "wagtailcore/richtext.html", {"html": expand_db_html(cls_field)}
+                )
 
         # If none of those then just return field
         return cls_field

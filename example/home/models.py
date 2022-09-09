@@ -128,6 +128,7 @@ class BlogPage(HeadlessPreviewMixin, Page):
         AuthorPage, null=True, blank=True, on_delete=models.SET_NULL, related_name="+"
     )
     summary = RichTextField(blank=True)
+    extra_summary = RichTextField(blank=True)
     body = StreamField(StreamFieldBlock())
     tags = ClusterTaggableManager(through=BlogPageTag, blank=True)
 
@@ -166,6 +167,8 @@ class BlogPage(HeadlessPreviewMixin, Page):
     graphql_fields = [
         GraphQLString("date", required=True),
         GraphQLRichText("summary"),
+        GraphQLString("string_summary", source="summary"),
+        GraphQLString("extra_summary"),
         GraphQLField(
             field_name="custom_property",
             field_type=graphene.JSONString,
@@ -245,6 +248,7 @@ class Advert(models.Model):
     url = models.URLField(null=True, blank=True)
     text = models.CharField(max_length=255)
     rich_text = RichTextField(blank=True, default="")
+    extra_rich_text = RichTextField(blank=True, default="")
 
     panels = [
         FieldPanel("url"),
@@ -258,6 +262,8 @@ class Advert(models.Model):
         GraphQLString("url"),
         GraphQLString("text"),
         GraphQLRichText("rich_text"),
+        GraphQLString("string_rich_text", source="rich_text"),
+        GraphQLString("extra_rich_text"),
     ]
 
     def __str__(self):

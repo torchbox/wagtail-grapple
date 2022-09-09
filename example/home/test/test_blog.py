@@ -122,6 +122,7 @@ class BlogTest(BaseGrappleTest):
             ],
             parent=cls.home,
             summary=cls.richtext_sample,
+            extra_summary=cls.richtext_sample,
         )
 
     def test_blog_page(self):
@@ -246,20 +247,38 @@ class BlogTest(BaseGrappleTest):
             page(id: $id) {
                 ... on BlogPage {
                     summary
+                    stringSummary
+                    extraSummary
                 }
             }
         }
         """
         executed = self.client.execute(query, variables={"id": self.blog_page.id})
 
-        # Check summary.
+        # Check summary declared as GraphQLRichText
         self.assertEquals(
             executed["data"]["page"]["summary"], self.richtext_sample_rendered
+        )
+
+        # Check summary declared as GraphQLString, with custom name
+        self.assertEqual(
+            executed["data"]["page"]["stringSummary"], self.richtext_sample_rendered
+        )
+
+        # Check rich text field declared as GraphQLString, default field name
+        self.assertEqual(
+            executed["data"]["page"]["extraSummary"], self.richtext_sample_rendered
         )
 
         with override_settings(GRAPPLE={"RICHTEXT_FORMAT": "raw"}):
             executed = self.client.execute(query, variables={"id": self.blog_page.id})
             self.assertEquals(executed["data"]["page"]["summary"], self.richtext_sample)
+            self.assertEqual(
+                executed["data"]["page"]["stringSummary"], self.richtext_sample
+            )
+            self.assertEqual(
+                executed["data"]["page"]["extraSummary"], self.richtext_sample
+            )
 
     def test_blog_body_imagechooserblock(self):
         block_type = "ImageChooserBlock"

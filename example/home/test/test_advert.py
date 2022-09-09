@@ -13,7 +13,7 @@ class AdvertTest(BaseGrappleTest):
             f'Text with a \'link\' to <a linktype="page" id="{cls.home.id}">Home</a>'
         )
         cls.richtext_sample_rendered = (
-            f"Text with a 'link' to <a href=\"{cls.home.url}\">Home</a>\n"
+            f"Text with a 'link' to <a href=\"{cls.home.url}\">Home</a>"
         )
         cls.advert = AdvertFactory(
             rich_text=cls.richtext_sample, extra_rich_text=cls.richtext_sample

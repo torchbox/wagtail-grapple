@@ -465,7 +465,7 @@ class TestRichTextType(BaseGrappleTest):
             f'Text with a \'link\' to <a linktype="page" id="{cls.home.id}">Home</a>'
         )
         cls.richtext_sample_rendered = (
-            f"Text with a 'link' to <a href=\"{cls.home.url}\">Home</a>\n"
+            f"Text with a 'link' to <a href=\"{cls.home.url}\">Home</a>"
         )
 
     def test_mutate_rich_text_type(self):
@@ -512,5 +512,5 @@ class TestRichTextType(BaseGrappleTest):
             query, variables={"id": advert_id, "richText": rich_text}
         )
         self.assertEqual(
-            result["data"]["updateAdvert"]["advert"]["richText"], rich_text + "\n"
+            result["data"]["updateAdvert"]["advert"]["richText"], rich_text
         )

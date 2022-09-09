@@ -7,7 +7,6 @@ import graphene
 from django.apps import apps
 from django.core.exceptions import FieldDoesNotExist
 from django.db import models
-from django.template.loader import render_to_string
 from graphene_django.types import DjangoObjectType
 
 try:
@@ -23,11 +22,11 @@ except ImportError:
 try:
     from wagtail.blocks import StructValue, stream_block
     from wagtail.models import Page as WagtailPage
-    from wagtail.rich_text import RichText, expand_db_html
+    from wagtail.rich_text import RichText
 except ImportError:
     from wagtail.core.blocks import StructValue, stream_block
     from wagtail.core.models import Page as WagtailPage
-    from wagtail.core.rich_text import RichText, expand_db_html
+    from wagtail.core.rich_text import RichText
 
 from wagtail.documents.models import AbstractDocument
 from wagtail.images.blocks import ImageChooserBlock
@@ -245,14 +244,8 @@ def model_resolver(field):
         except FieldDoesNotExist:
             return cls_field
 
-        else:
-            if (
-                type(field_model) is RichTextField
-                and grapple_settings.RICHTEXT_FORMAT == "html"
-            ):
-                return render_to_string(
-                    "wagtailcore/richtext.html", {"html": expand_db_html(cls_field)}
-                )
+        if type(field_model) is RichTextField:
+            return RichTextType.serialize(cls_field)
 
         # If none of those then just return field
         return cls_field
@@ -380,14 +373,8 @@ def get_field_value(instance, field_name: str):
     """
     if isinstance(instance, StructValue):
         return instance[field_name]
-    elif (
-        isinstance(instance.value, RichText)
-        and grapple_settings.RICHTEXT_FORMAT == "html"
-    ):
-        # Allow custom markup for RichText
-        return render_to_string(
-            "wagtailcore/richtext.html", {"html": expand_db_html(instance.value.source)}
-        )
+    elif isinstance(instance.value, RichText):
+        return RichTextType.serialize(instance.value.source)
     elif isinstance(instance.value, stream_block.StreamValue):
         stream_data = dict(instance.value.stream_data)
         return stream_data[field_name]

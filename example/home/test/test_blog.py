@@ -735,6 +735,27 @@ class BlogTest(BaseGrappleTest):
                 self.assertEquals(button["buttonText"], "Take me to the source")
                 self.assertEquals(button["buttonLink"], "https://wagtail.io/")
 
+    def test_nested_structvalue_block_id(self):
+        block_type = "CarouselBlock"
+        query_blocks = self.get_blocks_from_body(
+            block_type,
+            block_query="""
+                blocks {
+                    ...on ImageChooserBlock {
+                        id
+                    }
+                }
+            """,
+        )
+
+        blocks = query_blocks[0]["blocks"]
+
+        # Check that the id returned matches the original block's ID
+        for block in self.blog_page.body:
+            if type(block.block).__name__ == block_type:
+                for i, image_block in enumerate(block.value):
+                    self.assertEquals(blocks[i]["id"], image_block.id)
+
     def test_block_with_name(self):
         block_type = "BlockWithName"
         block_query = "name"

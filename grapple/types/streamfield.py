@@ -193,15 +193,14 @@ class StreamBlock(StructBlock):
         interfaces = (StreamFieldInterface,)
 
     def resolve_blocks(self, info, **kwargs):
-        stream_blocks = []
+        child_blocks = self.value.stream_block.child_blocks
 
-        for stream in self.value:
-            block_type = stream.block_type
-            value = stream.value
-            block = self.value.stream_block.child_blocks[block_type]
-            stream_blocks.append(StructBlockItem(block_type, block, value))
-
-        return stream_blocks
+        return [
+            StructBlockItem(
+                id=stream.id, block=child_blocks[stream.block_type], value=stream.value
+            )
+            for stream in self.value
+        ]
 
 
 class StreamFieldBlock(graphene.ObjectType):

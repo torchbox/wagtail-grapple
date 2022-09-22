@@ -1,4 +1,6 @@
-from graphene.types import Scalar
+from typing import Union
+
+from graphene.types import String
 
 try:
     from wagtail.rich_text import RichText as WagtailRichText
@@ -8,15 +10,19 @@ except ImportError:
 from ..settings import grapple_settings
 
 
-class RichText(Scalar):
+class RichText(String):
     @staticmethod
-    def serialize(rich_text: str):
+    def coerce_rich_text(rich_text: Union[str, WagtailRichText]):
+        # When serializing a model instance, we get a str. When serializing a
+        # RichTextBlock instance, its an instance of wagtail.rich_text.RichText already.
         if grapple_settings.RICHTEXT_FORMAT == "html":
-            return WagtailRichText(rich_text).__html__()
-        return rich_text
+            if isinstance(rich_text, str):
+                return WagtailRichText(rich_text).__html__()
+            return rich_text.__html__()
+        elif isinstance(rich_text, str):
+            return rich_text
+        else:
+            return rich_text.source
 
-    parse_value = str
-
-    @staticmethod
-    def parse_literal(node):
-        return str(node.value)
+    serialize = coerce_rich_text
+    parse_value = coerce_rich_text

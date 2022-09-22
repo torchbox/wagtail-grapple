@@ -93,6 +93,9 @@ Example:
 Note that the ``srcSet`` attribute on ``ImageObjectType`` generates ``width-*`` filters, so if in use
 consider adding the relevant filters to the allowed list.
 
+
+.. _rich text settings:
+
 Rich text settings
 ^^^^^^^^^^^^^^^^^^
 

@@ -17,6 +17,7 @@ from grapple.models import (
     GraphQLForeignKey,
     GraphQLImage,
     GraphQLInt,
+    GraphQLRichText,
     GraphQLStreamfield,
     GraphQLString,
 )
@@ -71,7 +72,7 @@ class CalloutBlock(blocks.StructBlock):
     text = blocks.RichTextBlock()
     image = ImageChooserBlock()
 
-    graphql_fields = [GraphQLString("text"), GraphQLImage("image")]
+    graphql_fields = [GraphQLRichText("text"), GraphQLImage("image")]
 
 
 @register_streamfield_block

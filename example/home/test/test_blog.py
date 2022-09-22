@@ -9,7 +9,6 @@ from django.core.exceptions import ValidationError
 from django.core.validators import URLValidator
 from django.test import override_settings
 from django.test.client import RequestFactory
-from django.utils.safestring import SafeText
 from home.blocks import CarouselBlock, ImageGalleryImages
 from home.factories import (
     AdvertFactory,
@@ -86,7 +85,7 @@ class BlogTest(BaseGrappleTest):
                         ),
                     },
                 ),
-                ("callout", {"text": RichText("<p>Hello, World</p>")}),
+                ("callout", {"text": RichText(cls.richtext_sample)}),
                 ("objectives", ["Read all of article!"]),
                 (
                     "video",
@@ -337,18 +336,21 @@ class BlogTest(BaseGrappleTest):
 
     def test_blog_body_calloutblock(self):
         block_type = "CalloutBlock"
-        query_blocks = self.get_blocks_from_body(
-            block_type,
-            block_query="""
-                text
-            """,
-        )
+        query_blocks = self.get_blocks_from_body(block_type, block_query="text")
 
-        # Check HTML is string
         for block in self.blog_page.body:
             if type(block.block).__name__ == block_type:
                 html = query_blocks[0]["text"]
-                self.assertEquals(type(html), SafeText)
+                self.assertIsInstance(html, str)
+                self.assertEqual(html, self.richtext_sample_rendered)
+
+        with override_settings(GRAPPLE={"RICHTEXT_FORMAT": "raw"}):
+            query_blocks = self.get_blocks_from_body(block_type, block_query="text")
+            for block in self.blog_page.body:
+                if type(block.block).__name__ == block_type:
+                    html = query_blocks[0]["text"]
+                    self.assertIsInstance(html, str)
+                    self.assertEqual(html, self.richtext_sample)
 
     def test_blog_body_decimalblock(self):
         block_type = "DecimalBlock"

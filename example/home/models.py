@@ -253,9 +253,9 @@ class Advert(models.Model):
     panels = [
         FieldPanel("url"),
         FieldPanel("text"),
-        RichTextFieldPanel("rich_text")
-        if settings.WAGTAIL_VERSION < (3, 0)
-        else FieldPanel("rich_text"),
+        FieldPanel("rich_text")
+        if settings.WAGTAIL_VERSION >= (3, 0)
+        else RichTextFieldPanel("rich_text"),
     ]
 
     graphql_fields = [

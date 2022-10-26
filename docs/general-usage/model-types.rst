@@ -636,3 +636,27 @@ GraphQLTag
     .. attribute:: required (bool=False)
 
         Represents the field as non-nullable in the schema. This promises the client that it will have a value returned.
+
+
+GraphQLRichText
+---------------
+.. module:: grapple.models
+.. class:: GraphQLRichText(field_name, required=False, **kwargs)
+
+    Use this field type to serialize ``RichTextField`` and ``RichTextBlock`` values. If your :ref:`RICHTEXT_FORMAT<rich text settings>` setting is ``"html"``, the stored value will be transformed from the internal representation to proper html. If set to ``"raw"``, the raw internal representation will be returned.
+
+    .. attribute:: field_name (str)
+
+        This is the name of the class property used in your model definition.
+
+    .. attribute:: required (bool=False)
+
+        Represents the field as non-nullable in the schema. This promises the client that it will have a value returned.
+
+    .. attribute:: kwargs
+
+        Useful keyword arguments:
+
+        * ``source`` (string)
+            You can pass a source string that is an attribute or method on the
+            class itself.

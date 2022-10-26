@@ -103,6 +103,15 @@ def GraphQLStreamfield(field_name: str, **kwargs):
     return Mixin
 
 
+def GraphQLRichText(field_name: str, **kwargs):
+    def Mixin():
+        from .types.rich_text import RichText
+
+        return GraphQLField(field_name, RichText, **kwargs)
+
+    return Mixin
+
+
 def GraphQLImage(field_name: str, **kwargs):
     def Mixin():
         from .types.images import get_image_type

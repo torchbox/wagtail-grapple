@@ -55,6 +55,7 @@ from grapple.models import (
     GraphQLImage,
     GraphQLMedia,
     GraphQLPage,
+    GraphQLRichText,
     GraphQLSnippet,
     GraphQLStreamfield,
     GraphQLString,
@@ -127,6 +128,7 @@ class BlogPage(HeadlessPreviewMixin, Page):
         AuthorPage, null=True, blank=True, on_delete=models.SET_NULL, related_name="+"
     )
     summary = RichTextField(blank=True)
+    extra_summary = RichTextField(blank=True)
     body = StreamField(StreamFieldBlock())
     tags = ClusterTaggableManager(through=BlogPageTag, blank=True)
 
@@ -164,7 +166,9 @@ class BlogPage(HeadlessPreviewMixin, Page):
 
     graphql_fields = [
         GraphQLString("date", required=True),
-        GraphQLString("summary"),
+        GraphQLRichText("summary"),
+        GraphQLString("string_summary", source="summary"),
+        GraphQLString("extra_summary"),
         GraphQLField(
             field_name="custom_property",
             field_type=graphene.JSONString,
@@ -235,7 +239,7 @@ class Author(Orderable):
 @register_query_field(
     "advert",
     "adverts",
-    {"url": graphene.String()},
+    query_params={"url": graphene.String()},
     required=True,
     plural_required=True,
     plural_item_required=True,
@@ -243,10 +247,24 @@ class Author(Orderable):
 class Advert(models.Model):
     url = models.URLField(null=True, blank=True)
     text = models.CharField(max_length=255)
+    rich_text = RichTextField(blank=True, default="")
+    extra_rich_text = RichTextField(blank=True, default="")
 
-    panels = [FieldPanel("url"), FieldPanel("text")]
+    panels = [
+        FieldPanel("url"),
+        FieldPanel("text"),
+        FieldPanel("rich_text")
+        if settings.WAGTAIL_VERSION >= (3, 0)
+        else RichTextFieldPanel("rich_text"),
+    ]
 
-    graphql_fields = [GraphQLString("url"), GraphQLString("text")]
+    graphql_fields = [
+        GraphQLString("url"),
+        GraphQLString("text"),
+        GraphQLRichText("rich_text"),
+        GraphQLString("string_rich_text", source="rich_text"),
+        GraphQLString("extra_rich_text"),
+    ]
 
     def __str__(self):
         return self.text

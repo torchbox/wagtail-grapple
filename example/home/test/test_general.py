@@ -454,3 +454,63 @@ class TestUtils(BaseGrappleTest):
         self.assertEqual(len(pages), 2)
         self.assertEqual(pages[0]["title"], "Test post 1")
         self.assertEqual(pages[1]["title"], "Test post 2")
+
+
+class TestRichTextType(BaseGrappleTest):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+
+        cls.richtext_sample = (
+            f'Text with a \'link\' to <a linktype="page" id="{cls.home.id}">Home</a>'
+        )
+        cls.richtext_sample_rendered = (
+            f"Text with a 'link' to <a href=\"{cls.home.url}\">Home</a>"
+        )
+
+    def test_mutate_rich_text_type(self):
+        query = """
+        mutation($url: String!, $text: String!, $richText: RichText) {
+            createAdvert(url: $url, text: $text, richText: $richText) {
+                advert {
+                    id
+                    url
+                    text
+                    richText
+                }
+            }
+        }
+        """
+        result = self.client.execute(
+            query,
+            variables={
+                "url": "https://http.cat",
+                "text": "cats",
+                "richText": self.richtext_sample,
+            },
+        )
+        self.assertEqual(
+            result["data"]["createAdvert"]["advert"]["richText"],
+            self.richtext_sample_rendered,
+        )
+
+        query = """
+        mutation($id: ID!, $url: String, $text: String, $richText: RichText) {
+            updateAdvert(id: $id, url: $url, text: $text, richText: $richText) {
+                advert {
+                    id
+                    url
+                    text
+                    richText
+                }
+            }
+        }
+        """
+        advert_id = result["data"]["createAdvert"]["advert"]["id"]
+        rich_text = "<b>dogs</b>"
+        result = self.client.execute(
+            query, variables={"id": advert_id, "richText": rich_text}
+        )
+        self.assertEqual(
+            result["data"]["updateAdvert"]["advert"]["richText"], rich_text
+        )

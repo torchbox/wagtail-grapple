@@ -122,6 +122,9 @@ class BlogPageFactory(wagtail_factories.PageFactory):
             "gallery": ImageGalleryBlockFactory,
             "page": PageChooserBlockFactory,
             "text_with_callable": TextWithCallableBlockFactory,
+            "objectives": wagtail_factories.ListBlockFactory(
+                wagtail_factories.CharBlockFactory
+            ),
         }
     )
 

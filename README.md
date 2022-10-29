@@ -65,8 +65,8 @@ Getting Grapple installed is designed to be as simple as possible!
 ### Prerequisites
 
 ```
-Django  >= 3.0, <4.0
-Wagtail >= 2.15, <4.1
+Django  >= 3.2, <4.0
+Wagtail >= 2.15, <5.0
 ```
 
 ### Installation
@@ -164,17 +164,17 @@ _For more examples, please refer to the [Documentation](https://wagtail-grapple.
 
 ## Contributing
 
-Contributions are what make the open source community such an amazing place to be learn, inspire, and create. Any contributions you make are **greatly appreciated**.
+Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
 
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/amazing-feature`)
-3. Commit your Changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the Branch (`git push origin feature/amazing-feature`)
+1. Fork the project
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
 ### Local development
 
--   In the python environment of your choice, navigate to `/example`
+-   In the Python environment of your choice, navigate to `/example`
 -   Run `pip install -r requirements.txt`
 -   Run `./manage.py migrate`
 -   Run server `./manage.py runserver`
@@ -184,9 +184,9 @@ Contributions are what make the open source community such an amazing place to b
 
 Wagtail Grapple supports:
 
--   Django >= 3.0, < 4.0
+-   Django >= 3.2, < 4.0
 -   Python 3.7, 3.8, 3.9, and 3.10
--   Wagtail >= 2.15, < 4.0
+-   Wagtail >= 2.15, < 5.0
 
 ## License
 

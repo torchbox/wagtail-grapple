@@ -9,7 +9,7 @@
 [![Build status](https://github.com/torchbox/wagtail-grapple/actions/workflows/ci.yml/badge.svg)](https://github.com/torchbox/wagtail-grapple/actions)
 [![PyPi](https://img.shields.io/pypi/v/wagtail-grapple.svg)](https://pypi.org/project/wagtail-grapple/)
 [![black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-[![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
+[![pre-commit.ci status](https://results.pre-commit.ci/badge/github/torchbox/wagtail-grapple/main.svg)](https://results.pre-commit.ci/latest/github/torchbox/wagtail-grapple/main)
 
 A library to build GraphQL endpoints easily so you can grapple your Wagtail data from anywhere!
 

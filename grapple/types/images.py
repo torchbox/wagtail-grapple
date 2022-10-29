@@ -1,5 +1,6 @@
 import graphene
 from graphene_django import DjangoObjectType
+from wagtail import VERSION as WAGTAIL_VERSION
 from wagtail.images import get_image_model
 from wagtail.images.models import Image as WagtailImage
 from wagtail.images.models import Rendition as WagtailImageRendition
@@ -175,15 +176,21 @@ def ImagesQuery():
         def resolve_image(self, info, id, **kwargs):
             """Returns an image given the id, if in a public collection"""
             try:
-                return mdl.objects.filter(
-                    collection__view_restrictions__isnull=True
-                ).get(pk=id)
-            except BaseException:
+                qs = mdl.objects.filter(collection__view_restrictions__isnull=True)
+                if WAGTAIL_VERSION >= (3, 0):
+                    qs = qs.prefetch_related("renditions")
+                return qs.get(pk=id)
+            except mdl.DoesNotExist:
                 return None
 
         def resolve_images(self, info, **kwargs):
             """Returns all images in a public collection"""
             qs = mdl.objects.filter(collection__view_restrictions__isnull=True)
+            if WAGTAIL_VERSION >= (4, 0):
+                qs = qs.prefetch_renditions()
+            elif WAGTAIL_VERSION >= (3, 0):
+                qs = qs.prefetch_related("renditions")
+
             return resolve_queryset(qs, info, **kwargs)
 
         # Give name of the image type, used to generate mixins

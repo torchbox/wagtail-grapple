@@ -1,10 +1,19 @@
 ## Unreleased
 
+### Added
+
+-   New `GraphQLRichText` field type, and RichText(Scalar) type ([#266](https://github.com/torchbox/wagtail-grapple/pull/266)) @jams2
+
+### Fixed
+
+-   Fix errors with attributes when checking for rich text fields ([#261](https://github.com/torchbox/wagtail-grapple/pull/261)) @Tijani-Dia
+-   Fix IDs for `StrucBlock`s nested in `StreamBlock`s ([#269](https://github.com/torchbox/wagtail-grapple/pull/269)) @Tijani-Dia
+
 ## [0.17.1] - 2022-08-24
 
 ### Fixed
 
--   Fix errors with attributes when checking for rich text fields (#261) @Tijani-Dia
+-   Fix errors with attributes when checking for rich text fields ([#261](https://github.com/torchbox/wagtail-grapple/pull/261)) @Tijani-Dia
 
 ## [0.17.0] - 2022-08-19
 

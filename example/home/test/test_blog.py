@@ -9,7 +9,7 @@ from django.core.exceptions import ValidationError
 from django.core.validators import URLValidator
 from django.test import override_settings
 from django.test.client import RequestFactory
-from home.blocks import CarouselBlock, ImageGalleryImages
+from home.blocks import ButtonBlock, CarouselBlock, ImageGalleryImages
 from home.factories import (
     AdvertFactory,
     BlogPageFactory,
@@ -18,11 +18,14 @@ from home.factories import (
 )
 
 try:
-    from wagtail.blocks import StreamValue
+    from wagtail.blocks import CharBlock, StreamValue
+    from wagtail.blocks.list_block import ListBlock, ListValue
     from wagtail.rich_text import RichText
 except ImportError:
     from wagtail.core.blocks import StreamValue
     from wagtail.core.rich_text import RichText
+
+from wagtail import VERSION as WAGTAIL_VERSION
 from wagtail.embeds.blocks import EmbedValue
 
 from example.tests.test_grapple import BaseGrappleTest
@@ -39,6 +42,31 @@ class BlogTest(BaseGrappleTest):
         cls.richtext_sample_rendered = (
             f"Text with a 'link' to <a href=\"{cls.home.url}\">Home</a>"
         )
+
+        if WAGTAIL_VERSION >= (3, 0):
+            objectives_list = ListValue(
+                ListBlock(CharBlock()), values=["Read all of article!"]
+            )
+            buttons_list = ListValue(
+                ListBlock(ButtonBlock()),
+                values=[
+                    {
+                        "button_text": "btn",
+                        "button_link": "https://www.graphql.com/",
+                    }
+                ],
+            )
+            cls.empty_buttons_list = ListValue(ListBlock(ButtonBlock()), values=[])
+        else:
+            objectives_list = ["Read all of article!"]
+            buttons_list = [
+                {
+                    "button_text": "btn",
+                    "button_link": "https://www.graphql.com/",
+                }
+            ]
+            cls.empty_buttons_list = []
+
         # Add a Blog post
         cls.blog_page = BlogPageFactory(
             body=[
@@ -86,7 +114,7 @@ class BlogTest(BaseGrappleTest):
                     },
                 ),
                 ("callout", {"text": RichText(cls.richtext_sample)}),
-                ("objectives", ["Read all of article!"]),
+                ("objectives", objectives_list),
                 (
                     "video",
                     {
@@ -99,12 +127,7 @@ class BlogTest(BaseGrappleTest):
                     "text_and_buttons",
                     {
                         "text": "Button text",
-                        "buttons": [
-                            {
-                                "button_text": "btn",
-                                "button_link": "https://www.graphql.com/",
-                            }
-                        ],
+                        "buttons": buttons_list,
                         "mainbutton": {
                             "button_text": "Take me to the source",
                             "button_link": "https://wagtail.io/",
@@ -842,7 +865,8 @@ class BlogTest(BaseGrappleTest):
 
     def test_empty_list_in_structblock(self):
         another_blog_post = BlogPageFactory(
-            body=[("text_and_buttons", {"buttons": []})], parent=self.home
+            body=[("text_and_buttons", {"buttons": self.empty_buttons_list})],
+            parent=self.home,
         )
         block_type = "TextAndButtonsBlock"
         block_query = """

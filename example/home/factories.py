@@ -81,7 +81,7 @@ class TextWithCallableBlockFactory(wagtail_factories.StructBlockFactory):
         model = TextWithCallableBlock
 
 
-class BlogPageRelatedLinkFactory(factory.DjangoModelFactory):
+class BlogPageRelatedLinkFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = BlogPageRelatedLink
 
@@ -90,7 +90,7 @@ class BlogPageRelatedLinkFactory(factory.DjangoModelFactory):
     url = factory.Sequence(lambda n: f"Url {n}")
 
 
-class AuthorFactory(factory.DjangoModelFactory):
+class AuthorFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Author
 
@@ -99,7 +99,7 @@ class AuthorFactory(factory.DjangoModelFactory):
     person = factory.SubFactory("home.factories.PersonFactory")
 
 
-class PersonFactory(factory.DjangoModelFactory):
+class PersonFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Person
 
@@ -122,6 +122,9 @@ class BlogPageFactory(wagtail_factories.PageFactory):
             "gallery": ImageGalleryBlockFactory,
             "page": PageChooserBlockFactory,
             "text_with_callable": TextWithCallableBlockFactory,
+            "objectives": wagtail_factories.ListBlockFactory(
+                wagtail_factories.CharBlockFactory
+            ),
         }
     )
 

@@ -1018,8 +1018,6 @@ class ImagesTest(BaseGrappleTest):
     def test_src_set_num_queries(self):
         sizes = [360, 720, 1024]
         filters = [f"width-{size}" for size in sizes]
-        N = 5  # Number of images
-        M = len(sizes)  # Number of renditions to generate per image
 
         def get_renditions(image):
             for img_filter in filters:
@@ -1027,7 +1025,7 @@ class ImagesTest(BaseGrappleTest):
 
         # Generate renditions for each filter in the filters list for all images
         get_renditions(self.example_image)
-        for i in range(N - 1):
+        for i in range(4):
             get_renditions(wagtail_factories.ImageFactory(title=f"Image {i}"))
 
         query = """
@@ -1038,7 +1036,11 @@ class ImagesTest(BaseGrappleTest):
         }
         """
 
-        with self.assertNumQueries(N * M + 1):
+        if WAGTAIL_VERSION >= (3, 0):
+            num_queries = 2
+        else:
+            num_queries = 5 * 3 + 1  # images x renditions + 1
+        with self.assertNumQueries(num_queries):
             self.client.execute(query)
 
     def tearDown(self):

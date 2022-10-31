@@ -1,5 +1,7 @@
 ## Unreleased
 
+## [0.18.0] - 2022-10-31
+
 ### Added
 
 -   New `GraphQLRichText` field type, and RichText(Scalar) type ([#266](https://github.com/torchbox/wagtail-grapple/pull/266)) @jams2
@@ -8,6 +10,7 @@
 
 -   Fix errors with attributes when checking for rich text fields ([#261](https://github.com/torchbox/wagtail-grapple/pull/261)) @Tijani-Dia
 -   Fix IDs for `StrucBlock`s nested in `StreamBlock`s ([#269](https://github.com/torchbox/wagtail-grapple/pull/269)) @Tijani-Dia
+-   Renditions are prefetched when using Wagtail 3.0+ ([#271](https://github.com/torchbox/wagtail-grapple/pull/269)) @zerolab with hat-tip to @Tijani-Dia
 
 ## [0.17.1] - 2022-08-24
 
@@ -253,7 +256,8 @@
 -   Improve field definition and under-the-hood implementation ([#28](https://github.com/torchbox/wagtail-grapple/pull/28))
 -   Add conditional checks when resolving streamfield type ([#29](https://github.com/torchbox/wagtail-grapple/pull/29))
 
-[unreleased]: https://github.com/torchbox/wagtail-grapple/compare/v0.17.1...HEAD
+[unreleased]: https://github.com/torchbox/wagtail-grapple/compare/v0.18.0...HEAD
+[0.18.0]: https://github.com/torchbox/wagtail-grapple/compare/v0.17.1...v0.18.0
 [0.17.1]: https://github.com/torchbox/wagtail-grapple/compare/v0.17.0...v0.17.1
 [0.17.0]: https://github.com/torchbox/wagtail-grapple/compare/v0.16.0...v0.17.0
 [0.16.0]: https://github.com/torchbox/wagtail-grapple/compare/v0.15.1...v0.16.0

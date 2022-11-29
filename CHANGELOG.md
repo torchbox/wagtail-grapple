@@ -1,5 +1,11 @@
 ## Unreleased
 
+## [0.18.1] - 2022-11-29
+
+### Changed
+
+-   Upgrade graphiql to 2.0.13, React to 18.2.0 ([#273](https://github.com/torchbox/wagtail-grapple/pull/273)) @dopry
+
 ## [0.18.0] - 2022-10-31
 
 ### Added
@@ -256,7 +262,8 @@
 -   Improve field definition and under-the-hood implementation ([#28](https://github.com/torchbox/wagtail-grapple/pull/28))
 -   Add conditional checks when resolving streamfield type ([#29](https://github.com/torchbox/wagtail-grapple/pull/29))
 
-[unreleased]: https://github.com/torchbox/wagtail-grapple/compare/v0.18.0...HEAD
+[unreleased]: https://github.com/torchbox/wagtail-grapple/compare/v0.18.1...HEAD
+[0.18.1]: https://github.com/torchbox/wagtail-grapple/compare/v0.18.0...v0.18.1
 [0.18.0]: https://github.com/torchbox/wagtail-grapple/compare/v0.17.1...v0.18.0
 [0.17.1]: https://github.com/torchbox/wagtail-grapple/compare/v0.17.0...v0.17.1
 [0.17.0]: https://github.com/torchbox/wagtail-grapple/compare/v0.16.0...v0.17.0

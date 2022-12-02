@@ -15,6 +15,7 @@ from home.models import (
     AuthorPage,
     BlogPage,
     BlogPageRelatedLink,
+    MiddlewareModel,
     Person,
     SimpleModel,
 )
@@ -163,3 +164,8 @@ class AdvertFactory(factory.django.DjangoModelFactory):
 class SimpleModelFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = SimpleModel
+
+
+class MiddlewareModelFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = MiddlewareModel

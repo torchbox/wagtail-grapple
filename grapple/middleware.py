@@ -38,6 +38,7 @@ class GrappleMiddleware:
         parent_name = info.parent_type.name
         if field_name in self.field_middlewares and parent_name in ROOT_TYPES:
             for middleware in self.field_middlewares[field_name]:
-                return middleware(next, root, info, **kwargs)
-
+                response = middleware(next, root, info, **args)
+                if not response:
+                    return None
         return next(root, info, **kwargs)

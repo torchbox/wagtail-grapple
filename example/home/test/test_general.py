@@ -2,11 +2,14 @@ import uuid
 
 from django.contrib.auth.models import AnonymousUser
 from django.test import RequestFactory, override_settings
-<<<<<<< HEAD
-from home.factories import AdvertFactory, BlogPageFactory, SimpleModelFactory
-=======
-from home.factories import BlogPageFactory, SimpleModelFactory, MiddlewareModelFactory
->>>>>>> e8bcc5a (Fixes #227 run all middleware passed through decorators)
+from home.factories import (
+    AdvertFactory,
+    BlogPageFactory,
+    MiddlewareModelFactory,
+    SimpleModelFactory,
+)
+
+from home.factories import BlogPageFactory, MiddlewareModelFactory, SimpleModelFactory
 
 from example.tests.test_grapple import BaseGrappleTest
 
@@ -155,13 +158,16 @@ class TestRegisterQueryField(BaseGrappleTest):
         }
         """
         results = self.client.execute(
-            query, variables={'id': 1}, context_value=self.request)
+            query, variables={"id": 1}, context_value=self.request
+        )
         # Check that both middleware ran ok, value returned means the assert passed in middleware_2
         self.assertEqual(int(results["data"]["middlewareModel"]["id"]), 1)
         results = self.client.execute(
-            query, variables={'id': 2}, context_value=self.request)
+            query, variables={"id": 2}, context_value=self.request
+        )
         # Check that the second middleware failed when id = 2
         self.assertEqual(results["data"]["middlewareModel"], None)
+
 
 class TestRegisterPaginatedQueryField(BaseGrappleTest):
     def setUp(self):

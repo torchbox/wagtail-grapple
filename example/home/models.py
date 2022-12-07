@@ -58,12 +58,14 @@ def custom_middleware_one(next, root, info, **args):
 def custom_middleware_two(next, root, info, **args):
     if not info.context.custom_middleware_one:
         raise Exception("Middleware one should have been called")
-    if args['id'] == 2:
+    if args["id"] == 2:
         return None
     return next(root, info, **args)
 
 
-@register_query_field('middlewareModel', middleware=[custom_middleware_one, custom_middleware_two])
+@register_query_field(
+    "middlewareModel", middleware=[custom_middleware_one, custom_middleware_two]
+)
 class MiddlewareModel(models.Model):
     pass
 

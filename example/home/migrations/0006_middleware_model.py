@@ -6,15 +6,22 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('home', '0005_auto_20220909_0959'),
+        ("home", "0005_auto_20220909_0959"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='MiddlewareModel',
+            name="MiddlewareModel",
             fields=[
-                ('id', models.AutoField(auto_created=True,
-                 primary_key=True, serialize=False, verbose_name='ID')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
             ],
         ),
     ]

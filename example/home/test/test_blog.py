@@ -900,6 +900,7 @@ class BlogTest(BaseGrappleTest):
         request.user = AnonymousUser()
         results = self.client.execute(query, context_value=request)
 
+        self.assertNotIn("errors", results)
         self.assertTrue("firstPost" in results["data"])
         self.assertEqual(int(results["data"]["firstPost"]["id"]), self.blog_page.id)
 

@@ -94,17 +94,19 @@ Note: subscriptions are only enabled when Grapple is installed with Django Chann
 Grapple provides a ``register_schema_subscription`` hook that is called when it creates the schema. You can use it to add your custom ``Subscription`` mixins
 
 .. code-block:: python
-
-    # your_app/subscriptions.py
+    import asyncio
     import graphene
-    from rx import Observable
 
 
     class Subscription(graphene.ObjectType):
-        hello = graphene.String()
+        count_seconds = graphene.String()
 
-        def resolve_hello(root, info):
-            return Observable.interval(3000).map(lambda i: "hello world!")
+        async def resolve_count_seconds(root, info, up_to):
+            for i in range(up_to):
+                yield i
+                await asyncio.sleep(1.0)
+            yield up_to
+
 
 
 .. code-block:: python

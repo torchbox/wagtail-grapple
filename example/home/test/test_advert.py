@@ -1,10 +1,10 @@
 from django.test import override_settings
 from home.factories import AdvertFactory
 
-from example.tests.test_grapple import BaseGrappleTest
+from example.tests.test_grapple import BaseGrappleTestWithIntrospection
 
 
-class AdvertTest(BaseGrappleTest):
+class AdvertTest(BaseGrappleTestWithIntrospection):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
@@ -58,8 +58,9 @@ class AdvertTest(BaseGrappleTest):
         self.validate_advert(advert)
 
     def test_advert_all_query_required(self):
-        queries = self.client.schema.introspect()["__schema"]["types"][0]["fields"]
-        adverts_query = list(filter(lambda x: x["name"] == "adverts", queries))[0]
+        adverts_query = list(
+            filter(lambda x: x["name"] == "adverts", self.available_queries)
+        )[0]
         adverts_query_kind = adverts_query["type"]["kind"]
         adverts_query_type = adverts_query["type"]["ofType"]
 
@@ -70,8 +71,9 @@ class AdvertTest(BaseGrappleTest):
         self.assertTrue(adverts_query_type["ofType"]["ofType"]["name"] == "Advert")
 
     def test_advert_single_query_required(self):
-        queries = self.client.schema.introspect()["__schema"]["types"][0]["fields"]
-        advert_query = list(filter(lambda x: x["name"] == "advert", queries))[0]
+        advert_query = list(
+            filter(lambda x: x["name"] == "advert", self.available_queries)
+        )[0]
         advert_query_kind = advert_query["type"]["kind"]
         advert_query_type = advert_query["type"]["ofType"]
 

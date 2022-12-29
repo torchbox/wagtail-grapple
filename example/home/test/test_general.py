@@ -2,7 +2,7 @@ import uuid
 
 from django.contrib.auth.models import AnonymousUser
 from django.test import RequestFactory, override_settings
-from home.factories import BlogPageFactory, SimpleModelFactory
+from home.factories import AdvertFactory, BlogPageFactory, SimpleModelFactory
 
 from example.tests.test_grapple import BaseGrappleTest
 
@@ -540,3 +540,18 @@ class TestFieldMiddleware(BaseGrappleTest):
         results = self.client.execute(query, context_value=self.request)
         data = results["data"]["blogPages"]
         self.assertEqual(data, None)
+
+    def test_function_middleware(self):
+        advert = AdvertFactory(text="test")
+
+        query = """
+        query($url: String) {
+           advert(url: $url) {
+                text
+            }
+        }
+        """
+        self.client.execute(
+            query, variables={"url": advert.url}, context_value=self.request
+        )
+        self.assertTrue(self.request.custom_middleware)

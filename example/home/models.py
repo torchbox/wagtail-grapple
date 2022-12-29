@@ -252,6 +252,11 @@ class Author(Orderable):
     graphql_fields = [GraphQLString("role"), GraphQLForeignKey("person", Person)]
 
 
+def custom_middleware(next, root, info, **kwargs):
+    info.context.custom_middleware = True
+    return next(root, info, **kwargs)
+
+
 @register_snippet
 @register_query_field(
     "advert",
@@ -260,6 +265,7 @@ class Author(Orderable):
     required=True,
     plural_required=True,
     plural_item_required=True,
+    middleware=[custom_middleware],
 )
 class Advert(models.Model):
     url = models.URLField(null=True, blank=True)

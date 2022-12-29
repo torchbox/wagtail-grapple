@@ -1,8 +1,0 @@
-Django>=3.2,<4.2
-wagtail>=2.15,<5.0
-wagtailmedia>=0.13
-graphene-django>=3.0.0
-factory-boy==3.2.1
-wagtail-factories>=4.0.0,<4.1.0
-django-cors-headers==3.4.0
-wagtail-headless-preview

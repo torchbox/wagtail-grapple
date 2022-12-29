@@ -1,8 +1,11 @@
-# Test requirements.
-black>=22.12.0
-
-# Your app requirements.
--r ../requirements.txt
+Django>=3.2,<4.2
+wagtail>=4.1,<5.0
+graphene-django>=3.0.0
+factory-boy==3.2.1
+wagtail-factories==3.1.0
+django-cors-headers==3.4.0
+wagtailmedia>=0.13
+wagtail-headless-preview
 
 # Your app in editable mode.
 -e ../

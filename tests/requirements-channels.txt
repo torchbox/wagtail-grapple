@@ -1,5 +1,6 @@
-# Project channel requirements
--r ../requirements-channels.txt
-
 # Local development requirements
 -r ./requirements.txt
+
+# Channels-specific requirements
+channels>=3.0, <3.1
+Rx==3.2.0

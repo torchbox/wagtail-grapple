@@ -7,6 +7,7 @@ A middleware is any object or function that responds to ``resolve(next_middlewar
 
 You can read more about middleware on the `Graphene docs <https://docs.graphene-python.org/en/latest/execution/middleware/>`_.
 
+You must enable the GrappleMiddleware for grapple's field level middleware to work.
 
 GrappleMiddleware
 -----------------

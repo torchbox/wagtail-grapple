@@ -1,24 +1,9 @@
-import inspect
-
 from graphene import ResolveInfo
-from graphql.execution.middleware import MIDDLEWARE_RESOLVER_FUNCTION
+from graphql.execution.middleware import get_middleware_resolvers
 
 from .registry import registry
 
 ROOT_TYPES = ["Query", "Mutation", "Subscription"]
-
-
-def get_middleware_resolvers(middlewares):
-    for middleware in middlewares:
-        if inspect.isfunction(middleware):
-            yield middleware
-        if not hasattr(middleware, MIDDLEWARE_RESOLVER_FUNCTION):
-            raise Exception(
-                "Middleware must be either a class or a function. Got: {}.\nYou can read more about middleware here: https://docs.graphene-python.org/en/latest/execution/middleware/".format(
-                    type(middleware)
-                )
-            )
-        yield getattr(middleware(), MIDDLEWARE_RESOLVER_FUNCTION)
 
 
 class IsAuthenticatedMiddleware(object):

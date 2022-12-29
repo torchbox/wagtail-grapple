@@ -1,5 +1,5 @@
 import graphene
-from graphql.validation.rules import NoUnusedFragments, specified_rules
+from graphql.validation import NoUnusedFragmentsRule
 
 try:
     from wagtail import hooks
@@ -16,9 +16,9 @@ from .settings import grapple_settings
 # to be a nice way to disable this validator so we monkey-patch it instead.
 
 
-# We need to update specified_rules in-place so the change appears
-# everywhere it's been imported
-specified_rules[:] = [rule for rule in specified_rules if rule is not NoUnusedFragments]
+# We can't simply override specified_rules because it's a tuple and immutable. Instead we are
+# monkey patching the NoUnusedFragmentRule.leave_document so it doesn't do any validation.
+NoUnusedFragmentsRule.leave_document = lambda self, *_args: None
 
 
 def create_schema():

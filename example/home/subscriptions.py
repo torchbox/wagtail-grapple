@@ -1,9 +1,11 @@
+import asyncio
+
 import graphene
-from rx import Observable
 
 
 class Subscription(graphene.ObjectType):
     hello = graphene.String()
 
-    def resolve_hello(root, info):
-        return Observable.interval(3000).map(lambda i: "hello world!")
+    async def resolve_hello(root, info):
+        await asyncio.sleep(3.0)
+        yield "hello world!"

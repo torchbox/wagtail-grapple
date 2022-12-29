@@ -4,7 +4,7 @@ from django.db.models import Q
 from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
 from graphene_django.types import DjangoObjectType
-from graphql.error import GraphQLError, GraphQLLocatedError
+from graphql import GraphQLError
 
 from ..utils import resolve_site
 
@@ -88,7 +88,7 @@ class PageInterface(graphene.Interface):
         """
         try:
             return self.get_parent().specific
-        except GraphQLLocatedError:
+        except GraphQLError:
             return WagtailPage.objects.none()
 
     def resolve_children(self, info, **kwargs):
@@ -372,7 +372,7 @@ def PagesQuery():
 
 
 if has_channels:
-    from rx.subjects import Subject
+    from rx.subject import Subject
 
     # Subject to sync Django Signals to Observable
     preview_subject = Subject()

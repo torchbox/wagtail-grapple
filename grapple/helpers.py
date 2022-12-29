@@ -37,17 +37,19 @@ def register_graphql_schema(schema_cls):
     return schema_cls
 
 
-def register_field_middleware(field_name: str, middleware):
-    assert isinstance(middleware, list), "middleware should be list but got {}.".format(
-        type(middleware)
-    )
+def register_field_middleware(field_name: str, middleware_list: list):
+    if not isinstance(middleware_list, list):
+        raise TypeError(
+            f"middleware_list should be a list, got {type(middleware_list)}"
+        )
+
     if grapple_settings.AUTO_CAMELCASE:
         field_name = to_camel_case(field_name)
 
     if field_name in field_middlewares:
-        field_middlewares[field_name] += middleware
+        field_middlewares[field_name] += middleware_list
     else:
-        field_middlewares[field_name] = middleware
+        field_middlewares[field_name] = middleware_list
 
 
 def register_query_field(

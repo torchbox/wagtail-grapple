@@ -91,9 +91,11 @@ class BlogPageTag(TaggedItemBase):
     )
 
 
-@register_singular_query_field("first_post", middleware=[IsAnonymousMiddleware()])
-@register_paginated_query_field("blog_page", middleware=[IsAnonymousMiddleware()])
-@register_query_field("post", middleware=[IsAnonymousMiddleware()])
+@register_singular_query_field("first_post", middleware=[IsAnonymousMiddleware])
+@register_paginated_query_field("blog_page", middleware=[IsAnonymousMiddleware])
+@register_query_field(
+    "post", middleware=[IsAnonymousMiddleware()]
+)  # instantiated on purpose
 class BlogPage(HeadlessPreviewMixin, Page):
     date = models.DateField("Post date")
     advert = models.ForeignKey(

@@ -6,33 +6,38 @@ from .registry import registry
 ROOT_TYPES = ["Query", "Mutation", "Subscription"]
 
 
-class IsAuthenticatedMiddleware(object):
-    def resolve(self, next, root, info, **args):
+class IsAuthenticatedMiddleware:
+    def resolve(self, next, root, info, **kwargs):
         if not info.context.user.is_authenticated:
             return None
-        return next(root, info, **args)
+        return next(root, info, **kwargs)
 
 
-class IsAnonymousMiddleware(object):
-    def resolve(self, next, root, info, **args):
+class IsAnonymousMiddleware:
+    def resolve(self, next, root, info, **kwargs):
         if not info.context.user.is_anonymous:
             return None
-        return next(root, info, **args)
+        return next(root, info, **kwargs)
 
 
-class GrappleMiddleware(object):
+class GrappleMiddleware:
     def __init__(self):
         self.field_middlewares = {}
         for field_name in registry.field_middlewares:
+            #  get_middleware_resolvers expects an instantiated class, if passing a class-based middleware.
+            middlewares = tuple(
+                middleware() if isinstance(middleware, type) else middleware
+                for middleware in registry.field_middlewares[field_name]
+            )
             self.field_middlewares[field_name] = list(
-                get_middleware_resolvers(registry.field_middlewares[field_name])
+                get_middleware_resolvers(middlewares)
             )
 
-    def resolve(self, next, root, info: ResolveInfo, **args):
+    def resolve(self, next, root, info: ResolveInfo, **kwargs):
         field_name = info.field_name
         parent_name = info.parent_type.name
         if field_name in self.field_middlewares and parent_name in ROOT_TYPES:
             for middleware in self.field_middlewares[field_name]:
-                return middleware(next, root, info, **args)
+                return middleware(next, root, info, **kwargs)
 
-        return next(root, info, **args)
+        return next(root, info, **kwargs)

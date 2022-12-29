@@ -1,4 +1,4 @@
-from django.test import override_settings
+from django.test import RequestFactory, override_settings
 from home.factories import AdvertFactory
 
 from example.tests.test_grapple import BaseGrappleTestWithIntrospection
@@ -19,6 +19,10 @@ class AdvertTest(BaseGrappleTestWithIntrospection):
             rich_text=cls.richtext_sample, extra_rich_text=cls.richtext_sample
         )
 
+    def setUp(self):
+        super().setUp()
+        self.request = RequestFactory()
+
     def validate_advert(self, advert):
         # Check all the fields
         self.assertTrue(isinstance(advert["id"], str))
@@ -35,7 +39,7 @@ class AdvertTest(BaseGrappleTestWithIntrospection):
             }
         }
         """
-        executed = self.client.execute(query)
+        executed = self.client.execute(query, context_value=self.request)
         advert = executed["data"]["adverts"][0]
 
         # Check all the fields
@@ -51,7 +55,9 @@ class AdvertTest(BaseGrappleTestWithIntrospection):
             }
         }
         """
-        executed = self.client.execute(query, variables={"url": self.advert.url})
+        executed = self.client.execute(
+            query, variables={"url": self.advert.url}, context_value=self.request
+        )
         advert = executed["data"]["advert"]
 
         # Check all the fields
@@ -91,7 +97,9 @@ class AdvertTest(BaseGrappleTestWithIntrospection):
             }
         }
         """
-        executed = self.client.execute(query, variables={"url": self.advert.url})
+        executed = self.client.execute(
+            query, variables={"url": self.advert.url}, context_value=self.request
+        )
         advert = executed["data"]["advert"]
 
         # Field declared with GraphQLRichText
@@ -104,7 +112,9 @@ class AdvertTest(BaseGrappleTestWithIntrospection):
         self.assertEqual(advert["extraRichText"], self.richtext_sample_rendered)
 
         with override_settings(GRAPPLE={"RICHTEXT_FORMAT": "raw"}):
-            executed = self.client.execute(query, variables={"url": self.advert.url})
+            executed = self.client.execute(
+                query, variables={"url": self.advert.url}, context_value=self.request
+            )
             advert = executed["data"]["advert"]
             self.assertEqual(advert["richText"], self.richtext_sample)
             self.assertEqual(advert["stringRichText"], self.richtext_sample)

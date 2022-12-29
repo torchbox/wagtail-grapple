@@ -18,6 +18,7 @@ from home.factories import (
 )
 from wagtail.blocks import CharBlock, StreamValue
 from wagtail.blocks.list_block import ListBlock, ListValue
+
 from wagtail.embeds.blocks import EmbedValue
 from wagtail.rich_text import RichText
 

@@ -2,9 +2,8 @@ import uuid
 
 from django.contrib.auth.models import AnonymousUser
 from django.test import RequestFactory, override_settings
-from home.factories import AdvertFactory, BlogPageFactory, SimpleModelFactory
-
 from example.tests.test_grapple import BaseGrappleTest
+from home.factories import AdvertFactory, BlogPageFactory, SimpleModelFactory
 
 
 class AuthenticatedUser(AnonymousUser):

@@ -1,7 +1,6 @@
 from django.test import RequestFactory, override_settings
-from home.factories import AdvertFactory
-
 from example.tests.test_grapple import BaseGrappleTestWithIntrospection
+from home.factories import AdvertFactory
 
 
 class AdvertTest(BaseGrappleTestWithIntrospection):

@@ -1,5 +1,0 @@
-# Project channel requirements
--r ../requirements-channels.txt
-
-# Local development requirements
--r ./requirements.txt

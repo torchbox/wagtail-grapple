@@ -1,4 +1,3 @@
-import inspect
 import os
 import sys
 import unittest
@@ -38,7 +37,7 @@ SCHEMA = locate(settings.GRAPHENE["SCHEMA"])
 MIDDLEWARE_OBJECTS = [
     locate(middleware) for middleware in settings.GRAPHENE["MIDDLEWARE"]
 ]
-MIDDLEWARE = [item() if inspect.isclass(item) else item for item in MIDDLEWARE_OBJECTS]
+MIDDLEWARE = [item() if isinstance(item, type) else item for item in MIDDLEWARE_OBJECTS]
 
 
 class BaseGrappleTest(TestCase):

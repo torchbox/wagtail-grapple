@@ -105,8 +105,7 @@ the root query type like so:
     }
 
 
-``ImageObjectType`` provides the following fields which include all the fields
-need for Gatsby Image features to work (see Handy Fragments page for more info):
+``ImageObjectType`` provides the following fields:
 
 ::
 

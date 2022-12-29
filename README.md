@@ -175,11 +175,11 @@ Any contributions [you make](https://github.com/torchbox/wagtail-grapple/graphs/
 
 ### Local development
 
--   In the Python environment of your choice, navigate to `/example`
--   Run `pip install -r requirements.txt`
--   Run `./manage.py migrate`
--   Run server `./manage.py runserver`
--   Run tests `./manage.py test`
+-   In the Python environment of your choice, navigate to `tests/`
+-   Run `python -m pip install -r requirements.txt`
+-   Run `python manage.py migrate`
+-   Run server `python manage.py runserver`
+-   Run tests `python manage.py test`
 
 ## Compatibility
 

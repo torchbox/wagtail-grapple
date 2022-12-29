@@ -9,6 +9,5 @@ General Usage
     preview
     decorators
     hooks
-    usage-with-gatsby
     settings
     middleware

@@ -71,8 +71,17 @@ Wagtail >= 4.1
 
 ### Installation
 
+#### Using pip
+
 ```bash
-pip install wagtail_grapple
+python -m pip install wagtail_grapple
+```
+
+#### Using flit
+
+```bash
+python -m pip install "flit>=3.8.0"
+flit install
 ```
 
 Add the following to the `INSTALLED_APPS` list in your Wagtail settings file:

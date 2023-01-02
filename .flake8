@@ -1,0 +1,5 @@
+[flake8]
+select = C,E,F,W,B,I
+ignore = E203,E501,W503
+exclude=migrations,dist,build,venv,node_modules,.tox,venv,.venv,.git
+max-line-length=88

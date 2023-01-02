@@ -23,12 +23,12 @@ repos:
     hooks:
       - id: black
   - repo: https://github.com/pycqa/isort
-    # isort config is in setup.cfg
+    # isort config is in pyproject.toml
     rev: 5.12.0
     hooks:
       - id: isort
   - repo: https://github.com/pycqa/flake8
-    # flake8 config is in setup.cfg
+    # flake8 config is in .flake8
     rev: 6.0.0
     hooks:
       - id: flake8

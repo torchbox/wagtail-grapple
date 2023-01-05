@@ -103,19 +103,6 @@ def resolve_queryset(
     else:
         qs = qs.all()
 
-    if id is None and search_query:
-        # Check if the queryset is searchable using Wagtail search.
-        if not class_is_indexed(qs.model):
-            raise TypeError("This data type is not searchable by Wagtail.")
-
-        if grapple_settings.ADD_SEARCH_HIT:
-            query = Query.get(search_query)
-            query.add_hit()
-
-        qs = get_search_backend().search(search_query, qs)
-
-        return _sliced_queryset(qs, limit, offset)
-
     if order is not None:
         qs = qs.order_by(*(x.strip() for x in order.split(",")))
 
@@ -126,6 +113,17 @@ def resolve_queryset(
             pass
         else:
             qs = qs.filter(collection=collection)
+
+    if id is None and search_query:
+        # Check if the queryset is searchable using Wagtail search.
+        if not class_is_indexed(qs.model):
+            raise TypeError("This data type is not searchable by Wagtail.")
+
+        if grapple_settings.ADD_SEARCH_HIT:
+            query = Query.get(search_query)
+            query.add_hit()
+
+        qs = get_search_backend().search(search_query, qs)
 
     return _sliced_queryset(qs, limit, offset)
 

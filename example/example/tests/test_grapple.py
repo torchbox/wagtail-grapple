@@ -434,6 +434,72 @@ class PagesTest(BaseGrappleTest):
             self.assertTrue(page["urlPath"].startswith(p1_2.url_path))
             self.assertEquals(page["depth"], p1_2.depth + 1)
 
+    def test_pages_search_and_natural_order(self):
+        BlogPageFactory(title="Alpha", parent=self.home)
+        BlogPageFactory(title="Alpha Alpha", parent=self.home)
+        BlogPageFactory(title="Alpha Beta", parent=self.home)
+        BlogPageFactory(title="Alpha Gamma", parent=self.home)
+        BlogPageFactory(title="Beta", parent=self.home)
+        BlogPageFactory(title="Beta Alpha", parent=self.home)
+        BlogPageFactory(title="Beta Beta", parent=self.home)
+        BlogPageFactory(title="Beta Gamma", parent=self.home)
+        BlogPageFactory(title="Gama", parent=self.home)
+        BlogPageFactory(title="Gamma Alpha", parent=self.home)
+        BlogPageFactory(title="Gamma Beta", parent=self.home)
+        BlogPageFactory(title="Gamma Gamma", parent=self.home)
+
+        query = """
+        query($searchQuery: String, $order: String) {
+            pages(searchQuery: $searchQuery, order: $order) {
+                title
+            }
+        }
+        """
+        executed = self.client.execute(query, variables={"searchQuery": "Alpha"})
+        page_data = executed["data"].get("pages")
+
+        self.assertEquals(len(page_data), 6)
+        self.assertEquals(page_data[0]["title"], "Alpha")
+        self.assertEquals(page_data[1]["title"], "Alpha Alpha")
+        self.assertEquals(page_data[2]["title"], "Alpha Beta")
+        self.assertEquals(page_data[3]["title"], "Alpha Gamma")
+        self.assertEquals(page_data[4]["title"], "Beta Alpha")
+        self.assertEquals(page_data[5]["title"], "Gamma Alpha")
+
+    def test_pages_search_and_explicit_order(self):
+        BlogPageFactory(title="Alpha", parent=self.home)
+        BlogPageFactory(title="Alpha Alpha", parent=self.home)
+        BlogPageFactory(title="Alpha Beta", parent=self.home)
+        BlogPageFactory(title="Alpha Gamma", parent=self.home)
+        BlogPageFactory(title="Beta", parent=self.home)
+        BlogPageFactory(title="Beta Alpha", parent=self.home)
+        BlogPageFactory(title="Beta Beta", parent=self.home)
+        BlogPageFactory(title="Beta Gamma", parent=self.home)
+        BlogPageFactory(title="Gamma", parent=self.home)
+        BlogPageFactory(title="Gamma Alpha", parent=self.home)
+        BlogPageFactory(title="Gamma Beta", parent=self.home)
+        BlogPageFactory(title="Gamma Gamma", parent=self.home)
+
+        query = """
+        query($searchQuery: String, $order: String) {
+            pages(searchQuery: $searchQuery, order: $order) {
+                title
+            }
+        }
+        """
+        executed = self.client.execute(
+            query, variables={"searchQuery": "Gamma", "order": "-title"}
+        )
+        page_data = executed["data"].get("pages")
+
+        self.assertEquals(len(page_data), 6)
+        self.assertEquals(page_data[0]["title"], "Gamma Gamma")
+        self.assertEquals(page_data[1]["title"], "Gamma Beta")
+        self.assertEquals(page_data[2]["title"], "Gamma Alpha")
+        self.assertEquals(page_data[3]["title"], "Gamma")
+        self.assertEquals(page_data[4]["title"], "Beta Gamma")
+        self.assertEquals(page_data[5]["title"], "Alpha Gamma")
+
 
 class PageUrlPathTest(BaseGrappleTest):
     def _query_by_path(self, path, in_site=False):

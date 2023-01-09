@@ -1,5 +1,12 @@
 ## Unreleased
 
+## [0.19.0] - 2023-01-09
+
+### Changed
+
+-   Upgrade graphene to v3 ([#143](https://github.com/torchbox/wagtail-grapple/pull/143), [#285](https://github.com/torchbox/wagtail-grapple/pull/285)) @fabienheureux, @dopry
+-   Change search queries to respect specified order ([#292](https://github.com/torchbox/wagtail-grapple/pull/292)) @dopry
+
 ## [0.18.1] - 2022-11-29
 
 ### Changed
@@ -262,7 +269,8 @@
 -   Improve field definition and under-the-hood implementation ([#28](https://github.com/torchbox/wagtail-grapple/pull/28))
 -   Add conditional checks when resolving streamfield type ([#29](https://github.com/torchbox/wagtail-grapple/pull/29))
 
-[unreleased]: https://github.com/torchbox/wagtail-grapple/compare/v0.18.1...HEAD
+[unreleased]: https://github.com/torchbox/wagtail-grapple/compare/v0.19.0...HEAD
+[0.19.0]: https://github.com/torchbox/wagtail-grapple/compare/v0.18.1...v0.19.0
 [0.18.1]: https://github.com/torchbox/wagtail-grapple/compare/v0.18.0...v0.18.1
 [0.18.0]: https://github.com/torchbox/wagtail-grapple/compare/v0.17.1...v0.18.0
 [0.17.1]: https://github.com/torchbox/wagtail-grapple/compare/v0.17.0...v0.17.1

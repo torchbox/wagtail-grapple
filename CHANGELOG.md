@@ -6,6 +6,7 @@
 
 -   Upgrade graphene to v3 ([#143](https://github.com/torchbox/wagtail-grapple/pull/143), [#285](https://github.com/torchbox/wagtail-grapple/pull/285)) @fabienheureux, @dopry
 -   Change search queries to respect specified order ([#292](https://github.com/torchbox/wagtail-grapple/pull/292)) @dopry
+-   Allows installation on Django 4.1
 
 ## [0.18.1] - 2022-11-29
 

@@ -185,7 +185,7 @@ Any contributions [you make](https://github.com/torchbox/wagtail-grapple/graphs/
 
 Wagtail Grapple supports:
 
--   Django >= 3.2, < 4.0
+-   Django >= 3.2, < 4.2
 -   Python 3.7, 3.8, 3.9, and 3.10
 -   Wagtail >= 2.15, < 5.0
 

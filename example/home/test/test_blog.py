@@ -32,15 +32,14 @@ from example.tests.test_grapple import BaseGrappleTest
 
 
 class BlogTest(BaseGrappleTest):
-    @classmethod
-    def setUpTestData(cls):
-        super().setUpTestData()
-
-        cls.richtext_sample = (
-            f'Text with a \'link\' to <a linktype="page" id="{cls.home.id}">Home</a>'
+    def setUp(self):
+        super().setUp()
+        # FIXME: change back to setUpTestData once https://github.com/wagtail/wagtail/issues/9788 is fixed
+        self.richtext_sample = (
+            f'Text with a \'link\' to <a linktype="page" id="{self.home.id}">Home</a>'
         )
-        cls.richtext_sample_rendered = (
-            f"Text with a 'link' to <a href=\"{cls.home.url}\">Home</a>"
+        self.richtext_sample_rendered = (
+            f"Text with a 'link' to <a href=\"{self.home.url}\">Home</a>"
         )
 
         if WAGTAIL_VERSION >= (3, 0):
@@ -56,7 +55,7 @@ class BlogTest(BaseGrappleTest):
                     }
                 ],
             )
-            cls.empty_buttons_list = ListValue(ListBlock(ButtonBlock()), values=[])
+            self.empty_buttons_list = ListValue(ListBlock(ButtonBlock()), values=[])
         else:
             objectives_list = ["Read all of article!"]
             buttons_list = [
@@ -65,15 +64,15 @@ class BlogTest(BaseGrappleTest):
                     "button_link": "https://www.graphql.com/",
                 }
             ]
-            cls.empty_buttons_list = []
+            self.empty_buttons_list = []
 
         # Add a Blog post
-        cls.blog_page = BlogPageFactory(
+        self.blog_page = BlogPageFactory(
             body=[
                 ("heading", "Test heading 1"),
                 (
                     "paragraph",
-                    RichText(cls.richtext_sample),
+                    RichText(self.richtext_sample),
                 ),
                 ("heading", "Test heading 2"),
                 ("image", wagtail_factories.ImageFactory()),
@@ -113,7 +112,7 @@ class BlogTest(BaseGrappleTest):
                         ),
                     },
                 ),
-                ("callout", {"text": RichText(cls.richtext_sample)}),
+                ("callout", {"text": RichText(self.richtext_sample)}),
                 ("objectives", objectives_list),
                 (
                     "video",
@@ -142,9 +141,9 @@ class BlogTest(BaseGrappleTest):
                 ),
                 ("text_with_callable", TextWithCallableBlockFactory()),
             ],
-            parent=cls.home,
-            summary=cls.richtext_sample,
-            extra_summary=cls.richtext_sample,
+            parent=self.home,
+            summary=self.richtext_sample,
+            extra_summary=self.richtext_sample,
         )
 
     def test_blog_page(self):
@@ -200,6 +199,7 @@ class BlogTest(BaseGrappleTest):
             block_type,
             block_query,
         )
+
         executed = self.client.execute(
             query, variables={"id": page_id or self.blog_page.id}
         )

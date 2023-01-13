@@ -1,5 +1,12 @@
 ## Unreleased
 
+## [0.19.1] - 2023-01-09
+
+## Fixed
+
+-   An error when using deprecated settings. ([#298](https://github.com/torchbox/wagtail-grapple/pull/298)) Thanks @kbayliss for the heads up
+-   Previews for drafts ([#277](https://github.com/torchbox/wagtail-grapple/pull/277)) @dopry
+
 ## [0.19.0] - 2023-01-09
 
 ### Changed

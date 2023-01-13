@@ -169,6 +169,66 @@ class Page(DjangoObjectType):
         interfaces = (PageInterface,)
 
 
+def get_preview_page(token):
+    """
+    Get a preview page from a token.
+    """
+    try:
+        token_params_list = token.split(":").pop(0)
+        token_params_kvstr = token_params_list.split(";")
+
+        params = {}
+        for arg in token_params_kvstr:
+            key, value = arg.split("=")
+            params[key] = value
+
+        id = params.get("id")
+        if id:
+            """
+            This is a page that had already been saved. Lookup the class and call get_page_from_preview_token.
+
+            TODO: update headless preview to always send page_type in the token so we can always
+            the if content_type branch and elimiate the if id branch.
+            """
+            page = WagtailPage.objects.get(pk=id).specific
+            if page:
+                cls = type(page)
+                """
+                get_page_from_preview_token is added by wagtail-headless-preview,
+                this condition checks that headless-preview is installed and enabled
+                for the model.
+                """
+                if hasattr(cls, "get_page_from_preview_token"):
+                    """we assume that get_page_from_preview_token validates the token"""
+                    return cls.get_page_from_preview_token(token)
+
+        content_type = params.get("page_type")
+        if content_type:
+            """
+            this is a page which has not been saved yet. lookup the content_type to get the class
+            and call get_page_from_preview_token.
+            """
+            app_label, model = content_type.lower().split(".")
+            ctype = ContentType.objects.get(app_label=app_label, model=model)
+            if ctype:
+                cls = ctype.model_class()
+                """
+                get_page_from_preview_token is added by wagtail-headless-preview,
+                this condition checks that headless-preview is installed and enabled
+                for the model.
+                """
+                if hasattr(cls, "get_page_from_preview_token"):
+                    """we assume that get_page_from_preview_token validates the token"""
+                    return cls.get_page_from_preview_token(token)
+    except Exception:
+        """
+        catch and suppress errors. we don't want to expose any information about unpublished content
+        accidentally.
+        TODO: consider logging here.
+        """
+        return None
+
+
 def get_specific_page(
     id=None, slug=None, url_path=None, token=None, content_type=None, site=None
 ):
@@ -177,9 +237,13 @@ def get_specific_page(
     """
     page = None
     try:
+        if token:
+            return get_preview_page(token)
+
         # Everything but the special RootPage
         qs = WagtailPage.objects.live().public().filter(depth__gt=1).specific()
         ctype = None
+
         if site:
             qs = qs.in_site(site)
 
@@ -210,17 +274,6 @@ def get_specific_page(
             if qs.exists():
                 page = qs.first()
 
-        # If token provided then get draft/preview
-        if token:
-            if page:
-                page_type = type(page)
-                if hasattr(page_type, "get_page_from_preview_token"):
-                    page = page_type.get_page_from_preview_token(token)
-
-            elif ctype:
-                cls = ctype.model_class()
-                if hasattr(cls, "get_page_from_preview_token"):
-                    page = cls.get_page_from_preview_token(token)
     except BaseException:
         page = None
 

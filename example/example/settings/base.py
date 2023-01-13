@@ -176,14 +176,16 @@ GRAPHENE = {
     "SCHEMA": "grapple.schema.schema",
     "MIDDLEWARE": ["grapple.middleware.GrappleMiddleware"],
 }
+
+GRAPPLE_EXPOSE_GRAPHIQL = True
+
 GRAPPLE = {
     "APPS": ["images", "home", "documents"],
     "ADD_SEARCH_HIT": True,
     "EXPOSE_GRAPHIQL": True,
 }
 
-HEADLESS_PREVIEW_CLIENT_URLS = {"default": "http://localhost:8001/preview"}
-HEADLESS_PREVIEW_LIVE = True
+WAGTAIL_HEADLESS_PREVIEW = {"CLIENT_URLS": {"default": "http://localhost:8001/preview"}}
 
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 

@@ -11,7 +11,7 @@ back to the defaults.
 """
 import logging
 
-from django.conf import settings
+from django.conf import settings as django_settings
 from django.test.signals import setting_changed
 
 logger = logging.getLogger("grapple")
@@ -70,7 +70,7 @@ class GrappleSettings:
     def user_settings(self):
         if not hasattr(self, "_user_settings"):
             self._user_settings = self.__check_user_settings(
-                getattr(settings, "GRAPPLE", {})
+                getattr(django_settings, "GRAPPLE", {})
             )
         return self._user_settings
 
@@ -91,20 +91,24 @@ class GrappleSettings:
         return val
 
     def __check_user_settings(self, user_settings):
-        SETTINGS_DOC = "https://wagtail-grapple.readthedocs.io/en/latest/general-usage/settings.html"
         for setting in DEPRECATED_SETTINGS:
-            if setting in user_settings or hasattr(settings, setting):
+            if setting in user_settings or hasattr(django_settings, setting):
                 new_setting = setting.replace("GRAPPLE_", "")
                 logger.warning(
                     "The '%s' setting is deprecated and will be removed in the next release, use GRAPPLE['%s'] instead."
                     % (setting, new_setting)
                 )
-                user_settings[new_setting] = user_settings[setting]
+                if setting in user_settings:
+                    user_settings[new_setting] = user_settings[setting]
+                else:
+                    user_settings[new_setting] = getattr(django_settings, setting)
+
+        settings_doc_url = "https://wagtail-grapple.readthedocs.io/en/latest/general-usage/settings.html"
         for setting in REMOVED_SETTINGS:
             if setting in user_settings:
                 raise RuntimeError(
                     "The '%s' setting has been removed. Please refer to '%s' for available settings."
-                    % (setting, SETTINGS_DOC)
+                    % (setting, settings_doc_url)
                 )
         return user_settings
 

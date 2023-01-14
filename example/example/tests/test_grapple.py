@@ -440,17 +440,17 @@ class PagesSearchTest(BaseGrappleTest):
     def setUpTestData(cls):
         cls.home = HomePage.objects.first()
         BlogPageFactory(title="Alpha", parent=cls.home)
-        BlogPageFactory(title="Alpha Alpha", parent=cls.home)
+        BlogPageFactory(title="Gamma Beta", parent=cls.home)
         BlogPageFactory(title="Alpha Beta", parent=cls.home)
+        BlogPageFactory(title="Beta Alpha", parent=cls.home)
         BlogPageFactory(title="Alpha Gamma", parent=cls.home)
         BlogPageFactory(title="Beta", parent=cls.home)
-        BlogPageFactory(title="Beta Alpha", parent=cls.home)
-        BlogPageFactory(title="Beta Beta", parent=cls.home)
-        BlogPageFactory(title="Beta Gamma", parent=cls.home)
-        BlogPageFactory(title="Gamma", parent=cls.home)
-        BlogPageFactory(title="Gamma Alpha", parent=cls.home)
-        BlogPageFactory(title="Gamma Beta", parent=cls.home)
+        BlogPageFactory(title="Alpha Alpha", parent=cls.home)
         BlogPageFactory(title="Gamma Gamma", parent=cls.home)
+        BlogPageFactory(title="Beta Beta", parent=cls.home)
+        BlogPageFactory(title="Gamma", parent=cls.home)
+        BlogPageFactory(title="Beta Gamma", parent=cls.home)
+        BlogPageFactory(title="Gamma Alpha", parent=cls.home)
 
     def test_natural_order(self):
         query = """
@@ -460,15 +460,18 @@ class PagesSearchTest(BaseGrappleTest):
             }
         }
         """
+        """
+        sqlite doesn't support scoring so natural order will be in the order of defintion.
+        with another database or elasticsearch backend the order will be different
+        """
         executed = self.client.execute(query, variables={"searchQuery": "Alpha"})
         page_data = executed["data"].get("pages")
-
         self.assertEquals(len(page_data), 6)
         self.assertEquals(page_data[0]["title"], "Alpha")
-        self.assertEquals(page_data[1]["title"], "Alpha Alpha")
-        self.assertEquals(page_data[2]["title"], "Alpha Beta")
+        self.assertEquals(page_data[1]["title"], "Alpha Beta")
+        self.assertEquals(page_data[2]["title"], "Beta Alpha")
         self.assertEquals(page_data[3]["title"], "Alpha Gamma")
-        self.assertEquals(page_data[4]["title"], "Beta Alpha")
+        self.assertEquals(page_data[4]["title"], "Alpha Alpha")
         self.assertEquals(page_data[5]["title"], "Gamma Alpha")
 
     def test_explicit_order(self):

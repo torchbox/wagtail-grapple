@@ -56,6 +56,8 @@ class PageInterface(graphene.Interface):
         graphene.NonNull(lambda: PageInterface), enable_search=True, required=True
     )
 
+    search_score = graphene.Float()
+
     @classmethod
     def resolve_type(cls, instance, info, **kwargs):
         """
@@ -148,6 +150,12 @@ class PageInterface(graphene.Interface):
         Get page's SEO title. Fallback to a normal page's title if absent.
         """
         return self.seo_title or self.title
+
+    def resolve_search_score(self, info, **kwargs):
+        """
+        Get page's search score, will be None if not in a search context.
+        """
+        return getattr(self, "search_score", None)
 
 
 class Page(DjangoObjectType):

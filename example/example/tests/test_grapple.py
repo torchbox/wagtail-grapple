@@ -440,26 +440,63 @@ class PagesSearchTest(BaseGrappleTest):
 
     @unittest.skipIf(
         connection.vendor != "sqlite",
-        "sqlite doesn't support scoring so natural order will be in the order of defintion",
+        "sqlite doesn't support annotating scores, so search results order will be in the order of defintion",
     )
-    def test_natural_order_sqlite(self):
+    def test_searchQuery_order_by_relevance_sqlite(self):
         query = """
         query($searchQuery: String, $order: String) {
             pages(searchQuery: $searchQuery, order: $order) {
                 title
+                searchScore
             }
         }
         """
+
         executed = self.client.execute(query, variables={"searchQuery": "Alpha"})
         page_data = executed["data"].get("pages")
-
         self.assertEquals(len(page_data), 6)
         self.assertEquals(page_data[0]["title"], "Alpha")
+        self.assertEquals(page_data[0]["searchScore"], None)
         self.assertEquals(page_data[1]["title"], "Alpha Alpha")
+        self.assertEquals(page_data[1]["searchScore"], None)
         self.assertEquals(page_data[2]["title"], "Alpha Beta")
+        self.assertEquals(page_data[2]["searchScore"], None)
         self.assertEquals(page_data[3]["title"], "Alpha Gamma")
+        self.assertEquals(page_data[3]["searchScore"], None)
         self.assertEquals(page_data[4]["title"], "Beta Alpha")
+        self.assertEquals(page_data[4]["searchScore"], None)
         self.assertEquals(page_data[5]["title"], "Gamma Alpha")
+        self.assertEquals(page_data[5]["searchScore"], None)
+
+    @unittest.skipIf(
+        connection.vendor == "sqlite",
+        "non-sqlite database backends should support annotating search score, so results should be orderd by score by default",
+    )
+    def test_searchQuery_order_by_relevance(self):
+        query = """
+        query($searchQuery: String, $order: String) {
+            pages(searchQuery: $searchQuery, order: $order) {
+                title
+                searchScore
+            }
+        }
+        """
+
+        executed = self.client.execute(query, variables={"searchQuery": "Alpha"})
+        page_data = executed["data"].get("pages")
+        self.assertEquals(len(page_data), 6)
+        self.assertEquals(page_data[0]["title"], "Alpha Alpha")
+        self.assertEquals(page_data[0]["searchScore"], 0.23700128495693207)
+        self.assertEquals(page_data[1]["title"], "Alpha")
+        self.assertEquals(page_data[1]["searchScore"], 0.18960101902484894)
+        self.assertEquals(page_data[2]["title"], "Gamma Alpha")
+        self.assertEquals(page_data[2]["searchScore"], 0.11060059443116188)
+        self.assertEquals(page_data[3]["title"], "Beta Alpha")
+        self.assertEquals(page_data[3]["searchScore"], 0.11060059443116188)
+        self.assertEquals(page_data[4]["title"], "Alpha Gamma")
+        self.assertEquals(page_data[4]["searchScore"], 0.11060059443116188)
+        self.assertEquals(page_data[5]["title"], "Alpha Beta")
+        self.assertEquals(page_data[5]["searchScore"], 0.10533389945824942)
 
     def test_explicit_order(self):
         query = """
@@ -476,9 +513,9 @@ class PagesSearchTest(BaseGrappleTest):
 
         self.assertEquals(len(page_data), 6)
         self.assertEquals(page_data[0]["title"], "Gamma Gamma")
-        self.assertEquals(page_data[3]["title"], "Gamma")
         self.assertEquals(page_data[1]["title"], "Gamma Beta")
         self.assertEquals(page_data[2]["title"], "Gamma Alpha")
+        self.assertEquals(page_data[3]["title"], "Gamma")
         self.assertEquals(page_data[4]["title"], "Beta Gamma")
         self.assertEquals(page_data[5]["title"], "Alpha Gamma")
 

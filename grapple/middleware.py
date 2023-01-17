@@ -43,4 +43,4 @@ class GrappleMiddleware:
             while middlewares:
                 next = partial(middlewares.pop(), next)
 
-        return next(root, info, **args)
+        return next(root, info, **kwargs)

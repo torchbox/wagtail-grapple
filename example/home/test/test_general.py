@@ -9,8 +9,6 @@ from home.factories import (
     SimpleModelFactory,
 )
 
-from home.factories import BlogPageFactory, MiddlewareModelFactory, SimpleModelFactory
-
 from example.tests.test_grapple import BaseGrappleTest
 
 

@@ -1,5 +1,11 @@
 ## Unreleased
 
+## [0.19.2] - 2023-01-17
+
+## Fixed
+
+-   Fix order_by_relevance needed for Postgres and queryset ordered searches ([#299](https://github.com/torchbox/wagtail-grapple/pull/299)) @dopry
+
 ## [0.19.1] - 2023-01-09
 
 ## Fixed
@@ -277,7 +283,9 @@
 -   Improve field definition and under-the-hood implementation ([#28](https://github.com/torchbox/wagtail-grapple/pull/28))
 -   Add conditional checks when resolving streamfield type ([#29](https://github.com/torchbox/wagtail-grapple/pull/29))
 
-[unreleased]: https://github.com/torchbox/wagtail-grapple/compare/v0.19.0...HEAD
+[unreleased]: https://github.com/torchbox/wagtail-grapple/compare/v0.19.2...HEAD
+[0.19.2]: https://github.com/torchbox/wagtail-grapple/compare/v0.19.1...v0.19.2
+[0.19.1]: https://github.com/torchbox/wagtail-grapple/compare/v0.19.0...v0.19.1
 [0.19.0]: https://github.com/torchbox/wagtail-grapple/compare/v0.18.1...v0.19.0
 [0.18.1]: https://github.com/torchbox/wagtail-grapple/compare/v0.18.0...v0.18.1
 [0.18.0]: https://github.com/torchbox/wagtail-grapple/compare/v0.17.1...v0.18.0

@@ -3,7 +3,6 @@ import os
 
 from django.conf import settings
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
-from wagtail.search.backends import get_search_backend
 from wagtail.search.index import class_is_indexed
 from wagtail.search.models import Query
 
@@ -103,8 +102,10 @@ def resolve_queryset(
     else:
         qs = qs.all()
 
+    order_by_relevance = True
     if order is not None:
         qs = qs.order_by(*(x.strip() for x in order.split(",")))
+        order_by_relevance = False
 
     if collection is not None:
         try:
@@ -123,7 +124,7 @@ def resolve_queryset(
             query = Query.get(search_query)
             query.add_hit()
 
-        qs = get_search_backend().search(search_query, qs)
+        qs = qs.search(search_query, order_by_relevance=order_by_relevance)
 
     return _sliced_queryset(qs, limit, offset)
 
@@ -192,6 +193,13 @@ def resolve_paginated_queryset(
     else:
         qs = qs.all()
 
+    # order_by_relevance will always take precedence over an existing order_by in the Postgres backend
+    # we need to set it to False if we want to specify our own order_by.
+    order_by_relevance = True
+    if order is not None:
+        qs = qs.order_by(*(x.strip() for x in order.split(",")))
+        order_by_relevance = False
+
     if id is None and search_query:
         # Check if the queryset is searchable using Wagtail search.
         if not class_is_indexed(qs.model):
@@ -201,12 +209,7 @@ def resolve_paginated_queryset(
             query = Query.get(search_query)
             query.add_hit()
 
-        results = get_search_backend().search(search_query, qs)
-
-        return get_paginated_result(results, page, per_page)
-
-    if order is not None:
-        qs = qs.order_by(*(x.strip() for x in order.split(",")))
+        qs = qs.search(search_query, order_by_relevance=order_by_relevance)
 
     return get_paginated_result(qs, page, per_page)
 

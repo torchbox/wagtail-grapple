@@ -22,7 +22,7 @@ from .helpers import field_middlewares, streamfield_types
 from .registry import registry
 from .settings import grapple_settings
 from .types.documents import DocumentObjectType
-from .types.images import ImageObjectType
+from .types.images import ImageObjectType, ImageRenditionObjectType
 from .types.pages import Page, PageInterface
 from .types.rich_text import RichText as RichTextType
 from .types.streamfield import generate_streamfield_union
@@ -122,7 +122,7 @@ def register_model(cls: type, type_prefix: str):
         elif issubclass(cls, AbstractImage):
             register_image_model(cls, type_prefix)
         elif issubclass(cls, AbstractRendition):
-            register_image_model(cls, type_prefix)
+            register_image_rendition_model(cls, type_prefix)
         elif has_wagtail_media and issubclass(cls, AbstractMedia):
             register_media_model(cls, type_prefix)
         elif issubclass(cls, (BaseSiteSetting, BaseGenericSetting)):
@@ -551,7 +551,7 @@ def register_image_rendition_model(cls: Type[AbstractRendition], type_prefix: st
         return
 
     # Create a GQL type derived from image rendition model.
-    image_node_type = build_node_type(cls, type_prefix, None, AbstractRendition)
+    image_node_type = build_node_type(cls, type_prefix, None, ImageRenditionObjectType)
 
     # Add image type to registry.
     if image_node_type:

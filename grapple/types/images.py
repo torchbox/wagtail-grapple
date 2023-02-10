@@ -59,11 +59,12 @@ class BaseImageObjectType(graphene.ObjectType):
 
 
 class ImageRenditionObjectType(DjangoObjectType, BaseImageObjectType):
+    filter_spec = graphene.String(required=True)
+    focal_point_key = graphene.String(required=True)
+    image = graphene.Field(lambda: get_image_type(), required=True)
+
     class Meta:
         model = WagtailImageRendition
-
-    def resolve_image(self, info, **kwargs):
-        return self.image
 
 
 def get_rendition_type():

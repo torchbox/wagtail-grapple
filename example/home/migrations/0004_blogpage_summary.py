@@ -9,7 +9,6 @@ except ImportError:
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("home", "0003_alter_blogpage_body"),
     ]

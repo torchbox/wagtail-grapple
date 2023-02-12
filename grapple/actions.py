@@ -458,6 +458,7 @@ def build_streamfield_type(
     Build a graphql type for a StreamBlock or StructBlock class
     If it has custom fields then implement them.
     """
+
     # Create a new blank node type
     class Meta:
         if hasattr(cls, "graphql_types"):

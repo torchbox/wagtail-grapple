@@ -12,7 +12,6 @@ import wagtail_headless_preview.models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [

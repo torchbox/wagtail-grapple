@@ -6,37 +6,14 @@ from home.blocks import StreamFieldBlock
 from modelcluster.contrib.taggit import ClusterTaggableManager
 from modelcluster.fields import ParentalKey
 from taggit.models import TaggedItemBase
-
-try:
-    from wagtail.admin.panels import FieldPanel, InlinePanel
-    from wagtail.fields import RichTextField, StreamField
-    from wagtail.models import Orderable, Page
-except ImportError:
-    from wagtail.admin.edit_handlers import (
-        FieldPanel,
-        InlinePanel,
-        RichTextFieldPanel,
-        StreamFieldPanel,
-    )
-    from wagtail.core.fields import RichTextField, StreamField
-    from wagtail.core.models import Orderable, Page
-
-try:
-    from wagtail.contrib.settings.models import (
-        BaseGenericSetting,
-        BaseSiteSetting,
-        register_setting,
-    )
-except ImportError:
-    # Wagtail < 4.0
-    from wagtail.contrib.settings.models import BaseSetting as BaseSiteSetting
-    from wagtail.contrib.settings.models import register_setting
-
-    BaseGenericSetting = models.Model
-
-from wagtail.documents.edit_handlers import DocumentChooserPanel
-from wagtail.images.edit_handlers import ImageChooserPanel
-from wagtail.snippets.edit_handlers import SnippetChooserPanel
+from wagtail.admin.panels import FieldPanel, InlinePanel
+from wagtail.contrib.settings.models import (
+    BaseGenericSetting,
+    BaseSiteSetting,
+    register_setting,
+)
+from wagtail.fields import RichTextField, StreamField
+from wagtail.models import Orderable, Page
 from wagtail.snippets.models import register_snippet
 from wagtail_headless_preview.models import HeadlessPreviewMixin
 from wagtailmedia.edit_handlers import MediaChooserPanel
@@ -131,38 +108,22 @@ class BlogPage(HeadlessPreviewMixin, Page):
     )
     summary = RichTextField(blank=True)
     extra_summary = RichTextField(blank=True)
-    sf_kwargs = {"use_json_field": True} if settings.WAGTAIL_VERSION >= (3, 0) else {}
-    body = StreamField(StreamFieldBlock(), **sf_kwargs)
+    body = StreamField(StreamFieldBlock(), use_json_field=True)
     tags = ClusterTaggableManager(through=BlogPageTag, blank=True)
 
-    if settings.WAGTAIL_VERSION >= (3, 0):
-        content_panels = Page.content_panels + [
-            FieldPanel("date"),
-            FieldPanel("hero_image"),
-            FieldPanel("summary"),
-            FieldPanel("body"),
-            FieldPanel("tags"),
-            InlinePanel("related_links", label="Related links"),
-            InlinePanel("authors", label="Authors"),
-            FieldPanel("author"),
-            FieldPanel("advert"),
-            FieldPanel("book_file"),
-            MediaChooserPanel("featured_media"),
-        ]
-    else:
-        content_panels = Page.content_panels + [
-            FieldPanel("date"),
-            ImageChooserPanel("hero_image"),
-            RichTextFieldPanel("summary"),
-            StreamFieldPanel("body"),
-            FieldPanel("tags"),
-            InlinePanel("related_links", label="Related links"),
-            InlinePanel("authors", label="Authors"),
-            FieldPanel("author"),
-            SnippetChooserPanel("advert"),
-            DocumentChooserPanel("book_file"),
-            MediaChooserPanel("featured_media"),
-        ]
+    content_panels = Page.content_panels + [
+        FieldPanel("date"),
+        FieldPanel("hero_image"),
+        FieldPanel("summary"),
+        FieldPanel("body"),
+        FieldPanel("tags"),
+        InlinePanel("related_links", label="Related links"),
+        InlinePanel("authors", label="Authors"),
+        FieldPanel("author"),
+        FieldPanel("advert"),
+        FieldPanel("book_file"),
+        MediaChooserPanel("featured_media"),
+    ]
 
     @property
     def copy(self):
@@ -244,10 +205,7 @@ class Author(Orderable):
         Person, null=True, blank=True, on_delete=models.SET_NULL, related_name="+"
     )
 
-    if settings.WAGTAIL_VERSION >= (3, 0):
-        panels = [FieldPanel("role"), FieldPanel("person")]
-    else:
-        panels = [FieldPanel("role"), SnippetChooserPanel("person")]
+    panels = [FieldPanel("role"), FieldPanel("person")]
 
     graphql_fields = [GraphQLString("role"), GraphQLForeignKey("person", Person)]
 
@@ -273,13 +231,7 @@ class Advert(models.Model):
     rich_text = RichTextField(blank=True, default="")
     extra_rich_text = RichTextField(blank=True, default="")
 
-    panels = [
-        FieldPanel("url"),
-        FieldPanel("text"),
-        FieldPanel("rich_text")
-        if settings.WAGTAIL_VERSION >= (3, 0)
-        else RichTextFieldPanel("rich_text"),
-    ]
+    panels = [FieldPanel("url"), FieldPanel("text"), FieldPanel("rich_text")]
 
     graphql_fields = [
         GraphQLString("url"),
@@ -310,9 +262,6 @@ class SocialMediaSettings(BaseSiteSetting):
     ]
 
 
-# BaseGenericSetting is not supported in Wagtail < 4.0
-# For older versions of Wagtail, we swap BaseGenericSetting with models.Model
-# BaseGenericSetting doesn't add any fields, so the migrations should be the same
 class GlobalSocialMediaSettings(BaseGenericSetting):
     facebook = models.URLField(help_text="Your Facebook page URL")
     instagram = models.CharField(
@@ -329,6 +278,4 @@ class GlobalSocialMediaSettings(BaseGenericSetting):
     ]
 
 
-# Only register it as a setting if BaseGenericSetting exists (on Wagtail 4.0+)
-if BaseGenericSetting is not models.Model:
-    register_setting(GlobalSocialMediaSettings)
+register_setting(GlobalSocialMediaSettings)

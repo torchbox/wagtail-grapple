@@ -2,10 +2,7 @@
 
 from django.db import migrations
 
-try:
-    import wagtail.fields as wagtail_fields
-except ImportError:
-    import wagtail.core.fields as wagtail_fields
+from wagtail.fields import RichTextField
 
 
 class Migration(migrations.Migration):
@@ -17,6 +14,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="blogpage",
             name="summary",
-            field=wagtail_fields.RichTextField(blank=True),
+            field=RichTextField(blank=True),
         ),
     ]

@@ -1,10 +1,6 @@
 import graphene
 from home.models import Advert, AuthorPage
-
-try:
-    from wagtail.models import Page
-except ImportError:
-    from wagtail.core.models import Page
+from wagtail.models import Page
 
 from grapple.registry import registry
 from grapple.types.pages import PageInterface

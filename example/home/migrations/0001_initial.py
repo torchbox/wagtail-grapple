@@ -4,8 +4,8 @@ from django.db import migrations, models
 import django.db.models.deletion
 import modelcluster.contrib.taggit
 import modelcluster.fields
-import wagtail.core.blocks
-import wagtail.core.fields
+import wagtail.blocks
+import wagtail.fields
 import wagtail.embeds.blocks
 import wagtail.images.blocks
 import wagtail_headless_preview.models
@@ -77,40 +77,38 @@ class Migration(migrations.Migration):
                 ("date", models.DateField(verbose_name="Post date")),
                 (
                     "body",
-                    wagtail.core.fields.StreamField(
+                    wagtail.fields.StreamField(
                         [
                             (
                                 "heading",
-                                wagtail.core.blocks.CharBlock(
-                                    form_classname="full title"
-                                ),
+                                wagtail.blocks.CharBlock(form_classname="full title"),
                             ),
-                            ("paragraph", wagtail.core.blocks.RichTextBlock()),
+                            ("paragraph", wagtail.blocks.RichTextBlock()),
                             ("image", wagtail.images.blocks.ImageChooserBlock()),
-                            ("decimal", wagtail.core.blocks.DecimalBlock()),
-                            ("date", wagtail.core.blocks.DateBlock()),
-                            ("datetime", wagtail.core.blocks.DateTimeBlock()),
+                            ("decimal", wagtail.blocks.DecimalBlock()),
+                            ("date", wagtail.blocks.DateBlock()),
+                            ("datetime", wagtail.blocks.DateTimeBlock()),
                             (
                                 "gallery",
-                                wagtail.core.blocks.StructBlock(
+                                wagtail.blocks.StructBlock(
                                     [
                                         (
                                             "title",
-                                            wagtail.core.blocks.CharBlock(
+                                            wagtail.blocks.CharBlock(
                                                 form_classname="full title"
                                             ),
                                         ),
                                         (
                                             "images",
-                                            wagtail.core.blocks.StreamBlock(
+                                            wagtail.blocks.StreamBlock(
                                                 [
                                                     (
                                                         "image",
-                                                        wagtail.core.blocks.StructBlock(
+                                                        wagtail.blocks.StructBlock(
                                                             [
                                                                 (
                                                                     "caption",
-                                                                    wagtail.core.blocks.CharBlock(
+                                                                    wagtail.blocks.CharBlock(
                                                                         form_classname="full title"
                                                                     ),
                                                                 ),
@@ -129,7 +127,7 @@ class Migration(migrations.Migration):
                             ),
                             (
                                 "video",
-                                wagtail.core.blocks.StructBlock(
+                                wagtail.blocks.StructBlock(
                                     [
                                         (
                                             "youtube_link",
@@ -142,17 +140,15 @@ class Migration(migrations.Migration):
                             ),
                             (
                                 "objectives",
-                                wagtail.core.blocks.ListBlock(
-                                    wagtail.core.blocks.CharBlock()
-                                ),
+                                wagtail.blocks.ListBlock(wagtail.blocks.CharBlock()),
                             ),
                             (
                                 "carousel",
-                                wagtail.core.blocks.StreamBlock(
+                                wagtail.blocks.StreamBlock(
                                     [
                                         (
                                             "text",
-                                            wagtail.core.blocks.CharBlock(
+                                            wagtail.blocks.CharBlock(
                                                 form_classname="full title"
                                             ),
                                         ),
@@ -160,15 +156,15 @@ class Migration(migrations.Migration):
                                             "image",
                                             wagtail.images.blocks.ImageChooserBlock(),
                                         ),
-                                        ("markup", wagtail.core.blocks.RichTextBlock()),
+                                        ("markup", wagtail.blocks.RichTextBlock()),
                                     ]
                                 ),
                             ),
                             (
                                 "callout",
-                                wagtail.core.blocks.StructBlock(
+                                wagtail.blocks.StructBlock(
                                     [
-                                        ("text", wagtail.core.blocks.RichTextBlock()),
+                                        ("text", wagtail.blocks.RichTextBlock()),
                                         (
                                             "image",
                                             wagtail.images.blocks.ImageChooserBlock(),
@@ -178,17 +174,17 @@ class Migration(migrations.Migration):
                             ),
                             (
                                 "text_and_buttons",
-                                wagtail.core.blocks.StructBlock(
+                                wagtail.blocks.StructBlock(
                                     [
-                                        ("text", wagtail.core.blocks.TextBlock()),
+                                        ("text", wagtail.blocks.TextBlock()),
                                         (
                                             "buttons",
-                                            wagtail.core.blocks.ListBlock(
-                                                wagtail.core.blocks.StructBlock(
+                                            wagtail.blocks.ListBlock(
+                                                wagtail.blocks.StructBlock(
                                                     [
                                                         (
                                                             "button_text",
-                                                            wagtail.core.blocks.CharBlock(
+                                                            wagtail.blocks.CharBlock(
                                                                 label="Text",
                                                                 max_length=50,
                                                                 required=True,
@@ -196,7 +192,7 @@ class Migration(migrations.Migration):
                                                         ),
                                                         (
                                                             "button_link",
-                                                            wagtail.core.blocks.CharBlock(
+                                                            wagtail.blocks.CharBlock(
                                                                 label="Link",
                                                                 max_length=255,
                                                                 required=True,
@@ -208,11 +204,11 @@ class Migration(migrations.Migration):
                                         ),
                                         (
                                             "mainbutton",
-                                            wagtail.core.blocks.StructBlock(
+                                            wagtail.blocks.StructBlock(
                                                 [
                                                     (
                                                         "button_text",
-                                                        wagtail.core.blocks.CharBlock(
+                                                        wagtail.blocks.CharBlock(
                                                             label="Text",
                                                             max_length=50,
                                                             required=True,
@@ -220,7 +216,7 @@ class Migration(migrations.Migration):
                                                     ),
                                                     (
                                                         "button_link",
-                                                        wagtail.core.blocks.CharBlock(
+                                                        wagtail.blocks.CharBlock(
                                                             label="Link",
                                                             max_length=255,
                                                             required=True,
@@ -232,21 +228,21 @@ class Migration(migrations.Migration):
                                     ]
                                 ),
                             ),
-                            ("page", wagtail.core.blocks.PageChooserBlock()),
+                            ("page", wagtail.blocks.PageChooserBlock()),
                             (
                                 "text_with_callable",
-                                wagtail.core.blocks.StructBlock(
+                                wagtail.blocks.StructBlock(
                                     [
-                                        ("text", wagtail.core.blocks.CharBlock()),
-                                        ("integer", wagtail.core.blocks.IntegerBlock()),
-                                        ("decimal", wagtail.core.blocks.FloatBlock()),
+                                        ("text", wagtail.blocks.CharBlock()),
+                                        ("integer", wagtail.blocks.IntegerBlock()),
+                                        ("decimal", wagtail.blocks.FloatBlock()),
                                     ]
                                 ),
                             ),
                             (
                                 "block_with_name",
-                                wagtail.core.blocks.StructBlock(
-                                    [("name", wagtail.core.blocks.TextBlock())]
+                                wagtail.blocks.StructBlock(
+                                    [("name", wagtail.blocks.TextBlock())]
                                 ),
                             ),
                         ]

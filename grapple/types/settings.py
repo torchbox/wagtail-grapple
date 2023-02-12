@@ -1,19 +1,10 @@
 import graphene
 from graphql.error import GraphQLError
-
-try:
-    from wagtail.models import Site
-except ImportError:
-    from wagtail.core.models import Site
+from wagtail.contrib.settings.models import BaseSiteSetting
+from wagtail.models import Site
 
 from ..registry import registry
 from ..utils import resolve_site
-
-try:
-    from wagtail.contrib.settings.models import BaseSiteSetting
-except ImportError:
-    # Wagtail < 4.0
-    from wagtail.contrib.settings.models import BaseSetting as BaseSiteSetting
 
 
 def SettingsQuery():

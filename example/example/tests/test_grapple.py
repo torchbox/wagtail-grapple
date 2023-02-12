@@ -1,37 +1,21 @@
 import os
-import sys
-import unittest
+from pydoc import locate
 from unittest.mock import patch
 
 import wagtail_factories
-
-from grapple.types.images import rendition_allowed
-
-if sys.version_info >= (3, 7):
-    from builtins import dict as dict_type
-else:
-    from collections import OrderedDict as dict_type
-
-from pydoc import locate
-
 from django.conf import settings
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import RequestFactory, TestCase, override_settings
 from graphene.test import Client
 from home.factories import BlogPageFactory
 from home.models import GlobalSocialMediaSettings, HomePage, SocialMediaSettings
-from wagtail import VERSION as WAGTAIL_VERSION
-
-try:
-    from wagtail.models import Page, Site
-except ImportError:
-    from wagtail.core.models import Page, Site
-
 from wagtail.documents import get_document_model
 from wagtail.images import get_image_model
+from wagtail.models import Page, Site
 from wagtailmedia.models import get_media_model
 
 from grapple.schema import create_schema
+from grapple.types.images import rendition_allowed
 
 SCHEMA = locate(settings.GRAPHENE["SCHEMA"])
 MIDDLEWARE_OBJECTS = [
@@ -113,18 +97,18 @@ class PagesTest(BaseGrappleTest):
 
         executed = self.client.execute(query)
 
-        self.assertEquals(type(executed["data"]), dict_type)
-        self.assertEquals(type(executed["data"]["pages"]), list)
-        self.assertEquals(type(executed["data"]["pages"][0]), dict_type)
+        self.assertEqual(type(executed["data"]), dict)
+        self.assertEqual(type(executed["data"]["pages"]), list)
+        self.assertEqual(type(executed["data"]["pages"][0]), dict)
 
         pages_data = executed["data"]["pages"]
-        self.assertEquals(pages_data[0]["contentType"], "home.HomePage")
-        self.assertEquals(pages_data[0]["pageType"], "HomePage")
-        self.assertEquals(pages_data[1]["contentType"], "home.BlogPage")
-        self.assertEquals(pages_data[1]["pageType"], "BlogPage")
+        self.assertEqual(pages_data[0]["contentType"], "home.HomePage")
+        self.assertEqual(pages_data[0]["pageType"], "HomePage")
+        self.assertEqual(pages_data[1]["contentType"], "home.BlogPage")
+        self.assertEqual(pages_data[1]["pageType"], "BlogPage")
 
         pages = Page.objects.filter(depth__gt=1)
-        self.assertEquals(len(executed["data"]["pages"]), pages.count())
+        self.assertEqual(len(executed["data"]["pages"]), pages.count())
 
     @override_settings(GRAPPLE={"PAGE_SIZE": 1, "MAX_PAGE_SIZE": 1})
     def test_pages_limit(self):
@@ -141,14 +125,14 @@ class PagesTest(BaseGrappleTest):
 
         executed = self.client.execute(query)
 
-        self.assertEquals(type(executed["data"]), dict_type)
-        self.assertEquals(type(executed["data"]["pages"]), list)
-        self.assertEquals(type(executed["data"]["pages"][0]), dict_type)
+        self.assertEqual(type(executed["data"]), dict)
+        self.assertEqual(type(executed["data"]["pages"]), list)
+        self.assertEqual(type(executed["data"]["pages"][0]), dict)
 
         pages_data = executed["data"]["pages"]
-        self.assertEquals(pages_data[0]["contentType"], "home.HomePage")
-        self.assertEquals(pages_data[0]["pageType"], "HomePage")
-        self.assertEquals(len(executed["data"]["pages"]), 1)
+        self.assertEqual(pages_data[0]["contentType"], "home.HomePage")
+        self.assertEqual(pages_data[0]["pageType"], "HomePage")
+        self.assertEqual(len(executed["data"]["pages"]), 1)
 
     def test_pages_in_site(self):
         query = """
@@ -164,14 +148,14 @@ class PagesTest(BaseGrappleTest):
         request = self.factory.get("/")
         executed = self.client.execute(query, context_value=request)
 
-        self.assertEquals(type(executed["data"]), dict_type)
-        self.assertEquals(type(executed["data"]["pages"]), list)
-        self.assertEquals(type(executed["data"]["pages"][0]), dict_type)
+        self.assertEqual(type(executed["data"]), dict)
+        self.assertEqual(type(executed["data"]["pages"]), list)
+        self.assertEqual(type(executed["data"]["pages"][0]), dict)
 
         site = Site.find_for_request(request)
         pages = Page.objects.in_site(site).live().public().filter(depth__gt=1)
 
-        self.assertEquals(len(executed["data"]["pages"]), pages.count())
+        self.assertEqual(len(executed["data"]["pages"]), pages.count())
 
     def test_pages_site(self):
         site = Site.objects.get(is_default_site=True)
@@ -195,13 +179,13 @@ class PagesTest(BaseGrappleTest):
             },
         )
 
-        self.assertEquals(type(executed["data"]), dict_type)
-        self.assertEquals(type(executed["data"]["pages"]), list)
-        self.assertEquals(type(executed["data"]["pages"][0]), dict_type)
+        self.assertEqual(type(executed["data"]), dict)
+        self.assertEqual(type(executed["data"]["pages"]), list)
+        self.assertEqual(type(executed["data"]["pages"][0]), dict)
 
         pages = Page.objects.in_site(site).live().public().filter(depth__gt=1)
 
-        self.assertEquals(len(executed["data"]["pages"]), pages.count())
+        self.assertEqual(len(executed["data"]["pages"]), pages.count())
 
     def test_pages_site_errors_when_multiple_sites_match_hostname_and_port_unspecified(
         self,
@@ -220,7 +204,7 @@ class PagesTest(BaseGrappleTest):
             query, variables={"site": self.site_different_hostname.hostname}
         )
 
-        self.assertEquals(
+        self.assertEqual(
             executed,
             {
                 "errors": [
@@ -253,8 +237,8 @@ class PagesTest(BaseGrappleTest):
             variables={"site": self.site_different_hostname.hostname + ":8000"},
         )
 
-        self.assertEquals(type(executed["data"]), dict_type)
-        self.assertEquals(type(executed["data"]["pages"]), list)
+        self.assertEqual(type(executed["data"]), dict)
+        self.assertEqual(type(executed["data"]["pages"]), list)
 
         pages = (
             Page.objects.in_site(self.site_different_hostname)
@@ -263,7 +247,7 @@ class PagesTest(BaseGrappleTest):
             .filter(depth__gt=1)
         )
 
-        self.assertEquals(len(executed["data"]["pages"]), pages.count())
+        self.assertEqual(len(executed["data"]["pages"]), pages.count())
 
     def test_pages_site_and_in_site_cannot_be_used_together(
         self,
@@ -282,7 +266,7 @@ class PagesTest(BaseGrappleTest):
             query, variables={"site": self.site_different_hostname.hostname}
         )
 
-        self.assertEquals(
+        self.assertEqual(
             executed,
             {
                 "errors": [
@@ -313,7 +297,7 @@ class PagesTest(BaseGrappleTest):
             query, variables={"content_type": "home.HomePage"}
         )
         data = results["data"]["pages"]
-        self.assertEquals(len(data), 1)
+        self.assertEqual(len(data), 1)
         self.assertEqual(int(data[0]["id"]), self.home.id)
 
         another_post = BlogPageFactory(parent=self.home)
@@ -330,7 +314,7 @@ class PagesTest(BaseGrappleTest):
             query, variables={"content_type": "home.HomePage,home.BlogPage"}
         )
         data = results["data"]["pages"]
-        self.assertEquals(len(data), 3)
+        self.assertEqual(len(data), 3)
         self.assertListEqual(
             [int(p["id"]) for p in data],
             [self.home.id, self.blog_post.id, another_post.id],
@@ -355,12 +339,12 @@ class PagesTest(BaseGrappleTest):
 
         executed = self.client.execute(query, variables={"id": self.blog_post.id})
 
-        self.assertEquals(type(executed["data"]), dict_type)
-        self.assertEquals(type(executed["data"]["page"]), dict_type)
+        self.assertEqual(type(executed["data"]), dict)
+        self.assertEqual(type(executed["data"]["page"]), dict)
 
         page_data = executed["data"]["page"]
-        self.assertEquals(page_data["contentType"], "home.BlogPage")
-        self.assertEquals(page_data["parent"]["contentType"], "home.HomePage")
+        self.assertEqual(page_data["contentType"], "home.BlogPage")
+        self.assertEqual(page_data["parent"]["contentType"], "home.HomePage")
 
     def test_pages_ancestor_filter(self):
         p1_1 = BlogPageFactory(slug="D1-1", parent=self.home)
@@ -393,7 +377,7 @@ class PagesTest(BaseGrappleTest):
 
         executed = self.client.execute(query, variables={"ancestor": p1_2.id})
         page_data = executed["data"].get("pages")
-        self.assertEquals(len(page_data), 6)
+        self.assertEqual(len(page_data), 6)
         for page in page_data:
             self.assertTrue(page["urlPath"].startswith(p1_2.url_path))
 
@@ -429,10 +413,10 @@ class PagesTest(BaseGrappleTest):
         executed = self.client.execute(query, variables={"parent": p1_2.id})
         page_data = executed["data"].get("pages")
 
-        self.assertEquals(len(page_data), 2)
+        self.assertEqual(len(page_data), 2)
         for page in page_data:
             self.assertTrue(page["urlPath"].startswith(p1_2.url_path))
-            self.assertEquals(page["depth"], p1_2.depth + 1)
+            self.assertEqual(page["depth"], p1_2.depth + 1)
 
 
 class PagesSearchTest(BaseGrappleTest):
@@ -466,13 +450,13 @@ class PagesSearchTest(BaseGrappleTest):
         """
         executed = self.client.execute(query, variables={"searchQuery": "Alpha"})
         page_data = executed["data"].get("pages")
-        self.assertEquals(len(page_data), 6)
-        self.assertEquals(page_data[0]["title"], "Alpha")
-        self.assertEquals(page_data[1]["title"], "Alpha Beta")
-        self.assertEquals(page_data[2]["title"], "Beta Alpha")
-        self.assertEquals(page_data[3]["title"], "Alpha Gamma")
-        self.assertEquals(page_data[4]["title"], "Alpha Alpha")
-        self.assertEquals(page_data[5]["title"], "Gamma Alpha")
+        self.assertEqual(len(page_data), 6)
+        self.assertEqual(page_data[0]["title"], "Alpha")
+        self.assertEqual(page_data[1]["title"], "Alpha Beta")
+        self.assertEqual(page_data[2]["title"], "Beta Alpha")
+        self.assertEqual(page_data[3]["title"], "Alpha Gamma")
+        self.assertEqual(page_data[4]["title"], "Alpha Alpha")
+        self.assertEqual(page_data[5]["title"], "Gamma Alpha")
 
     def test_explicit_order(self):
         query = """
@@ -487,13 +471,13 @@ class PagesSearchTest(BaseGrappleTest):
         )
         page_data = executed["data"].get("pages")
 
-        self.assertEquals(len(page_data), 6)
-        self.assertEquals(page_data[0]["title"], "Gamma Gamma")
-        self.assertEquals(page_data[1]["title"], "Gamma Beta")
-        self.assertEquals(page_data[2]["title"], "Gamma Alpha")
-        self.assertEquals(page_data[3]["title"], "Gamma")
-        self.assertEquals(page_data[4]["title"], "Beta Gamma")
-        self.assertEquals(page_data[5]["title"], "Alpha Gamma")
+        self.assertEqual(len(page_data), 6)
+        self.assertEqual(page_data[0]["title"], "Gamma Gamma")
+        self.assertEqual(page_data[1]["title"], "Gamma Beta")
+        self.assertEqual(page_data[2]["title"], "Gamma Alpha")
+        self.assertEqual(page_data[3]["title"], "Gamma")
+        self.assertEqual(page_data[4]["title"], "Beta Gamma")
+        self.assertEqual(page_data[5]["title"], "Alpha Gamma")
 
 
 class PageUrlPathTest(BaseGrappleTest):
@@ -519,19 +503,19 @@ class PageUrlPathTest(BaseGrappleTest):
         child = BlogPageFactory(slug="child", parent=parent)
 
         page_data = self._query_by_path("/parent/child/")
-        self.assertEquals(int(page_data["id"]), child.id)
+        self.assertEqual(int(page_data["id"]), child.id)
 
         # query without trailing slash
         page_data = self._query_by_path("/parent/child")
-        self.assertEquals(int(page_data["id"]), child.id)
+        self.assertEqual(int(page_data["id"]), child.id)
 
         # we have two pages with the same slug, however /home/child will
         # be returned first because of its position in the tree
         page_data = self._query_by_path("/child")
-        self.assertEquals(int(page_data["id"]), home_child.id)
+        self.assertEqual(int(page_data["id"]), home_child.id)
 
         page_data = self._query_by_path("/")
-        self.assertEquals(int(page_data["id"]), self.home.id)
+        self.assertEqual(int(page_data["id"]), self.home.id)
 
         page_data = self._query_by_path("foo/bar")
         self.assertIsNone(page_data)
@@ -549,17 +533,17 @@ class PageUrlPathTest(BaseGrappleTest):
 
         # with multiple sites, only the first one will be returned
         page_data = self._query_by_path("/child/")
-        self.assertEquals(int(page_data["id"]), home_child.id)
+        self.assertEqual(int(page_data["id"]), home_child.id)
 
         with patch(
             f"{settings.WAGTAIL_CORE}.models.Site.find_for_request",
             return_value=another_site,
         ):
             page_data = self._query_by_path("/child/", in_site=True)
-            self.assertEquals(int(page_data["id"]), another_child.id)
+            self.assertEqual(int(page_data["id"]), another_child.id)
 
             page_data = self._query_by_path("/child", in_site=True)
-            self.assertEquals(int(page_data["id"]), another_child.id)
+            self.assertEqual(int(page_data["id"]), another_child.id)
 
 
 class SitesTest(TestCase):
@@ -602,9 +586,9 @@ class SitesTest(TestCase):
 
         executed = self.client.execute(query)
 
-        self.assertEquals(type(executed["data"]), dict_type)
-        self.assertEquals(type(executed["data"]["sites"]), list)
-        self.assertEquals(len(executed["data"]["sites"]), Site.objects.count())
+        self.assertEqual(type(executed["data"]), dict)
+        self.assertEqual(type(executed["data"]["sites"]), list)
+        self.assertEqual(len(executed["data"]["sites"]), Site.objects.count())
 
     def test_site(self):
         query = """
@@ -622,15 +606,15 @@ class SitesTest(TestCase):
             query, variables={"hostname": self.site.hostname}
         )
 
-        self.assertEquals(type(executed["data"]), dict_type)
-        self.assertEquals(type(executed["data"]["site"]), dict_type)
-        self.assertEquals(type(executed["data"]["site"]["pages"]), list)
+        self.assertEqual(type(executed["data"]), dict)
+        self.assertEqual(type(executed["data"]["site"]), dict)
+        self.assertEqual(type(executed["data"]["site"]["pages"]), list)
 
-        self.assertEquals(executed["data"]["site"]["siteName"], "Grapple test site")
+        self.assertEqual(executed["data"]["site"]["siteName"], "Grapple test site")
 
         pages = Page.objects.in_site(self.site)
 
-        self.assertEquals(len(executed["data"]["site"]["pages"]), pages.count())
+        self.assertEqual(len(executed["data"]["site"]["pages"]), pages.count())
         self.assertNotEqual(
             len(executed["data"]["site"]["pages"]), Page.objects.count()
         )
@@ -648,7 +632,7 @@ class SitesTest(TestCase):
             query, variables={"hostname": self.site_different_hostname.hostname}
         )
 
-        self.assertEquals(
+        self.assertEqual(
             executed,
             {
                 "errors": [
@@ -679,7 +663,7 @@ class SitesTest(TestCase):
             variables={"hostname": self.site_different_hostname.hostname + ":8000"},
         )
 
-        self.assertEquals(
+        self.assertEqual(
             executed["data"]["site"]["siteName"],
             "Grapple test site (different hostname/port)",
         )
@@ -705,8 +689,8 @@ class SitesTest(TestCase):
             },
         )
         data = results["data"]["site"]["pages"]
-        self.assertEquals(len(data), 1)
-        self.assertEquals(data[0]["title"], self.site.root_page.title)
+        self.assertEqual(len(data), 1)
+        self.assertEqual(data[0]["title"], self.site.root_page.title)
 
         # Shouldn't return any data
         results = self.client.execute(
@@ -714,7 +698,7 @@ class SitesTest(TestCase):
             variables={"hostname": self.site.hostname, "content_type": "home.HomePage"},
         )
         data = results["data"]["site"]["pages"]
-        self.assertEquals(len(data), 0)
+        self.assertEqual(len(data), 0)
 
         # localhost root page
         results = self.client.execute(
@@ -725,9 +709,9 @@ class SitesTest(TestCase):
             },
         )
         data = results["data"]["site"]["pages"]
-        self.assertEquals(len(data), 1)
-        self.assertEquals(data[0]["contentType"], "home.HomePage")
-        self.assertEquals(data[0]["title"], self.home.title)
+        self.assertEqual(len(data), 1)
+        self.assertEqual(data[0]["contentType"], "home.HomePage")
+        self.assertEqual(data[0]["title"], self.home.title)
 
         # Blog page under grapple test site
         blog = BlogPageFactory(
@@ -738,9 +722,9 @@ class SitesTest(TestCase):
             variables={"hostname": self.site.hostname, "content_type": "home.BlogPage"},
         )
         data = results["data"]["site"]["pages"]
-        self.assertEquals(len(data), 1)
-        self.assertEquals(data[0]["contentType"], "home.BlogPage")
-        self.assertEquals(data[0]["title"], blog.title)
+        self.assertEqual(len(data), 1)
+        self.assertEqual(data[0]["contentType"], "home.BlogPage")
+        self.assertEqual(data[0]["title"], blog.title)
 
         # Blog page under localhost
         blog = BlogPageFactory(parent=self.home, title="blog on localhost")
@@ -752,9 +736,9 @@ class SitesTest(TestCase):
             },
         )
         data = results["data"]["site"]["pages"]
-        self.assertEquals(len(data), 1)
-        self.assertEquals(data[0]["contentType"], "home.BlogPage")
-        self.assertEquals(data[0]["title"], blog.title)
+        self.assertEqual(len(data), 1)
+        self.assertEqual(data[0]["contentType"], "home.BlogPage")
+        self.assertEqual(data[0]["title"], blog.title)
 
     def test_site_page_slug_filter(self):
         query = """
@@ -783,7 +767,7 @@ class SitesTest(TestCase):
         )
         data = results["data"]["site"]["page"]
         self.assertIsNotNone(data)
-        self.assertEquals(data["title"], blog.title)
+        self.assertEqual(data["title"], blog.title)
         # Shouldn't return any data
         results = self.client.execute(
             query,
@@ -808,7 +792,7 @@ class SitesTest(TestCase):
         )
         data = results["data"]["site"]["page"]
         self.assertIsNotNone(data)
-        self.assertEquals(data["title"], blog.title)
+        self.assertEqual(data["title"], blog.title)
 
     def test_site_page_url_path_filter(self):
         # These additional sites prevent the .relative_url() call below from returning a relative URL
@@ -841,7 +825,7 @@ class SitesTest(TestCase):
         )
         data = results["data"]["site"]["page"]
         self.assertIsNotNone(data)
-        self.assertEquals(data["title"], blog.title)
+        self.assertEqual(data["title"], blog.title)
         # Shouldn't return any data
         results = self.client.execute(
             query,
@@ -866,7 +850,7 @@ class SitesTest(TestCase):
         )
         data = results["data"]["site"]["page"]
         self.assertIsNotNone(data)
-        self.assertEquals(data["title"], blog.title)
+        self.assertEqual(data["title"], blog.title)
 
     def test_site_page_content_type_filter(self):
         query = """
@@ -893,7 +877,7 @@ class SitesTest(TestCase):
         )
         data = results["data"]["site"]["page"]
         self.assertIsNotNone(data)
-        self.assertEquals(data["title"], blog.title)
+        self.assertEqual(data["title"], blog.title)
         # Shouldn't return any data
         results = self.client.execute(
             query,
@@ -924,17 +908,17 @@ class DisableAutoCamelCaseTest(TestCase):
         """
         executed = self.client.execute(query)
 
-        self.assertEquals(type(executed["data"]), dict_type)
-        self.assertEquals(type(executed["data"]["pages"]), list)
-        self.assertEquals(type(executed["data"]["pages"][0]), dict_type)
-        self.assertEquals(type(executed["data"]["pages"][0]["title"]), str)
-        self.assertEquals(type(executed["data"]["pages"][0]["url_path"]), str)
+        self.assertEqual(type(executed["data"]), dict)
+        self.assertEqual(type(executed["data"]["pages"]), list)
+        self.assertEqual(type(executed["data"]["pages"][0]), dict)
+        self.assertEqual(type(executed["data"]["pages"][0]["title"]), str)
+        self.assertEqual(type(executed["data"]["pages"][0]["url_path"]), str)
 
         # note: not using .all() as the pages query returns all pages with a depth > 1. Wagtail will normally have
         # only one page at depth 1 (RootPage). everything else lives under it.
         pages = Page.objects.filter(depth__gt=1)
 
-        self.assertEquals(len(executed["data"]["pages"]), pages.count())
+        self.assertEqual(len(executed["data"]["pages"]), pages.count())
 
 
 class ImagesTest(BaseGrappleTest):
@@ -966,12 +950,12 @@ class ImagesTest(BaseGrappleTest):
 
         executed = self.client.execute(query)
 
-        self.assertEquals(executed["data"]["images"][0]["id"], "1")
-        self.assertEquals(
+        self.assertEqual(executed["data"]["images"][0]["id"], "1")
+        self.assertEqual(
             executed["data"]["images"][0]["url"],
             "http://localhost:8000" + self.example_image.file.url,
         )
-        self.assertEquals(
+        self.assertEqual(
             executed["data"]["images"][0]["url"], executed["data"]["images"][0]["src"]
         )
 
@@ -989,8 +973,8 @@ class ImagesTest(BaseGrappleTest):
 
         executed = self.client.execute(query)
 
-        self.assertEquals(executed["data"]["images"][0]["id"], "1")
-        self.assertEquals(
+        self.assertEqual(executed["data"]["images"][0]["id"], "1")
+        self.assertEqual(
             executed["data"]["images"][0]["rendition"]["url"],
             "http://localhost:8000"
             + self.example_image.get_rendition("width-200").file.url,
@@ -1129,11 +1113,7 @@ class ImagesTest(BaseGrappleTest):
         }
         """
 
-        if WAGTAIL_VERSION >= (3, 0):
-            num_queries = 2
-        else:
-            num_queries = 5 * 3 + 1  # images x renditions + 1
-        with self.assertNumQueries(num_queries):
+        with self.assertNumQueries(2):
             self.client.execute(query)
 
     def tearDown(self):
@@ -1184,11 +1164,11 @@ class DocumentsTest(BaseGrappleTest):
 
         documents = self.document_model.objects.all()
 
-        self.assertEquals(len(executed["data"]["documents"]), documents.count())
-        self.assertEquals(
+        self.assertEqual(len(executed["data"]["documents"]), documents.count())
+        self.assertEqual(
             executed["data"]["documents"][0]["id"], str(self.example_document.id)
         )
-        self.assertEquals(
+        self.assertEqual(
             executed["data"]["documents"][0]["customDocumentProperty"],
             "Document Model!",
         )
@@ -1205,7 +1185,7 @@ class DocumentsTest(BaseGrappleTest):
 
         executed = self.client.execute(query)
 
-        self.assertEquals(
+        self.assertEqual(
             executed["data"]["documents"][0]["file"], self.example_document.file.name
         )
 
@@ -1221,7 +1201,7 @@ class DocumentsTest(BaseGrappleTest):
 
         executed = self.client.execute(query)
 
-        self.assertEquals(
+        self.assertEqual(
             executed["data"]["documents"][0]["fileHash"],
             self.example_document.file_hash,
         )
@@ -1238,7 +1218,7 @@ class DocumentsTest(BaseGrappleTest):
 
         executed = self.client.execute(query)
 
-        self.assertEquals(
+        self.assertEqual(
             executed["data"]["documents"][0]["fileSize"],
             self.example_document.file_size,
         )
@@ -1318,8 +1298,8 @@ class MediaTest(BaseGrappleTest):
 
         media = self.media_model.objects.all()
 
-        self.assertEquals(len(executed["data"]["media"]), media.count())
-        self.assertEquals(executed["data"]["media"][0]["id"], str(self.media_item.id))
+        self.assertEqual(len(executed["data"]["media"]), media.count())
+        self.assertEqual(executed["data"]["media"][0]["id"], str(self.media_item.id))
 
     def test_query_file_field(self):
         query = """
@@ -1333,7 +1313,7 @@ class MediaTest(BaseGrappleTest):
 
         executed = self.client.execute(query)
 
-        self.assertEquals(
+        self.assertEqual(
             executed["data"]["media"][0]["file"], self.media_item.file.name
         )
 
@@ -1544,9 +1524,6 @@ class SettingsTest(BaseGrappleTest):
             },
         )
 
-    @unittest.skipIf(
-        WAGTAIL_VERSION < (4, 0), "Generic settings are not supported on Wagtail < 4.0"
-    )
     def test_query_all_settings(self):
         query = """
         {
@@ -1597,9 +1574,6 @@ class SettingsTest(BaseGrappleTest):
             },
         )
 
-    @unittest.skipIf(
-        WAGTAIL_VERSION < (4, 0), "Generic settings are not supported on Wagtail < 4.0"
-    )
     def test_query_all_settings_with_site_filter(self):
         query = """
         {

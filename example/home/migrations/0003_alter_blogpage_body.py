@@ -2,14 +2,8 @@
 
 from django.db import migrations
 
-try:
-    from wagtail import blocks
-    from wagtail import fields
-except ImportError:
-    # Wagtail < 3.0
-    from wagtail.core import blocks
-    from wagtail.core import fields
-
+from wagtail import blocks
+from wagtail import fields
 from wagtail.embeds.blocks import EmbedBlock
 from wagtail.images.blocks import ImageChooserBlock
 from wagtail.snippets.blocks import SnippetChooserBlock

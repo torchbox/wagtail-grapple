@@ -31,9 +31,9 @@ class TestSettings(TestCase):
             from grapple.settings import grapple_settings
         setting_changed signal hook must ensure bound instance is refreshed.
         """
-        self.assertEquals(grapple_settings.PAGE_SIZE, 10)
+        self.assertEqual(grapple_settings.PAGE_SIZE, 10)
 
         with override_settings(GRAPPLE={"PAGE_SIZE": 5}):
-            self.assertEquals(grapple_settings.PAGE_SIZE, 5)
+            self.assertEqual(grapple_settings.PAGE_SIZE, 5)
 
-        self.assertEquals(grapple_settings.PAGE_SIZE, 10)
+        self.assertEqual(grapple_settings.PAGE_SIZE, 10)

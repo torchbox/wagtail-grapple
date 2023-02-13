@@ -173,7 +173,7 @@ GRAPHENE = {
     "MIDDLEWARE": ["grapple.middleware.GrappleMiddleware"],
 }
 
-GRAPPLE_EXPOSE_GRAPHIQL = True
+# GRAPPLE_EXPOSE_GRAPHIQL = True
 
 GRAPPLE = {
     "APPS": ["images", "home", "documents"],

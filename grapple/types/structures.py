@@ -15,7 +15,7 @@ class PositiveInt(Int):
 
     @staticmethod
     def parse_literal(ast, _variables=None):
-        return_value = super().parse_literal(ast, _variables=_variables)
+        return_value = Int.parse_literal(ast, _variables=_variables)
         if return_value is not None and return_value >= 0:
             return return_value
 

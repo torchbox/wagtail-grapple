@@ -536,7 +536,7 @@ class PageUrlPathTest(BaseGrappleTest):
         self.assertEqual(int(page_data["id"]), home_child.id)
 
         with patch(
-            f"{settings.WAGTAIL_CORE}.models.Site.find_for_request",
+            "wagtail.models.Site.find_for_request",
             return_value=another_site,
         ):
             page_data = self._query_by_path("/child/", in_site=True)

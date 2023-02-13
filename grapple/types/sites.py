@@ -3,13 +3,8 @@ from django.contrib.contenttypes.models import ContentType
 from django.utils.translation import gettext_lazy as _
 from graphene_django.types import DjangoObjectType
 from graphql.error import GraphQLError
-
-try:
-    from wagtail.models import Page as WagtailPage
-    from wagtail.models import Site
-except ImportError:
-    from wagtail.core.models import Page as WagtailPage
-    from wagtail.core.models import Site
+from wagtail.models import Page as WagtailPage
+from wagtail.models import Site
 
 from ..utils import resolve_queryset, resolve_site
 from .pages import PageInterface, get_specific_page

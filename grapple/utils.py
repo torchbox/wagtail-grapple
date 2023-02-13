@@ -1,15 +1,8 @@
-import base64
-import os
-
 from django.conf import settings
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
+from wagtail.models import Site
 from wagtail.search.index import class_is_indexed
 from wagtail.search.models import Query
-
-try:
-    from wagtail.models import Site
-except ImportError:
-    from wagtail.core.models import Site
 
 from .settings import grapple_settings
 from .types.structures import BasePaginatedType, PaginationType
@@ -224,20 +217,3 @@ def get_media_item_url(cls):
     if url[0] == "/":
         return settings.BASE_URL + url
     return url
-
-
-def image_as_base64(image_file, format="png"):
-    """
-    :param `image_file` for the complete path of image.
-    :param `format` is format for image, eg: `png` or `jpg`.
-    """
-    encoded_string = ""
-    image_file = settings.BASE_DIR + image_file
-
-    if not os.path.isfile(image_file):
-        return "not an image"
-
-    with open(image_file, "rb") as img_f:
-        encoded_string = base64.b64encode(img_f.read())
-
-    return "data:image/%s;base64,%s" % (format, encoded_string)

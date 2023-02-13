@@ -1,10 +1,6 @@
 from django.apps import apps
 from graphene import ObjectType
-
-try:
-    from wagtail import hooks
-except ImportError:
-    from wagtail.core import hooks
+from wagtail import hooks
 
 from .registry import registry
 from .types.collections import CollectionsQuery

@@ -14,11 +14,10 @@ class PositiveInt(Int):
     """
 
     @staticmethod
-    def parse_literal(node):
-        return_value = Int.parse_literal(node)
-        if return_value is not None:
-            if return_value >= 0:
-                return return_value
+    def parse_literal(ast, _variables=None):
+        return_value = super().parse_literal(ast, _variables=_variables)
+        if return_value is not None and return_value >= 0:
+            return return_value
 
 
 class QuerySetList(graphene.List):

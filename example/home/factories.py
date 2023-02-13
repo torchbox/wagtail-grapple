@@ -18,7 +18,7 @@ from home.models import (
     Person,
     SimpleModel,
 )
-from wagtail.core import blocks
+from wagtail import blocks
 
 
 # START: Block Factories

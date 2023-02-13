@@ -4,7 +4,7 @@ from types import MethodType
 import graphene
 from django.utils.translation import gettext_lazy as _
 from graphene.utils.str_converters import to_camel_case
-from wagtail.core.models import Page
+from wagtail.models import Page
 
 from .registry import registry
 from .settings import grapple_settings

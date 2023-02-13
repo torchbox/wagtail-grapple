@@ -1,6 +1,8 @@
 import inspect
 
 import graphene
+
+# TODO: use specific imports
 import wagtail
 import wagtail.documents.blocks
 import wagtail.embeds.blocks
@@ -8,19 +10,12 @@ import wagtail.images.blocks
 import wagtail.snippets.blocks
 from graphene.types import Scalar
 from graphene_django.converter import convert_django_field
-
-try:
-    from wagtail import blocks
-    from wagtail.fields import StreamField
-    from wagtail.rich_text import RichText
-except ImportError:
-    from wagtail.core import blocks
-    from wagtail.core.fields import StreamField
-    from wagtail.core.rich_text import RichText
-
+from wagtail import blocks
 from wagtail.embeds.blocks import EmbedValue
 from wagtail.embeds.embeds import get_embed
 from wagtail.embeds.exceptions import EmbedException
+from wagtail.fields import StreamField
+from wagtail.rich_text import RichText
 
 from ..registry import registry
 from .rich_text import RichText as RichTextType

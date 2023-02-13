@@ -1,11 +1,7 @@
 from typing import Union
 
 from graphene.types import String
-
-try:
-    from wagtail.rich_text import RichText as WagtailRichText
-except ImportError:
-    from wagtail.core.rich_text import RichText as WagtailRichText
+from wagtail.rich_text import RichText as WagtailRichText
 
 from ..settings import grapple_settings
 

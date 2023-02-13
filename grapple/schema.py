@@ -1,10 +1,6 @@
 import graphene
 from graphql.validation import NoUnusedFragmentsRule
-
-try:
-    from wagtail import hooks
-except ImportError:
-    from wagtail.core import hooks
+from wagtail import hooks
 
 from .registry import registry
 from .settings import grapple_settings

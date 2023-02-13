@@ -5,21 +5,13 @@ from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
 from graphene_django.types import DjangoObjectType
 from graphql import GraphQLError
-
-from ..utils import resolve_site
-
-try:
-    from wagtail.models import Page as WagtailPage
-    from wagtail.models import Site
-except ImportError:
-    from wagtail.core.models import Page as WagtailPage
-    from wagtail.core.models import Site
-
+from wagtail.models import Page as WagtailPage
+from wagtail.models import Site
 from wagtail_headless_preview.signals import preview_update
 
 from ..registry import registry
 from ..settings import has_channels
-from ..utils import resolve_queryset
+from ..utils import resolve_queryset, resolve_site
 from .structures import QuerySetList
 
 
@@ -136,7 +128,7 @@ class PageInterface(graphene.Interface):
     def resolve_descendants(self, info, **kwargs):
         """
         Resolves a list of nodes pointing to the current page’s descendants.
-        Docs: https://docs.wagtail.io/en/stable/reference/pages/model_reference.html#wagtail.core.models.Page.get_descendants
+        Docs: https://docs.wagtail.io/en/stable/reference/pages/model_reference.html#wagtail.models.Page.get_descendants
         """
         return resolve_queryset(
             self.get_descendants().live().public().specific(), info, **kwargs
@@ -145,7 +137,7 @@ class PageInterface(graphene.Interface):
     def resolve_ancestors(self, info, **kwargs):
         """
         Resolves a list of nodes pointing to the current page’s ancestors.
-        Docs: https://docs.wagtail.io/en/stable/reference/pages/model_reference.html#wagtail.core.models.Page.get_ancestors
+        Docs: https://docs.wagtail.io/en/stable/reference/pages/model_reference.html#wagtail.models.Page.get_ancestors
         """
         return resolve_queryset(
             self.get_ancestors().live().public().specific(), info, **kwargs

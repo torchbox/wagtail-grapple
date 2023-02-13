@@ -2,7 +2,7 @@ from typing import Any, Dict, Optional
 
 import graphene
 from django.utils.text import slugify
-from wagtail.core import blocks
+from wagtail import blocks
 from wagtail.embeds.blocks import EmbedBlock
 from wagtail.images.blocks import ImageChooserBlock
 from wagtail.snippets.blocks import SnippetChooserBlock
@@ -102,7 +102,7 @@ class TextAndButtonsBlock(blocks.StructBlock):
 @register_streamfield_block
 class BlockWithName(blocks.StructBlock):
     """
-    wagtail.core.blocks.Block defines a name property inherited by all blocks.
+    wagtail.blocks.Block defines a name property inherited by all blocks.
     Ensure that when we bind a block to "name" that the block's value is
     returned in GraphQL queries.
     """

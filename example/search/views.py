@@ -1,10 +1,6 @@
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.shortcuts import render
-
-try:
-    from wagtail.models import Page
-except ImportError:
-    from wagtail.core.models import Page
+from wagtail.models import Page
 from wagtail.search.models import Query
 
 

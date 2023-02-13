@@ -344,7 +344,7 @@ More information can be found on :doc:`middleware docs <middleware>`.
 
 Returns the first item of the given type using the ``Model`` ordering.
 You can expose any Django model by decorating it with ``@register_singular_query_field``. This is especially useful
-when you have Wagtail Pages with ``max_count`` of one(`Ref: Wagtail documentation <https://docs.wagtail.io/en/stable/reference/pages/model_reference.html#wagtail.core.models.Page.max_count>`_),
+when you have Wagtail Pages with ``max_count`` of one(`Ref: Wagtail documentation <https://docs.wagtail.io/en/stable/reference/pages/model_reference.html#wagtail.models.Page.max_count>`_),
 thus there is no need to query by id.
 
 .. code-block:: python

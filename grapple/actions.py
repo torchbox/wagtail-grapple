@@ -8,29 +8,14 @@ from django.apps import apps
 from django.core.exceptions import FieldDoesNotExist
 from django.db import models
 from graphene_django.types import DjangoObjectType
-
-try:
-    from wagtail.contrib.settings.models import BaseGenericSetting, BaseSiteSetting
-    from wagtail.fields import RichTextField
-except ImportError:
-    # Wagtail < 4.0
-    from wagtail.contrib.settings.models import BaseSetting as BaseGenericSetting
-    from wagtail.contrib.settings.models import BaseSetting as BaseSiteSetting
-    from wagtail.core.fields import RichTextField
-
-
-try:
-    from wagtail.blocks import StructValue, stream_block
-    from wagtail.models import Page as WagtailPage
-    from wagtail.rich_text import RichText
-except ImportError:
-    from wagtail.core.blocks import StructValue, stream_block
-    from wagtail.core.models import Page as WagtailPage
-    from wagtail.core.rich_text import RichText
-
+from wagtail.blocks import StructValue, stream_block
+from wagtail.contrib.settings.models import BaseGenericSetting, BaseSiteSetting
 from wagtail.documents.models import AbstractDocument
+from wagtail.fields import RichTextField
 from wagtail.images.blocks import ImageChooserBlock
 from wagtail.images.models import AbstractImage, AbstractRendition
+from wagtail.models import Page as WagtailPage
+from wagtail.rich_text import RichText
 from wagtail.snippets.models import get_snippet_models
 
 from .helpers import field_middlewares, streamfield_types

@@ -65,8 +65,8 @@ Getting Grapple installed is designed to be as simple as possible!
 ### Prerequisites
 
 ```
-Django  >= 3.2, <4.0
-Wagtail >= 2.15, <5.0
+Python>=3.8,<3.12
+Wagtail >= 4.1
 ```
 
 ### Installation
@@ -185,9 +185,8 @@ Any contributions [you make](https://github.com/torchbox/wagtail-grapple/graphs/
 
 Wagtail Grapple supports:
 
--   Django >= 3.2, < 4.2
--   Python 3.7, 3.8, 3.9, and 3.10
--   Wagtail >= 2.15, < 5.0
+-   Python 3.8, 3.9, 3.10 and 3.11
+-   Wagtail >= 4.1
 
 ## License
 

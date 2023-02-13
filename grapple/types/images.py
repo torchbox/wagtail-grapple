@@ -1,6 +1,5 @@
 import graphene
 from graphene_django import DjangoObjectType
-from wagtail import VERSION as WAGTAIL_VERSION
 from wagtail.images import get_image_model
 from wagtail.images.models import Image as WagtailImage
 from wagtail.images.models import Rendition as WagtailImageRendition
@@ -53,7 +52,7 @@ class BaseImageObjectType(graphene.ObjectType):
         return self.width / self.height
 
     def resolve_sizes(self, info, **kwargs):
-        return "(max-width: {}px) 100vw, {}px".format(self.width, self.width)
+        return f"(max-width: {self.width}px) 100vw, {self.width}px"
 
     def resolve_tags(self, info, **kwargs):
         return self.tags.all()
@@ -173,25 +172,22 @@ def ImagesQuery():
         )
         image_type = graphene.String(required=True)
 
+        @property
+        def _base_queryset(self):
+            return mdl.objects.filter(
+                collection__view_restrictions__isnull=True
+            ).prefetch_renditions()
+
         def resolve_image(self, info, id, **kwargs):
             """Returns an image given the id, if in a public collection"""
             try:
-                qs = mdl.objects.filter(collection__view_restrictions__isnull=True)
-                if WAGTAIL_VERSION >= (3, 0):
-                    qs = qs.prefetch_related("renditions")
-                return qs.get(pk=id)
+                return self._base_queryset.get(pk=id)
             except mdl.DoesNotExist:
                 return None
 
         def resolve_images(self, info, **kwargs):
             """Returns all images in a public collection"""
-            qs = mdl.objects.filter(collection__view_restrictions__isnull=True)
-            if WAGTAIL_VERSION >= (4, 0):
-                qs = qs.prefetch_renditions()
-            elif WAGTAIL_VERSION >= (3, 0):
-                qs = qs.prefetch_related("renditions")
-
-            return resolve_queryset(qs, info, **kwargs)
+            return resolve_queryset(self._base_queryset, info, **kwargs)
 
         # Give name of the image type, used to generate mixins
         def resolve_image_type(self, info, **kwargs):

@@ -16,16 +16,22 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-latest
+    continue-on-error: ${{ matrix.allowfail }}
     strategy:
+      fail-fast: false
       max-parallel: 4
+      allowfail: [false]
       matrix:
-        python-version: ['3.7', '3.8', '3.9', '3.10']
-        wagtail-version: ['2.15', '4.0', '4.1', 'main']
+        python-version: ['3.8', '3.9', '3.10']
+        wagtail-version: ['4.1', '4.2', 'main']
         include:
           - python-version: '3.11'
             wagtail-version: '4.1'
           - python-version: '3.11'
+            wagtail-version: '4.2'
+          - python-version: '3.11'
             wagtail-version: 'main'
+            allowfail: true
 
     steps:
       - uses: actions/checkout@v3

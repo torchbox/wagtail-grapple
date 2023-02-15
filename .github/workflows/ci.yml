@@ -54,28 +54,4 @@ jobs:
         run: |
           cd tests
           python manage.py migrate
-          python manage.py test
-
-  test_channels:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
-        with:
-          python-version: 3.8
-          cache: 'pip'
-          cache-dependency-path: |
-            tests/requirements-channels.txt
-
-      - name: Install Dependencies
-        run: |
-          python -m pip install --upgrade pip
-          cd tests
-          python -m pip install -r requirements-channels.txt
-
-      - name: Run Tests
-        run: |
-          cd tests
-          python manage.py migrate
-          python manage.py test
+          python manage.py test --parallel

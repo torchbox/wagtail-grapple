@@ -4,7 +4,6 @@ from wagtail.models import Page
 from grapple.registry import registry
 from grapple.types.pages import PageInterface
 from grapple.types.rich_text import RichText
-
 from testapp.models import Advert, AuthorPage
 
 

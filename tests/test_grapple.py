@@ -14,10 +14,8 @@ from wagtailmedia.models import get_media_model
 
 from grapple.schema import create_schema
 from grapple.types.images import rendition_allowed
-
 from testapp.factories import BlogPageFactory
 from testapp.models import GlobalSocialMediaSettings, HomePage, SocialMediaSettings
-
 
 SCHEMA = locate(settings.GRAPHENE["SCHEMA"])
 MIDDLEWARE_OBJECTS = [

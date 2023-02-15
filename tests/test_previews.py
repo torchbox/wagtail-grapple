@@ -1,8 +1,8 @@
 from datetime import date
 
 from django.test import TestCase
-from grapple.types.pages import get_preview_page
 
+from grapple.types.pages import get_preview_page
 from testapp.models import BlogPage, HomePage
 
 

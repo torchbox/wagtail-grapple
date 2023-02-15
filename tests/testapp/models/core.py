@@ -38,9 +38,7 @@ from grapple.models import (
     GraphQLTag,
 )
 from grapple.utils import resolve_paginated_queryset
-
 from testapp.blocks import StreamFieldBlock
-
 
 document_model_string = getattr(
     settings, "WAGTAILDOCS_DOCUMENT_MODEL", "wagtaildocs.Document"

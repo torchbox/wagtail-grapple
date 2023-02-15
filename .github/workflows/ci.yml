@@ -36,7 +36,8 @@ jobs:
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install -r tests/requirements.txt
+          cd tests
+          python -m pip install -r requirements.txt
 
       - name: Install Wagtail package
         if: ${{ matrix.wagtail-version != 'main' }}
@@ -70,8 +71,8 @@ jobs:
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install -r tests/requirements-channels.txt
-          python -m pip install .[channels]
+          cd tests
+          python -m pip install -r requirements-channels.txt
 
       - name: Run Tests
         run: |

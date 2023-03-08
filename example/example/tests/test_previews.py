@@ -40,7 +40,6 @@ class TestSavedPagePreview(TestCase):
         self.token = self.preview.token
 
     def test_get_preview_page(self):
-        self.assertEqual(self.page.pk, 4)
         preview = get_preview_page(self.token)
         self.assertEqual(preview.title, self.page.title)
         self.assertEqual(preview.slug, self.page.slug)

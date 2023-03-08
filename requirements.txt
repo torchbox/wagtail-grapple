@@ -6,3 +6,7 @@ factory-boy==3.2.1
 wagtail-factories>=4.0.0,<4.1.0
 django-cors-headers==3.4.0
 wagtail-headless-preview
+# simplified database configuration to support testing multiple DB engines in CI.
+dj-database-url==1.2.0
+# for postgres testing
+psycopg2==2.9.5

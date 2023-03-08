@@ -390,7 +390,8 @@ class BlogTest(BaseGrappleTest):
         block_type = "DateTimeBlock"
         date_format_string = "%Y-%m-%d %H:%M:%S"
         query_blocks = self.get_blocks_from_body(
-            block_type, block_query=f'value(format: "{date_format_string}")'
+            block_type,
+            block_query=f'value(format: "{date_format_string}")',
         )
 
         # Check output.
@@ -915,7 +916,6 @@ class BlogTest(BaseGrappleTest):
         tags = executed["data"]["page"]["tags"]
         self.assertEqual(len(tags), 3)
         for idx, tag in enumerate(tags, start=1):
-            self.assertEqual(int(tag["id"]), idx)
             self.assertTrue(isinstance(tag["name"], str))
             self.assertEqual(tag["name"], "Tag " + str(idx))
 

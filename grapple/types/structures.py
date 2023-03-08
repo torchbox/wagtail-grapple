@@ -48,6 +48,7 @@ class QuerySetList(graphene.List):
     * ``offset``
     * ``search_query``
     * ``search_operator``
+    * ``search_fields``
     * ``order``
 
     :param enable_in_menu: Enable in_menu filter.
@@ -58,6 +59,8 @@ class QuerySetList(graphene.List):
     :type enable_offset: bool
     :param enable_search: Enable search query argument.
     :type enable_search: bool
+    :param enable_search_fields: Enable search fields argument, enable_search must also be True
+    :type enable_search_fields: bool
     :param enable_search_operator: Enable search operator argument, enable_search must also be True
     :type enable_search_operator: bool
     :param enable_order: Enable ordering via query argument.
@@ -70,6 +73,7 @@ class QuerySetList(graphene.List):
         enable_offset = kwargs.pop("enable_offset", True)
         enable_order = kwargs.pop("enable_order", True)
         enable_search = kwargs.pop("enable_search", True)
+        enable_search_fields = kwargs.pop("enable_search_fields", True)
         enable_search_operator = kwargs.pop("enable_search_operator", True)
 
         # Check if the type is a Django model type. Do not perform the
@@ -134,6 +138,14 @@ class QuerySetList(graphene.List):
                     default_value="and",
                 )
 
+            if enable_search_fields:
+                kwargs["search_fields"] = graphene.Argument(
+                    graphene.List(graphene.String),
+                    description=_(
+                        "A list of fields to search in. see: https://docs.wagtail.org/en/stable/topics/search/searching.html#specifying-the-fields-to-search"
+                    ),
+                )
+
         if "id" not in kwargs:
             kwargs["id"] = graphene.Argument(graphene.ID, description=_("Filter by ID"))
 
@@ -187,10 +199,13 @@ def PaginatedQuerySet(of_type, type_class, **kwargs):
     * ``per_page``
     * ``search_query``
     * ``search_operator``
+    * ``search_fields``
     * ``order``
 
     :param enable_search: Enable search query argument.
     :type enable_search: bool
+    :param enable_search_fields: Enable search fields argument, enable_search must also be True
+    :type enable_search_fields: bool
     :param enable_search_operator: Enable search operator argument, enable_search must also be True
     :type enable_search_operator: bool
     :param enable_order: Enable ordering via query argument.
@@ -199,6 +214,7 @@ def PaginatedQuerySet(of_type, type_class, **kwargs):
 
     enable_in_menu = kwargs.pop("enable_in_menu", False)
     enable_search = kwargs.pop("enable_search", True)
+    enable_search_fields = kwargs.pop("enable_search_fields", True)
     enable_search_operator = kwargs.pop("enable_search_operator", True)
     enable_order = kwargs.pop("enable_order", True)
     required = kwargs.get("required", False)
@@ -263,6 +279,14 @@ def PaginatedQuerySet(of_type, type_class, **kwargs):
                     "Specify search operator (and/or), see: https://docs.wagtail.org/en/stable/topics/search/searching.html#search-operator"
                 ),
                 default_value="and",
+            )
+
+        if enable_search_fields:
+            kwargs["search_fields"] = graphene.Argument(
+                graphene.List(graphene.String),
+                description=_(
+                    "A comma-separated list of fields to search in. see: https://docs.wagtail.org/en/stable/topics/search/searching.html#specifying-the-fields-to-search"
+                ),
             )
 
     if "id" not in kwargs:

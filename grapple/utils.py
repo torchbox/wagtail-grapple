@@ -103,6 +103,7 @@ def resolve_queryset(
     collection=None,
     in_menu=None,
     search_operator="and",
+    search_fields=None,
     **kwargs,
 ):
     """
@@ -127,6 +128,8 @@ def resolve_queryset(
     :param search_operator: The operator to use when combining search terms.
                             Defaults to "and".
     :type search_operator: "and" | "or"
+    :param search_fields: A list of fields to search. Defaults to all fields.
+    :type search_fields: list
     """
 
     qs = qs.all() if id is None else qs.filter(pk=id)
@@ -159,10 +162,15 @@ def resolve_queryset(
 
         filters, parsed_query = parse_query_string(search_query, str(search_operator))
 
+        # check if search_fields is provided in the query string if it isn't provided as a graphQL argument
+        if search_fields is None:
+            search_fields = filters.getlist("fields", None)
+
         qs = qs.search(
             parsed_query,
             order_by_relevance=order_by_relevance,
             operator=search_operator,
+            fields=search_fields,
         )
         if connection.vendor != "sqlite":
             qs = qs.annotate_score("search_score")
@@ -212,6 +220,7 @@ def resolve_paginated_queryset(
     order=None,
     search_query=None,
     search_operator="and",
+    search_fields=None,
     **kwargs,
 ):
     """
@@ -234,6 +243,8 @@ def resolve_paginated_queryset(
     :param search_operator: The operator to use when combining search terms.
                             Defaults to "and".
     :type search_operator: "and" | "or"
+    :param search_fields: A list of fields to search. Defaults to all fields.
+    :type search_fields: list
     """
     page = int(page or 1)
     per_page = min(
@@ -260,10 +271,15 @@ def resolve_paginated_queryset(
 
         filters, parsed_query = parse_query_string(search_query, search_operator)
 
+        # check if search_fields is provided in the query string if it isn't provided as a graphQL argument
+        if search_fields is None:
+            search_fields = filters.getlist("fields", None)
+
         qs = qs.search(
             parsed_query,
             order_by_relevance=order_by_relevance,
             operator=search_operator,
+            fields=search_fields,
         )
         if connection.vendor != "sqlite":
             qs = qs.annotate_score("search_score")

@@ -672,6 +672,52 @@ class PagesSearchTest(BaseGrappleTest):
         self.assertEqual(page_data[8]["title"], "Gamma Alpha")
         self.assertEqual(page_data[9]["title"], "Gamma Beta")
 
+    def test_search_fields_unset(self):
+        query = """
+        query {
+            pages(searchQuery: "Sigma") {
+                title
+            }
+        }
+        """
+        executed = self.client.execute(query)
+        page_data = executed["data"].get("pages")
+        self.assertEqual(len(page_data), 6)
+        self.assertEqual(page_data[0]["title"], "Alpha")
+        self.assertEqual(page_data[1]["title"], "Alpha Alpha")
+        self.assertEqual(page_data[2]["title"], "Alpha Beta")
+        self.assertEqual(page_data[3]["title"], "Alpha Gamma")
+        self.assertEqual(page_data[4]["title"], "Beta Alpha")
+        self.assertEqual(page_data[5]["title"], "Gamma Alpha")
+
+    def test_search_fields_graphql_arg(self):
+        query = """
+        query {
+            pages(searchQuery: "Sigma", searchFields: "title") {
+                title
+            }
+        }
+        """
+        executed = self.client.execute(query)
+        page_data = executed["data"].get("pages")
+        self.assertEqual(len(page_data), 0)
+
+    def test_search_fields_filter(self):
+        query = """
+        query($searchQuery: String) {
+            pages(searchQuery: $searchQuery) {
+                title
+                searchScore
+            }
+        }
+        """
+        executed = self.client.execute(
+            query,
+            variables={"searchQuery": "Sigma fields:title"},
+        )
+        page_data = executed["data"].get("pages")
+        self.assertEqual(len(page_data), 0)
+
 
 class PageUrlPathTest(BaseGrappleTest):
     def _query_by_path(self, path, *, in_site=False):

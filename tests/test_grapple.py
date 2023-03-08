@@ -474,18 +474,41 @@ class PagesSearchTest(BaseGrappleTest):
     @classmethod
     def setUpTestData(cls):
         cls.home = HomePage.objects.first()
-        BlogPageFactory(title="Alpha", parent=cls.home, show_in_menus=True)
-        BlogPageFactory(title="Alpha Alpha", parent=cls.home)
-        BlogPageFactory(title="Alpha Beta", parent=cls.home)
-        BlogPageFactory(title="Alpha Gamma", parent=cls.home)
-        BlogPageFactory(title="Beta", parent=cls.home)
-        BlogPageFactory(title="Beta Alpha", parent=cls.home)
-        BlogPageFactory(title="Beta Beta", parent=cls.home)
-        BlogPageFactory(title="Beta Gamma", parent=cls.home)
-        BlogPageFactory(title="Gamma", parent=cls.home)
-        BlogPageFactory(title="Gamma Alpha", parent=cls.home)
-        BlogPageFactory(title="Gamma Beta", parent=cls.home)
-        BlogPageFactory(title="Gamma Gamma", parent=cls.home)
+        BlogPageFactory(
+            title="Alpha",
+            body=[("heading", "Sigma")],
+            parent=cls.home,
+            show_in_menus=True,
+        )
+        BlogPageFactory(
+            title="Alpha Alpha", body=[("heading", "Sigma Sigma")], parent=cls.home
+        )
+        BlogPageFactory(
+            title="Alpha Beta", body=[("heading", "Sigma Theta")], parent=cls.home
+        )
+        BlogPageFactory(
+            title="Alpha Gamma", body=[("heading", "Sigma Delta")], parent=cls.home
+        )
+        BlogPageFactory(title="Beta", body=[("heading", "Theta")], parent=cls.home)
+        BlogPageFactory(
+            title="Beta Alpha", body=[("heading", "Theta Sigma")], parent=cls.home
+        )
+        BlogPageFactory(
+            title="Beta Beta", body=[("heading", "Theta Theta")], parent=cls.home
+        )
+        BlogPageFactory(
+            title="Beta Gamma", body=[("heading", "Theta Delta")], parent=cls.home
+        )
+        BlogPageFactory(title="Gamma", body=[("heading", "Delta")], parent=cls.home)
+        BlogPageFactory(
+            title="Gamma Alpha", body=[("heading", "Delta Sigma")], parent=cls.home
+        )
+        BlogPageFactory(
+            title="Gamma Beta", body=[("heading", "Delta Theta")], parent=cls.home
+        )
+        BlogPageFactory(
+            title="Gamma Gamma", body=[("heading", "Delta Delta")], parent=cls.home
+        )
 
     @unittest.skipIf(
         connection.vendor != "sqlite",
@@ -530,7 +553,6 @@ class PagesSearchTest(BaseGrappleTest):
             }
         }
         """
-
         executed = self.client.execute(query, variables={"searchQuery": "Alpha"})
         page_data = executed["data"].get("pages")
         self.assertEqual(len(page_data), 6)
@@ -559,7 +581,6 @@ class PagesSearchTest(BaseGrappleTest):
             query, variables={"searchQuery": "Gamma", "order": "-title"}
         )
         page_data = executed["data"].get("pages")
-
         self.assertEqual(len(page_data), 6)
         self.assertEqual(page_data[0]["title"], "Gamma Gamma")
         self.assertEqual(page_data[1]["title"], "Gamma Beta")
@@ -592,6 +613,110 @@ class PagesSearchTest(BaseGrappleTest):
         executed = self.client.execute(query, variables={"inMenu": False})
         page_data = executed["data"].get("pages")
         self.assertEqual(len(page_data), 12)  # 11 blog pages + home page
+
+    def test_search_operator_default(self):
+        """default operator is and"""
+        query = """
+        query($searchQuery: String) {
+            pages(searchQuery: $searchQuery) {
+                title
+                searchScore
+            }
+        }
+        """
+        executed = self.client.execute(query, variables={"searchQuery": "Alpha Beta"})
+        page_data = executed["data"].get("pages")
+        self.assertEqual(len(page_data), 2)
+        self.assertEqual(page_data[0]["title"], "Alpha Beta")
+        self.assertEqual(page_data[1]["title"], "Beta Alpha")
+
+    def test_search_operator_and(self):
+        query = """
+        query($searchQuery: String, $searchOperator: SearchOperatorEnum) {
+            pages(searchQuery: $searchQuery, searchOperator: $searchOperator) {
+                title
+                searchScore
+            }
+        }
+        """
+        executed = self.client.execute(
+            query, variables={"searchQuery": "Alpha Beta", "searchOperator": "AND"}
+        )
+        page_data = executed["data"].get("pages")
+        self.assertEqual(len(page_data), 2)
+        self.assertEqual(page_data[0]["title"], "Alpha Beta")
+        self.assertEqual(page_data[1]["title"], "Beta Alpha")
+
+    def test_search_operator_or(self):
+        query = """
+        query($searchQuery: String, $searchOperator: SearchOperatorEnum) {
+            pages(searchQuery: $searchQuery, searchOperator: $searchOperator) {
+                title
+                searchScore
+            }
+        }
+        """
+        executed = self.client.execute(
+            query, variables={"searchQuery": "Alpha Beta", "searchOperator": "OR"}
+        )
+        page_data = executed["data"].get("pages")
+        self.assertEqual(len(page_data), 10)
+        self.assertEqual(page_data[0]["title"], "Alpha")
+        self.assertEqual(page_data[1]["title"], "Alpha Alpha")
+        self.assertEqual(page_data[2]["title"], "Alpha Beta")
+        self.assertEqual(page_data[3]["title"], "Alpha Gamma")
+        self.assertEqual(page_data[4]["title"], "Beta")
+        self.assertEqual(page_data[5]["title"], "Beta Alpha")
+        self.assertEqual(page_data[6]["title"], "Beta Beta")
+        self.assertEqual(page_data[7]["title"], "Beta Gamma")
+        self.assertEqual(page_data[8]["title"], "Gamma Alpha")
+        self.assertEqual(page_data[9]["title"], "Gamma Beta")
+
+    def test_search_fields_unset(self):
+        query = """
+        query {
+            pages(searchQuery: "Sigma") {
+                title
+            }
+        }
+        """
+        executed = self.client.execute(query)
+        page_data = executed["data"].get("pages")
+        self.assertEqual(len(page_data), 6)
+        self.assertEqual(page_data[0]["title"], "Alpha")
+        self.assertEqual(page_data[1]["title"], "Alpha Alpha")
+        self.assertEqual(page_data[2]["title"], "Alpha Beta")
+        self.assertEqual(page_data[3]["title"], "Alpha Gamma")
+        self.assertEqual(page_data[4]["title"], "Beta Alpha")
+        self.assertEqual(page_data[5]["title"], "Gamma Alpha")
+
+    def test_search_fields_graphql_arg(self):
+        query = """
+        query {
+            pages(searchQuery: "Sigma", searchFields: "title") {
+                title
+            }
+        }
+        """
+        executed = self.client.execute(query)
+        page_data = executed["data"].get("pages")
+        self.assertEqual(len(page_data), 0)
+
+    def test_search_fields_filter(self):
+        query = """
+        query($searchQuery: String) {
+            pages(searchQuery: $searchQuery) {
+                title
+                searchScore
+            }
+        }
+        """
+        executed = self.client.execute(
+            query,
+            variables={"searchQuery": "Sigma fields:title"},
+        )
+        page_data = executed["data"].get("pages")
+        self.assertEqual(len(page_data), 0)
 
 
 class PageUrlPathTest(BaseGrappleTest):

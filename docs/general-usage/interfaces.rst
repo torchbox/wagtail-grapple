@@ -28,12 +28,12 @@ The interface exposes the following fields, following the Wagtail Page model fie
     showInMenus: Boolean
     contentType: String
     parent: PageInterface
-    children(limit: PositiveInt, offset: PositiveInt, order: String, searchQuery: String, id: ID): [PageInterface]
-    siblings(limit: PositiveInt, offset: PositiveInt, order: String, searchQuery: String, id: ID): [PageInterface]
-    nextSiblings(limit: PositiveInt, offset: PositiveInt, order: String, searchQuery: String, id: ID): [PageInterface]
-    previousSiblings(limit: PositiveInt, offset: PositiveInt, order: String, searchQuery: String, id: ID): [PageInterface]
-    descendants(limit: PositiveInt, offset: PositiveInt, order: String, searchQuery: String, id: ID): [PageInterface]
-    ancestors(limit: PositiveInt, offset: PositiveInt, order: String, searchQuery: String, id: ID): [PageInterface]
+    children(limit: PositiveInt, offset: PositiveInt, order: String, searchQuery: String, searchOperator: SearchOperatorEnum, id: ID): [PageInterface]
+    siblings(limit: PositiveInt, offset: PositiveInt, order: String, searchQuery: String, searchOperator: SearchOperatorEnum, id: ID): [PageInterface]
+    nextSiblings(limit: PositiveInt, offset: PositiveInt, order: String, searchQuery: String, searchOperator: SearchOperatorEnum, id: ID): [PageInterface]
+    previousSiblings(limit: PositiveInt, offset: PositiveInt, order: String, searchQuery: String, searchOperator: SearchOperatorEnum, id: ID): [PageInterface]
+    descendants(limit: PositiveInt, offset: PositiveInt, order: String, searchQuery: String, searchOperator: SearchOperatorEnum, id: ID): [PageInterface]
+    ancestors(limit: PositiveInt, offset: PositiveInt, order: String, searchQuery: String, searchOperator: SearchOperatorEnum, id: ID): [PageInterface]
 
 
 Any custom ``graphql_fields`` added to your specific Page models will be available here via the 'on' spread operator and
@@ -65,7 +65,8 @@ accepts the following arguments:
     offset: PositiveInt
     order: String
     searchQuery: String
-    contentType: String           #  comma separated list of content types in app.Model notation
+    searchOperator: OR | AND      # default is AND
+    contentType: String           # comma separated list of content types in app.Model notation
     inSite: Boolean
     ancestor: PositiveInt         # ID of ancestor page to restrict results to
     parent: PositiveInt           # ID of parent page to restrict results to

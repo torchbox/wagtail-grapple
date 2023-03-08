@@ -1,6 +1,6 @@
-import os
-from pydoc import locate
+import shutil
 import unittest
+from pydoc import locate
 from unittest.mock import patch
 
 import wagtail_factories
@@ -925,14 +925,12 @@ class DisableAutoCamelCaseTest(TestCase):
 
 
 class ImagesTest(BaseGrappleTest):
-    def setUp(self):
-        super().setUp()
-        self.image_model = get_image_model()
-        self.assertEqual(self.image_model.objects.all().count(), 0)
-        self.example_image = wagtail_factories.ImageFactory(title="Example Image")
-        self.example_image.full_clean()
-        self.example_image.save()
-        self.assertEqual(self.image_model.objects.all().count(), 1)
+    @classmethod
+    def setUpTestData(cls):
+        cls.image_model = get_image_model()
+        cls.example_image = wagtail_factories.ImageFactory(title="Example Image")
+        cls.example_image.full_clean()
+        cls.example_image.save()
 
     def test_properties_on_saved_example_image(self):
         example_img = self.image_model.objects.first()
@@ -1119,10 +1117,10 @@ class ImagesTest(BaseGrappleTest):
         with self.assertNumQueries(2):
             self.client.execute(query)
 
-    def tearDown(self):
-        example_image_path = self.example_image.file.path
-        self.example_image.delete()
-        os.remove(example_image_path)
+    @classmethod
+    def tearDownClass(cls):
+        super().tearDownClass()
+        shutil.rmtree(settings.MEDIA_ROOT, ignore_errors=True)
 
 
 class DocumentsTest(BaseGrappleTest):

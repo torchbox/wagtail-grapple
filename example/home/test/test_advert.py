@@ -8,7 +8,6 @@ class AdvertTest(BaseGrappleTestWithIntrospection):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
-
         cls.richtext_sample = (
             f'Text with a \'link\' to <a linktype="page" id="{cls.home.id}">Home</a>'
         )

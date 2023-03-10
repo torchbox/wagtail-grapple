@@ -92,9 +92,10 @@ class TestRegisterQueryField(BaseGrappleTest):
         results = self.client.execute(query, context_value=self.request)
         data = results["data"]["posts"]
         self.assertEqual(len(data), 3)
-        self.assertEqual(int(data[0]["id"]), self.child_post.id)
-        self.assertEqual(int(data[1]["id"]), self.another_post.id)
-        self.assertEqual(int(data[2]["id"]), self.blog_post.id)
+        ids = [int(d["id"]) for d in data]
+        self.assertIn(self.blog_post.id, ids)
+        self.assertIn(self.another_post.id, ids)
+        self.assertIn(self.child_post.id, ids)
 
     def test_query_field(self):
         query = """
@@ -198,7 +199,7 @@ class TestRegisterPaginatedQueryField(BaseGrappleTest):
     def test_paginated_query_field_plural(self):
         query = """
         {
-            blogPages(perPage: 1) {
+            blogPages(perPage: 1, order: "title") {
                 items {
                     id
                 }
@@ -211,7 +212,6 @@ class TestRegisterPaginatedQueryField(BaseGrappleTest):
         results = self.client.execute(query, context_value=self.request)
         data = results["data"]["blogPages"]
         self.assertEqual(len(data["items"]), 1)
-        self.assertEqual(int(data["items"][0]["id"]), self.child_post.id)
         self.assertEqual(int(data["pagination"]["totalPages"]), 3)
 
     @override_settings(GRAPPLE={"PAGE_SIZE": 2})
@@ -232,7 +232,6 @@ class TestRegisterPaginatedQueryField(BaseGrappleTest):
         results = self.client.execute(query, context_value=self.request)
         data = results["data"]["blogPages"]
         self.assertEqual(len(data["items"]), 2)
-        self.assertEqual(int(data["items"][0]["id"]), self.child_post.id)
         self.assertEqual(int(data["pagination"]["perPage"]), 2)
         self.assertEqual(int(data["pagination"]["totalPages"]), 2)
 
@@ -254,7 +253,6 @@ class TestRegisterPaginatedQueryField(BaseGrappleTest):
         results = self.client.execute(query, context_value=self.request)
         data = results["data"]["blogPages"]
         self.assertEqual(len(data["items"]), 3)
-        self.assertEqual(int(data["items"][0]["id"]), self.child_post.id)
         self.assertEqual(int(data["pagination"]["perPage"]), 3)
         self.assertEqual(int(data["pagination"]["totalPages"]), 1)
 
@@ -315,64 +313,55 @@ class TestUtils(BaseGrappleTest):
         BlogPageFactory(parent=self.home, title="Test post 2", slug="post-two")
         BlogPageFactory(parent=self.home, title="Test post 3", slug="post-three")
 
-    def test_pages_search(self):
+    def _query_pages(self, limit=None, offset=None):
         query = """
-        query ($term: String, $limit: PositiveInt, $offset: PositiveInt) {
-            pages(searchQuery: $term, limit: $limit, offset: $offset) {
+        query ($limit: PositiveInt, $offset: PositiveInt) {
+            pages(contentType: "home.BlogPage", order: "title", limit: $limit, offset: $offset) {
                 title
             }
         }
         """
-
         results = self.client.execute(
             query,
-            variables={"term": "Test", "limit": 1},
+            variables={"limit": limit, "offset": offset},
         )
-        pages = results["data"]["pages"]
-        self.assertEqual(len(pages), 1)
-        self.assertEqual(pages[0]["title"], "Test post 1")
+        return results["data"]["pages"]
 
-        results = self.client.execute(
-            query,
-            variables={"term": "Test", "limit": 2, "offset": 1},
-        )
-        pages = results["data"]["pages"]
-        self.assertEqual(len(pages), 2)
-        self.assertEqual(pages[0]["title"], "Test post 2")
-        self.assertEqual(pages[1]["title"], "Test post 3")
+    def test_page_size_is_default_limit(self):
+        with override_settings(GRAPPLE={"PAGE_SIZE": 3, "MAX_PAGE_SIZE": 8}):
+            pages = self._query_pages()
+        self.assertEqual(len(pages), 3)
 
-    def test_pages_search_with_min_max_page_size_settings(self):
-        query = """
-        query ($term: String, $limit: PositiveInt, $offset: PositiveInt) {
-            pages(searchQuery: $term, limit: $limit, offset: $offset) {
-                title
-            }
-        }
-        """
+    def test_limit_supercedes_page_size(self):
+        with override_settings(GRAPPLE={"PAGE_SIZE": 3, "MAX_PAGE_SIZE": 8}):
+            pages = self._query_pages(5)
+        self.assertEqual(len(pages), 3)
 
+    def test_max_page_size_supercedes_page_size(self):
         # the max page size is 1 and we should get only one,
         # even if default page size and the requested limit are higher
         with override_settings(GRAPPLE={"PAGE_SIZE": 10, "MAX_PAGE_SIZE": 1}):
-            results = self.client.execute(
-                query,
-                variables={"term": "Test", "limit": 2},
-            )
+            pages = self._query_pages(None)
 
-        pages = results["data"]["pages"]
         self.assertEqual(len(pages), 1)
         self.assertEqual(pages[0]["title"], "Test post 1")
 
+    def test_max_page_size_supercedes_limit(self):
         # Default page size is one, but we ask for two which is still less than max page size
-        with override_settings(GRAPPLE={"PAGE_SIZE": 1, "MAX_PAGE_SIZE": 5}):
-            results = self.client.execute(
-                query,
-                variables={"term": "Test", "limit": 2},
-            )
-
-        pages = results["data"]["pages"]
+        with override_settings(GRAPPLE={"PAGE_SIZE": 1, "MAX_PAGE_SIZE": 2}):
+            pages = self._query_pages(5)
         self.assertEqual(len(pages), 2)
         self.assertEqual(pages[0]["title"], "Test post 1")
-        self.assertEqual(pages[1]["title"], "Test post 2")
+
+    def test_offset(self):
+        pages = self._query_pages(1)
+        self.assertEqual(len(pages), 1)
+        self.assertEqual(pages[0]["title"], "Test post 1")
+
+        pages = self._query_pages(2, 1)
+        self.assertEqual(len(pages), 2)
+        self.assertEqual(pages[0]["title"], "Test post 2")
+        self.assertEqual(pages[1]["title"], "Test post 3")
 
 
 class TestRichTextType(BaseGrappleTest):

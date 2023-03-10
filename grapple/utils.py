@@ -45,17 +45,11 @@ def resolve_site(hostname):
 
 def _sliced_queryset(qs, limit=None, offset=None):
     offset = int(offset or 0)
-
-    if limit is not None:
-        limit = min(
-            int(limit or grapple_settings.PAGE_SIZE), grapple_settings.MAX_PAGE_SIZE
-        )
-        return qs[offset : limit + offset]
-
-    if offset:
-        return qs[offset:]
-
-    return qs
+    # default
+    limit = int(limit or grapple_settings.PAGE_SIZE)
+    # maximum
+    limit = min(limit, grapple_settings.MAX_PAGE_SIZE)
+    return qs[offset : limit + offset]
 
 
 def resolve_queryset(

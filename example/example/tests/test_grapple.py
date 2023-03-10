@@ -1,10 +1,12 @@
-import os
+import shutil
+import unittest
 from pydoc import locate
 from unittest.mock import patch
 
 import wagtail_factories
 from django.conf import settings
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.db import connection
 from django.test import RequestFactory, TestCase, override_settings
 from graphene.test import Client
 from home.factories import BlogPageFactory
@@ -424,19 +426,23 @@ class PagesSearchTest(BaseGrappleTest):
     def setUpTestData(cls):
         cls.home = HomePage.objects.first()
         BlogPageFactory(title="Alpha", parent=cls.home)
-        BlogPageFactory(title="Gamma Beta", parent=cls.home)
+        BlogPageFactory(title="Alpha Alpha", parent=cls.home)
         BlogPageFactory(title="Alpha Beta", parent=cls.home)
-        BlogPageFactory(title="Beta Alpha", parent=cls.home)
         BlogPageFactory(title="Alpha Gamma", parent=cls.home)
         BlogPageFactory(title="Beta", parent=cls.home)
-        BlogPageFactory(title="Alpha Alpha", parent=cls.home)
-        BlogPageFactory(title="Gamma Gamma", parent=cls.home)
+        BlogPageFactory(title="Beta Alpha", parent=cls.home)
         BlogPageFactory(title="Beta Beta", parent=cls.home)
-        BlogPageFactory(title="Gamma", parent=cls.home)
         BlogPageFactory(title="Beta Gamma", parent=cls.home)
+        BlogPageFactory(title="Gamma", parent=cls.home)
         BlogPageFactory(title="Gamma Alpha", parent=cls.home)
+        BlogPageFactory(title="Gamma Beta", parent=cls.home)
+        BlogPageFactory(title="Gamma Gamma", parent=cls.home)
 
-    def test_natural_order(self):
+    @unittest.skipIf(
+        connection.vendor != "sqlite",
+        "sqlite doesn't support scoring so natural order will be in the order of defintion",
+    )
+    def test_natural_order_sqlite(self):
         query = """
         query($searchQuery: String, $order: String) {
             pages(searchQuery: $searchQuery, order: $order) {
@@ -444,19 +450,16 @@ class PagesSearchTest(BaseGrappleTest):
             }
         }
         """
-        """
-        sqlite doesn't support scoring so natural order will be in the order of defintion.
-        with another database or elasticsearch backend the order will be different
-        """
         executed = self.client.execute(query, variables={"searchQuery": "Alpha"})
         page_data = executed["data"].get("pages")
-        self.assertEqual(len(page_data), 6)
-        self.assertEqual(page_data[0]["title"], "Alpha")
-        self.assertEqual(page_data[1]["title"], "Alpha Beta")
-        self.assertEqual(page_data[2]["title"], "Beta Alpha")
-        self.assertEqual(page_data[3]["title"], "Alpha Gamma")
-        self.assertEqual(page_data[4]["title"], "Alpha Alpha")
-        self.assertEqual(page_data[5]["title"], "Gamma Alpha")
+
+        self.assertEquals(len(page_data), 6)
+        self.assertEquals(page_data[0]["title"], "Alpha")
+        self.assertEquals(page_data[1]["title"], "Alpha Alpha")
+        self.assertEquals(page_data[2]["title"], "Alpha Beta")
+        self.assertEquals(page_data[3]["title"], "Alpha Gamma")
+        self.assertEquals(page_data[4]["title"], "Beta Alpha")
+        self.assertEquals(page_data[5]["title"], "Gamma Alpha")
 
     def test_explicit_order(self):
         query = """
@@ -471,13 +474,13 @@ class PagesSearchTest(BaseGrappleTest):
         )
         page_data = executed["data"].get("pages")
 
-        self.assertEqual(len(page_data), 6)
-        self.assertEqual(page_data[0]["title"], "Gamma Gamma")
-        self.assertEqual(page_data[1]["title"], "Gamma Beta")
-        self.assertEqual(page_data[2]["title"], "Gamma Alpha")
-        self.assertEqual(page_data[3]["title"], "Gamma")
-        self.assertEqual(page_data[4]["title"], "Beta Gamma")
-        self.assertEqual(page_data[5]["title"], "Alpha Gamma")
+        self.assertEquals(len(page_data), 6)
+        self.assertEquals(page_data[0]["title"], "Gamma Gamma")
+        self.assertEquals(page_data[3]["title"], "Gamma")
+        self.assertEquals(page_data[1]["title"], "Gamma Beta")
+        self.assertEquals(page_data[2]["title"], "Gamma Alpha")
+        self.assertEquals(page_data[4]["title"], "Beta Gamma")
+        self.assertEquals(page_data[5]["title"], "Alpha Gamma")
 
 
 class PageUrlPathTest(BaseGrappleTest):
@@ -922,14 +925,12 @@ class DisableAutoCamelCaseTest(TestCase):
 
 
 class ImagesTest(BaseGrappleTest):
-    def setUp(self):
-        super().setUp()
-        self.image_model = get_image_model()
-        self.assertEqual(self.image_model.objects.all().count(), 0)
-        self.example_image = wagtail_factories.ImageFactory(title="Example Image")
-        self.example_image.full_clean()
-        self.example_image.save()
-        self.assertEqual(self.image_model.objects.all().count(), 1)
+    @classmethod
+    def setUpTestData(cls):
+        cls.image_model = get_image_model()
+        cls.example_image = wagtail_factories.ImageFactory(title="Example Image")
+        cls.example_image.full_clean()
+        cls.example_image.save()
 
     def test_properties_on_saved_example_image(self):
         example_img = self.image_model.objects.first()
@@ -1116,10 +1117,10 @@ class ImagesTest(BaseGrappleTest):
         with self.assertNumQueries(2):
             self.client.execute(query)
 
-    def tearDown(self):
-        example_image_path = self.example_image.file.path
-        self.example_image.delete()
-        os.remove(example_image_path)
+    @classmethod
+    def tearDownClass(cls):
+        super().tearDownClass()
+        shutil.rmtree(settings.MEDIA_ROOT, ignore_errors=True)
 
 
 class DocumentsTest(BaseGrappleTest):

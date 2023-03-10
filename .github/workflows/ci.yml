@@ -22,6 +22,19 @@ jobs:
       matrix:
         python-version: ['3.8', '3.9', '3.10', '3.11']
         wagtail-version: ['4.1', '4.2']
+        DATABASE_URL: ['sqlite:///db.sqlite3', 'postgres://postgres:postgres@localhost/postgres']
+
+    env:
+      DATABASE_URL: ${{matrix.DATABASE_URL}}
+
+    services:
+      postgres:
+        image: postgres:14
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
     steps:
       - uses: actions/checkout@v3

@@ -468,7 +468,8 @@ def build_streamfield_type(
 
             # Add support for `graphql_fields`
             methods["resolve_" + field.field_name] = (
-                custom_cls_resolver(cls=cls, graphql_field=field) or streamfield_resolver
+                custom_cls_resolver(cls=cls, graphql_field=field)
+                or streamfield_resolver
             )
 
             # Add field to GQL type with correct field-type

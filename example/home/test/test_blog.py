@@ -1035,6 +1035,21 @@ class BlogTest(BaseGrappleTest):
                 # Ensure TextWithCallableBlock.get_field_method called.
                 self.assertIn("text-with-callable", result)
 
+    def test_graphqlfield_method_with_extra_arg_in_structblock(self):
+        block_type = "TextWithCallableBlock"
+        block_query_field = "fieldMethodWithExtraArg"
+        extra_arg = "hello"
+        block_query = f'{block_query_field}(extraArg: "{extra_arg}")'
+        query_blocks = self.get_blocks_from_body(block_type, block_query=block_query)
+
+        for block in self.blog_page.body:
+            if type(block.block).__name__ == block_type:
+                # Ensure TextWithCallableBlock.field_method not called.
+                result = query_blocks[0][block_query_field]
+
+                # Ensure TextWithCallableBlock.get_field_method_with_extra_arg called with right argument.
+                self.assertIn(extra_arg, result)
+
     def test_custom_property(self):
         query = """
         query($id: Int) {

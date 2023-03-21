@@ -139,8 +139,12 @@ class TextWithCallableBlock(blocks.StructBlock):
         # GraphQLField test attributes
         GraphQLField("field_property", graphene.String, source="get_field_property"),
         GraphQLField("field_method", graphene.String, source="get_field_method"),
-        (GraphQLString("field_method_with_extra_arg", source="get_field_method_with_extra_arg"),
-         lambda field_type: graphene.Field(field_type, extra_arg=graphene.String())),
+        (
+            GraphQLString(
+                "field_method_with_extra_arg", source="get_field_method_with_extra_arg"
+            ),
+            lambda field_type: graphene.Field(field_type, extra_arg=graphene.String()),
+        ),
     ]
 
     # GraphQLString test attributes

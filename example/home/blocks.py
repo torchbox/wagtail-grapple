@@ -139,6 +139,8 @@ class TextWithCallableBlock(blocks.StructBlock):
         # GraphQLField test attributes
         GraphQLField("field_property", graphene.String, source="get_field_property"),
         GraphQLField("field_method", graphene.String, source="get_field_method"),
+        (GraphQLString("field_method_with_extra_arg", source="get_field_method_with_extra_arg"),
+         lambda field_type: graphene.Field(field_type, extra_arg=graphene.String())),
     ]
 
     # GraphQLString test attributes
@@ -235,6 +237,13 @@ class TextWithCallableBlock(blocks.StructBlock):
         values: Dict[str, Any] = None,
     ) -> Optional[str]:
         return slugify(values.get("text")) if values else None
+
+    def get_field_method_with_extra_arg(
+        self,
+        values: Dict[str, Any] = None,
+        extra_arg: Optional[str] = None,
+    ) -> Optional[str]:
+        return extra_arg
 
 
 class StreamFieldBlock(blocks.StreamBlock):

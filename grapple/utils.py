@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
+from django.db import connection
 from wagtail.models import Site
 from wagtail.search.index import class_is_indexed
 from wagtail.search.models import Query
@@ -112,6 +113,8 @@ def resolve_queryset(
             query.add_hit()
 
         qs = qs.search(search_query, order_by_relevance=order_by_relevance)
+        if connection.vendor != "sqlite":
+            qs = qs.annotate_score("search_score")
 
     return _sliced_queryset(qs, limit, offset)
 
@@ -197,6 +200,8 @@ def resolve_paginated_queryset(
             query.add_hit()
 
         qs = qs.search(search_query, order_by_relevance=order_by_relevance)
+        if connection.vendor != "sqlite":
+            qs = qs.annotate_score("search_score")
 
     return get_paginated_result(qs, page, per_page)
 

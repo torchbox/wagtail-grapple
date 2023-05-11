@@ -1,3 +1,5 @@
+from functools import partial
+
 from graphene import ResolveInfo
 from graphql.execution.middleware import get_middleware_resolvers
 
@@ -37,7 +39,8 @@ class GrappleMiddleware:
         field_name = info.field_name
         parent_name = info.parent_type.name
         if field_name in self.field_middlewares and parent_name in ROOT_TYPES:
-            for middleware in self.field_middlewares[field_name]:
-                return middleware(next, root, info, **kwargs)
+            middlewares = self.field_middlewares[field_name].copy()
+            while middlewares:
+                next = partial(middlewares.pop(), next)
 
         return next(root, info, **kwargs)

@@ -478,6 +478,7 @@ class BlogTest(BaseGrappleTest):
                                 url
                                 embed
                                 rawEmbed
+                                rawValue
                             }
                         }
                     }
@@ -501,9 +502,11 @@ class BlogTest(BaseGrappleTest):
         for block in body:
             if block["blockType"] == "VideoBlock":
                 embed = block["youtubeLink"]
+                expected_raw_value = "<div>\n    {}\n</div>\n".format(embed["embed"])
                 self.assertTrue(isinstance(embed["url"], str))
                 self.assertEqual(embed["embed"], raw_embed["html"])
                 self.assertEqual(embed["rawEmbed"], json.dumps(raw_embed))
+                self.assertEqual(embed["rawValue"], expected_raw_value)
                 return
 
         self.fail("VideoBlock type not instantiated in Streamfield")

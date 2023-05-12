@@ -9,7 +9,7 @@ from .settings import grapple_settings, has_channels
 def graphiql(request):
     graphiql_settings = {
         "REACT_VERSION": "18.2.0",
-        "GRAPHIQL_VERSION": "2.0.13",
+        "GRAPHIQL_VERSION": "2.4.7",
         "endpointURL": reverse("grapple_graphql"),
         "supports_subscriptions": has_channels,
     }

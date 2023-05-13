@@ -1,6 +1,0 @@
--r ./requirements.txt
-
-# Channels-specific requirements
-Django>=3.2, <4.1
-channels>=3.0, <3.1
-Rx==3.2.0

@@ -1,7 +1,6 @@
 ### Django ###
 *.log
 *.pot
-*.pyc
 __pycache__/
 local_settings.py
 media
@@ -139,3 +138,7 @@ Temporary Items
 *.sublime-workspace
 .vscode
 .idea
+
+
+# wagtail
+tests/static/

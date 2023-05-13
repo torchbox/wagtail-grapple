@@ -1,0 +1,3 @@
+need to prevent
+WARNINGS:
+?: (staticfiles.W004) The directory '/home/runner/work/wagtail-grapple/wagtail-grapple/static' in the STATICFILES_DIRS setting does not exist.

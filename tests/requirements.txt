@@ -1,0 +1,20 @@
+# Test requirements.
+black>=22.12.0
+
+# Runtime requirements
+Django>=3.2,<4.2
+wagtail>=2.15,<5.0
+graphene-django>=3.0.0
+factory-boy==3.2.1
+wagtail-factories>=4.0.0,<4.1.0
+django-cors-headers==3.4.0
+wagtailmedia>=0.13
+wagtail-headless-preview
+# simplified database configuration to support testing multiple DB engines in CI.
+dj-database-url==1.2.0
+# for postgres testing
+psycopg2==2.9.5
+
+
+# Your app in editable mode.
+-e ../

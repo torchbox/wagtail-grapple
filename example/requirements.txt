@@ -1,8 +1,0 @@
-# Test requirements.
-black>=22.12.0
-
-# Your app requirements.
--r ../requirements.txt
-
-# Your app in editable mode.
--e ../

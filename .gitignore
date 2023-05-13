@@ -141,4 +141,4 @@ Temporary Items
 
 
 # wagtail
-static/
+tests/static/

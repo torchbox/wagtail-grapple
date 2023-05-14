@@ -1,7 +1,7 @@
 import inspect
 from collections.abc import Iterable
 from types import MethodType
-from typing import Any, Dict, Type, Union
+from typing import Any, Dict, Type, Union, Callable
 
 import graphene
 from django.apps import apps
@@ -19,6 +19,7 @@ from wagtail.rich_text import RichText
 from wagtail.snippets.models import get_snippet_models
 
 from .helpers import field_middlewares, streamfield_types
+from .models import GraphQLField
 from .registry import registry
 from .settings import grapple_settings
 from .types.documents import DocumentObjectType
@@ -154,7 +155,20 @@ def get_fields_and_properties(cls):
     return fields + properties
 
 
-def get_field_type(field):
+ComplicatedField = Any  # QuerySetList, TagList, ...
+
+
+def get_field_type(
+    field: Union[
+        GraphQLField,
+        tuple[GraphQLField, ComplicatedField],
+        Callable[[], GraphQLField],
+        tuple[Callable[[], GraphQLField], ComplicatedField],
+        tuple[Callable[[], tuple[GraphQLField, ComplicatedField]]],
+    ]
+) -> tuple[GraphQLField, Any]:
+    if callable(field):
+        field = field()
     # If a tuple is returned then obj[1] wraps obj[0]
     field_wrapper = None
     if isinstance(field, tuple):
@@ -317,9 +331,6 @@ def load_type_fields():
                 methods = {}
                 if hasattr(cls, "graphql_fields"):
                     for field in cls.graphql_fields:
-                        if callable(field):
-                            field = field()
-
                         # Add field to GQL type with correct field-type
                         field, field_type = get_field_type(field)
                         type_meta[field.field_name] = field_type
@@ -460,9 +471,6 @@ def build_streamfield_type(
     # Add any custom fields to node if they are defined.
     if hasattr(cls, "graphql_fields"):
         for item in cls.graphql_fields:
-            if callable(item):
-                item = item()
-
             # Get correct types from field
             field, field_type = get_field_type(item)
 

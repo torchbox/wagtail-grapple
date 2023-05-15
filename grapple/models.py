@@ -4,6 +4,13 @@ from django.apps import apps
 from .registry import registry
 
 
+class DefaultField:
+    field_name: str
+
+    def __init__(self, field_name: str):
+        self.field_name = field_name
+
+
 # Classes used to define what the Django field should look like in the GQL type
 class GraphQLField:
     field_name: str

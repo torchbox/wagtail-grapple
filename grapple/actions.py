@@ -19,7 +19,7 @@ from wagtail.rich_text import RichText
 from wagtail.snippets.models import get_snippet_models
 
 from .helpers import field_middlewares, streamfield_types
-from .models import GraphQLField
+from .models import GraphQLField, DefaultField
 from .registry import registry
 from .settings import grapple_settings
 from .types.documents import DocumentObjectType
@@ -27,6 +27,7 @@ from .types.images import ImageObjectType
 from .types.pages import Page, PageInterface
 from .types.rich_text import RichText as RichTextType
 from .types.streamfield import generate_streamfield_union
+from .utils import resolve_not_exposed_exception
 
 if apps.is_installed("wagtailmedia"):
     from wagtailmedia.models import AbstractMedia
@@ -311,39 +312,66 @@ def load_type_fields():
                 type_meta = {"Meta": Meta, "id": graphene.ID(), "name": type_name}
 
                 exclude_fields = []
+                exclude_meta_fields = []
+                graphql_fields = getattr(cls, "graphql_fields", [])
+                default_graphql_fields = [
+                    i.field_name for i in graphql_fields if isinstance(i, DefaultField)
+                ]
+                custom_graphql_fields = [
+                    get_field_type(i)
+                    for i in graphql_fields
+                    if not isinstance(i, DefaultField)
+                ]
                 base_type_for_exclusion_checks = (
                     base_type if not issubclass(cls, WagtailPage) else WagtailPage
                 )
                 for field in get_fields_and_properties(cls):
-                    # Filter out any fields that are defined on the interface of base type to prevent the
-                    # 'Excluding the custom field "<field>" on DjangoObjectType "<cls>" has no effect.
-                    # Either remove the custom field or remove the field from the "exclude" list.' warning
-                    if (
+                    if field in default_graphql_fields and not (
+                        hasattr(interface, field)
+                        or hasattr(base_type_for_exclusion_checks, field)
+                    ):
+                        raise TypeError(
+                            f"{field} is not part of grapple default implementation"
+                        )
+
+                    if not (
                         field == "id"
                         or hasattr(interface, field)
                         or hasattr(base_type_for_exclusion_checks, field)
                     ):
-                        continue
-
-                    exclude_fields.append(field)
+                        # see #105
+                        # Filter out any fields that are defined on the interface of base type to prevent the
+                        # 'Excluding the custom field "<field>" on DjangoObjectType "<cls>" has no effect.
+                        # Either remove the custom field or remove the field from the "exclude" list.' warning
+                        exclude_meta_fields.append(field)
+                    else:
+                        if (
+                            default_graphql_fields
+                            and field not in default_graphql_fields
+                        ):
+                            # Filter out any fields that are not acquired by the user
+                            exclude_fields.append(field)
 
                 # Add any custom fields to node if they are defined.
                 methods = {}
-                if hasattr(cls, "graphql_fields"):
-                    for field in cls.graphql_fields:
-                        # Add field to GQL type with correct field-type
-                        field, field_type = get_field_type(field)
-                        type_meta[field.field_name] = field_type
+                for field, field_type in custom_graphql_fields:
+                    # Add field to GQL type with correct field-type
+                    type_meta[field.field_name] = field_type
 
-                        # Remove field from excluded list
-                        if field.field_name in exclude_fields:
-                            exclude_fields.remove(field.field_name)
+                    # Remove field from excluded lists
+                    if field.field_name in exclude_fields:
+                        exclude_fields.remove(field.field_name)
+                    if field.field_name in exclude_meta_fields:
+                        exclude_meta_fields.remove(field.field_name)
 
-                        # Add a custom resolver for each field
-                        methods["resolve_" + field.field_name] = model_resolver(field)
+                    # Add a custom resolver for each field
+                    methods["resolve_" + field.field_name] = model_resolver(field)
+                for i in exclude_fields:
+                    # because of #105 we can't remove them from the schema, so just raise error in case of access
+                    methods["resolve_" + i] = resolve_not_exposed_exception
 
+                type_meta["Meta"].exclude_fields = exclude_meta_fields
                 # Replace stud node with real thing
-                type_meta["Meta"].exclude_fields = exclude_fields
                 node = type(type_name, (base_type,), type_meta)
 
                 # Add custom resolvers for fields

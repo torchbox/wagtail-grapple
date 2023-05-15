@@ -37,6 +37,7 @@ from grapple.models import (
     GraphQLStreamfield,
     GraphQLString,
     GraphQLTag,
+    DefaultField,
 )
 from grapple.utils import resolve_paginated_queryset
 
@@ -76,10 +77,16 @@ class HomePage(Page):
 
 class AuthorPage(Page):
     name = models.CharField(max_length=255)
+    nickname = models.CharField(max_length=255, blank=True)
 
     content_panels = Page.content_panels + [FieldPanel("name")]
 
-    graphql_fields = [GraphQLString("name")]
+    graphql_fields = [
+        DefaultField("id"),
+        DefaultField("title"),
+        DefaultField("slug"),
+        GraphQLString("name"),
+    ]
 
 
 class BlogPageTag(TaggedItemBase):

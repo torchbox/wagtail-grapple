@@ -1,7 +1,7 @@
 import inspect
 from collections.abc import Iterable
 from types import MethodType
-from typing import Any, Dict, Type, Union, Callable
+from typing import Any, Dict, Type, Union, Callable, Tuple
 
 import graphene
 from django.apps import apps
@@ -162,12 +162,12 @@ ComplicatedField = Any  # QuerySetList, TagList, ...
 def get_field_type(
     field: Union[
         GraphQLField,
-        tuple[GraphQLField, ComplicatedField],
+        Tuple[GraphQLField, ComplicatedField],
         Callable[[], GraphQLField],
-        tuple[Callable[[], GraphQLField], ComplicatedField],
-        tuple[Callable[[], tuple[GraphQLField, ComplicatedField]]],
+        Tuple[Callable[[], GraphQLField], ComplicatedField],
+        Tuple[Callable[[], Tuple[GraphQLField, ComplicatedField]]],
     ]
-) -> tuple[GraphQLField, Any]:
+) -> Tuple[GraphQLField, Any]:
     if callable(field):
         field = field()
     # If a tuple is returned then obj[1] wraps obj[0]

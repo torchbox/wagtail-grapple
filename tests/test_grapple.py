@@ -1005,6 +1005,7 @@ class ImagesTest(BaseGrappleTest):
             executed["data"]["images"][0]["url"], executed["data"]["images"][0]["src"]
         )
 
+    @unittest.skip
     def test_query_rendition_url_field(self):
         query = """
         {

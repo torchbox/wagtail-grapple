@@ -1,7 +1,7 @@
 import inspect
 from collections.abc import Iterable
 from types import MethodType
-from typing import Any, Dict, Type, Union, Callable, Tuple
+from typing import Any, Callable, Dict, Tuple, Type, Union
 
 import graphene
 from django.apps import apps
@@ -19,7 +19,7 @@ from wagtail.rich_text import RichText
 from wagtail.snippets.models import get_snippet_models
 
 from .helpers import field_middlewares, streamfield_types
-from .models import GraphQLField, DefaultField
+from .models import DefaultField, GraphQLField
 from .registry import registry
 from .settings import grapple_settings
 from .types.documents import DocumentObjectType

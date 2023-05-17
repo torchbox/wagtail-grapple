@@ -25,6 +25,7 @@ from grapple.helpers import (
 )
 from grapple.middleware import IsAnonymousMiddleware
 from grapple.models import (
+    DefaultField,
     GraphQLCollection,
     GraphQLDocument,
     GraphQLField,
@@ -37,7 +38,6 @@ from grapple.models import (
     GraphQLStreamfield,
     GraphQLString,
     GraphQLTag,
-    DefaultField,
 )
 from grapple.utils import resolve_paginated_queryset
 

@@ -9,7 +9,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import connection
 from django.test import RequestFactory, TestCase, override_settings
 from graphene.test import Client
-from testapp.factories import BlogPageFactory, AuthorPageFactory
+from testapp.factories import AuthorPageFactory, BlogPageFactory
 from testapp.models import GlobalSocialMediaSettings, HomePage, SocialMediaSettings
 from wagtail.documents import get_document_model
 from wagtail.images import get_image_model

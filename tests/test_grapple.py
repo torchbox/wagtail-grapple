@@ -1005,7 +1005,7 @@ class ImagesTest(BaseGrappleTest):
             executed["data"]["images"][0]["url"], executed["data"]["images"][0]["src"]
         )
 
-    @unittest.skip
+    @unittest.skip("Important!passing this test depends on mering #329")
     def test_query_rendition_url_field(self):
         query = """
         {

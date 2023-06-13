@@ -31,6 +31,12 @@ GraphQLField
 
         Useful keyword arguments:
 
+        * ``description`` (string)
+            A description of the type to show in the GraphiQL browser.
+
+        * ``deprecation_reason`` (string)
+            Provide a deprecation reason for the Field, will also show in the GraphiQL browser.
+
         * ``source`` (string)
             You can pass a source string that is an attribute or method on the
             class itself.
@@ -74,6 +80,12 @@ GraphQLString
     .. attribute:: kwargs
 
         Useful keyword arguments:
+
+        * ``description`` (string)
+            A description of the type to show in the GraphiQL browser.
+
+        * ``deprecation_reason`` (string)
+            Provide a deprecation reason for the Field, will also show in the GraphiQL browser.
 
         * ``source`` (string)
             You can pass a source string that is an attribute or method on the
@@ -245,6 +257,12 @@ GraphQLInt
 
         Useful keyword arguments:
 
+        * ``description`` (string)
+            A description of the type to show in the GraphiQL browser.
+
+        * ``deprecation_reason`` (string)
+            Provide a deprecation reason for the Field, will also show in the GraphiQL browser.
+
         * ``source`` (string)
             You can pass a source string that is an attribute or method on the
             class itself.
@@ -287,6 +305,12 @@ GraphQLFloat
 
         Useful keyword arguments:
 
+        * ``description`` (string)
+            A description of the type to show in the GraphiQL browser.
+
+        * ``deprecation_reason`` (string)
+            Provide a deprecation reason for the Field, will also show in the GraphiQL browser.
+
         * ``source`` (string)
             You can pass a source string that is an attribute or method on the
             class itself.
@@ -328,6 +352,12 @@ GraphQLBoolean
     .. attribute:: kwargs
 
         Useful keyword arguments:
+
+        * ``description`` (string)
+            A description of the type to show in the GraphiQL browser.
+
+        * ``deprecation_reason`` (string)
+            Provide a deprecation reason for the Field, will also show in the GraphiQL browser.
 
         * ``source`` (string)
             You can pass a source string that is an attribute or method on the
@@ -575,6 +605,16 @@ GraphQLImage
 
         Represents the field as non-nullable in the schema. This promises the client that it will have a value returned.
 
+    .. attribute:: kwargs
+
+        Useful keyword arguments:
+
+        * ``description`` (string)
+            A description of the type to show in the GraphiQL browser.
+
+        * ``deprecation_reason`` (string)
+            Provide a deprecation reason for the Field, will also show in the GraphiQL browser.
+
 
 GraphQLDocument
 ---------------
@@ -592,6 +632,16 @@ GraphQLDocument
 
         Represents the field as non-nullable in the schema. This promises the client that it will have a value returned.
 
+    .. attribute:: kwargs
+
+        Useful keyword arguments:
+
+        * ``description`` (string)
+            A description of the type to show in the GraphiQL browser.
+
+        * ``deprecation_reason`` (string)
+            Provide a deprecation reason for the Field, will also show in the GraphiQL browser.
+
 
 GraphQLPage
 -----------
@@ -608,12 +658,20 @@ GraphQLPage
 
         This is the name of the class property used in your model definition.
 
+    .. attribute:: required (bool=False)
+
+        Represents the field as non-nullable in the schema. This promises the client that it will have a value returned.
+
     .. attribute:: kwargs
 
         Useful keyword arguments:
 
-        * ``required`` (bool=False)
-            Represents the field as non-nullable in the schema. This promises the client that it will have a value returned.
+        * ``description`` (string)
+            A description of the type to show in the GraphiQL browser.
+
+        * ``deprecation_reason`` (string)
+            Provide a deprecation reason for the Field, will also show in the GraphiQL browser.
+
         * ``source`` (string)
             You can pass a source string that is an attribute or method on the
             model itself. It can also be several layers deep and Grapple will
@@ -637,6 +695,17 @@ GraphQLTag
 
         Represents the field as non-nullable in the schema. This promises the client that it will have a value returned.
 
+    .. attribute:: kwargs
+
+        Useful keyword arguments:
+
+        * ``description`` (string)
+            A description of the type to show in the GraphiQL browser.
+
+        * ``deprecation_reason`` (string)
+            Provide a deprecation reason for the Field, will also show in the GraphiQL browser.
+
+
 
 GraphQLRichText
 ---------------
@@ -656,6 +725,12 @@ GraphQLRichText
     .. attribute:: kwargs
 
         Useful keyword arguments:
+
+        * ``description`` (string)
+            A description of the type to show in the GraphiQL browser.
+
+        * ``deprecation_reason`` (string)
+            Provide a deprecation reason for the Field, will also show in the GraphiQL browser.
 
         * ``source`` (string)
             You can pass a source string that is an attribute or method on the

@@ -297,7 +297,7 @@ class GlobalSocialMediaSettings(BaseGenericSetting):
             description="Provides an Instagram account username, without the @",
         ),
         GraphQLString("trip_advisor"),
-        GraphQLString("youtube", deprecation_reason="Deprecated."),
+        GraphQLString("youtube", deprecation_reason="No longer supported"),
     ]
 
 

@@ -7,7 +7,7 @@ from .registry import registry
 # Classes used to define what the Django field should look like in the GQL type
 class GraphQLField:
     field_name: str
-    field_type: str
+    field_type: type
     field_source: str
 
     def __init__(
@@ -17,16 +17,26 @@ class GraphQLField:
         self.field_name = field_name
         self.field_type = field_type
         self.field_source = kwargs.get("source", field_name)
+        self.description = kwargs.get("description", None)
+        self.deprecation_reason = kwargs.get("deprecation_reason", None)
 
         # Add support for NonNull/required fields
         if required:
-            self.field_type = graphene.NonNull(field_type)
+            assert (
+                self.deprecation_reason is None
+            ), f"Argument {field_name} is required, cannot deprecate it."
+            self.field_type = graphene.NonNull(field_type, description=self.description)
 
         # Legacy collection API (Allow lists):
         self.extract_key = kwargs.get("key", None)
         is_list = kwargs.get("is_list", False)
         if is_list:
-            self.field_type = graphene.List(field_type)
+            self.field_type = graphene.List(
+                field_type,
+                required=required,
+                description=self.description,
+                deprecation_reason=self.deprecation_reason,
+            )
 
 
 def GraphQLString(field_name: str, **kwargs):
@@ -146,6 +156,8 @@ def GraphQLCollection(
     is_queryset=False,
     is_paginated_queryset=False,
     required=False,
+    description=None,
+    deprecation_reason=None,
     item_required=False,
     **kwargs,
 ):
@@ -160,14 +172,23 @@ def GraphQLCollection(
                 kwargs["source"] = source
                 kwargs["key"] = key
 
-        # Create the nested type and wrap it in some list field.
+        if required:
+            assert (
+                deprecation_reason is None
+            ), f"Argument {field_name} is required, cannot deprecate it."
+
+        # Create the nested type
         graphql_type = nested_type(field_name, *args, required=item_required, **kwargs)
-        collection_type = graphene.List
 
         if is_paginated_queryset:
+            # Wrap the nested type in a PaginatedQuerySet type
             type_class = nested_type(field_name, *args)().field_type()
             collection_type = lambda nested_type: PaginatedQuerySet(  # noqa: E731
-                nested_type, type_class, required=required
+                nested_type,
+                type_class,
+                required=required,
+                description=description,
+                deprecation_reason=deprecation_reason,
             )
             return graphql_type, collection_type
 
@@ -177,7 +198,11 @@ def GraphQLCollection(
             or nested_type == GraphQLForeignKey
             or nested_type == GraphQLSnippet
         ):
+            # Wrap the nested type in a QuerySetList type
             collection_type = QuerySetList
+        else:
+            # Wrap the nested type in a List type
+            collection_type = graphene.List
 
         # Add support for NonNull/required to wrapper field
         required_collection_type = None
@@ -191,11 +216,11 @@ def GraphQLCollection(
     return Mixin
 
 
-def GraphQLEmbed(field_name: str):
+def GraphQLEmbed(field_name: str, **kwargs):
     def Mixin():
         from .types.streamfield import EmbedBlock
 
-        return GraphQLField(field_name, EmbedBlock)
+        return GraphQLField(field_name, EmbedBlock, **kwargs)
 
     return Mixin
 

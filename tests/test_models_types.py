@@ -1,19 +1,17 @@
 import graphene
+from django.test import TestCase
+
+from grapple.actions import get_field_type
 from grapple.models import (
-    GraphQLField,
-    GraphQLString,
-    GraphQLStreamfield,
     GraphQLCollection,
-    GraphQLSnippet,
+    GraphQLField,
     GraphQLForeignKey,
+    GraphQLSnippet,
+    GraphQLStreamfield,
+    GraphQLString,
 )
 from grapple.types.streamfield import StreamFieldInterface
-from grapple.types.structures import (
-    QuerySetList,
-    BasePaginatedType,
-)
-from grapple.actions import get_field_type
-from django.test import TestCase
+from grapple.types.structures import BasePaginatedType, QuerySetList
 
 
 class FieldTest(TestCase):
@@ -55,7 +53,9 @@ class FieldTest(TestCase):
         """
         with self.assertRaises(AssertionError) as context:
             GraphQLField(
-                self.field_name, required=True, deprecation_reason=self.deprecation_reason
+                self.field_name,
+                required=True,
+                deprecation_reason=self.deprecation_reason,
             )
         assert (
             str(context.exception)
@@ -100,7 +100,9 @@ class FieldTest(TestCase):
         """
         with self.assertRaises(AssertionError) as context:
             GraphQLStreamfield(
-                self.field_name, required=True, deprecation_reason=self.deprecation_reason
+                self.field_name,
+                required=True,
+                deprecation_reason=self.deprecation_reason,
             )()
         assert (
             str(context.exception)
@@ -113,7 +115,7 @@ class FieldTest(TestCase):
         """
         MyType = object()
         field = GraphQLField(MyType, required=True)
-       
+
         # Assert field type is NonNull
         assert isinstance(field.field_type, graphene.NonNull)
 

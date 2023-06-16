@@ -200,7 +200,7 @@ except ImportError:
 
 DEBUG = True
 
-SECRET_KEY = "this-is-not-a-secret"
+SECRET_KEY = "this-is-not-a-secret"  # noqa: #S105
 
 # SECURITY WARNING: define the correct hosts in production!
 ALLOWED_HOSTS = ["*"]

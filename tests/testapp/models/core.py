@@ -5,7 +5,6 @@ from django.utils.functional import cached_property
 from modelcluster.contrib.taggit import ClusterTaggableManager
 from modelcluster.fields import ParentalKey
 from taggit.models import TaggedItemBase
-from testapp.blocks import StreamFieldBlock
 from wagtail.admin.panels import FieldPanel, InlinePanel
 from wagtail.contrib.settings.models import (
     BaseGenericSetting,
@@ -39,6 +38,7 @@ from grapple.models import (
     GraphQLTag,
 )
 from grapple.utils import resolve_paginated_queryset
+from testapp.blocks import StreamFieldBlock
 
 document_model_string = getattr(
     settings, "WAGTAILDOCS_DOCUMENT_MODEL", "wagtaildocs.Document"

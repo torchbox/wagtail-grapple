@@ -143,13 +143,10 @@ def get_fields_and_properties(cls):
     # cls._meta.get_fields(include_parents=False) includes symmetrical ManyToMany fields, while get_model_fields doesn't
     fields = [field for field, instance in get_model_fields(cls)]
 
-    try:
-        properties = [
-            method[0]
-            for method in inspect.getmembers(cls, lambda o: isinstance(o, property))
-        ]
-    except BaseException:
-        properties = []
+    properties = [
+        method[0]
+        for method in inspect.getmembers(cls, lambda o: isinstance(o, property))
+    ]
 
     return fields + properties
 

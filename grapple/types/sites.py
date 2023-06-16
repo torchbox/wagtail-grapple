@@ -83,11 +83,11 @@ def SitesQuery():
             elif hostname:
                 try:
                     return resolve_site(hostname)
-                except Site.MultipleObjectsReturned:
+                except Site.MultipleObjectsReturned as err:
                     raise GraphQLError(
                         "Your 'hostname' filter value of '{}' returned multiple sites. Try adding a port number (for example: '{}:80').".format(
                             hostname, hostname
                         )
-                    )
+                    ) from err
 
     return Mixin

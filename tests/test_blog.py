@@ -188,7 +188,7 @@ class BlogTest(BaseGrappleTest):
 
         # Print the error response
         if not executed.get("data"):
-            print(executed)
+            print(executed)  # noqa: T201
 
         blocks = []
         for block in executed["data"]["page"]["body"]:

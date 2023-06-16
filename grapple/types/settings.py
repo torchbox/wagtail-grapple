@@ -36,12 +36,12 @@ def SettingsQuery():
                 if site_hostname is not None:
                     try:
                         site = resolve_site(site_hostname)
-                    except Site.MultipleObjectsReturned:
+                    except Site.MultipleObjectsReturned as err:
                         raise GraphQLError(
                             "Your 'site' filter value of '{}' returned multiple sites. Try adding a port number (for example: '{}:80').".format(
                                 site_hostname, site_hostname
                             )
-                        )
+                        ) from err
                 else:
                     site = None
 
@@ -65,12 +65,12 @@ def SettingsQuery():
                 if site_hostname is not None:
                     try:
                         site = resolve_site(site_hostname)
-                    except Site.MultipleObjectsReturned:
+                    except Site.MultipleObjectsReturned as err:
                         raise GraphQLError(
                             "Your 'site' filter value of '{}' returned multiple sites. Try adding a port number (for example: '{}:80').".format(
                                 site_hostname, site_hostname
                             )
-                        )
+                        ) from err
                 else:
                     site = None
 

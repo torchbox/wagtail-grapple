@@ -95,8 +95,7 @@ class GrappleSettings:
             if setting in user_settings or hasattr(django_settings, setting):
                 new_setting = setting.replace("GRAPPLE_", "")
                 logger.warning(
-                    "The '%s' setting is deprecated and will be removed in the next release, use GRAPPLE['%s'] instead."
-                    % (setting, new_setting)
+                    f"The '{setting}' setting is deprecated and will be removed in the next release, use GRAPPLE['{new_setting}'] instead."
                 )
                 if setting in user_settings:
                     user_settings[new_setting] = user_settings[setting]
@@ -107,8 +106,7 @@ class GrappleSettings:
         for setting in REMOVED_SETTINGS:
             if setting in user_settings:
                 raise RuntimeError(
-                    "The '%s' setting has been removed. Please refer to '%s' for available settings."
-                    % (setting, settings_doc_url)
+                    f"The '{setting}' setting has been removed. Please refer to '{settings_doc_url}' for available settings."
                 )
         return user_settings
 

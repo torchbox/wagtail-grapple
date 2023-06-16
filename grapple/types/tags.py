@@ -36,7 +36,7 @@ def TagsQuery():
         def resolve_tag(self, info, id, **kwargs):
             try:
                 return Tag.objects.get(pk=id)
-            except BaseException:
+            except Tag.DoesNotExist:
                 return None
 
         def resolve_tags(self, info, **kwargs):

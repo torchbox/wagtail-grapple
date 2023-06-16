@@ -3,6 +3,8 @@ import datetime
 import factory
 import wagtail_factories
 from factory import fuzzy
+from wagtail import blocks
+
 from testapp.blocks import (
     ImageGalleryBlock,
     ImageGalleryImage,
@@ -19,7 +21,6 @@ from testapp.models import (
     Person,
     SimpleModel,
 )
-from wagtail import blocks
 
 
 # START: Block Factories

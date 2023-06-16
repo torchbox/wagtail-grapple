@@ -31,7 +31,7 @@
                 var eq = entry.indexOf('=');
                 if (eq >= 0) {
                     parameters[decodeURIComponent(entry.slice(0, eq))] =
-                    decodeURIComponent(entry.slice(eq + 1));
+                        decodeURIComponent(entry.slice(eq + 1));
                 }
             });
             // Produce a Location query string from a parameter object.

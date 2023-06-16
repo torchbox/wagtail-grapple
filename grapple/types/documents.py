@@ -66,7 +66,7 @@ def DocumentsQuery():
                 return mdl.objects.filter(
                     collection__view_restrictions__isnull=True
                 ).get(pk=id)
-            except BaseException:
+            except mdl.DoesNotExist:
                 return None
 
         def resolve_documents(self, info, **kwargs):

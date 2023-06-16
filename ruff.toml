@@ -1,0 +1,23 @@
+# E501: Line too long
+ignore = ["E501","B028"]
+
+exclude = ["dist","build","venv",".venv",".tox",".git"]
+line-length = 88
+
+select = [
+    "E",  # pycodestyle errors
+    "F",  # pyflakes
+    "I",  # isort
+    "B",  # flake8-bugbear
+    "BLE",  # flake8-blind-except
+    "C4",   # flake8-comprehensions
+    "S",  # flake8-bandit
+    "T20",  # flake8-print
+    "UP",   # pyupgrade
+    "W",    # pycodestyle warnings
+]
+
+target-version = "py38"
+
+[isort]
+known-first-party = ["src"]

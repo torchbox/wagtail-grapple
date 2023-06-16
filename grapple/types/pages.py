@@ -182,16 +182,14 @@ def get_preview_page(token):
             key, value = arg.split("=")
             params[key] = value
 
-        id = params.get("id")
-        if id:
+        if _id := params.get("id"):
             """
             This is a page that had already been saved. Lookup the class and call get_page_from_preview_token.
 
             TODO: update headless preview to always send page_type in the token so we can always
-            the if content_type branch and elimiate the if id branch.
+            the if content_type branch and eliminate the if id branch.
             """
-            page = WagtailPage.objects.get(pk=id).specific
-            if page:
+            if page := WagtailPage.objects.get(pk=_id).specific:
                 cls = type(page)
                 """
                 get_page_from_preview_token is added by wagtail-headless-preview,
@@ -202,15 +200,13 @@ def get_preview_page(token):
                     """we assume that get_page_from_preview_token validates the token"""
                     return cls.get_page_from_preview_token(token)
 
-        content_type = params.get("page_type")
-        if content_type:
+        if content_type := params.get("page_type"):
             """
             this is a page which has not been saved yet. lookup the content_type to get the class
             and call get_page_from_preview_token.
             """
             app_label, model = content_type.lower().split(".")
-            ctype = ContentType.objects.get(app_label=app_label, model=model)
-            if ctype:
+            if ctype := ContentType.objects.get(app_label=app_label, model=model):
                 cls = ctype.model_class()
                 """
                 get_page_from_preview_token is added by wagtail-headless-preview,
@@ -220,7 +216,7 @@ def get_preview_page(token):
                 if hasattr(cls, "get_page_from_preview_token"):
                     """we assume that get_page_from_preview_token validates the token"""
                     return cls.get_page_from_preview_token(token)
-    except Exception:
+    except (WagtailPage.DoesNotExist, ContentType.DoesNotExist, ValueError):
         """
         catch and suppress errors. we don't want to expose any information about unpublished content
         accidentally.
@@ -242,15 +238,15 @@ def get_specific_page(
 
         # Everything but the special RootPage
         qs = WagtailPage.objects.live().public().filter(depth__gt=1).specific()
-        ctype = None
 
         if site:
             qs = qs.in_site(site)
 
         if content_type:
             app_label, model = content_type.lower().split(".")
-            ctype = ContentType.objects.get(app_label=app_label, model=model)
-            qs = qs.filter(content_type=ctype)
+            qs = qs.filter(
+                content_type=ContentType.objects.get(app_label=app_label, model=model)
+            )
 
         if id:
             page = qs.get(pk=id)
@@ -274,7 +270,7 @@ def get_specific_page(
             if qs.exists():
                 page = qs.first()
 
-    except BaseException:
+    except WagtailPage.DoesNotExist:
         page = None
 
     return page
@@ -292,12 +288,12 @@ def get_site_filter(info, **kwargs):
     if site_hostname is not None:
         try:
             return resolve_site(site_hostname)
-        except Site.MultipleObjectsReturned:
+        except Site.MultipleObjectsReturned as err:
             raise GraphQLError(
                 "Your 'site' filter value of '{}' returned multiple sites. Try adding a port number (for example: '{}:80').".format(
                     site_hostname, site_hostname
                 )
-            )
+            ) from err
     elif in_current_site:
         return Site.find_for_request(info.context)
 

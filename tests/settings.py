@@ -185,19 +185,6 @@ WAGTAIL_HEADLESS_PREVIEW = {"CLIENT_URLS": {"default": "http://localhost:8001/pr
 
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
-try:
-    import channels  # noqa: F401
-
-    INSTALLED_APPS += [
-        "channels",
-    ]
-    # FIXME: re-add graphql-ws or re-implement
-    # ASGI_APPLICATION = "graphql_ws.django.routing.application"
-
-except ImportError:
-    pass
-
-
 DEBUG = True
 
 SECRET_KEY = "this-is-not-a-secret"  # noqa: #S105

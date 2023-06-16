@@ -9,7 +9,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import connection
 from django.test import RequestFactory, TestCase, override_settings
 from graphene.test import Client
-from testapp.factories import BlogPageFactory
+from testapp.factories import AuthorPageFactory, BlogPageFactory
 from testapp.models import GlobalSocialMediaSettings, HomePage, SocialMediaSettings
 from wagtail.documents import get_document_model
 from wagtail.images import get_image_model
@@ -1684,3 +1684,49 @@ class SettingsTest(BaseGrappleTest):
                 }
             },
         )
+
+
+class ExcludeFieldTest(BaseGrappleTest):
+    def setUp(self):
+        super().setUp()
+        self.factory = RequestFactory()
+        self.author = AuthorPageFactory(parent=self.home, nickname="the_nickname")
+
+    def test_returned_value_of_excluded_field(self):
+        query = """
+        {
+          pages(contentType: "testapp.AuthorPage") {
+            id
+            ...on AuthorPage{
+              contentType
+              numchild
+            }
+          }
+        }
+        """
+
+        executed = self.client.execute(query)
+        self.assertEqual(
+            executed["data"]["pages"][0]["contentType"], "this field is not exposed"
+        )
+        self.assertEqual(executed["data"]["pages"][0]["numchild"], 0)
+
+    def test_returned_value_of_meta_excluded_field(self):
+        query = """
+        {
+          pages(contentType: "testapp.AuthorPage") {
+            id
+            ...on AuthorPage{
+              nickname
+            }
+          }
+        }
+        """
+
+        executed = self.client.execute(query)
+        for e in executed["errors"]:
+            if "Cannot query field" in e["message"] and "nickname" in e["message"]:
+                "an assertion that indicates that the test is passed"
+                self.assertTrue(True)
+                return
+        self.fail("Expected error message not found in executed errors")

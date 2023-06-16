@@ -24,6 +24,7 @@ from grapple.helpers import (
 )
 from grapple.middleware import IsAnonymousMiddleware
 from grapple.models import (
+    DefaultField,
     GraphQLCollection,
     GraphQLDocument,
     GraphQLField,
@@ -76,10 +77,16 @@ class HomePage(Page):
 
 class AuthorPage(Page):
     name = models.CharField(max_length=255)
+    nickname = models.CharField(max_length=255, blank=True)
 
     content_panels = Page.content_panels + [FieldPanel("name")]
 
-    graphql_fields = [GraphQLString("name")]
+    graphql_fields = [
+        DefaultField("id"),
+        DefaultField("title"),
+        DefaultField("slug"),
+        GraphQLString("name"),
+    ]
 
 
 class BlogPageTag(TaggedItemBase):

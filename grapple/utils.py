@@ -1,6 +1,8 @@
+import graphql
 from django.conf import settings
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db import connection
+from graphql import GraphQLError
 from wagtail.models import Site
 from wagtail.search.index import class_is_indexed
 from wagtail.search.models import Query
@@ -216,3 +218,12 @@ def get_media_item_url(cls):
     if url[0] == "/":
         return settings.BASE_URL + url
     return url
+
+
+def resolve_not_exposed_exception(cls, instance, info, **kwargs):
+    if info.return_type.of_type == graphql.GraphQLInt:
+        return 0
+    if info.return_type.of_type == graphql.GraphQLString:
+        return "this field is not exposed"
+    # Add other types here
+    raise GraphQLError("this field is not exposed")

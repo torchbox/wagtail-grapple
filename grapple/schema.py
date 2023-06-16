@@ -12,8 +12,8 @@ from .settings import grapple_settings
 # to be a nice way to disable this validator so we monkey-patch it instead.
 
 
-# We can't simply override specified_rules because it's a tuple and immutable. Instead we are
-# monkey patching the NoUnusedFragmentRule.leave_document so it doesn't do any validation.
+# We can't simply override specified_rules because it's a tuple and immutable. Instead, we are
+# monkey patching the NoUnusedFragmentRule.leave_document, so it doesn't do any validation.
 NoUnusedFragmentsRule.leave_document = lambda self, *_args: None
 
 
@@ -22,8 +22,6 @@ def create_schema():
     Root schema object that graphene is pointed at.
     It inherits its queries from each of the specific type mixins.
     """
-
-    from .settings import has_channels
 
     query_mixins = []
     for fn in hooks.get_hooks("register_schema_query"):
@@ -40,11 +38,10 @@ def create_schema():
     for fn in hooks.get_hooks("register_schema_mutation"):
         fn(mutation_mixins)
 
-    # ensure graphene.ObjectType is always present
-    if graphene.ObjectType not in mutation_mixins:
-        mutation_mixins.append(graphene.ObjectType)
-
-    if len(mutation_mixins) > 1:
+    if len(mutation_mixins) > 0:
+        # ensure graphene.ObjectType is always present
+        if graphene.ObjectType not in mutation_mixins:
+            mutation_mixins.append(graphene.ObjectType)
 
         class Mutation(*mutation_mixins):
             pass
@@ -52,22 +49,17 @@ def create_schema():
     else:
         Mutation = None
 
-    if has_channels:
-        subscription_mixins = []
-        for fn in hooks.get_hooks("register_schema_subscription"):
-            fn(subscription_mixins)
+    subscription_mixins = []
+    for fn in hooks.get_hooks("register_schema_subscription"):
+        fn(subscription_mixins)
 
+    if len(subscription_mixins) > 0:
         # ensure graphene.ObjectType is always present
         if graphene.ObjectType not in subscription_mixins:
             subscription_mixins.append(graphene.ObjectType)
 
-        if len(subscription_mixins) > 1:
-
-            class Subscription(*subscription_mixins):
-                pass
-
-        else:
-            Subscription = None
+        class Subscription(*subscription_mixins):
+            pass
 
     else:
         Subscription = None

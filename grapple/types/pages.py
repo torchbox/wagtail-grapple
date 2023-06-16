@@ -1,16 +1,13 @@
 import graphene
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import Q
-from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
 from graphene_django.types import DjangoObjectType
 from graphql import GraphQLError
 from wagtail.models import Page as WagtailPage
 from wagtail.models import Site
-from wagtail_headless_preview.signals import preview_update
 
 from ..registry import registry
-from ..settings import has_channels
 from ..utils import resolve_queryset, resolve_site
 from .structures import QuerySetList
 
@@ -418,72 +415,3 @@ def PagesQuery():
             )
 
     return Mixin
-
-
-if has_channels:
-    from rx.subject import Subject
-
-    # Subject to sync Django Signals to Observable
-    preview_subject = Subject()
-
-    @receiver(preview_update)
-    def on_updated(sender, token, **kwargs):
-        preview_subject.on_next(token)
-
-    # Subscription Mixin
-    def PagesSubscription():
-        def preview_observable(id, slug, url_path, token, content_type, site):
-            return preview_subject.filter(
-                lambda previewToken: previewToken == token
-            ).map(
-                lambda token: get_specific_page(
-                    id, slug, url_path, token, content_type, site
-                )
-            )
-
-        class Mixin:
-            page = graphene.Field(
-                PageInterface,
-                id=graphene.Int(),
-                slug=graphene.String(),
-                url_path=graphene.Argument(
-                    graphene.String,
-                    description=_(
-                        "Filter by url path. Note: in a multi-site setup, returns the first available page based. "
-                        "Use `inSite: true` from the relevant site domain."
-                    ),
-                ),
-                token=graphene.Argument(
-                    graphene.String,
-                    description=_(
-                        "Filter by preview token as passed by the `wagtail-headless-preview` package."
-                    ),
-                ),
-                content_type=graphene.Argument(
-                    graphene.String,
-                    description=_(
-                        "Filter by content type using the `app.ModelName` notation. e.g. `myapp.BlogPage`"
-                    ),
-                ),
-                in_site=graphene.Argument(
-                    graphene.Boolean,
-                    description=_("Filter to pages in the current site only."),
-                    default_value=False,
-                ),
-                site=graphene.Argument(
-                    graphene.String,
-                    description=_("Filter to pages in the give site."),
-                ),
-            )
-
-            def resolve_page(self, info, **kwargs):
-                return preview_observable(
-                    id=kwargs.get("id"),
-                    slug=kwargs.get("slug"),
-                    url_path=kwargs.get("url_path"),
-                    token=kwargs.get("token"),
-                    content_type=kwargs.get("content_type"),
-                    site=get_site_filter(info, **kwargs),
-                )
-
-        return Mixin

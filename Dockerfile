@@ -20,13 +20,12 @@ COPY ./setup.py ./code/setup.py
 
 # copy example site requires file
 COPY ./tests/requirements.txt /code/tests/requirements.txt
-COPY ./tests/requirements-channels.txt /code/tests/requirements-channels.txt
 
 WORKDIR /code/tests
 
 RUN pip install --upgrade pip
 # Install any needed packages specified in requirements.txt
-RUN pip install -r ./requirements-channels.txt
+RUN pip install -r ./requirements.txt
 RUN pip install gunicorn
 
 # Copy the current directory contents into the container at /code/

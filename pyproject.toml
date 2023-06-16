@@ -1,0 +1,73 @@
+[build-system]
+requires = ["flit_core >=3.2,<4"]
+build-backend = "flit_core.buildapi"
+
+[project]
+name = "wagtail-grapple"
+authors = [
+    {name = "Nathan Horrigan", email = "hello@torchbox.com"}
+]
+maintainers = [
+    {name = "Dan Braghis", email = "dan.braghis@torchbox.com"}
+]
+description = "A Wagtail package that speeds up and simplifies implementing a GraphQL endpoint!"
+readme = "README.md"
+license = {file = "LICENSE"}
+keywords = ["wagtail", "django", "graphql", "graphene", "api"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Framework :: Wagtail",
+    "Framework :: Wagtail :: 4",
+    "Framework :: Wagtail :: 5",
+]
+dynamic = ["version"]
+requires-python = ">=3.8"
+dependencies = [
+    "Wagtail>=4.1",
+    "graphene-django>=3,<4",
+    "wagtail-headless-preview"
+]
+
+[project.optional-dependencies]
+channels = [
+    "Django>=3.2,<4.0",
+    "channels>=3.0,<3.1",
+    "channels_redis==3.3.0",
+    "graphql-ws>=0.4.4,<0.5"
+]
+
+[project.urls]
+Changelog = "https://github.com/torchbox/wagtail-grapple/blob/main/CHANGELOG.md"
+Documentation = "https://wagtail-grapple.readthedocs.io/en/latest/"
+
+[tool.flit.module]
+name = "grapple"
+
+[tool.flit.sdist]
+include = ["LICENSE"]
+exclude = [
+    "docs/",
+    "tests/",
+    "CHANGELOG.md",
+    "Dockerfile",
+    "Makefile",
+    ".*",
+    "*.json",
+    "*.ini",
+    "*.yml",
+    "*.yaml",
+    "ruff.toml",
+]
+
+[tool.doc8]
+ignore = ["D000", "D001"]
+ignore_path = ["docs/build", "src", "tests", ".git", ".tox", ".venv", "venv"]

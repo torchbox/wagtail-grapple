@@ -44,8 +44,8 @@ class ImageRenditionObjectType(DjangoObjectType):
     class Meta:
         model = WagtailImageRendition
 
-    def resolve_url(self, info, **kwargs):
-        return self.full_url
+    def resolve_url(instance, info, **kwargs):
+        return instance.full_url
 
 
 class ImageObjectType(DjangoObjectType):
@@ -86,7 +86,7 @@ class ImageObjectType(DjangoObjectType):
     class Meta:
         model = WagtailImage
 
-    def resolve_rendition(self, info, **kwargs):
+    def resolve_rendition(instance, info, **kwargs):
         """
         Render a custom rendition of the current image.
         """
@@ -96,15 +96,15 @@ class ImageObjectType(DjangoObjectType):
         if not rendition_allowed(filters):
             return
         try:
-            return self.get_rendition(filters)
+            return instance.get_rendition(filters)
         except SourceImageIOError:
             return
 
-    def resolve_url(self, info, **kwargs):
+    def resolve_url(instance, info, **kwargs):
         """
         Get the uploaded image url.
         """
-        return get_media_item_url(self)
+        return get_media_item_url(instance)
 
     def resolve_src(self, info, **kwargs):
         """
@@ -112,28 +112,28 @@ class ImageObjectType(DjangoObjectType):
         """
         return get_media_item_url(self)
 
-    def resolve_aspect_ratio(self, info, **kwargs):
+    def resolve_aspect_ratio(instance, info, **kwargs):
         """
         Calculate aspect ratio for the image.
         """
-        return self.width / self.height
+        return instance.width / instance.height
 
-    def resolve_sizes(self, info, **kwargs):
-        return f"(max-width: {self.width}px) 100vw, {self.width}px"
+    def resolve_sizes(instance, info, **kwargs):
+        return f"(max-width: {instance.width}px) 100vw, {instance.width}px"
 
-    def resolve_tags(self, info, **kwargs):
-        return self.tags.all()
+    def resolve_tags(instance, info, **kwargs):
+        return instance.tags.all()
 
-    def resolve_src_set(self, info, sizes, format=None, **kwargs):
+    def resolve_src_set(instance, info, sizes, format=None, **kwargs):
         """
         Generate src set of renditions.
         """
         filter_suffix = f"|format-{format}" if format else ""
         format_kwarg = {"format": format} if format else {}
-        if self.file.name is not None:
+        if instance.file.name is not None:
             rendition_list = [
                 ImageObjectType.resolve_rendition(
-                    self, info, width=width, **format_kwarg
+                    instance, info, width=width, **format_kwarg
                 )
                 for width in sizes
                 if rendition_allowed(f"width-{width}{filter_suffix}")
@@ -151,8 +151,7 @@ class ImageObjectType(DjangoObjectType):
 
 
 def get_image_type():
-    mdl = get_image_model()
-    return registry.images.get(mdl, ImageObjectType)
+    return registry.images.get(get_image_model(), ImageObjectType)
 
 
 def ImagesQuery():
@@ -171,7 +170,7 @@ def ImagesQuery():
         )
         image_type = graphene.String(required=True)
 
-        def resolve_image(self, info, id, **kwargs):
+        def resolve_image(parent, info, id, **kwargs):
             """Returns an image given the id, if in a public collection"""
             try:
                 return (
@@ -182,7 +181,7 @@ def ImagesQuery():
             except mdl.DoesNotExist:
                 return None
 
-        def resolve_images(self, info, **kwargs):
+        def resolve_images(parent, info, **kwargs):
             """Returns all images in a public collection"""
             return resolve_queryset(
                 mdl.objects.filter(
@@ -193,7 +192,7 @@ def ImagesQuery():
             )
 
         # Give name of the image type, used to generate mixins
-        def resolve_image_type(self, info, **kwargs):
-            return get_image_type()
+        def resolve_image_type(parent, info, **kwargs):
+            return mdl_type
 
     return Mixin

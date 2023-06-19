@@ -13,6 +13,15 @@ from .structures import QuerySetList
 from .tags import TagObjectType
 
 
+def get_image_type():
+    return registry.images.get(get_image_model(), ImageObjectType)
+
+
+def get_rendition_type():
+    rendition_mdl = get_image_model().renditions.rel.related_model
+    return registry.images.get(rendition_mdl, ImageRenditionObjectType)
+
+
 def rendition_allowed(rendition_filter):
     """Checks a given rendition filter is allowed"""
     allowed_filters = grapple_settings.ALLOWED_IMAGE_FILTERS
@@ -20,12 +29,6 @@ def rendition_allowed(rendition_filter):
         return True
 
     return rendition_filter in allowed_filters
-
-
-def get_rendition_type():
-    rendition_mdl = get_image_model().renditions.rel.related_model
-    rendition_type = registry.images.get(rendition_mdl, ImageRenditionObjectType)
-    return rendition_type
 
 
 class ImageRenditionObjectType(DjangoObjectType):
@@ -148,10 +151,6 @@ class ImageObjectType(DjangoObjectType):
             )
 
         return ""
-
-
-def get_image_type():
-    return registry.images.get(get_image_model(), ImageObjectType)
 
 
 def ImagesQuery():

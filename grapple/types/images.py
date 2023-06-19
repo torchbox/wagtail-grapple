@@ -108,22 +108,12 @@ class ImageObjectType(DjangoObjectType, BaseImageObjectType):
         filters = "|".join([f"{key}-{val}" for key, val in kwargs.items()])
 
         # Only allowed the defined filters (thus renditions)
-        if rendition_allowed(filters):
-            try:
-                img = self.get_rendition(filters)
-            except SourceImageIOError:
-                return
-
-            rendition_type = get_rendition_type()
-
-            return rendition_type(
-                id=img.id,
-                url=get_media_item_url(img),
-                width=img.width,
-                height=img.height,
-                file=img.file,
-                image=self,
-            )
+        if not rendition_allowed(filters):
+            return
+        try:
+            return self.get_rendition(filters)
+        except SourceImageIOError:
+            return
 
     def resolve_src_set(self, info, sizes, format=None, **kwargs):
         """

@@ -13,7 +13,42 @@ from .structures import QuerySetList
 from .tags import TagObjectType
 
 
-class BaseImageObjectType(graphene.ObjectType):
+def rendition_allowed(rendition_filter):
+    """Checks a given rendition filter is allowed"""
+    allowed_filters = grapple_settings.ALLOWED_IMAGE_FILTERS
+    if allowed_filters is None or not isinstance(allowed_filters, (list, tuple)):
+        return True
+
+    return rendition_filter in allowed_filters
+
+
+def get_rendition_type():
+    rendition_mdl = get_image_model().renditions.rel.related_model
+    rendition_type = registry.images.get(rendition_mdl, ImageRenditionObjectType)
+    return rendition_type
+
+
+class ImageRenditionObjectType(DjangoObjectType):
+    id = graphene.ID(required=True)
+    file = graphene.String(required=True)
+    image = graphene.Field(lambda: get_image_type(), required=True)
+    filter_spec = graphene.String(required=True)
+    width = graphene.Int(required=True)
+    height = graphene.Int(required=True)
+    focal_point_key = graphene.String(required=True)
+    focal_point = graphene.String()
+    url = graphene.String(required=True)
+    alt = graphene.String(required=True)
+    background_position_style = graphene.String(required=True)
+
+    class Meta:
+        model = WagtailImageRendition
+
+    def resolve_url(self, info, **kwargs):
+        return self.full_url
+
+
+class ImageObjectType(DjangoObjectType):
     id = graphene.ID(required=True)
     title = graphene.String(required=True)
     file = graphene.String(required=True)
@@ -32,56 +67,6 @@ class BaseImageObjectType(graphene.ObjectType):
     sizes = graphene.String(required=True)
     collection = graphene.Field(lambda: CollectionObjectType, required=True)
     tags = graphene.List(graphene.NonNull(lambda: TagObjectType), required=True)
-
-    def resolve_url(self, info, **kwargs):
-        """
-        Get the uploaded image url.
-        """
-        return get_media_item_url(self)
-
-    def resolve_src(self, info, **kwargs):
-        """
-        Deprecated. Use the `url` attribute.
-        """
-        return get_media_item_url(self)
-
-    def resolve_aspect_ratio(self, info, **kwargs):
-        """
-        Calculate aspect ratio for the image.
-        """
-        return self.width / self.height
-
-    def resolve_sizes(self, info, **kwargs):
-        return f"(max-width: {self.width}px) 100vw, {self.width}px"
-
-    def resolve_tags(self, info, **kwargs):
-        return self.tags.all()
-
-
-class ImageRenditionObjectType(DjangoObjectType, BaseImageObjectType):
-    class Meta:
-        model = WagtailImageRendition
-
-    def resolve_image(self, info, **kwargs):
-        return self.image
-
-
-def get_rendition_type():
-    rendition_mdl = get_image_model().renditions.rel.related_model
-    rendition_type = registry.images.get(rendition_mdl, ImageRenditionObjectType)
-    return rendition_type
-
-
-def rendition_allowed(rendition_filter):
-    """Checks a given rendition filter is allowed"""
-    allowed_filters = grapple_settings.ALLOWED_IMAGE_FILTERS
-    if allowed_filters is None or not isinstance(allowed_filters, (list, tuple)):
-        return True
-
-    return rendition_filter in allowed_filters
-
-
-class ImageObjectType(DjangoObjectType, BaseImageObjectType):
     rendition = graphene.Field(
         lambda: get_rendition_type(),
         max=graphene.String(),
@@ -114,6 +99,30 @@ class ImageObjectType(DjangoObjectType, BaseImageObjectType):
             return self.get_rendition(filters)
         except SourceImageIOError:
             return
+
+    def resolve_url(self, info, **kwargs):
+        """
+        Get the uploaded image url.
+        """
+        return get_media_item_url(self)
+
+    def resolve_src(self, info, **kwargs):
+        """
+        Deprecated. Use the `url` attribute.
+        """
+        return get_media_item_url(self)
+
+    def resolve_aspect_ratio(self, info, **kwargs):
+        """
+        Calculate aspect ratio for the image.
+        """
+        return self.width / self.height
+
+    def resolve_sizes(self, info, **kwargs):
+        return f"(max-width: {self.width}px) 100vw, {self.width}px"
+
+    def resolve_tags(self, info, **kwargs):
+        return self.tags.all()
 
     def resolve_src_set(self, info, sizes, format=None, **kwargs):
         """

@@ -1024,7 +1024,7 @@ class ImagesTest(BaseGrappleTest):
         )
         self.assertEqual(
             executed["data"]["images"][0]["rendition"]["url"],
-            self.example_image.get_rendition("width-200").file.url,
+            self.example_image.get_rendition("width-200").full_url,
         )
 
     def test_renditions(self):

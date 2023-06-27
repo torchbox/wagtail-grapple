@@ -2,6 +2,7 @@ import graphene
 from django.test import TestCase
 
 from grapple.actions import get_field_type
+from grapple.exceptions import IllegalDeprecation
 from grapple.models import (
     GraphQLCollection,
     GraphQLField,
@@ -33,10 +34,10 @@ class FieldTest(TestCase):
             deprecation_reason=self.deprecation_reason,
         )
         # Assert field properties
-        assert field.field_name == self.field_name
-        assert field.field_type == MyType
-        assert field.deprecation_reason == self.deprecation_reason
-        assert field.description == self.description
+        self.assertEqual(field.field_name, self.field_name)
+        self.assertEqual(field.field_type, MyType)
+        self.assertEqual(field.deprecation_reason, self.deprecation_reason)
+        self.assertEqual(field.description, self.description)
 
     def test_field_required(self):
         """
@@ -45,22 +46,18 @@ class FieldTest(TestCase):
         MyType = object()
         field = GraphQLField(MyType, required=True)
         # Assert field type is NonNull
-        assert isinstance(field.field_type, graphene.NonNull)
+        self.assertIsInstance(field.field_type, graphene.NonNull)
 
     def test_field_required_deprecated(self):
         """
-        Test that GraphQLField with required=True and deprecation_reason raises AssertionError.
+        Test that GraphQLField with required=True and deprecation_reason raises IllegalDeprecation.
         """
-        with self.assertRaises(AssertionError) as context:
+        with self.assertRaises(IllegalDeprecation):
             GraphQLField(
                 self.field_name,
                 required=True,
                 deprecation_reason=self.deprecation_reason,
             )
-        assert (
-            str(context.exception)
-            == f"Argument {self.field_name} is required, cannot deprecate it."
-        )
 
     def test_streamfield(self):
         """
@@ -72,11 +69,11 @@ class FieldTest(TestCase):
             deprecation_reason=self.deprecation_reason,
         )()
         # Assert field type is List[StreamFieldInterface]
-        assert isinstance(field.field_type, graphene.List)
-        assert field.field_type.of_type == StreamFieldInterface
-        assert field.field_name == self.field_name
-        assert field.deprecation_reason == self.deprecation_reason
-        assert field.description == self.description
+        self.assertIsInstance(field.field_type, graphene.List)
+        self.assertEqual(field.field_type.of_type, StreamFieldInterface)
+        self.assertEqual(field.field_name, self.field_name)
+        self.assertEqual(field.deprecation_reason, self.deprecation_reason)
+        self.assertEqual(field.description, self.description)
 
     def test_streamfield_is_not_a_list(self):
         """
@@ -89,25 +86,21 @@ class FieldTest(TestCase):
             deprecation_reason=self.deprecation_reason,
         )()
         # Assert field type is StreamFieldInterface
-        assert field.field_type == StreamFieldInterface
-        assert field.field_name == self.field_name
-        assert field.deprecation_reason == self.deprecation_reason
-        assert field.description == self.description
+        self.assertEqual(field.field_type, StreamFieldInterface)
+        self.assertEqual(field.field_name, self.field_name)
+        self.assertEqual(field.deprecation_reason, self.deprecation_reason)
+        self.assertEqual(field.description, self.description)
 
     def test_streamfield_required_deprecated(self):
         """
-        Test that GraphQLStreamfield with required=True and deprecation_reason raises AssertionError.
+        Test that GraphQLStreamfield with required=True and deprecation_reason raises IllegalDeprecation.
         """
-        with self.assertRaises(AssertionError) as context:
+        with self.assertRaises(IllegalDeprecation):
             GraphQLStreamfield(
                 self.field_name,
                 required=True,
                 deprecation_reason=self.deprecation_reason,
             )()
-        assert (
-            str(context.exception)
-            == f"Argument {self.field_name} is required, cannot deprecate it."
-        )
 
     def test_streamfield_required(self):
         """
@@ -117,7 +110,7 @@ class FieldTest(TestCase):
         field = GraphQLField(MyType, required=True)
 
         # Assert field type is NonNull
-        assert isinstance(field.field_type, graphene.NonNull)
+        self.assertIsInstance(field.field_type, graphene.NonNull)
 
     def test_collection_field(self):
         """
@@ -133,7 +126,7 @@ class FieldTest(TestCase):
         # Use get_field_type to replicate behavior of grapple.actions.load_type_fields
         field, field_wrapper = get_field_type(field)
         # Assert field_wrapper type is List
-        assert isinstance(field_wrapper, graphene.List)
+        self.assertIsInstance(field_wrapper, graphene.List)
 
         MyType = GraphQLSnippet
         field = GraphQLCollection(
@@ -146,7 +139,7 @@ class FieldTest(TestCase):
         # Use get_field_type to replicate behavior of grapple.actions.load_type_fields
         field, field_wrapper = get_field_type(field)
         # Assert field_wrapper type is QuerySetList
-        assert isinstance(field_wrapper, QuerySetList)
+        self.assertIsInstance(field_wrapper, QuerySetList)
 
         MyType = GraphQLForeignKey
         field = GraphQLCollection(
@@ -159,7 +152,7 @@ class FieldTest(TestCase):
         # Use get_field_type to replicate behavior of grapple.actions.load_type_fields
         field, field_wrapper = get_field_type(field)
         # Assert field_wrapper type is QuerySetList
-        assert isinstance(field_wrapper, QuerySetList)
+        self.assertIsInstance(field_wrapper, QuerySetList)
 
         # is_paginated_queryset should return PaginatedQuerySet
         MyType = GraphQLForeignKey
@@ -174,14 +167,14 @@ class FieldTest(TestCase):
         # Use get_field_type to replicate behavior of grapple.actions.load_type_fields
         field, field_wrapper = get_field_type(field)
         # Assert field_wrapper type is Field and issubclass of BasePaginatedType
-        assert isinstance(field_wrapper, graphene.Field)
-        assert issubclass(field_wrapper.type, BasePaginatedType)
+        self.assertIsInstance(field_wrapper, graphene.Field)
+        self.assertTrue(issubclass(field_wrapper.type, BasePaginatedType))
 
     def test_collection_field_required_deprecated(self):
         """
-        Test that GraphQLCollection with required=True and deprecation_reason raises AssertionError.
+        Test that GraphQLCollection with required=True and deprecation_reason raises IllegalDeprecation.
         """
-        with self.assertRaises(AssertionError) as context:
+        with self.assertRaises(IllegalDeprecation):
             MyType = object()
             GraphQLCollection(
                 MyType,
@@ -189,7 +182,3 @@ class FieldTest(TestCase):
                 required=True,
                 deprecation_reason=self.deprecation_reason,
             )()
-        assert (
-            str(context.exception)
-            == f"Argument {self.field_name} is required, cannot deprecate it."
-        )

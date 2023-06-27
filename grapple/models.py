@@ -1,6 +1,7 @@
 import graphene
 from django.apps import apps
 
+from .exceptions import IllegalDeprecation
 from .registry import registry
 
 
@@ -22,9 +23,10 @@ class GraphQLField:
 
         # Add support for NonNull/required fields
         if required:
-            assert (
-                self.deprecation_reason is None
-            ), f"Argument {field_name} is required, cannot deprecate it."
+            if self.deprecation_reason is not None:
+                raise IllegalDeprecation(
+                    f"Field '{field_name}' cannot be both required and deprecated"
+                )
             self.field_type = graphene.NonNull(field_type, description=self.description)
 
         # Legacy collection API (Allow lists):
@@ -172,10 +174,10 @@ def GraphQLCollection(
                 kwargs["source"] = source
                 kwargs["key"] = key
 
-        if required:
-            assert (
-                deprecation_reason is None
-            ), f"Argument {field_name} is required, cannot deprecate it."
+        if required and deprecation_reason is not None:
+            raise IllegalDeprecation(
+                f"Field '{field_name}' cannot be both required and deprecated"
+            )
 
         # Create the nested type
         graphql_type = nested_type(field_name, *args, required=item_required, **kwargs)

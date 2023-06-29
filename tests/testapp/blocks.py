@@ -40,6 +40,7 @@ class ImageGalleryImages(blocks.StreamBlock):
     class Meta:
         min_num = 2
         max_num = 15
+        graphql_description = "This is an image gallery"
 
 
 @register_streamfield_block
@@ -51,6 +52,9 @@ class ImageGalleryBlock(blocks.StructBlock):
         GraphQLString("title"),
         GraphQLCollection(GraphQLForeignKey, "images", ImageGalleryImage),
     ]
+
+    class Meta:
+        graphql_description = "Image block for the image gallery"
 
 
 @register_streamfield_block

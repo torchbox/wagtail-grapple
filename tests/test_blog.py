@@ -10,7 +10,12 @@ from django.core.validators import URLValidator
 from django.test import override_settings
 from django.test.client import RequestFactory
 from test_grapple import BaseGrappleTest
-from testapp.blocks import ButtonBlock, CarouselBlock, ImageGalleryImages
+from testapp.blocks import (
+    ButtonBlock,
+    CarouselBlock,
+    ImageGalleryBlock,
+    ImageGalleryImages,
+)
 from testapp.factories import (
     AdvertFactory,
     BlogPageFactory,
@@ -1069,3 +1074,61 @@ class BlogTest(BaseGrappleTest):
             json.loads(executed["data"]["page"]["customProperty"]),
             self.blog_page.custom_property,
         )
+
+    def test_stream_block_description(self):
+        """
+        A StreamBlock with a graphql_description field in its Metaclass should have that value exposed
+        """
+
+        query = """
+            query {
+              __type(name: "ImageGalleryImages") {
+                description
+              }
+            }
+        """
+        response = self.client.execute(query)
+        self.assertEqual(
+            ImageGalleryImages._meta_class.graphql_description,
+            response["data"]["__type"]["description"],
+        )
+
+    def test_stream_block_no_description(self):
+        query = """
+            query {
+              __type(name: "CarouselBlock") {
+                description
+              }
+            }
+        """
+        response = self.client.execute(query)
+        self.assertIsNone(response["data"]["__type"]["description"])
+
+    def test_struct_block_description(self):
+        """
+        A StructBlock with a graphql_description field in its Metaclass should have that value exposed
+        """
+
+        query = """
+            query {
+              __type(name: "ImageGalleryBlock") {
+                description
+              }
+            }
+        """
+        response = self.client.execute(query)
+        self.assertEqual(
+            ImageGalleryBlock._meta_class.graphql_description,
+            response["data"]["__type"]["description"],
+        )
+
+    def test_struct_block_no_description(self):
+        query = """
+            query {
+              __type(name: "ButtonBlock") {
+                description
+              }
+            }
+        """
+        response = self.client.execute(query)
+        self.assertIsNone(response["data"]["__type"]["description"])

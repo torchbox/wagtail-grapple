@@ -453,8 +453,8 @@ def build_streamfield_type(
             ]
         else:
             interfaces = (interface,) if interface is not None else ()
-        # Add description to type if streamfield has a docstring
-        description = cls.__doc__
+        # Add description to type if the Meta class declares it
+        description = getattr(cls._meta_class, "graphql_description", None)
 
     methods = {}
     type_name = type_prefix + cls.__name__

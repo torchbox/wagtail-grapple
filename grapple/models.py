@@ -1,3 +1,5 @@
+from typing import Optional
+
 import graphene
 from django.apps import apps
 
@@ -8,8 +10,10 @@ from .registry import registry
 # Classes used to define what the Django field should look like in the GQL type
 class GraphQLField:
     field_name: str
-    field_type: type
-    field_source: str
+    field_type: Optional[type]
+    field_source: Optional[str]
+    description: Optional[str]
+    deprecation_reason: Optional[str]
 
     def __init__(
         self, field_name: str, field_type: type = None, required: bool = None, **kwargs

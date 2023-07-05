@@ -28,7 +28,6 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ("wagtailcore", "0078_referenceindex"),
-        ("taggit", "0005_auto_20220424_2025"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ("wagtailmedia", "0004_duration_optional_floatfield"),
     ]

@@ -189,6 +189,25 @@ class PagesTest(BaseGrappleTest):
 
         self.assertEqual(len(executed["data"]["pages"]), pages.count())
 
+    def test_pages_site_returns_empty_list_when_no_site_found(
+        self,
+    ):
+        query = """
+        query($site: String) {
+            pages(site: $site) {
+                title
+                contentType
+                pageType
+            }
+        }
+        """
+
+        executed = self.client.execute(query, variables={"site": "does.not.exist"})
+
+        self.assertEqual(type(executed["data"]), dict)
+        self.assertEqual(type(executed["data"]["pages"]), list)
+        self.assertEqual(len(executed["data"]["pages"]), 0)
+
     def test_pages_site_errors_when_multiple_sites_match_hostname_and_port_unspecified(
         self,
     ):
@@ -211,10 +230,11 @@ class PagesTest(BaseGrappleTest):
             {
                 "errors": [
                     {
-                        "message": "Your 'site' filter value of "
-                        "'different-hostname.localhost' returned multiple "
-                        "sites. Try adding a port number (for example: "
-                        "'different-hostname.localhost:80').",
+                        "message": (
+                            f"Your `Site` filter `hostname={self.site_different_hostname.hostname}` returned "
+                            "multiple sites. Try including a port number to disambiguate "
+                            f"(e.g. `hostname={self.site_different_hostname.hostname}:8000`)."
+                        ),
                         "locations": [{"line": 3, "column": 13}],
                         "path": ["pages"],
                     }
@@ -236,7 +256,7 @@ class PagesTest(BaseGrappleTest):
 
         executed = self.client.execute(
             query,
-            variables={"site": self.site_different_hostname.hostname + ":8000"},
+            variables={"site": f"{self.site_different_hostname.hostname}:8000"},
         )
 
         self.assertEqual(type(executed["data"]), dict)
@@ -659,7 +679,26 @@ class SitesTest(TestCase):
             len(executed["data"]["site"]["pages"]), Page.objects.count()
         )
 
-    def test_site_errors_when_multiple_sites_match_hostname_and_port_unspecified(self):
+    def test_site_returns_none_when_no_site_found(
+        self,
+    ):
+        query = """
+        query($hostname: String) {
+            site(hostname: $hostname) {
+                siteName
+            }
+        }
+        """
+
+        executed = self.client.execute(query, variables={"hostname": "does.not.exist"})
+
+        self.assertEqual(type(executed["data"]), dict)
+        self.assertEqual(type(executed["data"]["site"]), type(None))
+        self.assertEqual(executed["data"]["site"], None)
+
+    def test_site_errors_when_multiple_sites_match_hostname_and_port_unspecified(
+        self,
+    ):
         query = """
         query($hostname: String) {
             site(hostname: $hostname) {
@@ -677,10 +716,11 @@ class SitesTest(TestCase):
             {
                 "errors": [
                     {
-                        "message": "Your 'hostname' filter value of "
-                        "'different-hostname.localhost' returned multiple "
-                        "sites. Try adding a port number (for example: "
-                        "'different-hostname.localhost:80').",
+                        "message": (
+                            f"Your `Site` filter `hostname={self.site_different_hostname.hostname}` returned "
+                            "multiple sites. Try including a port number to disambiguate "
+                            f"(e.g. `hostname={self.site_different_hostname.hostname}:8000`)."
+                        ),
                         "locations": [{"line": 3, "column": 13}],
                         "path": ["site"],
                     }
@@ -1423,6 +1463,10 @@ class SettingsTest(BaseGrappleTest):
         )
 
     def test_query_single_setting(self):
+        # This only works if there is a single Site, so let's make that true.
+        self.site_b.delete()
+        self.site_b_settings.delete()
+
         query = """
         {
             setting(name: "SocialMediaSettings") {
@@ -1508,7 +1552,11 @@ class SettingsTest(BaseGrappleTest):
             {
                 "errors": [
                     {
-                        "message": "Your 'site' filter value of 'b' returned multiple sites. Try adding a port number (for example: 'b:80').",
+                        "message": (
+                            f"Your `Site` filter `hostname={self.site_b.hostname}` returned "
+                            "multiple sites. Try including a port number to disambiguate "
+                            f"(e.g. `hostname={self.site_b.hostname}:8000`)."
+                        ),
                         "locations": [{"line": 3, "column": 13}],
                         "path": ["setting"],
                     }

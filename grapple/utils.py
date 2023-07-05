@@ -1,6 +1,9 @@
+from typing import Optional
+
 from django.conf import settings
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db import connection
+from graphql import GraphQLError
 from wagtail.models import Site
 from wagtail.search.index import class_is_indexed
 from wagtail.search.models import Query
@@ -9,39 +12,60 @@ from .settings import grapple_settings
 from .types.structures import BasePaginatedType, PaginationType
 
 
-def resolve_site(hostname):
+def resolve_site(
+    id: Optional[int] = None, hostname: Optional[str] = None
+) -> Optional[Site]:
     """
-    Looks up a Site record from a hostname.
+    Find a `Site` object by ID or hostname.
 
-    If two site records exist with the same hostname, you must specify a port
-    to disambiguate the by appending a colon followed by the port number to the
-    end of the hostname.
+    If resolving via hostname, and two `Site` records exist with the same
+    hostname, you must include the port to disambiguate.
 
     For example:
 
-    >>> resolve_site("wagtail.org")
-    >>> resolve_site("wagtail.org:443")
-
-    May raise one of the following exceptions:
-     - Site.DoesNotExist: If the site is not found
-     - Site.MultipleObjectsReturned: If multiple sites are found for a given hostname
-
-    :param hostname: The hostname of the site to look up
-    :type hostname: str
+    >>> resolve_site(hostname="wagtail.org")
+    >>> resolve_site(hostname="wagtail.org:443")
     """
-    # Optionally allow querying by port
-    if ":" in hostname:
-        (hostname, port) = hostname.split(":", 1)
-        query = {
-            "hostname": hostname,
-            "port": port,
-        }
-    else:
-        query = {
-            "hostname": hostname,
-        }
 
-    return Site.objects.get(**query)
+    if not id and not hostname:
+        raise TypeError(
+            "resolve_site() requires either `hostname` or `id`, though neither "
+            "were passed."
+        )
+    elif id and hostname:
+        raise ValueError(
+            "resolve_site() requires either `hostname` or `id`, though both "
+            "were passed."
+        )
+
+    if id:
+        query = {
+            "id": id,
+        }
+    elif hostname:
+        # Optionally allow querying by port
+        if ":" in hostname:
+            (hostname, port) = hostname.split(":", 1)
+            query = {
+                "hostname": hostname,
+                "port": port,
+            }
+        else:
+            query = {
+                "hostname": hostname,
+            }
+
+    try:
+        return Site.objects.get(**query)
+    except Site.MultipleObjectsReturned as err:
+        raise GraphQLError(
+            f"Your `Site` filter `hostname={hostname}` returned "
+            "multiple sites. Try including a port number to disambiguate "
+            f"(e.g. `hostname={hostname}:8000`)."
+        ) from err
+    except Site.DoesNotExist:
+        # This is an expected error, so should not raise a GraphQLError.
+        return None
 
 
 def _sliced_queryset(qs, limit=None, offset=None):

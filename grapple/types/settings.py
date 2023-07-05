@@ -1,5 +1,4 @@
 import graphene
-from graphql.error import GraphQLError
 from wagtail.contrib.settings.models import BaseSiteSetting
 from wagtail.models import Site
 
@@ -34,14 +33,7 @@ def SettingsQuery():
                 site_hostname = kwargs.pop("site", None)
 
                 if site_hostname is not None:
-                    try:
-                        site = resolve_site(site_hostname)
-                    except Site.MultipleObjectsReturned as err:
-                        raise GraphQLError(
-                            "Your 'site' filter value of '{}' returned multiple sites. Try adding a port number (for example: '{}:80').".format(
-                                site_hostname, site_hostname
-                            )
-                        ) from err
+                    site = resolve_site(hostname=site_hostname)
                 else:
                     site = None
 
@@ -53,8 +45,13 @@ def SettingsQuery():
 
                     if site and issubclass(setting._meta.model, BaseSiteSetting):
                         return setting._meta.model.objects.filter(site=site).first()
-                    else:
+
+                    # If there's only one Site, we can reliably return the
+                    # correct SiteSetting here.
+                    if Site.objects.all().count() == 1:
                         return setting._meta.model.objects.first()
+                    else:
+                        return None
 
             # Return all settings.
             def resolve_settings(self, info, **kwargs):
@@ -63,14 +60,7 @@ def SettingsQuery():
                 site_hostname = kwargs.pop("site", None)
 
                 if site_hostname is not None:
-                    try:
-                        site = resolve_site(site_hostname)
-                    except Site.MultipleObjectsReturned as err:
-                        raise GraphQLError(
-                            "Your 'site' filter value of '{}' returned multiple sites. Try adding a port number (for example: '{}:80').".format(
-                                site_hostname, site_hostname
-                            )
-                        ) from err
+                    site = resolve_site(hostname=site_hostname)
                 else:
                     site = None
 

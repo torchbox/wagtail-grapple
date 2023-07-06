@@ -231,9 +231,9 @@ class PagesTest(BaseGrappleTest):
                 "errors": [
                     {
                         "message": (
-                            f"Your `Site` filter `hostname={self.site_different_hostname.hostname}` returned "
+                            f"Your filter `site={self.site_different_hostname.hostname}` returned "
                             "multiple sites. Try including a port number to disambiguate "
-                            f"(e.g. `hostname={self.site_different_hostname.hostname}:8000`)."
+                            f"(e.g. `site={self.site_different_hostname.hostname}:8000`)."
                         ),
                         "locations": [{"line": 3, "column": 13}],
                         "path": ["pages"],
@@ -717,7 +717,7 @@ class SitesTest(TestCase):
                 "errors": [
                     {
                         "message": (
-                            f"Your `Site` filter `hostname={self.site_different_hostname.hostname}` returned "
+                            f"Your filter `hostname={self.site_different_hostname.hostname}` returned "
                             "multiple sites. Try including a port number to disambiguate "
                             f"(e.g. `hostname={self.site_different_hostname.hostname}:8000`)."
                         ),
@@ -1553,9 +1553,9 @@ class SettingsTest(BaseGrappleTest):
                 "errors": [
                     {
                         "message": (
-                            f"Your `Site` filter `hostname={self.site_b.hostname}` returned "
+                            f"Your filter `site={self.site_b.hostname}` returned "
                             "multiple sites. Try including a port number to disambiguate "
-                            f"(e.g. `hostname={self.site_b.hostname}:8000`)."
+                            f"(e.g. `site={self.site_b.hostname}:8000`)."
                         ),
                         "locations": [{"line": 3, "column": 13}],
                         "path": ["setting"],

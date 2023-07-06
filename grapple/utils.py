@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Literal, Optional
 
 from django.conf import settings
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
@@ -13,7 +13,10 @@ from .types.structures import BasePaginatedType, PaginationType
 
 
 def resolve_site(
-    id: Optional[int] = None, hostname: Optional[str] = None
+    *,
+    id: Optional[int] = None,
+    hostname: Optional[str] = None,
+    hostname_filter_name: Optional[Literal["site", "hostname"]] = None,
 ) -> Optional[Site]:
     """
     Find a `Site` object by ID or hostname.
@@ -29,13 +32,18 @@ def resolve_site(
 
     if not id and not hostname:
         raise TypeError(
-            "resolve_site() requires either `hostname` or `id`, though neither "
-            "were passed."
+            "resolve_site() requires either `hostname` or `id` args, though "
+            "neither were passed."
         )
     elif id and hostname:
         raise ValueError(
-            "resolve_site() requires either `hostname` or `id`, though both "
-            "were passed."
+            "resolve_site() requires either `hostname` or `id` args, though "
+            "both were passed."
+        )
+    elif hostname and not hostname_filter_name:
+        raise TypeError(
+            "Using resolve_site() with `hostname` arg also requires passing a "
+            "`hostname_filter_name` arg."
         )
 
     if id:
@@ -59,9 +67,9 @@ def resolve_site(
         return Site.objects.get(**query)
     except Site.MultipleObjectsReturned as err:
         raise GraphQLError(
-            f"Your `Site` filter `hostname={hostname}` returned "
+            f"Your filter `{hostname_filter_name}={hostname}` returned "
             "multiple sites. Try including a port number to disambiguate "
-            f"(e.g. `hostname={hostname}:8000`)."
+            f"(e.g. `{hostname_filter_name}={hostname}:8000`)."
         ) from err
     except Site.DoesNotExist:
         # This is an expected error, so should not raise a GraphQLError.

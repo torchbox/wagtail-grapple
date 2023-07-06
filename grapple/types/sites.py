@@ -87,6 +87,6 @@ def SitesQuery():
             if id := kwargs.get("id"):
                 return resolve_site(id=id)
             elif hostname := kwargs.get("hostname"):
-                return resolve_site(hostname=hostname)
+                return resolve_site(hostname=hostname, hostname_filter_name="hostname")
 
     return Mixin

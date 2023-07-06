@@ -31,10 +31,13 @@ def SettingsQuery():
             def resolve_setting(self, info, **kwargs):
                 # Site filter
                 # Only applies to settings that inherit from BaseSiteSetting
-                site_hostname = kwargs.pop("site", None)
+                site_hostname_kwarg = "site"
+                site_hostname = kwargs.pop(site_hostname_kwarg, None)
 
                 if site_hostname is not None:
-                    site = resolve_site(hostname=site_hostname)
+                    site = resolve_site(
+                        hostname=site_hostname, hostname_filter_name=site_hostname_kwarg
+                    )
                 else:
                     site = None
 
@@ -70,10 +73,13 @@ def SettingsQuery():
             def resolve_settings(self, info, **kwargs):
                 # Site filter
                 # Only applies to settings that inherit from BaseSiteSetting
-                site_hostname = kwargs.pop("site", None)
+                site_hostname_kwarg = "site"
+                site_hostname = kwargs.pop(site_hostname_kwarg, None)
 
                 if site_hostname is not None:
-                    site = resolve_site(hostname=site_hostname)
+                    site = resolve_site(
+                        hostname=site_hostname, hostname_filter_name=site_hostname_kwarg
+                    )
                 else:
                     site = None
 

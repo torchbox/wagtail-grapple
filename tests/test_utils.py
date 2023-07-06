@@ -28,7 +28,7 @@ class TestResolveSite(TestCase):
         site = wagtail_factories.SiteFactory(hostname="example.com")
 
         self.assertEqual(
-            resolve_site(hostname="example.com"),
+            resolve_site(hostname="example.com", hostname_filter_name="hostname"),
             site,
         )
 
@@ -41,7 +41,7 @@ class TestResolveSite(TestCase):
         site = wagtail_factories.SiteFactory(hostname="example.com", port="1000")
 
         self.assertEqual(
-            resolve_site(hostname="example.com:1000"),
+            resolve_site(hostname="example.com:1000", hostname_filter_name="hostname"),
             site,
         )
 
@@ -57,7 +57,7 @@ class TestResolveSite(TestCase):
         with self.assertRaisesRegex(
             GraphQLError, "Try including a port number to disambiguate"
         ):
-            resolve_site(hostname="example.com")
+            resolve_site(hostname="example.com", hostname_filter_name="hostname")
 
     def test_response_is_none_when_no_sites_match_hostname(self):
         """
@@ -67,14 +67,17 @@ class TestResolveSite(TestCase):
 
         wagtail_factories.SiteFactory(hostname="example.com")
 
-        self.assertEqual(resolve_site(hostname="not.example.com"), None)
+        self.assertEqual(
+            resolve_site(hostname="not.example.com", hostname_filter_name="hostname"),
+            None,
+        )
 
     def test_must_provide_id_or_hostname(self):
         """
         Ensure resolve_site() warns if used without `id` or `hostname`.
         """
 
-        with self.assertRaises(TypeError):
+        with self.assertRaisesRegex(TypeError, "neither were passed"):
             resolve_site()
 
     def test_cannot_provide_id_and_hostname(self):
@@ -82,5 +85,16 @@ class TestResolveSite(TestCase):
         Ensure resolve_site() warns if used with `id` and `hostname`.
         """
 
-        with self.assertRaises(ValueError):
-            resolve_site(id=1000, hostname="example.com")
+        with self.assertRaisesRegex(ValueError, "both were passed"):
+            resolve_site(
+                id=1000, hostname="example.com", hostname_filter_name="hostname"
+            )
+
+    def test_must_provide_hostname_filter_name_if_using_hostname(self):
+        """
+        Ensure resolve_site() warns if `hostname` is used without
+        `hostname_filter_name`.
+        """
+
+        with self.assertRaisesRegex(TypeError, "hostname_filter_name"):
+            resolve_site(hostname="example.com")

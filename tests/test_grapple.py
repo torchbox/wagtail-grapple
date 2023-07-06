@@ -1732,3 +1732,42 @@ class SettingsTest(BaseGrappleTest):
                 }
             },
         )
+
+    def test_query_single_setting_without_site_filter_and_multiple_sites(self):
+        # Create another site so that querying for `SocialMediaSettings` is
+        # ambiguous (i.e. which site should we be returning
+        # `SocialMediaSettings` for?)
+        wagtail_factories.SiteFactory()
+
+        query = """
+        {
+            setting(name: "SocialMediaSettings") {
+                ... on SocialMediaSettings {
+                    facebook
+                    instagram
+                    tripAdvisor
+                    youtube
+                }
+            }
+        }
+        """
+
+        response = self.client.execute(query)
+
+        self.assertEqual(
+            response,
+            {
+                "errors": [
+                    {
+                        "message": (
+                            "There are multiple `SocialMediaSettings` instances - "
+                            "please include a `site` filter to disambiguate "
+                            "(e.g. `setting(name: 'SocialMediaSettings', site='example.com')`."
+                        ),
+                        "locations": [{"column": 13, "line": 3}],
+                        "path": ["setting"],
+                    }
+                ],
+                "data": {"setting": None},
+            },
+        )

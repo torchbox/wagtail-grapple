@@ -18,7 +18,7 @@ def resolve_site(
     """
     Find a `Site` object by ID or hostname.
 
-    If resolving via hostname, and two `Site` records exist with the same
+    If resolving via hostname and two `Site` records exist with the same
     hostname, you must include the port to disambiguate.
 
     For example:

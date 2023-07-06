@@ -1,5 +1,6 @@
 import graphene
-from wagtail.contrib.settings.models import BaseSiteSetting
+from graphql import GraphQLError
+from wagtail.contrib.settings.models import BaseGenericSetting, BaseSiteSetting
 from wagtail.models import Site
 
 from ..registry import registry
@@ -43,15 +44,27 @@ def SettingsQuery():
                     if name and setting._meta.model_name != name.lower():
                         continue
 
-                    if site and issubclass(setting._meta.model, BaseSiteSetting):
-                        return setting._meta.model.objects.filter(site=site).first()
+                    if issubclass(setting._meta.model, BaseSiteSetting):
+                        if site:
+                            return setting._meta.model.objects.filter(site=site).first()
+                        elif Site.objects.all().count() == 1:
+                            # If there's only one Site, we can reliably return
+                            # the correct (i.e. only) SiteSetting.
+                            return setting._meta.model.objects.first()
+                        else:
+                            # If there are multiple `Site`s, we don't know what
+                            # data to return.
+                            raise GraphQLError(
+                                f"There are multiple `{name}` instances - "
+                                "please include a `site` filter to disambiguate "
+                                f"(e.g. `setting(name: '{name}', site='example.com')`."
+                            )
 
-                    # If there's only one Site, we can reliably return the
-                    # correct SiteSetting here.
-                    if Site.objects.all().count() == 1:
+                    elif issubclass(setting._meta.model, BaseGenericSetting):
+                        # If it's a GenericSetting, there can only be one.
                         return setting._meta.model.objects.first()
-                    else:
-                        return None
+
+                    return None
 
             # Return all settings.
             def resolve_settings(self, info, **kwargs):

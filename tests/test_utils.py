@@ -45,7 +45,7 @@ class TestResolveSite(TestCase):
             site,
         )
 
-    def test_graphqlerror_when_query_is_ambiguous(self):
+    def test_graphqlerror_when_hostname_is_ambiguous(self):
         """
         Ensure a `GraphQLError` is returned when passing an ambiguous
         `hostname`.
@@ -59,9 +59,10 @@ class TestResolveSite(TestCase):
         ):
             resolve_site(hostname="example.com")
 
-    def test_response_is_none_when_query_is_ambiguous(self):
+    def test_response_is_none_when_no_sites_match_hostname(self):
         """
-        Ensure `None` is returned when passing an unknown `hostname`.
+        Ensure `None` is returned when passing a `hostname` that doesn't match
+        any `Site`s.
         """
 
         wagtail_factories.SiteFactory(hostname="example.com")

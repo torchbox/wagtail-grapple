@@ -81,12 +81,14 @@ def SitesQuery():
 
         def resolve_site(self, info, **kwargs) -> Optional[Site]:
             """
-            Return a single `Site` object, identified by ID or hostname.
+            Attempt to return a single `Site` object identified by ID or
+            hostname.
             """
 
             if id := kwargs.get("id"):
                 return resolve_site(id=id)
             elif hostname := kwargs.get("hostname"):
                 return resolve_site(hostname=hostname, hostname_filter_name="hostname")
+            return None
 
     return Mixin

@@ -2,9 +2,9 @@
 
 ### Changed
 
--   `GraphQLError` no longer raised when querying for a site by hostname that doesn't match any `Site`s (`None` is returned instead) - ([#342](https://github.com/torchbox/wagtail-grapple/pull/342)) - @kbayliss
--   When querying pages with a site filter (e.g. `pages(site: "localhost")`) whose hostname does not match a `Site`, we no longer return pages for the first `Site` (`None` is returned instead) - ([#342](https://github.com/torchbox/wagtail-grapple/pull/342)) - @kbayliss
--   When querying site setting/settings without a site filter (e.g. `setting(name: "SocialMediaSettings")`) and there are multiple `Site`s, we no longer return settings for the first `Site` (`GraphQLError` is raised instead) - ([#342](https://github.com/torchbox/wagtail-grapple/pull/342)) - @kbayliss
+-   `GraphQLError` no longer raised when querying for a site by hostname that doesn't match any `Site`s (`None` is returned instead) - ([#342](https://github.com/torchbox/wagtail-grapple/pull/342)) @kbayliss
+-   When querying pages with a site filter (e.g. `pages(site: "localhost")`) whose hostname does not match a `Site`, we no longer return pages for the first `Site` (`None` is returned instead) - ([#342](https://github.com/torchbox/wagtail-grapple/pull/342)) @kbayliss
+-   When querying site setting/settings without a site filter (e.g. `setting(name: "SocialMediaSettings")`) and there are multiple `Site`s, we no longer return settings for the first `Site` (`GraphQLError` is raised instead) - ([#342](https://github.com/torchbox/wagtail-grapple/pull/342)) @kbayliss
 
 ## [0.19.2] - 2023-01-17
 

@@ -8,7 +8,7 @@ from wagtail.models import Page as WagtailPage
 from wagtail.models import Site
 
 from ..registry import registry
-from ..utils import resolve_queryset, resolve_site
+from ..utils import resolve_queryset, resolve_site_by_hostname
 from .structures import QuerySetList
 
 
@@ -283,14 +283,10 @@ def get_site_filter(info, **kwargs):
         )
 
     if site_hostname is not None:
-        try:
-            return resolve_site(site_hostname)
-        except Site.MultipleObjectsReturned as err:
-            raise GraphQLError(
-                "Your 'site' filter value of '{}' returned multiple sites. Try adding a port number (for example: '{}:80').".format(
-                    site_hostname, site_hostname
-                )
-            ) from err
+        return resolve_site_by_hostname(
+            hostname=site_hostname,
+            filter_name="site",
+        )
     elif in_current_site:
         return Site.find_for_request(info.context)
 
@@ -387,8 +383,17 @@ def PagesQuery():
             pages = qs.live().public().filter(depth__gt=1).specific()
 
             site = get_site_filter(info, **kwargs)
+            site_hostname = kwargs.get("site", None)
+            in_current_site = kwargs.get("in_site", False)
+
             if site is not None:
                 pages = pages.in_site(site)
+            elif site is None and any(
+                [site_hostname is not None, in_current_site is True]
+            ):
+                # If we could not resolve a Site but _were_ passed a filter, we
+                # should not return any results.
+                return WagtailPage.objects.none()
 
             content_type = kwargs.pop("content_type", None)
             content_types = content_type.split(",") if content_type else None

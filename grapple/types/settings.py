@@ -1,10 +1,10 @@
 import graphene
-from graphql.error import GraphQLError
-from wagtail.contrib.settings.models import BaseSiteSetting
+from graphql import GraphQLError
+from wagtail.contrib.settings.models import BaseGenericSetting, BaseSiteSetting
 from wagtail.models import Site
 
 from ..registry import registry
-from ..utils import resolve_site
+from ..utils import resolve_site_by_hostname
 
 
 def SettingsQuery():
@@ -31,17 +31,14 @@ def SettingsQuery():
             def resolve_setting(self, info, **kwargs):
                 # Site filter
                 # Only applies to settings that inherit from BaseSiteSetting
-                site_hostname = kwargs.pop("site", None)
+                site_hostname_kwarg = "site"
+                site_hostname = kwargs.pop(site_hostname_kwarg, None)
 
                 if site_hostname is not None:
-                    try:
-                        site = resolve_site(site_hostname)
-                    except Site.MultipleObjectsReturned as err:
-                        raise GraphQLError(
-                            "Your 'site' filter value of '{}' returned multiple sites. Try adding a port number (for example: '{}:80').".format(
-                                site_hostname, site_hostname
-                            )
-                        ) from err
+                    site = resolve_site_by_hostname(
+                        hostname=site_hostname,
+                        filter_name=site_hostname_kwarg,
+                    )
                 else:
                     site = None
 
@@ -51,26 +48,40 @@ def SettingsQuery():
                     if name and setting._meta.model_name != name.lower():
                         continue
 
-                    if site and issubclass(setting._meta.model, BaseSiteSetting):
-                        return setting._meta.model.objects.filter(site=site).first()
-                    else:
+                    if issubclass(setting._meta.model, BaseSiteSetting):
+                        if site:
+                            return setting._meta.model.objects.filter(site=site).first()
+                        elif Site.objects.all().count() == 1:
+                            # If there's only one Site, we can reliably return
+                            # the correct (i.e. only) SiteSetting.
+                            return setting._meta.model.objects.first()
+                        else:
+                            # If there are multiple `Site`s, we don't know what
+                            # data to return.
+                            raise GraphQLError(
+                                f"There are multiple `{name}` instances - "
+                                "please include a `site` filter to disambiguate "
+                                f"(e.g. `setting(name: '{name}', site='example.com')`."
+                            )
+
+                    elif issubclass(setting._meta.model, BaseGenericSetting):
+                        # If it's a GenericSetting, there can only be one.
                         return setting._meta.model.objects.first()
+
+                    return None
 
             # Return all settings.
             def resolve_settings(self, info, **kwargs):
                 # Site filter
                 # Only applies to settings that inherit from BaseSiteSetting
-                site_hostname = kwargs.pop("site", None)
+                site_hostname_kwarg = "site"
+                site_hostname = kwargs.pop(site_hostname_kwarg, None)
 
                 if site_hostname is not None:
-                    try:
-                        site = resolve_site(site_hostname)
-                    except Site.MultipleObjectsReturned as err:
-                        raise GraphQLError(
-                            "Your 'site' filter value of '{}' returned multiple sites. Try adding a port number (for example: '{}:80').".format(
-                                site_hostname, site_hostname
-                            )
-                        ) from err
+                    site = resolve_site_by_hostname(
+                        hostname=site_hostname,
+                        filter_name=site_hostname_kwarg,
+                    )
                 else:
                     site = None
 

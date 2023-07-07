@@ -1,12 +1,14 @@
+from typing import Optional
+
 import graphene
 from django.contrib.contenttypes.models import ContentType
+from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 from graphene_django.types import DjangoObjectType
-from graphql.error import GraphQLError
 from wagtail.models import Page as WagtailPage
 from wagtail.models import Site
 
-from ..utils import resolve_queryset, resolve_site
+from ..utils import resolve_queryset, resolve_site_by_hostname, resolve_site_by_id
 from .pages import PageInterface, get_specific_page
 from .structures import QuerySetList
 
@@ -70,24 +72,26 @@ def SitesQuery():
             graphene.NonNull(SiteObjectType), enable_search=True, required=True
         )
 
-        # Return all sites.
-        def resolve_sites(self, info, **kwargs):
+        def resolve_sites(self, info, **kwargs) -> QuerySet[Site]:
+            """
+            Return all `Site` objects.
+            """
+
             return resolve_queryset(Site.objects.all(), info, **kwargs)
 
-        # Return a site, identified by ID or hostname.
-        def resolve_site(self, info, **kwargs):
-            id, hostname = kwargs.get("id"), kwargs.get("hostname")
+        def resolve_site(self, info, **kwargs) -> Optional[Site]:
+            """
+            Attempt to return a single `Site` object identified by ID or
+            hostname.
+            """
 
-            if id:
-                return Site.objects.filter(pk=id).first()
-            elif hostname:
-                try:
-                    return resolve_site(hostname)
-                except Site.MultipleObjectsReturned as err:
-                    raise GraphQLError(
-                        "Your 'hostname' filter value of '{}' returned multiple sites. Try adding a port number (for example: '{}:80').".format(
-                            hostname, hostname
-                        )
-                    ) from err
+            if id := kwargs.get("id"):
+                return resolve_site_by_id(id=id)
+            elif hostname := kwargs.get("hostname"):
+                return resolve_site_by_hostname(
+                    hostname=hostname,
+                    filter_name="hostname",
+                )
+            return None
 
     return Mixin

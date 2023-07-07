@@ -22,7 +22,7 @@ from .helpers import field_middlewares, streamfield_types
 from .registry import registry
 from .settings import grapple_settings
 from .types.documents import DocumentObjectType
-from .types.images import ImageObjectType
+from .types.images import ImageObjectType, ImageRenditionObjectType
 from .types.pages import Page, PageInterface
 from .types.rich_text import RichText as RichTextType
 from .types.streamfield import generate_streamfield_union
@@ -66,7 +66,7 @@ def import_apps():
             add_app(name, prefix)
             registry.apps.append(name)
 
-    # Register any 'decorated' streamfield structs.
+    # Register any 'decorated' StreamField structs.
     for streamfield_type in streamfield_types:
         cls = streamfield_type["cls"]
         base_type = streamfield_type["base_type"]
@@ -98,7 +98,7 @@ def add_app(app_label: str, prefix: str = ""):
     # Create a collection of models of standard models (Pages, Images, Documents).
     models = list(app.get_models())
 
-    # Add snippet models to model collection.
+    # Add snippet models to the model collection.
     for snippet in get_snippet_models():
         if snippet._meta.app_label == app_label:
             models.append(snippet)
@@ -122,7 +122,7 @@ def register_model(cls: type, type_prefix: str):
         elif issubclass(cls, AbstractImage):
             register_image_model(cls, type_prefix)
         elif issubclass(cls, AbstractRendition):
-            register_image_model(cls, type_prefix)
+            register_image_rendition_model(cls, type_prefix)
         elif has_wagtail_media and issubclass(cls, AbstractMedia):
             register_media_model(cls, type_prefix)
         elif issubclass(cls, (BaseSiteSetting, BaseGenericSetting)):
@@ -490,11 +490,9 @@ def register_page_model(cls: Type[WagtailPage], type_prefix: str):
     if cls in registry.pages:
         return
 
-    # Create a GQL type derived from page model.
-    page_node_type = build_node_type(cls, type_prefix, PageInterface, Page)
-
-    # Add page type to registry.
-    if page_node_type:
+    # Create a GQL type derived from the page model.
+    if page_node_type := build_node_type(cls, type_prefix, PageInterface, Page):
+        # Add page type to registry.
         registry.pages[cls] = page_node_type
 
 
@@ -509,11 +507,11 @@ def register_document_model(cls: Type[AbstractDocument], type_prefix: str):
     if cls in registry.documents:
         return
 
-    # Create a GQL type derived from document model.
-    document_node_type = build_node_type(cls, type_prefix, None, DocumentObjectType)
-
-    # Add document type to registry.
-    if document_node_type:
+    # Create a GQL type derived from the document model.
+    if document_node_type := build_node_type(
+        cls, type_prefix, None, DocumentObjectType
+    ):
+        # Add document type to registry.
         registry.documents[cls] = document_node_type
 
 
@@ -528,11 +526,9 @@ def register_image_model(cls: Type[AbstractImage], type_prefix: str):
     if cls in registry.images:
         return
 
-    # Create a GQL type derived from image model.
-    image_node_type = build_node_type(cls, type_prefix, None, ImageObjectType)
-
-    # Add image type to registry.
-    if image_node_type:
+    # Create a GQL type derived from the image model.
+    if image_node_type := build_node_type(cls, type_prefix, None, ImageObjectType):
+        # Add image type to registry.
         registry.images[cls] = image_node_type
 
 
@@ -543,16 +539,14 @@ def register_image_rendition_model(cls: Type[AbstractRendition], type_prefix: st
     needs to be set in settings.
     """
 
-    # Avoid gql type duplicates
     if cls in registry.images:
         return
 
-    # Create a GQL type derived from image rendition model.
-    image_node_type = build_node_type(cls, type_prefix, None, AbstractRendition)
-
-    # Add image type to registry.
-    if image_node_type:
-        registry.images[cls] = image_node_type
+    # Create a GQL type derived from the image rendition model.
+    if rendition_type := build_node_type(
+        cls, type_prefix, None, ImageRenditionObjectType
+    ):
+        registry.images[cls] = rendition_type
 
 
 def register_media_model(cls: Type[AbstractMedia], type_prefix: str):
@@ -562,15 +556,11 @@ def register_media_model(cls: Type[AbstractMedia], type_prefix: str):
     needs to be set in settings.
     """
 
-    # Avoid gql type duplicates
     if cls in registry.media:
         return
 
-    # Create a GQL type derived from media model.
-    media_node_type = build_node_type(cls, type_prefix, None, MediaObjectType)
-
-    # Add media type to registry.
-    if media_node_type:
+    # Create a GQL type derived from the media model.
+    if media_node_type := build_node_type(cls, type_prefix, None, MediaObjectType):
         registry.media[cls] = media_node_type
 
 
@@ -581,15 +571,11 @@ def register_settings_model(
     Create a graphene node type for a settings page.
     """
 
-    # Avoid gql type duplicates
     if cls in registry.settings:
         return
 
-    # Create a GQL type derived from document model.
-    settings_node_type = build_node_type(cls, type_prefix, None)
-
-    # Add image type to registry.
-    if settings_node_type:
+    # Create a GQL type that for the Settings model
+    if settings_node_type := build_node_type(cls, type_prefix, None):
         registry.settings[cls] = settings_node_type
 
 
@@ -598,7 +584,6 @@ def register_snippet_model(cls: Type[models.Model], type_prefix: str):
     Create a graphene type for a snippet model.
     """
 
-    # Avoid gql type duplicates
     if cls in registry.snippets:
         return
 
@@ -611,7 +596,7 @@ def register_snippet_model(cls: Type[models.Model], type_prefix: str):
 
 def register_django_model(cls: Type[models.Model], type_prefix: str):
     """
-    Create a graphene type for (non-specific) django model.
+    Create a graphene type for (non-specific) Django model.
     Used for Orderables and other foreign keys.
     """
 
@@ -619,8 +604,6 @@ def register_django_model(cls: Type[models.Model], type_prefix: str):
     if cls in registry.django_models:
         return
 
-    # Create a GQL type that implements Snippet Interface
-    django_node_type = build_node_type(cls, type_prefix, None)
-
-    if django_node_type:
+    # Create a GQL type for the non-specific Django model.
+    if django_node_type := build_node_type(cls, type_prefix, None):
         registry.django_models[cls] = django_node_type

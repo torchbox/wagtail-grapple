@@ -111,6 +111,7 @@ need for Gatsby Image features to work (see Handy Fragments page for more info):
 ::
 
     id: ID!
+    collection: CollectionObjectType!
     title: String!
     file: String!
     width: Int!
@@ -122,12 +123,10 @@ need for Gatsby Image features to work (see Handy Fragments page for more info):
     focalPointHeight: Int
     fileSize: Int
     fileHash: String!
-    renditions: [ImageRenditionObjectType]
-    src: String
-    srcSet(
-        sizes: [Int]
-        format: String
-    ): String
+    url: String!
+    aspectRatio: Float!
+    sizes: String!
+    tags: [TagObjectType!]!
     rendition(
         max: String
         min: String
@@ -139,6 +138,11 @@ need for Gatsby Image features to work (see Handy Fragments page for more info):
         jpegquality: Int
         webpquality: Int
     ): ImageRenditionObjectType
+    srcSet(
+        sizes: [Int]
+        format: String
+    ): String
+
 
 
 ImageRenditions are useful feature in Wagtail and they exist in Grapple as well
@@ -146,14 +150,17 @@ the ``ImageRenditionObjectType`` provides the following fields:
 
 ::
 
-    id: ID
-    url: String
+    id: ID!
+    filter_spec = String!
     file: String!
-    width: Int
-    height: Int
-    aspectRatio: Float!
-    sizes: String!
+    width: Int!
+    height: Int!
+    focal_point_key = String!
     image: ImageObjectType!
+    focalPoint: String
+    url: String!
+    alt = String!
+    backgroundPositionStyle = String!
 
 
 DocumentObjectType

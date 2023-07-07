@@ -1064,8 +1064,7 @@ class ImagesTest(BaseGrappleTest):
         )
         self.assertEqual(
             executed["data"]["images"][0]["rendition"]["url"],
-            "http://localhost:8000"
-            + self.example_image.get_rendition("width-200").file.url,
+            self.example_image.get_rendition("width-200").full_url,
         )
 
     def test_renditions(self):
@@ -1075,6 +1074,7 @@ class ImagesTest(BaseGrappleTest):
             image(id: %d) {
                 rendition(width: 100) {
                     url
+                    customRenditionProperty
                 }
             }
         }
@@ -1084,6 +1084,10 @@ class ImagesTest(BaseGrappleTest):
 
         executed = self.client.execute(query)
         self.assertIn("width-100", executed["data"]["image"]["rendition"]["url"])
+        self.assertIn(
+            "Rendition Model!",
+            executed["data"]["image"]["rendition"]["customRenditionProperty"],
+        )
 
     @override_settings(GRAPPLE={"ALLOWED_IMAGE_FILTERS": ["width-200"]})
     def test_renditions_with_allowed_image_filters_restrictions(self):

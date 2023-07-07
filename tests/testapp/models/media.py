@@ -2,7 +2,7 @@ from django.db import models
 from wagtail.documents.models import AbstractDocument, Document
 from wagtail.images.models import AbstractImage, AbstractRendition, Image
 
-from grapple.models import GraphQLImage, GraphQLInt, GraphQLString
+from grapple.models import GraphQLString
 
 
 class CustomDocument(AbstractDocument):
@@ -34,12 +34,4 @@ class CustomImageRendition(AbstractRendition):
     def custom_rendition_property(self, info, **kwargs):
         return "Rendition Model!"
 
-    graphql_fields = (
-        GraphQLString("custom_rendition_property", required=True),
-        GraphQLInt("id", required=True),
-        GraphQLString("url", required=True),
-        GraphQLString("width", required=True),
-        GraphQLString("height", required=True),
-        GraphQLImage("image", required=True),
-        GraphQLString("file", required=True),
-    )
+    graphql_fields = (GraphQLString("custom_rendition_property", required=True),)

@@ -90,7 +90,7 @@ def SitesQuery():
             elif hostname := kwargs.get("hostname"):
                 return resolve_site_by_hostname(
                     hostname=hostname,
-                    hostname_filter_name="hostname",
+                    filter_name="hostname",
                 )
             return None
 

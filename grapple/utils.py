@@ -30,7 +30,7 @@ def resolve_site_by_id(
 def resolve_site_by_hostname(
     *,
     hostname: str,
-    hostname_filter_name: Literal["site", "hostname"],
+    filter_name: Literal["site", "hostname"],
 ) -> Optional[Site]:
     """
     Find a `Site` object by hostname.
@@ -60,9 +60,9 @@ def resolve_site_by_hostname(
         return Site.objects.get(**query)
     except Site.MultipleObjectsReturned as err:
         raise GraphQLError(
-            f"Your filter `{hostname_filter_name}={hostname}` returned "
+            f"Your filter `{filter_name}={hostname}` returned "
             "multiple sites. Try including a port number to disambiguate "
-            f"(e.g. `{hostname_filter_name}={hostname}:8000`)."
+            f"(e.g. `{filter_name}={hostname}:8000`)."
         ) from err
     except Site.DoesNotExist:
         # This is an expected error, so should not raise a GraphQLError.

@@ -285,7 +285,7 @@ def get_site_filter(info, **kwargs):
     if site_hostname is not None:
         return resolve_site_by_hostname(
             hostname=site_hostname,
-            hostname_filter_name="site",
+            filter_name="site",
         )
     elif in_current_site:
         return Site.find_for_request(info.context)

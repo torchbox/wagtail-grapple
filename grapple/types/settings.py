@@ -37,7 +37,7 @@ def SettingsQuery():
                 if site_hostname is not None:
                     site = resolve_site_by_hostname(
                         hostname=site_hostname,
-                        hostname_filter_name=site_hostname_kwarg,
+                        filter_name=site_hostname_kwarg,
                     )
                 else:
                     site = None
@@ -80,7 +80,7 @@ def SettingsQuery():
                 if site_hostname is not None:
                     site = resolve_site_by_hostname(
                         hostname=site_hostname,
-                        hostname_filter_name=site_hostname_kwarg,
+                        filter_name=site_hostname_kwarg,
                     )
                 else:
                     site = None

@@ -50,7 +50,7 @@ class TestResolveSiteByHostname(TestCase):
         self.assertEqual(
             resolve_site_by_hostname(
                 hostname="example.com",
-                hostname_filter_name="hostname",
+                filter_name="hostname",
             ),
             site,
         )
@@ -66,7 +66,7 @@ class TestResolveSiteByHostname(TestCase):
         self.assertEqual(
             resolve_site_by_hostname(
                 hostname="example.com:1000",
-                hostname_filter_name="hostname",
+                filter_name="hostname",
             ),
             site,
         )
@@ -82,7 +82,7 @@ class TestResolveSiteByHostname(TestCase):
         self.assertEqual(
             resolve_site_by_hostname(
                 hostname="not.example.com",
-                hostname_filter_name="hostname",
+                filter_name="hostname",
             ),
             None,
         )
@@ -101,5 +101,5 @@ class TestResolveSiteByHostname(TestCase):
         ):
             resolve_site_by_hostname(
                 hostname="example.com",
-                hostname_filter_name="hostname",
+                filter_name="hostname",
             )

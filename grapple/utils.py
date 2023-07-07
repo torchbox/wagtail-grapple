@@ -12,56 +12,49 @@ from .settings import grapple_settings
 from .types.structures import BasePaginatedType, PaginationType
 
 
-def resolve_site(
+def resolve_site_by_id(
     *,
-    id: Optional[int] = None,
-    hostname: Optional[str] = None,
-    hostname_filter_name: Optional[Literal["site", "hostname"]] = None,
+    id: int,
 ) -> Optional[Site]:
     """
-    Find a `Site` object by ID or hostname.
+    Find a `Site` object by ID
+    """
 
-    If resolving via hostname and two `Site` records exist with the same
-    hostname, you must include the port to disambiguate.
+    try:
+        return Site.objects.get(id=id)
+    except Site.DoesNotExist:
+        # This is an expected error, so should not raise a GraphQLError.
+        return None
+
+
+def resolve_site_by_hostname(
+    *,
+    hostname: str,
+    hostname_filter_name: Literal["site", "hostname"],
+) -> Optional[Site]:
+    """
+    Find a `Site` object by hostname.
+
+    If two `Site` records exist with the same hostname, you must include the
+    port to disambiguate.
 
     For example:
 
-    >>> resolve_site(hostname="wagtail.org")
-    >>> resolve_site(hostname="wagtail.org:443")
+    >>> resolve_site_by_hostname(hostname="wagtail.org")
+    >>> resolve_site_by_hostname(hostname="wagtail.org:443")
     """
 
-    if not id and not hostname:
-        raise TypeError(
-            "resolve_site() requires either `hostname` or `id` args, though "
-            "neither were passed."
-        )
-    elif id and hostname:
-        raise ValueError(
-            "resolve_site() requires either `hostname` or `id` args, though "
-            "both were passed."
-        )
-    elif hostname and not hostname_filter_name:
-        raise TypeError(
-            "Using resolve_site() with `hostname` arg also requires passing a "
-            "`hostname_filter_name` arg."
-        )
-
-    if id:
+    # Optionally allow querying by port
+    if ":" in hostname:
+        (hostname, port) = hostname.split(":", 1)
         query = {
-            "id": id,
+            "hostname": hostname,
+            "port": port,
         }
-    elif hostname:
-        # Optionally allow querying by port
-        if ":" in hostname:
-            (hostname, port) = hostname.split(":", 1)
-            query = {
-                "hostname": hostname,
-                "port": port,
-            }
-        else:
-            query = {
-                "hostname": hostname,
-            }
+    else:
+        query = {
+            "hostname": hostname,
+        }
 
     try:
         return Site.objects.get(**query)

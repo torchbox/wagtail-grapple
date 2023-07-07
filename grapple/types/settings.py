@@ -4,7 +4,7 @@ from wagtail.contrib.settings.models import BaseGenericSetting, BaseSiteSetting
 from wagtail.models import Site
 
 from ..registry import registry
-from ..utils import resolve_site
+from ..utils import resolve_site_by_hostname
 
 
 def SettingsQuery():
@@ -35,8 +35,9 @@ def SettingsQuery():
                 site_hostname = kwargs.pop(site_hostname_kwarg, None)
 
                 if site_hostname is not None:
-                    site = resolve_site(
-                        hostname=site_hostname, hostname_filter_name=site_hostname_kwarg
+                    site = resolve_site_by_hostname(
+                        hostname=site_hostname,
+                        hostname_filter_name=site_hostname_kwarg,
                     )
                 else:
                     site = None
@@ -77,8 +78,9 @@ def SettingsQuery():
                 site_hostname = kwargs.pop(site_hostname_kwarg, None)
 
                 if site_hostname is not None:
-                    site = resolve_site(
-                        hostname=site_hostname, hostname_filter_name=site_hostname_kwarg
+                    site = resolve_site_by_hostname(
+                        hostname=site_hostname,
+                        hostname_filter_name=site_hostname_kwarg,
                     )
                 else:
                     site = None

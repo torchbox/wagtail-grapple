@@ -8,7 +8,7 @@ from wagtail.models import Page as WagtailPage
 from wagtail.models import Site
 
 from ..registry import registry
-from ..utils import resolve_queryset, resolve_site
+from ..utils import resolve_queryset, resolve_site_by_hostname
 from .structures import QuerySetList
 
 
@@ -283,7 +283,10 @@ def get_site_filter(info, **kwargs):
         )
 
     if site_hostname is not None:
-        return resolve_site(hostname=site_hostname, hostname_filter_name="site")
+        return resolve_site_by_hostname(
+            hostname=site_hostname,
+            hostname_filter_name="site",
+        )
     elif in_current_site:
         return Site.find_for_request(info.context)
 

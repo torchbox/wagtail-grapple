@@ -8,7 +8,7 @@ from graphene_django.types import DjangoObjectType
 from wagtail.models import Page as WagtailPage
 from wagtail.models import Site
 
-from ..utils import resolve_queryset, resolve_site
+from ..utils import resolve_queryset, resolve_site_by_hostname, resolve_site_by_id
 from .pages import PageInterface, get_specific_page
 from .structures import QuerySetList
 
@@ -86,9 +86,12 @@ def SitesQuery():
             """
 
             if id := kwargs.get("id"):
-                return resolve_site(id=id)
+                return resolve_site_by_id(id=id)
             elif hostname := kwargs.get("hostname"):
-                return resolve_site(hostname=hostname, hostname_filter_name="hostname")
+                return resolve_site_by_hostname(
+                    hostname=hostname,
+                    hostname_filter_name="hostname",
+                )
             return None
 
     return Mixin

@@ -164,7 +164,11 @@ def get_field_type(field):
         if field_wrapper:
             return field, field_wrapper(field_type)
         else:
-            return field, graphene.Field(field_type)
+            return field, graphene.Field(
+                field_type,
+                description=field.description,
+                deprecation_reason=field.deprecation_reason,
+            )
 
 
 def model_resolver(field):
@@ -449,6 +453,8 @@ def build_streamfield_type(
             ]
         else:
             interfaces = (interface,) if interface is not None else ()
+        # Add description to type if the Meta class declares it
+        description = getattr(cls._meta_class, "graphql_description", None)
 
     methods = {}
     type_name = type_prefix + cls.__name__

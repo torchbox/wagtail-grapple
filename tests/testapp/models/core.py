@@ -163,7 +163,7 @@ class BlogPage(HeadlessPreviewMixin, Page):
         GraphQLString("date", required=True),
         GraphQLRichText("summary"),
         GraphQLString("string_summary", source="summary"),
-        GraphQLString("extra_summary"),
+        GraphQLString("extra_summary", deprecation_reason="Use summary instead"),
         GraphQLField(
             field_name="custom_property",
             field_type=graphene.JSONString,
@@ -258,7 +258,7 @@ class Advert(models.Model):
         GraphQLString("text"),
         GraphQLRichText("rich_text"),
         GraphQLString("string_rich_text", source="rich_text"),
-        GraphQLString("extra_rich_text"),
+        GraphQLString("extra_rich_text", deprecation_reason="Use rich_text instead"),
     ]
 
     def __str__(self):
@@ -292,9 +292,12 @@ class GlobalSocialMediaSettings(BaseGenericSetting):
 
     graphql_fields = [
         GraphQLString("facebook"),
-        GraphQLString("instagram"),
+        GraphQLString(
+            "instagram",
+            description="Provides an Instagram account username, without the @",
+        ),
         GraphQLString("trip_advisor"),
-        GraphQLString("youtube"),
+        GraphQLString("youtube", deprecation_reason="No longer supported"),
     ]
 
 

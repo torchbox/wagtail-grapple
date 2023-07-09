@@ -37,8 +37,3 @@ def register_schema_query(query_mixins):
         query_mixins.append(MediaQuery())
 
     query_mixins += registry.schema
-
-
-@hooks.register("register_schema_mutation")
-def register_schema_mutation(mutation_mixins):
-    mutation_mixins += [ObjectType]

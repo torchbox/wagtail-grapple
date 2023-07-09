@@ -39,9 +39,6 @@ def create_schema():
         fn(mutation_mixins)
 
     if len(mutation_mixins) > 0:
-        # ensure graphene.ObjectType is always present
-        if graphene.ObjectType not in mutation_mixins:
-            mutation_mixins.append(graphene.ObjectType)
 
         class Mutation(*mutation_mixins):
             pass

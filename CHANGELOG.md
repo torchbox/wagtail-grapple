@@ -1,10 +1,13 @@
 ## Unreleased
 
+## [0.20.0] - 2023-07-10
+
 ### Added
 
 -   `searchScore` field for pages ([#320](https://github.com/torchbox/wagtail-grapple/pull/320)) @dopry
 -   Support for passing callables for resolving `StreamField` block values ([#322](https://github.com/torchbox/wagtail-grapple/pull/322)) @bbliem, @dopry
 -   Support for graphene type arguments, chiefly `description` and `deprecation_reason ([#333](https://github.com/torchbox/wagtail-grapple/pull/333)) @Morsey187, @jams2
+-   Testing with PostgreSQL ([#301](https://github.com/torchbox/wagtail-grapple/pull/301)) @dopry
 
 ### Changed
 
@@ -310,7 +313,8 @@
 -   Improve field definition and under-the-hood implementation ([#28](https://github.com/torchbox/wagtail-grapple/pull/28))
 -   Add conditional checks when resolving streamfield type ([#29](https://github.com/torchbox/wagtail-grapple/pull/29))
 
-[unreleased]: https://github.com/torchbox/wagtail-grapple/compare/v0.19.2...HEAD
+[unreleased]: https://github.com/torchbox/wagtail-grapple/compare/v0.20.0...HEAD
+[0.20.0]: https://github.com/torchbox/wagtail-grapple/compare/v0.19.2...v0.20.0
 [0.19.2]: https://github.com/torchbox/wagtail-grapple/compare/v0.19.1...v0.19.2
 [0.19.1]: https://github.com/torchbox/wagtail-grapple/compare/v0.19.0...v0.19.1
 [0.19.0]: https://github.com/torchbox/wagtail-grapple/compare/v0.18.1...v0.19.0

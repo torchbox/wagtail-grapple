@@ -32,7 +32,7 @@ you want to give to GraphQL types (you can usually leave this blank):
         "APPS": ["home"],
     }
 
-Add the GraphQL urls to your ``urls.py``:
+Add the GraphQL URLs to your ``urls.py``:
 
 .. code-block:: python
 

@@ -96,6 +96,7 @@ The ``register_schema_subscription`` hook is still provided. It is called when G
 You can use it to add your custom ``Subscription`` mixins and functionality.
 
 .. code-block:: python
+
     import asyncio
     import graphene
 

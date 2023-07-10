@@ -1,9 +1,9 @@
 Settings
 ========
 
-Wagtail Grapple configuration is namespaced inside a single ``GRAPPLE`` Django setting.
+The Wagtail Grapple configuration is contained inside a single Django setting - ``GRAPPLE``.
 
-For example your project's ``settings.py`` file might include something like this:
+For example, your project's ``settings.py`` file might include something like this:
 
 .. code-block:: python
 
@@ -56,8 +56,8 @@ Default: ``True``
 EXPOSE_GRAPHIQL
 ***************
 
-By default, Grapple will add ``/graphql`` url to where you can make GET/POST GraphQL requests.
-When setting ``GRAPPLE['EXPOSE_GRAPHIQL']`` to ``True``, the ``/graphiql`` url is also added to
+By default, Grapple will add ``/graphql`` URL to where you can make GET/POST GraphQL requests.
+When setting ``GRAPPLE['EXPOSE_GRAPHIQL']`` to ``True``, the ``/graphiql`` URL is also added to
 provide access to GraphiQL.
 
 Default: ``False``

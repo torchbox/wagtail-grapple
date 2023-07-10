@@ -22,7 +22,7 @@ The interface itself has the following fields (you'll notice a similarity to
 the fields on a Wagtail Page model). As such with GraphQL interfaces, your page
 models inherit these fields also:
 
-::
+.. code-block:: graphql
 
     id: ID
     url: String
@@ -46,7 +46,7 @@ models inherit these fields also:
 Also, each of your Page models that you have appended ``graphql_fields`` to will be
 available here by using a 'on' spread operator and the name of the model like so:
 
-::
+.. code-block:: graphql
 
     {
         pages {
@@ -63,7 +63,7 @@ field on the root Query type that returns a ``PageInterface``.
 The plural ``pages`` field (as do all plural fields)
 accepts the following arguments:
 
-::
+.. code-block:: graphql
 
     id: ID
     limit: PositiveInt
@@ -78,7 +78,7 @@ accepts the following arguments:
 
 The singular ``page`` field accepts the following arguments:
 
-::
+.. code-block:: graphql
 
     id: Int                       # Can be used on it's own
     slug: String                  # Can be used on it's own
@@ -92,11 +92,11 @@ The singular ``page`` field accepts the following arguments:
 ImageObjectType
 ^^^^^^^^^^^^^^^
 
-Any image-based field type (whether ``GraphQLImage`` or Streamfield block) will
-return a ``ImageObjectType``. Images are queryable from the ``images`` field on
+Any image-based field type (whether ``GraphQLImage`` or StreamField block) will
+return a ``ImageObjectType``. Images can be queried via the ``images`` field on
 the root query type like so:
 
-::
+.. code-block:: graphql
 
     {
         images {
@@ -108,7 +108,7 @@ the root query type like so:
 ``ImageObjectType`` provides the following fields which include all the fields
 need for Gatsby Image features to work (see Handy Fragments page for more info):
 
-::
+.. code-block:: graphql
 
     id: ID!
     collection: CollectionObjectType!
@@ -195,7 +195,7 @@ as opposed to an interface or base type.
 
 An example of querying all snippets:
 
-::
+.. code-block:: graphql
 
     {
         snippets {
@@ -215,7 +215,7 @@ Similar to ``SnippetObjectType``, Settings are grouped together under the
 ``SettingObjectType`` union. You can then query any settings that you have
 appended a ``graphql_fields`` list to like so:
 
-::
+.. code-block:: graphql
 
     {
         settings {
@@ -229,7 +229,7 @@ appended a ``graphql_fields`` list to like so:
 
 You can also query a setting by model name:
 
-::
+.. code-block:: graphql
 
     {
         setting(name: "SocialMediaSettings") {
@@ -249,7 +249,7 @@ Field type based on the Wagtail's ``Site`` model. This is accessible through
 the ``sites`` or ``site`` field on the root query type. Available fields for the
 ``SiteObjectType`` are:
 
-::
+.. code-block:: graphql
 
     id: ID
     port: Int
@@ -261,9 +261,9 @@ the ``sites`` or ``site`` field on the root query type. Available fields for the
     pages(limit: PositiveInt, offset: PositiveInt, order: String, searchQuery: String, id: ID): [PageInterface]
 
 
-The plural ``sites`` field is queryable like so:
+The plural ``sites`` field can be queried like so:
 
-::
+.. code-block:: graphql
 
     {
         sites {
@@ -274,15 +274,15 @@ The plural ``sites`` field is queryable like so:
 
 The singular ``site`` field accepts the following arguments:
 
-::
+.. code-block:: graphql
 
     # Either the `id` or `hostname` must be provided.
     id: ID
     hostname: String
 
-and is queryable like so:
+and can be queried like so:
 
-::
+.. code-block:: graphql
 
     {
         site(hostname: "my.domain") {
@@ -298,7 +298,7 @@ Search
 
 You can also simply search all models via GraphQL like so:
 
-::
+.. code-block:: graphql
 
     {
         search(query:"blog") {

@@ -12,9 +12,9 @@ infrastructure without errors isn't as easy to come by.
 
 The purpose of Grapple is to be able to build GraphQL endpoints on a model
 by model basis as quickly as possible. The setup and configuration have been
-designed to be as simple but also provide the best features; No complex serializers
-need to be written just add a ``graphql_fields`` list to your model and away
-you go (although if you want to go deeper you can!).
+designed to be as simple but also provide the best features - no complex serializers
+need to be written - just add a ``graphql_fields`` list to your model and away
+you go (although if you want to go deeper, you can!).
 
 Features
 ^^^^^^^^
@@ -23,7 +23,7 @@ Features
    models.
 -  Supports traditional Wagtail models:
 
-   -  Pages (including Streamfield & Orderables)
+   -  Pages (including ``StreamField`` and ``Orderable``)
    -  Snippets
    -  Images
    -  Documents

@@ -174,7 +174,7 @@ GraphQLCollection
 
     .. attribute:: **kwargs
 
-        Any keyword args that you want to pass on to the nested type.
+        Any keyword arguments that you want to pass on to the nested type.
 
         One keyword argument that is more powerful with Collections is the ``source`` argument. With ``GraphQLCollection``,
         You can pass a source string that is multiple layers deep and Grapple will handle the querying for you through

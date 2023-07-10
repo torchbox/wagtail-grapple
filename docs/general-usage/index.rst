@@ -4,11 +4,10 @@ General Usage
 .. toctree::
     :maxdepth: 1
 
+    settings
     model-types
     graphql-types
-    preview
     decorators
     hooks
-    usage-with-gatsby
-    settings
     middleware
+    preview

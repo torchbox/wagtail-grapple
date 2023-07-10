@@ -37,6 +37,15 @@ dependencies = [
     "wagtail-headless-preview"
 ]
 
+[project.optional-dependencies]
+docs = [
+    "Sphinx>=7.0,<8.0",
+    "sphinx-wagtail-theme>=6.0,<7.0",
+    "sphinxcontrib-spelling>=8.0,<9.0",
+    "sphinx_copybutton>=0.5",
+    "pygments-graphql==1.0.0",
+]
+
 [project.urls]
 Changelog = "https://github.com/torchbox/wagtail-grapple/blob/main/CHANGELOG.md"
 Documentation = "https://wagtail-grapple.readthedocs.io/en/latest/"

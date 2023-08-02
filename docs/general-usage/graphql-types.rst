@@ -80,7 +80,7 @@ The singular ``page`` field accepts the following arguments:
 
 .. code-block:: graphql
 
-    id: Int                       # Can be used on it's own
+    id: ID                        # Can be used on it's own
     slug: String                  # Can be used on it's own
     urlPath: String               # Can be used on it's own
     token: String                 # Must be used with one of the others. Usually contentType

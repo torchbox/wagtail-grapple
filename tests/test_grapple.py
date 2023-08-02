@@ -352,7 +352,7 @@ class PagesTest(BaseGrappleTest):
 
     def test_page(self):
         query = """
-        query($id: Int) {
+        query($id: ID) {
             page(id: $id) {
                 contentType
                 parent {

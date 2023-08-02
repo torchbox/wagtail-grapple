@@ -334,7 +334,7 @@ def PagesQuery():
         )
         page = graphene.Field(
             PageInterface,
-            id=graphene.Int(),
+            id=graphene.ID(),
             slug=graphene.String(),
             url_path=graphene.Argument(
                 graphene.String,

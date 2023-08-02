@@ -104,7 +104,7 @@ class TestRegisterQueryField(BaseGrappleTest):
 
     def test_query_field(self):
         query = """
-        query ($id: Int, $urlPath: String, $slug: String) {
+        query ($id: ID, $urlPath: String, $slug: String) {
             post(id: $id, urlPath: $urlPath, slug: $slug) {
                 id
                 urlPath
@@ -148,7 +148,7 @@ class TestRegisterQueryField(BaseGrappleTest):
 
     def test_multiple_middleware(self):
         query = """
-        query ($id: Int) {
+        query ($id: ID) {
             middlewareModel(id: $id) {
                 id
             }
@@ -178,7 +178,7 @@ class TestRegisterPaginatedQueryField(BaseGrappleTest):
 
     def test_paginated_query_field(self):
         query = """
-        query ($id: Int, $urlPath: String, $slug: String) {
+        query ($id: ID, $urlPath: String, $slug: String) {
             blogPage(id: $id, urlPath: $urlPath, slug: $slug) {
                 id
                 urlPath
@@ -476,7 +476,7 @@ class TestFieldMiddleware(BaseGrappleTest):
         """
 
         query = """
-        query ($id: Int) {
+        query ($id: ID) {
             post(id: $id) {
                 id
                 urlPath
@@ -514,7 +514,7 @@ class TestFieldMiddleware(BaseGrappleTest):
         The query field was registered with the anonymous middleware, i.e. requires only anonymous users
         """
         query = """
-        query ($id: Int) {
+        query ($id: ID) {
             blogPage(id: $id) {
                 id
                 urlPath

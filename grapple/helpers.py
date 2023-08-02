@@ -74,7 +74,7 @@ def register_query_field(
         field_type = lambda: registry.models[cls]  # noqa: E731
         field_query_params = query_params
         if field_query_params is None:
-            field_query_params = {"id": graphene.Int()}
+            field_query_params = {"id": graphene.ID()}
 
             if issubclass(cls, Page):
                 field_query_params["slug"] = graphene.Argument(
@@ -194,7 +194,7 @@ def register_paginated_query_field(
         field_type = lambda: registry.models[cls]  # noqa: E731
         field_query_params = query_params
         if field_query_params is None:
-            field_query_params = {"id": graphene.Int()}
+            field_query_params = {"id": graphene.ID()}
 
             if issubclass(cls, Page):
                 field_query_params["slug"] = graphene.Argument(

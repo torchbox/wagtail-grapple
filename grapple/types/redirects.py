@@ -1,4 +1,5 @@
 import graphene
+
 from django.conf import settings
 from wagtail.contrib.redirects.models import Redirect
 

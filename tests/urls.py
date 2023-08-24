@@ -7,6 +7,7 @@ from wagtail.documents import urls as wagtaildocs_urls
 
 from grapple import urls as grapple_urls
 
+
 urlpatterns = [
     path("django-admin/", admin.site.urls),
     path("admin/", include(wagtailadmin_urls)),

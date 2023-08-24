@@ -1,4 +1,5 @@
 import wagtail_factories
+
 from django.test import TestCase
 from graphql import GraphQLError
 

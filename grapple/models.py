@@ -1,6 +1,7 @@
 from typing import Optional
 
 import graphene
+
 from django.apps import apps
 
 from .exceptions import IllegalDeprecation
@@ -199,11 +200,7 @@ def GraphQLCollection(
             return graphql_type, collection_type
 
         # Add queryset filtering when necessary.
-        if (
-            is_queryset
-            or nested_type == GraphQLForeignKey
-            or nested_type == GraphQLSnippet
-        ):
+        if is_queryset or nested_type in (GraphQLForeignKey, GraphQLSnippet):
             # Wrap the nested type in a QuerySetList type
             collection_type = QuerySetList
         else:

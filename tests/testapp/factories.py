@@ -2,6 +2,7 @@ import datetime
 
 import factory
 import wagtail_factories
+
 from factory import fuzzy
 from wagtail import blocks
 

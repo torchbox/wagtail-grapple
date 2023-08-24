@@ -3,6 +3,7 @@ import decimal
 import json
 
 import wagtail_factories
+
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import ValidationError
@@ -169,23 +170,20 @@ class BlogTest(BaseGrappleTest):
         )
 
     def get_blocks_from_body(self, block_type, block_query="rawValue", page_id=None):
-        query = """
+        query = f"""
         query($id: Int) {{
             page(id: $id) {{
                 ... on BlogPage {{
                     body {{
                         blockType
-                        ... on {} {{
-                            {}
+                        ... on {block_type} {{
+                            {block_query}
                         }}
                     }}
                 }}
             }}
         }}
-        """.format(
-            block_type,
-            block_query,
-        )
+        """
 
         executed = self.client.execute(
             query, variables={"id": page_id or self.blog_page.id}

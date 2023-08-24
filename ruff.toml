@@ -1,23 +1,33 @@
-# E501: Line too long
-ignore = ["E501","B028"]
+target-version = "py38"
 
 exclude = ["dist","build","venv",".venv",".tox",".git"]
-line-length = 88
 
 select = [
-    "E",  # pycodestyle errors
-    "F",  # pyflakes
-    "I",  # isort
-    "B",  # flake8-bugbear
-    "BLE",  # flake8-blind-except
-    "C4",   # flake8-comprehensions
-    "S",  # flake8-bandit
+    "B",   # flake8-bugbear
+    "BLE", # flake8-blind-except
+    "C4",  # flake8-comprehensions
+    "DJ",  # flake8-django
+    "E",   # pycodestyle errors
+    "F",   # pyflakes
+    "I",   # isort
+    "PGH", # pygrep-hooks
+    "RUF100",  # unused noqa
+    "S",   # flake8-bandit
     "T20",  # flake8-print
     "UP",   # pyupgrade
     "W",    # pycodestyle warnings
+    "YTT",   # flake8-2020
 ]
 
-target-version = "py38"
+fixable = ["C4", "E", "F", "I", "UP"]
+
+# E501: Line too long
+ignore = ["E501","B028"]
+
+[per-file-ignores]
+"tests/**.py" = ["DJ008"]
 
 [isort]
-known-first-party = ["src"]
+known-first-party = ["grapple"]
+lines-between-types = 1
+lines-after-imports = 2

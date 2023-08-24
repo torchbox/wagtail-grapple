@@ -13,9 +13,11 @@ import wagtail.models.collections
 import wagtail.search.index
 import wagtail.snippets.blocks
 import wagtail_headless_preview.models
+
 from django.conf import settings
 from django.db import migrations, models
 from wagtail import VERSION as WAGTAIL_VERSION
+
 
 if WAGTAIL_VERSION < (4, 2):
     from django.db.models import ImageField as ImageField
@@ -47,7 +49,7 @@ class Migration(migrations.Migration):
                         verbose_name="ID",
                     ),
                 ),
-                ("url", models.URLField(blank=True, null=True)),
+                ("url", models.URLField(blank=True)),
                 ("text", models.CharField(max_length=255)),
                 ("rich_text", wagtail.fields.RichTextField(blank=True, default="")),
                 (

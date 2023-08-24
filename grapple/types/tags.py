@@ -1,4 +1,5 @@
 import graphene
+
 from graphene_django.converter import convert_django_field
 from modelcluster.contrib.taggit import ClusterTaggableManager
 from taggit.managers import TaggableManager

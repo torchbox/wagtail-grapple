@@ -1,9 +1,11 @@
 import inspect
+
 from collections.abc import Iterable
 from types import MethodType
 from typing import Any, Dict, Type, Union
 
 import graphene
+
 from django.apps import apps
 from django.core.exceptions import FieldDoesNotExist
 from django.db import models
@@ -26,6 +28,7 @@ from .types.images import ImageObjectType, ImageRenditionObjectType
 from .types.pages import Page, PageInterface
 from .types.rich_text import RichText as RichTextType
 from .types.streamfield import generate_streamfield_union
+
 
 if apps.is_installed("wagtailmedia"):
     from wagtailmedia.models import AbstractMedia

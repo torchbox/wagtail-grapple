@@ -1,4 +1,5 @@
 import graphene
+
 from graphene_django import DjangoObjectType
 from wagtail.images import get_image_model
 from wagtail.images.models import Image as WagtailImage

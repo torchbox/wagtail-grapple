@@ -1,6 +1,7 @@
 from typing import Optional
 
 import graphene
+
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _

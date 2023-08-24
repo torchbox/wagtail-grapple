@@ -14,6 +14,7 @@ import logging
 from django.conf import settings as django_settings
 from django.test.signals import setting_changed
 
+
 logger = logging.getLogger("grapple")
 
 

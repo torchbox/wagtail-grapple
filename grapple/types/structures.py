@@ -2,6 +2,7 @@ import inspect
 
 import graphene
 import graphene_django
+
 from django.utils.translation import gettext_lazy as _
 from graphene.types import Int
 from taggit.managers import _TaggableManager

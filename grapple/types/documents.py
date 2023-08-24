@@ -1,4 +1,5 @@
 import graphene
+
 from graphene_django.types import DjangoObjectType
 from wagtail.documents import get_document_model
 from wagtail.documents.models import Document as WagtailDocument

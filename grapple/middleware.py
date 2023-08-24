@@ -5,6 +5,7 @@ from graphql.execution.middleware import get_middleware_resolvers
 
 from .registry import registry
 
+
 ROOT_TYPES = ["Query", "Mutation", "Subscription"]
 
 

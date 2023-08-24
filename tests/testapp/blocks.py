@@ -1,6 +1,7 @@
 from typing import Any, Dict, Optional
 
 import graphene
+
 from django.utils.text import slugify
 from wagtail import blocks
 from wagtail.embeds.blocks import EmbedBlock

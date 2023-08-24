@@ -15,6 +15,7 @@ import os
 
 import dj_database_url
 
+
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
 BASE_DIR = os.path.dirname(PROJECT_DIR)
 
@@ -187,7 +188,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
 DEBUG = True
 
-SECRET_KEY = "this-is-not-a-secret"  # noqa: #S105
+SECRET_KEY = "this-is-not-a-secret"  # noqa: S105
 
 # SECURITY WARNING: define the correct hosts in production!
 ALLOWED_HOSTS = ["*"]
@@ -196,6 +197,6 @@ EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 
 try:
-    from .local import *  # noqa: F403, F401
+    from .local import *  # noqa: F403
 except ImportError:
     pass

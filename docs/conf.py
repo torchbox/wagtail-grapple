@@ -2,10 +2,12 @@ import os
 import sys
 
 import sphinx_wagtail_theme
+
 from pygments_graphql import GraphqlLexer
 from sphinx.highlighting import lexers
 
 from grapple import __version__
+
 
 sys.path.insert(0, os.path.abspath("./grapple"))
 

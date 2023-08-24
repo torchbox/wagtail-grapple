@@ -1,9 +1,11 @@
 import shutil
 import unittest
+
 from pydoc import locate
 from unittest.mock import patch
 
 import wagtail_factories
+
 from django.conf import settings
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import connection
@@ -18,6 +20,7 @@ from wagtailmedia.models import get_media_model
 
 from grapple.schema import create_schema
 from grapple.types.images import rendition_allowed
+
 
 SCHEMA = locate(settings.GRAPHENE["SCHEMA"])
 MIDDLEWARE_OBJECTS = [

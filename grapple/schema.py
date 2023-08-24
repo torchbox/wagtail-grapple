@@ -1,9 +1,11 @@
 import graphene
+
 from graphql.validation import NoUnusedFragmentsRule
 from wagtail import hooks
 
 from .registry import registry
 from .settings import grapple_settings
+
 
 # HACK: Remove NoUnusedFragments validator
 # Due to the way previews work on the frontend, we need to pass all

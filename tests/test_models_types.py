@@ -1,4 +1,5 @@
 import graphene
+
 from django.test import TestCase
 
 from grapple.actions import get_field_type

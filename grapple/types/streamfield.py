@@ -8,6 +8,7 @@ import wagtail.documents.blocks
 import wagtail.embeds.blocks
 import wagtail.images.blocks
 import wagtail.snippets.blocks
+
 from graphene.types import Scalar
 from graphene_django.converter import convert_django_field
 from wagtail import blocks

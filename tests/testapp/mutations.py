@@ -1,4 +1,5 @@
 import graphene
+
 from wagtail.models import Page
 
 from grapple.registry import registry

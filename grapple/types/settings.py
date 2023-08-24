@@ -1,4 +1,5 @@
 import graphene
+
 from graphql import GraphQLError
 from wagtail.contrib.settings.models import BaseGenericSetting, BaseSiteSetting
 from wagtail.models import Site

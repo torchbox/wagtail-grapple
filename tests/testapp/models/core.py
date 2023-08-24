@@ -1,4 +1,5 @@
 import graphene
+
 from django.conf import settings
 from django.db import models
 from django.utils.functional import cached_property
@@ -39,6 +40,7 @@ from grapple.models import (
 )
 from grapple.utils import resolve_paginated_queryset
 from testapp.blocks import StreamFieldBlock
+
 
 document_model_string = getattr(
     settings, "WAGTAILDOCS_DOCUMENT_MODEL", "wagtaildocs.Document"
@@ -246,7 +248,7 @@ def custom_middleware(next, root, info, **kwargs):
     middleware=[custom_middleware],
 )
 class Advert(models.Model):
-    url = models.URLField(null=True, blank=True)
+    url = models.URLField(blank=True)
     text = models.CharField(max_length=255)
     rich_text = RichTextField(blank=True, default="")
     extra_rich_text = RichTextField(blank=True, default="")

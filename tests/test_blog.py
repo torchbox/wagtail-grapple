@@ -1040,6 +1040,78 @@ class BlogTest(BaseGrappleTest):
                 # Ensure TextWithCallableBlock.get_field_method called.
                 self.assertIn("text-with-callable", result)
 
+    def test_streamfield_callable_resolver_using_graphqlinfo(self):
+        site_two = wagtail_factories.SiteFactory(
+            hostname="grapple.localhost", site_name="Grapple test site", port=80
+        )
+
+        slug = self.blog_page.slug
+        site_two_post = BlogPageFactory(
+            parent=site_two.root_page,
+            title="post on grapple test site",
+            slug=slug,  # same slug as self.blog_page which is on the default site
+        )
+
+        the_post = BlogPageFactory(
+            parent=site_two.root_page,
+            title="the blog post on grapple test site",
+            slug="the-blog-post",
+            body=[
+                (
+                    "text_with_callable",
+                    TextWithCallableBlockFactory(page=site_two_post),
+                ),
+                (
+                    "text_with_callable",
+                    TextWithCallableBlockFactory(page=self.blog_page),
+                ),
+            ],
+        )
+
+        query = """
+        query($hostname: String, $id: ID) {
+            site(hostname: $hostname) {
+                page(id: $id) {
+                    title
+                    ... on BlogPage {
+                        body {
+                            ...on TextWithCallableBlock {
+                                linkUrl
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        """
+
+        query_variables = {
+            "hostname": site_two.hostname,
+            "id": the_post.id,
+        }
+        results = self.client.execute(query, variables=query_variables)
+
+        data = results["data"]["site"]["page"]
+        self.assertEqual(data["title"], the_post.title)
+        self.assertEqual(
+            data["body"][0]["linkUrl"], f"http://grapple.localhost/{slug}/"
+        )
+        # expeting the full url since we are not passing the request context
+        self.assertEqual(data["body"][1]["linkUrl"], f"http://localhost/{slug}/")
+
+        # now pass on the request context
+        request = RequestFactory().request(server_name=site_two.hostname)
+        results = self.client.execute(
+            query, variables=query_variables, context_value=request
+        )
+
+        data = results["data"]["site"]["page"]
+        self.assertEqual(data["title"], the_post.title)
+        self.assertEqual(
+            data["body"][0]["linkUrl"], f"http://grapple.localhost/{slug}/"
+        )
+        self.assertEqual(data["body"][1]["linkUrl"], f"/{slug}/")
+
     def test_graphqlfield_method_with_extra_arg_in_structblock(self):
         block_type = "TextWithCallableBlock"
         block_query_field = "fieldMethodWithExtraArg"

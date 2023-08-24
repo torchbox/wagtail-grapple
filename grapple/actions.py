@@ -418,7 +418,11 @@ def custom_cls_resolver(*, cls, graphql_field):
         elif callable(getattr(cls, graphql_field.field_source)):
             return lambda self, instance, info, **kwargs: getattr(
                 klass, graphql_field.field_source
-            )(values=get_all_field_values(instance=instance, cls=cls), **kwargs)
+            )(
+                info=info,
+                values=get_all_field_values(instance=instance, cls=cls),
+                **kwargs,
+            )
 
     # If the `field_name` is a property or method of the class: use it.
     if hasattr(graphql_field, "field_name") and hasattr(
@@ -431,7 +435,11 @@ def custom_cls_resolver(*, cls, graphql_field):
         elif callable(getattr(cls, graphql_field.field_name)):
             return lambda self, instance, info, **kwargs: getattr(
                 klass, graphql_field.field_name
-            )(values=get_all_field_values(instance=instance, cls=cls), **kwargs)
+            )(
+                info=info,
+                values=get_all_field_values(instance=instance, cls=cls),
+                **kwargs,
+            )
 
     # No match found - fall back to the streamfield_resolver() later.
     return None

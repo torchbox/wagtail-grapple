@@ -78,12 +78,12 @@ class PagesTest(BaseGrappleTest):
         self.blog_post = BlogPageFactory(parent=self.home)
 
         self.site_different_hostname = wagtail_factories.SiteFactory(
-            hostname="different-hostname.localhost",
+            hostname="grapple-hook.localhost",
             site_name="Grapple test site (different hostname)",
         )
 
         self.site_different_hostname_different_port = wagtail_factories.SiteFactory(
-            hostname="different-hostname.localhost",
+            hostname="grapple-hook.localhost",
             port=8000,
             site_name="Grapple test site (different hostname/port)",
         )
@@ -616,12 +616,12 @@ class SitesTest(TestCase):
         )
 
         self.site_different_hostname = wagtail_factories.SiteFactory(
-            hostname="different-hostname.localhost",
+            hostname="grapple-hook.localhost",
             site_name="Grapple test site (different hostname)",
         )
 
         self.site_different_hostname_different_port = wagtail_factories.SiteFactory(
-            hostname="different-hostname.localhost",
+            hostname="grapple-hook.localhost",
             port=8000,
             site_name="Grapple test site (different hostname/port)",
         )
@@ -801,7 +801,7 @@ class SitesTest(TestCase):
 
         # Blog page under grapple test site
         blog = BlogPageFactory(
-            parent=self.site.root_page, title="blog on grapple test site"
+            parent=self.site.root_page, title="post on grapple test site"
         )
         results = self.client.execute(
             query,
@@ -843,7 +843,7 @@ class SitesTest(TestCase):
         # Blog page under grapple test site
         blog = BlogPageFactory(
             parent=self.site.root_page,
-            title="blog on grapple test site",
+            title="post on grapple test site",
             slug="blog-page-1",
         )
         # grapple test SiteObjectType page field
@@ -902,7 +902,7 @@ class SitesTest(TestCase):
         # Blog page under grapple test site
         blog = BlogPageFactory(
             parent=self.site.root_page,
-            title="blog on grapple test site",
+            title="post on grapple test site",
             slug="blog-page-1",
         )
         results = self.client.execute(
@@ -954,7 +954,7 @@ class SitesTest(TestCase):
         """
         # Blog page under grapple test site
         blog = BlogPageFactory(
-            parent=self.site.root_page, title="blog on grapple test site"
+            parent=self.site.root_page, title="post on grapple test site"
         )
         results = self.client.execute(
             query,

@@ -1,11 +1,12 @@
 from wagtail import hooks
 
-from .mutations import Mutations
 from .subscriptions import Subscription
 
 
 @hooks.register("register_schema_mutation")
 def register_mutation_class(mutation_mixins):
+    from .mutations import Mutations
+
     mutation_mixins.append(Mutations)
 
 

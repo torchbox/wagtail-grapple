@@ -81,7 +81,9 @@ class ImageRenditionObjectType(DjangoObjectType):
     class Meta:
         model = WagtailImageRendition
 
-    def resolve_url(instance, info, **kwargs):
+    def resolve_url(
+        instance: WagtailImageRendition, info: GraphQLResolveInfo, **kwargs
+    ):
         return instance.full_url
 
 
@@ -136,31 +138,41 @@ class ImageObjectType(DjangoObjectType):
         except SourceImageIOError:
             return
 
-    def resolve_url(instance, info, **kwargs):
+    def resolve_url(instance: WagtailImage, info: GraphQLResolveInfo, **kwargs) -> str:
         """
         Get the uploaded image url.
         """
         return get_media_item_url(instance)
 
-    def resolve_src(self, info, **kwargs):
+    def resolve_src(self: WagtailImage, info, **kwargs) -> str:
         """
         Deprecated. Use the `url` attribute.
         """
         return get_media_item_url(self)
 
-    def resolve_aspect_ratio(instance, info, **kwargs):
+    def resolve_aspect_ratio(
+        instance: WagtailImage, info: GraphQLResolveInfo, **kwargs
+    ):
         """
         Calculate aspect ratio for the image.
         """
         return instance.width / instance.height
 
-    def resolve_sizes(instance, info, **kwargs):
+    def resolve_sizes(
+        instance: WagtailImage, info: GraphQLResolveInfo, **kwargs
+    ) -> str:
         return f"(max-width: {instance.width}px) 100vw, {instance.width}px"
 
-    def resolve_tags(instance, info, **kwargs):
+    def resolve_tags(instance: WagtailImage, info: GraphQLResolveInfo, **kwargs):
         return instance.tags.all()
 
-    def resolve_src_set(instance, info, sizes, format=None, **kwargs):
+    def resolve_src_set(
+        instance: WagtailImage,
+        info: GraphQLResolveInfo,
+        sizes: list[int],
+        format: str | None = None,
+        **kwargs,
+    ) -> str:
         """
         Generate src set of renditions.
         """

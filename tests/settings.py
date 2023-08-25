@@ -149,8 +149,10 @@ MEDIA_URL = "/media/"
 
 # Wagtail settings
 
-WAGTAIL_SITE_NAME = "example"
+WAGTAIL_SITE_NAME = "Grapple example"
 WAGTAILIMAGES_IMAGE_MODEL = "testapp.CustomImage"
+WAGTAILIMAGES_EXTENSIONS = ["gif", "jpg", "jpeg", "png", "webp", "svg"]
+
 WAGTAILDOCS_DOCUMENT_MODEL = "testapp.CustomDocument"
 WAGTAILDOCS_SERVE_METHOD = "serve_view"
 

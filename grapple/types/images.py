@@ -1,6 +1,11 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import graphene
 
 from graphene_django import DjangoObjectType
+from wagtail import VERSION as WAGTAIL_VERSION
 from wagtail.images import get_image_model
 from wagtail.images.models import Image as WagtailImage
 from wagtail.images.models import Rendition as WagtailImageRendition
@@ -14,6 +19,14 @@ from .structures import QuerySetList
 from .tags import TagObjectType
 
 
+if TYPE_CHECKING:
+    from graphql import GraphQLResolveInfo
+
+
+if WAGTAIL_VERSION > (5, 0):
+    from wagtail.images.utils import to_svg_safe_spec
+
+
 def get_image_type():
     return registry.images.get(get_image_model(), ImageObjectType)
 
@@ -23,13 +36,33 @@ def get_rendition_type():
     return registry.images.get(rendition_mdl, ImageRenditionObjectType)
 
 
-def rendition_allowed(rendition_filter):
+def get_rendition_field_kwargs():
+    kwargs = {
+        "max": graphene.String(),
+        "min": graphene.String(),
+        "width": graphene.Int(),
+        "height": graphene.Int(),
+        "fill": graphene.String(),
+        "format": graphene.String(),
+        "bgcolor": graphene.String(),
+        "jpegquality": graphene.Int(),
+        "webpquality": graphene.Int(),
+    }
+    if WAGTAIL_VERSION > (5, 0):
+        kwargs["preserve_svg"] = graphene.Boolean(
+            description="Restrict the operations applied to an SVG image to only those that do not require rasterisation"
+        )
+
+    return kwargs
+
+
+def rendition_allowed(filter_specs: str) -> bool:
     """Checks a given rendition filter is allowed"""
     allowed_filters = grapple_settings.ALLOWED_IMAGE_FILTERS
     if allowed_filters is None or not isinstance(allowed_filters, (list, tuple)):
         return True
 
-    return rendition_filter in allowed_filters
+    return filter_specs in allowed_filters
 
 
 class ImageRenditionObjectType(DjangoObjectType):
@@ -71,18 +104,7 @@ class ImageObjectType(DjangoObjectType):
     sizes = graphene.String(required=True)
     collection = graphene.Field(lambda: CollectionObjectType, required=True)
     tags = graphene.List(graphene.NonNull(lambda: TagObjectType), required=True)
-    rendition = graphene.Field(
-        lambda: get_rendition_type(),
-        max=graphene.String(),
-        min=graphene.String(),
-        width=graphene.Int(),
-        height=graphene.Int(),
-        fill=graphene.String(),
-        format=graphene.String(),
-        bgcolor=graphene.String(),
-        jpegquality=graphene.Int(),
-        webpquality=graphene.Int(),
-    )
+    rendition = graphene.Field(get_rendition_type, **get_rendition_field_kwargs())
     src_set = graphene.String(
         sizes=graphene.List(graphene.Int), format=graphene.String()
     )
@@ -90,17 +112,27 @@ class ImageObjectType(DjangoObjectType):
     class Meta:
         model = WagtailImage
 
-    def resolve_rendition(instance, info, **kwargs):
+    def resolve_rendition(
+        instance: WagtailImage, info: GraphQLResolveInfo, **kwargs
+    ) -> WagtailImageRendition | None:
         """
         Render a custom rendition of the current image.
         """
-        filters = "|".join([f"{key}-{val}" for key, val in kwargs.items()])
+        preserve_svg = kwargs.pop("preserve_svg", False)
+        filter_specs = "|".join([f"{key}-{val}" for key, val in kwargs.items()])
 
         # Only allowed the defined filters (thus renditions)
-        if not rendition_allowed(filters):
+        if not rendition_allowed(filter_specs):
             return
+
+        if preserve_svg:
+            filter_specs = to_svg_safe_spec(filter_specs)
+
+        if not filter_specs:
+            return
+
         try:
-            return instance.get_rendition(filters)
+            return instance.get_rendition(filter_specs)
         except SourceImageIOError:
             return
 

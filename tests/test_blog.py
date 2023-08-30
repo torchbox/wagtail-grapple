@@ -136,7 +136,7 @@ class BlogTest(BaseGrappleTest):
 
     def test_blog_page(self):
         query = """
-        query($id: Int) {
+        query($id: ID) {
             page(id: $id) {
                 ... on BlogPage {
                     title
@@ -151,7 +151,7 @@ class BlogTest(BaseGrappleTest):
 
     def test_related_author_page(self):
         query = """
-        query($id: Int) {
+        query($id: ID) {
             page(id: $id) {
                 ... on BlogPage {
                     author {
@@ -171,7 +171,7 @@ class BlogTest(BaseGrappleTest):
 
     def get_blocks_from_body(self, block_type, block_query="rawValue", page_id=None):
         query = f"""
-        query($id: Int) {{
+        query($id: ID) {{
             page(id: $id) {{
                 ... on BlogPage {{
                     body {{
@@ -248,7 +248,7 @@ class BlogTest(BaseGrappleTest):
 
     def test_richtext(self):
         query = """
-        query($id: Int) {
+        query($id: ID) {
             page(id: $id) {
                 ... on BlogPage {
                     summary
@@ -471,7 +471,7 @@ class BlogTest(BaseGrappleTest):
 
     def test_blog_embed(self):
         query = """
-        query($id: Int) {
+        query($id: ID) {
             page(id: $id) {
                 ... on BlogPage {
                     body {
@@ -656,7 +656,7 @@ class BlogTest(BaseGrappleTest):
     # Next 2 tests are used to test the Collection API, both ForeignKey and nested field extraction.
     def test_blog_page_related_links(self):
         query = """
-        query($id: Int) {
+        query($id: ID) {
             page(id: $id) {
                 ... on BlogPage {
                     relatedLinks {
@@ -676,7 +676,7 @@ class BlogTest(BaseGrappleTest):
 
     def test_blog_page_related_urls(self):
         query = """
-        query($id: Int) {
+        query($id: ID) {
             page(id: $id) {
                 ... on BlogPage {
                     relatedUrls
@@ -696,7 +696,7 @@ class BlogTest(BaseGrappleTest):
         per_page = 5
 
         query = """
-        query ($id: Int, $page: PositiveInt, $perPage: PositiveInt) {
+        query ($id: ID, $page: PositiveInt, $perPage: PositiveInt) {
             page(id: $id) {
                 ... on BlogPage {
                     paginatedAuthors(page: $page, perPage: $perPage) {
@@ -905,7 +905,7 @@ class BlogTest(BaseGrappleTest):
 
     def test_blog_page_tags(self):
         query = """
-        query($id: Int) {
+        query($id: ID) {
             page(id: $id) {
                 ... on BlogPage {
                     tags {
@@ -1057,7 +1057,7 @@ class BlogTest(BaseGrappleTest):
 
     def test_custom_property(self):
         query = """
-        query($id: Int) {
+        query($id: ID) {
             page(id: $id) {
                 ... on BlogPage {
                     customProperty

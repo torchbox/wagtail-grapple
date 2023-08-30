@@ -26,7 +26,7 @@ class SiteObjectType(DjangoObjectType):
     )
     page = graphene.Field(
         PageInterface,
-        id=graphene.Int(),
+        id=graphene.ID(),
         slug=graphene.String(),
         url_path=graphene.String(),
         token=graphene.String(),

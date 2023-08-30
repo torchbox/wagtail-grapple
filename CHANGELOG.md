@@ -1,5 +1,12 @@
 ## Unreleased
 
+## Changed
+
+-   Use consistent ID type for pages and page queries ([#350](https://github.com/torchbox/wagtail-grapple/pull/350)) @estyxx
+    Note: if your query looked like `query($id: Int) { page(id: $id) { ... } }`, it must now be `query($id: ID) { page(id: $id) { ... } }`
+-   Pass the `GraphQLResolveInfo` object to the StreamField callables ([#356](https://github.com/torchbox/wagtail-grapple/pull/)) @zerolab
+    This is passed as the `info` kwarg.
+
 ## [0.20.0] - 2023-07-10
 
 ### Added

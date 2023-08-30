@@ -1,4 +1,6 @@
-from typing import Any, Dict, Optional
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any
 
 import graphene
 
@@ -22,6 +24,10 @@ from grapple.models import (
     GraphQLStreamfield,
     GraphQLString,
 )
+
+
+if TYPE_CHECKING:
+    from graphql import GraphQLResolveInfo
 
 
 @register_streamfield_block
@@ -124,6 +130,7 @@ class TextWithCallableBlock(blocks.StructBlock):
     text = blocks.CharBlock()
     integer = blocks.IntegerBlock()
     decimal = blocks.FloatBlock()
+    page = blocks.PageChooserBlock()
 
     graphql_fields = [
         GraphQLString("text"),
@@ -150,6 +157,12 @@ class TextWithCallableBlock(blocks.StructBlock):
             ),
             lambda field_type: graphene.Field(field_type, extra_arg=graphene.String()),
         ),
+        GraphQLField(
+            field_name="link_url",
+            field_type=graphene.String,
+            source="get_link_url",
+            required=True,
+        ),
     ]
 
     # GraphQLString test attributes
@@ -160,15 +173,17 @@ class TextWithCallableBlock(blocks.StructBlock):
 
     def simple_string_method(
         self,
-        values: Dict[str, Any] = None,
+        info: GraphQLResolveInfo,
+        values: dict[str, Any] = None,
     ):
         # Should not be used as we define `source="get_simple_string_method"`.
         raise Exception
 
     def get_simple_string_method(
         self,
-        values: Dict[str, Any] = None,
-    ) -> Optional[str]:
+        info: GraphQLResolveInfo,
+        values: dict[str, Any] = None,
+    ) -> str | None:
         return slugify(values.get("text")) if values else None
 
     # GraphQLInt test attributes
@@ -179,15 +194,17 @@ class TextWithCallableBlock(blocks.StructBlock):
 
     def simple_int_method(
         self,
-        values: Dict[str, Any] = None,
+        info: GraphQLResolveInfo,
+        values: dict[str, Any] = None,
     ):
         # Should not be used as we define `source="get_simple_int_method"`.
         raise Exception
 
     def get_simple_int_method(
         self,
-        values: Dict[str, Any] = None,
-    ) -> Optional[int]:
+        info: GraphQLResolveInfo,
+        values: dict[str, Any] = None,
+    ) -> int | None:
         return values.get("integer") * 2 if values else None
 
     # GraphQLFloat test attributes
@@ -198,15 +215,17 @@ class TextWithCallableBlock(blocks.StructBlock):
 
     def simple_float_method(
         self,
-        values: Dict[str, Any] = None,
+        info: GraphQLResolveInfo,
+        values: dict[str, Any] = None,
     ):
         # Should not be used as we define `source="get_simple_float_method"`.
         raise Exception
 
     def get_simple_float_method(
         self,
-        values: Dict[str, Any] = None,
-    ) -> Optional[float]:
+        info: GraphQLResolveInfo,
+        values: dict[str, Any] = None,
+    ) -> float | None:
         return values.get("decimal") * 2 if values else None
 
     # GraphQLBoolean test attributes
@@ -217,15 +236,17 @@ class TextWithCallableBlock(blocks.StructBlock):
 
     def simple_boolean_method(
         self,
-        values: Dict[str, Any] = None,
+        info: GraphQLResolveInfo,
+        values: dict[str, Any] = None,
     ):
         # Should not be used as we define `source="get_simple_boolean_method"`.
         raise Exception
 
     def get_simple_boolean_method(
         self,
-        values: Dict[str, Any] = None,
-    ) -> Optional[bool]:
+        info: GraphQLResolveInfo,
+        values: dict[str, Any] = None,
+    ) -> bool | None:
         return bool(values.get("text")) if values else None
 
     # GraphQLField test attributes
@@ -236,23 +257,38 @@ class TextWithCallableBlock(blocks.StructBlock):
 
     def field_method(
         self,
-        values: Dict[str, Any] = None,
+        info: GraphQLResolveInfo,
+        values: dict[str, Any] = None,
     ):
         # Should not be used as we define `source="get_field_method"`.
         raise Exception
 
     def get_field_method(
         self,
-        values: Dict[str, Any] = None,
-    ) -> Optional[str]:
+        info: GraphQLResolveInfo,
+        values: dict[str, Any] = None,
+    ) -> str | None:
         return slugify(values.get("text")) if values else None
 
     def get_field_method_with_extra_arg(
         self,
-        values: Dict[str, Any] = None,
-        extra_arg: Optional[str] = None,
-    ) -> Optional[str]:
+        info: GraphQLResolveInfo,
+        values: dict[str, Any] = None,
+        extra_arg: str | None = None,
+    ) -> str | None:
         return extra_arg
+
+    def get_link_url(
+        self, info: GraphQLResolveInfo, values: dict[str, Any] = None
+    ) -> str:
+        """
+        Returns the page URL.
+        """
+        if page := values.get("page"):
+            if page_url := page.get_url(request=info.context):
+                return str(page_url)
+
+        return ""
 
 
 class StreamFieldBlock(blocks.StreamBlock):

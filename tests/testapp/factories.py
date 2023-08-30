@@ -79,6 +79,7 @@ class TextWithCallableBlockFactory(wagtail_factories.StructBlockFactory):
     text = factory.Sequence(lambda n: f"Text with callable {n}")
     integer = factory.fuzzy.FuzzyInteger(low=1, high=10)
     decimal = factory.fuzzy.FuzzyFloat(low=0.1, high=0.9)
+    page = factory.SubFactory(PageChooserBlockFactory)
 
     class Meta:
         model = TextWithCallableBlock

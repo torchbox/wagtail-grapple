@@ -110,6 +110,8 @@ class ImageObjectType(DjangoObjectType):
     src_set = graphene.String(
         sizes=graphene.List(graphene.Int), format=graphene.String()
     )
+    if WAGTAIL_VERSION > (5, 0):
+        is_svg = graphene.Boolean(required=True)
 
     class Meta:
         model = WagtailImage
@@ -127,7 +129,7 @@ class ImageObjectType(DjangoObjectType):
         if not rendition_allowed(filter_specs):
             return
 
-        if preserve_svg:
+        if instance.is_svg() and preserve_svg:
             filter_specs = to_svg_safe_spec(filter_specs)
 
         if not filter_specs:
@@ -196,6 +198,13 @@ class ImageObjectType(DjangoObjectType):
             )
 
         return ""
+
+    if WAGTAIL_VERSION > (5, 0):
+
+        def resolve_is_svg(
+            instance: WagtailImage, info: GraphQLResolveInfo, **kwargs
+        ) -> bool:
+            return instance.is_svg()
 
 
 def ImagesQuery():

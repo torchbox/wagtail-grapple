@@ -67,6 +67,31 @@ class BaseGrappleTestWithIntrospection(BaseGrappleTest):
         executed = self.client.execute(query)
         self.available_queries = executed["data"]["__schema"]["queryType"]["fields"]
 
+    def query_schema_by_type(self, object_type: str):
+        query = """
+        query schemaByType ($type: String!) {
+            __type(name: $type) {
+                name
+                fields {
+                    name
+                    type {
+                        name
+                        kind
+                    }
+                    args {
+                        name
+                        type {
+                            name
+                            kind
+                        }
+                        description
+                    }
+                }
+            }
+        }
+        """
+        return self.client.execute(query, variables={"type": object_type})
+
 
 class PagesTest(BaseGrappleTest):
     def setUp(self):

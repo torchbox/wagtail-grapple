@@ -105,8 +105,7 @@ the root query type like so:
     }
 
 
-``ImageObjectType`` provides the following fields which include all the fields
-need for Gatsby Image features to work (see Handy Fragments page for more info):
+``ImageObjectType`` describes a Wagtail iamge and provides the following fields:
 
 .. code-block:: graphql
 
@@ -137,16 +136,17 @@ need for Gatsby Image features to work (see Handy Fragments page for more info):
         bgcolor: String
         jpegquality: Int
         webpquality: Int
+        preserve_svg: Boolean
     ): ImageRenditionObjectType
     srcSet(
         sizes: [Int]
         format: String
     ): String
+    isSvg: Boolean!
 
 
 
-ImageRenditions are useful feature in Wagtail and they exist in Grapple as well
-the ``ImageRenditionObjectType`` provides the following fields:
+``ImageRenditionObjectType`` describes a Wagtail image rendition and provides the following fields:
 
 ::
 

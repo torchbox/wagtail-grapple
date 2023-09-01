@@ -1,0 +1,5 @@
+flit>=3.8
+coverage[toml]>=7.0,<8.0
+factory-boy==3.2.1
+wagtail-factories>=4.1.0
+tblib==1.7.0

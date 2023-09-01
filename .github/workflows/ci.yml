@@ -60,7 +60,7 @@ jobs:
         run: python -Im flit build --format wheel
 
       - name: 🧪 Run tox targets for Python ${{ matrix.python-version }}
-        run: tox --installpkg ./dist/*.whl
+        run: tox --installpkg ./dist/*.whl -- -v 1
 
       - name: ⬆️ Upload coverage data
         uses: actions/upload-artifact@v3
@@ -90,6 +90,7 @@ jobs:
 
       - name: ＋ Generate report
         run: |
+          python -Im coverage combine
           python -Im coverage html --skip-covered --skip-empty
           python -Im coverage report
           echo "## Coverage summary" >> $GITHUB_STEP_SUMMARY

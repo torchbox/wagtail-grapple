@@ -1,34 +1,33 @@
-import shutil
+from unittest import skipIf
 
 import wagtail_factories
 
-from django.conf import settings
 from django.test import override_settings
-from test_grapple import BaseGrappleTest, BaseGrappleTestWithIntrospection
+from test_grapple import BaseGrappleTestWithIntrospection
 from wagtail import VERSION as WAGTAIL_VERSION
 from wagtail.images import get_image_model
 
 from grapple.types.images import rendition_allowed
 
 
+Image = get_image_model()
+
+
 class ImageTypesTest(BaseGrappleTestWithIntrospection):
     @classmethod
     def setUpTestData(cls):
-        cls.image_model = get_image_model()
-        cls.example_image = wagtail_factories.ImageFactory(title="Example Image")
-        cls.example_image.full_clean()
-        cls.example_image.save()
+        cls.example_image = wagtail_factories.ImageFactory(
+            title="Example Image", file__filename="grapple-test.png"
+        )
+
+    def tearDown(self) -> None:
+        for rendition in self.example_image.renditions.all():
+            rendition.file.delete(False)
 
     @classmethod
     def tearDownClass(cls):
         super().tearDownClass()
-        shutil.rmtree(settings.MEDIA_ROOT, ignore_errors=True)
-
-    def test_properties_on_saved_example_image(self):
-        example_img = self.image_model.objects.first()
-
-        self.assertEqual(example_img.id, self.example_image.id)
-        self.assertEqual(example_img.title, "Example Image")
+        cls.example_image.file.delete(False)
 
     def test_query_url_field(self):
         query = """
@@ -41,18 +40,14 @@ class ImageTypesTest(BaseGrappleTestWithIntrospection):
         }
         """
 
-        executed = self.client.execute(query)
+        data = self.client.execute(query)["data"]["images"]
 
+        self.assertEqual(data[0]["id"], str(self.example_image.id))
         self.assertEqual(
-            executed["data"]["images"][0]["id"], str(self.example_image.id)
-        )
-        self.assertEqual(
-            executed["data"]["images"][0]["url"],
+            data[0]["url"],
             "http://localhost:8000" + self.example_image.file.url,
         )
-        self.assertEqual(
-            executed["data"]["images"][0]["url"], executed["data"]["images"][0]["src"]
-        )
+        self.assertEqual(data[0]["url"], data[0]["src"])
 
     def test_query_rendition_url_field(self):
         query = """
@@ -66,13 +61,11 @@ class ImageTypesTest(BaseGrappleTestWithIntrospection):
         }
         """
 
-        executed = self.client.execute(query)
+        data = self.client.execute(query)["data"]["images"]
 
+        self.assertEqual(data[0]["id"], str(self.example_image.id))
         self.assertEqual(
-            executed["data"]["images"][0]["id"], str(self.example_image.id)
-        )
-        self.assertEqual(
-            executed["data"]["images"][0]["rendition"]["url"],
+            data[0]["rendition"]["url"],
             self.example_image.get_rendition("width-200").full_url,
         )
 
@@ -112,16 +105,20 @@ class ImageTypesTest(BaseGrappleTestWithIntrospection):
                 % params
             )
 
-        executed = self.client.execute(
+        results = self.client.execute(
             get_query(width=100), variables={"id": self.example_image.id}
         )
-        self.assertIsNone(executed["data"]["image"]["rendition"])
-
-        executed = self.client.execute(
-            get_query(width=200), variables={"id": self.example_image.id}
+        self.assertIsNone(results["data"]["image"]["rendition"])
+        self.assertEqual(
+            results["errors"][0]["message"],
+            "Invalid filter specs. Check the `ALLOWED_IMAGE_FILTERS` setting.",
         )
-        self.assertIsNotNone(executed["data"]["image"]["rendition"])
-        self.assertIn("width-200", executed["data"]["image"]["rendition"]["url"])
+
+        data = self.client.execute(
+            get_query(width=200), variables={"id": self.example_image.id}
+        )["data"]["image"]
+        self.assertIsNotNone(data["rendition"])
+        self.assertIn("width-200", data["rendition"]["url"])
 
     @override_settings(GRAPPLE={"ALLOWED_IMAGE_FILTERS": ["width-200"]})
     def test_src_set(self):
@@ -133,11 +130,13 @@ class ImageTypesTest(BaseGrappleTestWithIntrospection):
         }
         """
 
-        executed = self.client.execute(query, variables={"id": self.example_image.id})
+        data = self.client.execute(query, variables={"id": self.example_image.id})[
+            "data"
+        ]["image"]
 
         # only the width-200 rendition is allowed
-        self.assertNotIn("width-100", executed["data"]["image"]["srcSet"])
-        self.assertIn("width-200", executed["data"]["image"]["srcSet"])
+        self.assertNotIn("width-100", data["srcSet"])
+        self.assertIn("width-200", data["srcSet"])
 
     def test_src_set_with_format(self):
         query = """
@@ -147,9 +146,11 @@ class ImageTypesTest(BaseGrappleTestWithIntrospection):
             }
         }
         """
-        executed = self.client.execute(query, variables={"id": self.example_image.id})
-        self.assertIn("width-100.format-webp.webp", executed["data"]["image"]["srcSet"])
-        self.assertIn("width-300.format-webp.webp", executed["data"]["image"]["srcSet"])
+        data = self.client.execute(query, variables={"id": self.example_image.id})[
+            "data"
+        ]["image"]
+        self.assertIn("width-100.format-webp.webp", data["srcSet"])
+        self.assertIn("width-300.format-webp.webp", data["srcSet"])
 
     def test_src_set_invalid_format(self):
         query = """
@@ -160,9 +161,9 @@ class ImageTypesTest(BaseGrappleTestWithIntrospection):
         }
         """
 
-        executed = self.client.execute(query, variables={"id": self.example_image.id})
-        self.assertEqual(len(executed["errors"]), 1)
-        self.assertIn("Format must be either 'jpeg'", executed["errors"][0]["message"])
+        results = self.client.execute(query, variables={"id": self.example_image.id})
+        self.assertEqual(len(results["errors"]), 1)
+        self.assertIn("Format must be either 'jpeg'", results["errors"][0]["message"])
 
     @override_settings(GRAPPLE={"ALLOWED_IMAGE_FILTERS": ["width-200"]})
     def test_src_set_disallowed_filter(self):
@@ -173,8 +174,8 @@ class ImageTypesTest(BaseGrappleTestWithIntrospection):
             }
         }
         """
-        executed = self.client.execute(query, variables={"id": self.example_image.id})
-        self.assertEqual("", executed["data"]["image"]["srcSet"])
+        results = self.client.execute(query, variables={"id": self.example_image.id})
+        self.assertEqual("", results["data"]["image"]["srcSet"])
 
     @override_settings(GRAPPLE={"ALLOWED_IMAGE_FILTERS": ["width-200|format-webp"]})
     def test_src_set_allowed_filter(self):
@@ -185,8 +186,8 @@ class ImageTypesTest(BaseGrappleTestWithIntrospection):
             }
         }
         """
-        executed = self.client.execute(query, variables={"id": self.example_image.id})
-        self.assertIn("width-200.format-webp.webp", executed["data"]["image"]["srcSet"])
+        results = self.client.execute(query, variables={"id": self.example_image.id})
+        self.assertIn("width-200.format-webp.webp", results["data"]["image"]["srcSet"])
 
     def test_rendition_allowed_method(self):
         self.assertTrue(rendition_allowed("width-100"))
@@ -222,41 +223,54 @@ class ImageTypesTest(BaseGrappleTestWithIntrospection):
         with self.assertNumQueries(2):
             self.client.execute(query)
 
+    @skipIf(WAGTAIL_VERSION >= (5, 0), "SVG support added in Wagtail 5.0")
     def test_schema_for_svg_related_fields_and_arguments(self):
-        results = self.query_schema_by_type(self.image_model.__name__)
+        results = self.introspect_schema_by_type(Image.__name__)
         mapping = {
             field["name"]: field for field in results["data"]["__type"]["fields"]
         }
         rendition_args = {arg["name"]: arg for arg in mapping["rendition"]["args"]}
 
-        if WAGTAIL_VERSION >= (5, 0):
-            self.assertIn("isSvg", mapping)
-            self.assertEqual(mapping["isSvg"]["type"]["kind"], "NON_NULL")
-            self.assertEqual(rendition_args["preserveSvg"]["type"]["name"], "Boolean")
-            self.assertEqual(
-                rendition_args["preserveSvg"]["description"],
-                "Restrict the operations applied to an SVG image to only those that do not require rasterisation",
-            )
-        else:
-            self.assertNotIn("isSvg", mapping)
-            self.assertNotIn("preserveSvg", rendition_args)
+        self.assertNotIn("isSvg", mapping)
+        self.assertNotIn("preserveSvg", rendition_args)
 
 
 if WAGTAIL_VERSION >= (5, 0):
     from wagtail.images.tests.utils import get_test_image_file_svg
 
-    class ImageTypesTestWithSVG(BaseGrappleTest):
+    class ImageTypesTestWithSVG(BaseGrappleTestWithIntrospection):
         @classmethod
         def setUpTestData(cls):
             super().setUpTestData()
             cls.example_svg_image = wagtail_factories.ImageFactory(
-                title="Example SVG Image", file=get_test_image_file_svg()
+                title="Example SVG Image",
+                file=get_test_image_file_svg(filename="grapple-test.svg"),
             )
+
+        def tearDown(self) -> None:
+            for rendition in self.example_svg_image.renditions.all():
+                rendition.file.delete(False)
 
         @classmethod
         def tearDownClass(cls):
             super().tearDownClass()
-            shutil.rmtree(settings.MEDIA_ROOT, ignore_errors=True)
+            cls.example_svg_image.file.delete(False)
+
+        def test_schema_for_svg_related_fields_and_arguments(self):
+            results = self.introspect_schema_by_type(Image.__name__)
+            mapping = {
+                field["name"]: field for field in results["data"]["__type"]["fields"]
+            }
+            rendition_args = {arg["name"]: arg for arg in mapping["rendition"]["args"]}
+
+            self.assertIn("isSvg", mapping)
+            self.assertEqual(mapping["isSvg"]["type"]["kind"], "NON_NULL")
+            self.assertEqual(rendition_args["preserveSvg"]["type"]["name"], "Boolean")
+            self.assertEqual(
+                rendition_args["preserveSvg"]["description"],
+                "Prevents raster image operations (e.g. `format-webp`, `bgcolor`, etc.) being applied to SVGs. "
+                "More info: https://docs.wagtail.org/en/stable/topics/images.html#svg-images",
+            )
 
         def test_svg_rendition(self):
             query = """
@@ -270,15 +284,11 @@ if WAGTAIL_VERSION >= (5, 0):
             }
             """
 
-            results = self.client.execute(
+            data = self.client.execute(
                 query, variables={"id": self.example_svg_image.id}
-            )
-            self.assertTrue(results["data"]["image"]["isSvg"])
-            self.assertTrue(
-                results["data"]["image"]["rendition"]["url"].endswith(
-                    "test.width-100.svg"
-                )
-            )
+            )["data"]["image"]
+            self.assertTrue(data["isSvg"])
+            self.assertTrue(data["rendition"]["url"].endswith("test.width-100.svg"))
 
         def test_svg_rendition_with_raster_format_with_preserve_svg(self):
             query = """
@@ -335,3 +345,7 @@ if WAGTAIL_VERSION >= (5, 0):
                 query, variables={"id": self.example_svg_image.id}
             )
             self.assertIsNone(results["data"]["image"]["rendition"])
+            self.assertEqual(
+                results["errors"][0]["message"],
+                "No valid filter specs for SVG. See https://docs.wagtail.org/en/stable/topics/images.html#svg-images for details.",
+            )

@@ -9,7 +9,6 @@ from wagtail import VERSION as WAGTAIL_VERSION
 from wagtail.images import get_image_model
 from wagtail.images.models import Image as WagtailImage
 from wagtail.images.models import Rendition as WagtailImageRendition
-from wagtail.images.models import SourceImageIOError
 
 from ..registry import registry
 from ..settings import grapple_settings
@@ -21,7 +20,6 @@ from .tags import TagObjectType
 
 if TYPE_CHECKING:
     from graphql import GraphQLResolveInfo
-
 
 if WAGTAIL_VERSION > (5, 0):
     from wagtail.images.utils import to_svg_safe_spec
@@ -36,7 +34,11 @@ def get_rendition_type():
     return registry.images.get(rendition_mdl, ImageRenditionObjectType)
 
 
-def get_rendition_field_kwargs():
+def get_rendition_field_kwargs() -> dict[str, graphene.Scalar]:
+    """
+    Returns a list of kwargs for the rendition field.
+    Extracted for convenience, to accommodate for the conditional logic needed for various Wagtail versions.
+    """
     kwargs = {
         "max": graphene.String(),
         "min": graphene.String(),
@@ -50,7 +52,8 @@ def get_rendition_field_kwargs():
     }
     if WAGTAIL_VERSION > (5, 0):
         kwargs["preserve_svg"] = graphene.Boolean(
-            description="Restrict the operations applied to an SVG image to only those that do not require rasterisation"
+            description="Prevents raster image operations (e.g. `format-webp`, `bgcolor`, etc.) being applied to SVGs. "
+            "More info: https://docs.wagtail.org/en/stable/topics/images.html#svg-images"
         )
 
     return kwargs
@@ -125,20 +128,25 @@ class ImageObjectType(DjangoObjectType):
         preserve_svg = kwargs.pop("preserve_svg", False)
         filter_specs = "|".join([f"{key}-{val}" for key, val in kwargs.items()])
 
-        # Only allowed the defined filters (thus renditions)
+        # Only allow the defined filters (thus renditions)
         if not rendition_allowed(filter_specs):
-            return
+            raise TypeError(
+                "Invalid filter specs. Check the `ALLOWED_IMAGE_FILTERS` setting."
+            )
 
         if instance.is_svg() and preserve_svg:
+            # when dealing with SVGs, we want to limit the filter specs to those that are safe
             filter_specs = to_svg_safe_spec(filter_specs)
 
-        if not filter_specs:
-            return
+            if not filter_specs:
+                raise TypeError(
+                    "No valid filter specs for SVG. "
+                    "See https://docs.wagtail.org/en/stable/topics/images.html#svg-images for details."
+                )
 
-        try:
-            return instance.get_rendition(filter_specs)
-        except SourceImageIOError:
-            return
+        # previously we wrapped this in a try/except SourceImageIOError block.
+        # Removed to allow the error to bubble up in the response ("errors") and be handled by the user.
+        return instance.get_rendition(filter_specs)
 
     def resolve_url(instance: WagtailImage, info: GraphQLResolveInfo, **kwargs) -> str:
         """

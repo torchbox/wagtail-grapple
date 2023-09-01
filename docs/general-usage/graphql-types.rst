@@ -105,7 +105,7 @@ the root query type like so:
     }
 
 
-``ImageObjectType`` describes a Wagtail iamge and provides the following fields:
+``ImageObjectType`` describes a Wagtail image and provides the following fields:
 
 .. code-block:: graphql
 

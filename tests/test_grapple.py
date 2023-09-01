@@ -36,8 +36,7 @@ class BaseGrappleTest(TestCase):
 
 
 class BaseGrappleTestWithIntrospection(BaseGrappleTest):
-    def setUp(self):
-        super().setUp()
+    def introspect_schema_for_available_queries(self):
         query = """
         query availableQueries {
           __schema {
@@ -64,10 +63,12 @@ class BaseGrappleTestWithIntrospection(BaseGrappleTest):
           }
         }
         """
-        executed = self.client.execute(query)
-        self.available_queries = executed["data"]["__schema"]["queryType"]["fields"]
+        return self.client.execute(query)["data"]["__schema"]["queryType"]["fields"]
 
-    def query_schema_by_type(self, object_type: str):
+    def introspect_schema_by_type(self, object_type: str):
+        """
+        Introspect the schema for a given type name.
+        """
         query = """
         query schemaByType ($type: String!) {
             __type(name: $type) {

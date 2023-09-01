@@ -22,7 +22,7 @@ env:
   PYTHON_LATEST: "3.11"
 
 jobs:
-  test:
+  tests:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -61,3 +61,41 @@ jobs:
 
       - name: 🧪 Run tox targets for Python ${{ matrix.python-version }}
         run: tox --installpkg ./dist/*.whl
+
+      - name: ⬆️ Upload coverage data
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-data
+          path: tests/.coverage*
+          if-no-files-found: ignore
+          retention-days: 1
+
+  coverage:
+    runs-on: ubuntu-latest
+    needs: tests
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          # Use latest Python, so it understands all syntax.
+          python-version: ${{env.PYTHON_LATEST}}
+
+      - run: python -Im pip install --upgrade coverage[toml]
+
+      - name: ⬇️ Download coverage data
+        uses: actions/download-artifact@v3
+        with:
+          name: coverage-data
+
+      - name: ＋ Generate report
+        run: |
+          python -Im coverage html --skip-covered --skip-empty
+          python -Im coverage report
+          echo "## Coverage summary" >> $GITHUB_STEP_SUMMARY
+          python -Im coverage report --format=markdown >> $GITHUB_STEP_SUMMARY
+      - name: 📈 Upload HTML report
+        uses: actions/upload-artifact@v3
+        with:
+          name: html-report
+          path: htmlcov

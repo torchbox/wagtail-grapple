@@ -1,11 +1,24 @@
 ## Unreleased
 
-## Changed
+## [0.21.0] - 2023-09-04
+
+### Added
+
+-   Support for SVGs when using Wagtail 5.0+ ([#359](https://github.com/torchbox/wagtail-grapple/pull/359)) @zerolab
+    You can differentiate images using the `isSVG` property. The image rendition field accepts a `preserveSvg` argument
+    which will help prevent raster image operations (e.g. format-webp, bgcolor, etc.) being applied to SVGs. [Reference](https://docs.wagtail.org/en/stable/topics/images.html#svg-images)
+
+### Changed
 
 -   Use consistent ID type for pages and page queries ([#350](https://github.com/torchbox/wagtail-grapple/pull/350)) @estyxx
-    Note: if your query looked like `query($id: Int) { page(id: $id) { ... } }`, it must now be `query($id: ID) { page(id: $id) { ... } }`
+    ⚠️ Warning note: if your query looked like `query($id: Int) { page(id: $id) { ... } }`, it must now be `query($id: ID) { page(id: $id) { ... } }`
 -   Pass the `GraphQLResolveInfo` object to the StreamField callables ([#356](https://github.com/torchbox/wagtail-grapple/pull/)) @zerolab
     This is passed as the `info` kwarg.
+-   The image rendition query will now surface any errors when:
+  -   using filters not present in the `ALLOWED_IMAGE_FILTERS` Grapple setting,
+  -   there are no filters to apply (for example you are requesting an SVG rendition but supply raster image operations)
+  -   the source image is not present
+
 
 ## [0.20.0] - 2023-07-10
 

@@ -136,7 +136,7 @@ the root query type like so:
         bgcolor: String
         jpegquality: Int
         webpquality: Int
-        preserve_svg: Boolean
+        preserveSvg: Boolean
     ): ImageRenditionObjectType
     srcSet(
         sizes: [Int]

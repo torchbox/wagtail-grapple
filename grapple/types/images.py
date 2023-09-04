@@ -1,10 +1,14 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import graphene
 
 from graphene_django import DjangoObjectType
+from wagtail import VERSION as WAGTAIL_VERSION
 from wagtail.images import get_image_model
 from wagtail.images.models import Image as WagtailImage
 from wagtail.images.models import Rendition as WagtailImageRendition
-from wagtail.images.models import SourceImageIOError
 
 from ..registry import registry
 from ..settings import grapple_settings
@@ -12,6 +16,13 @@ from ..utils import get_media_item_url, resolve_queryset
 from .collections import CollectionObjectType
 from .structures import QuerySetList
 from .tags import TagObjectType
+
+
+if TYPE_CHECKING:
+    from graphql import GraphQLResolveInfo
+
+if WAGTAIL_VERSION > (5, 0):
+    from wagtail.images.utils import to_svg_safe_spec
 
 
 def get_image_type():
@@ -23,13 +34,38 @@ def get_rendition_type():
     return registry.images.get(rendition_mdl, ImageRenditionObjectType)
 
 
-def rendition_allowed(rendition_filter):
+def get_rendition_field_kwargs() -> dict[str, graphene.Scalar]:
+    """
+    Returns a list of kwargs for the rendition field.
+    Extracted for convenience, to accommodate for the conditional logic needed for various Wagtail versions.
+    """
+    kwargs = {
+        "max": graphene.String(),
+        "min": graphene.String(),
+        "width": graphene.Int(),
+        "height": graphene.Int(),
+        "fill": graphene.String(),
+        "format": graphene.String(),
+        "bgcolor": graphene.String(),
+        "jpegquality": graphene.Int(),
+        "webpquality": graphene.Int(),
+    }
+    if WAGTAIL_VERSION > (5, 0):
+        kwargs["preserve_svg"] = graphene.Boolean(
+            description="Prevents raster image operations (e.g. `format-webp`, `bgcolor`, etc.) being applied to SVGs. "
+            "More info: https://docs.wagtail.org/en/stable/topics/images.html#svg-images"
+        )
+
+    return kwargs
+
+
+def rendition_allowed(filter_specs: str) -> bool:
     """Checks a given rendition filter is allowed"""
     allowed_filters = grapple_settings.ALLOWED_IMAGE_FILTERS
     if allowed_filters is None or not isinstance(allowed_filters, (list, tuple)):
         return True
 
-    return rendition_filter in allowed_filters
+    return filter_specs in allowed_filters
 
 
 class ImageRenditionObjectType(DjangoObjectType):
@@ -48,7 +84,9 @@ class ImageRenditionObjectType(DjangoObjectType):
     class Meta:
         model = WagtailImageRendition
 
-    def resolve_url(instance, info, **kwargs):
+    def resolve_url(
+        instance: WagtailImageRendition, info: GraphQLResolveInfo, **kwargs
+    ):
         return instance.full_url
 
 
@@ -71,64 +109,80 @@ class ImageObjectType(DjangoObjectType):
     sizes = graphene.String(required=True)
     collection = graphene.Field(lambda: CollectionObjectType, required=True)
     tags = graphene.List(graphene.NonNull(lambda: TagObjectType), required=True)
-    rendition = graphene.Field(
-        lambda: get_rendition_type(),
-        max=graphene.String(),
-        min=graphene.String(),
-        width=graphene.Int(),
-        height=graphene.Int(),
-        fill=graphene.String(),
-        format=graphene.String(),
-        bgcolor=graphene.String(),
-        jpegquality=graphene.Int(),
-        webpquality=graphene.Int(),
-    )
+    rendition = graphene.Field(get_rendition_type, **get_rendition_field_kwargs())
     src_set = graphene.String(
         sizes=graphene.List(graphene.Int), format=graphene.String()
     )
+    if WAGTAIL_VERSION > (5, 0):
+        is_svg = graphene.Boolean(required=True)
 
     class Meta:
         model = WagtailImage
 
-    def resolve_rendition(instance, info, **kwargs):
+    def resolve_rendition(
+        instance: WagtailImage, info: GraphQLResolveInfo, **kwargs
+    ) -> WagtailImageRendition | None:
         """
         Render a custom rendition of the current image.
         """
-        filters = "|".join([f"{key}-{val}" for key, val in kwargs.items()])
+        preserve_svg = kwargs.pop("preserve_svg", False)
+        filter_specs = "|".join([f"{key}-{val}" for key, val in kwargs.items()])
 
-        # Only allowed the defined filters (thus renditions)
-        if not rendition_allowed(filters):
-            return
-        try:
-            return instance.get_rendition(filters)
-        except SourceImageIOError:
-            return
+        # Only allow the defined filters (thus renditions)
+        if not rendition_allowed(filter_specs):
+            raise TypeError(
+                "Invalid filter specs. Check the `ALLOWED_IMAGE_FILTERS` setting."
+            )
 
-    def resolve_url(instance, info, **kwargs):
+        if instance.is_svg() and preserve_svg:
+            # when dealing with SVGs, we want to limit the filter specs to those that are safe
+            filter_specs = to_svg_safe_spec(filter_specs)
+
+            if not filter_specs:
+                raise TypeError(
+                    "No valid filter specs for SVG. "
+                    "See https://docs.wagtail.org/en/stable/topics/images.html#svg-images for details."
+                )
+
+        # previously we wrapped this in a try/except SourceImageIOError block.
+        # Removed to allow the error to bubble up in the response ("errors") and be handled by the user.
+        return instance.get_rendition(filter_specs)
+
+    def resolve_url(instance: WagtailImage, info: GraphQLResolveInfo, **kwargs) -> str:
         """
         Get the uploaded image url.
         """
         return get_media_item_url(instance)
 
-    def resolve_src(self, info, **kwargs):
+    def resolve_src(self: WagtailImage, info, **kwargs) -> str:
         """
         Deprecated. Use the `url` attribute.
         """
         return get_media_item_url(self)
 
-    def resolve_aspect_ratio(instance, info, **kwargs):
+    def resolve_aspect_ratio(
+        instance: WagtailImage, info: GraphQLResolveInfo, **kwargs
+    ):
         """
         Calculate aspect ratio for the image.
         """
         return instance.width / instance.height
 
-    def resolve_sizes(instance, info, **kwargs):
+    def resolve_sizes(
+        instance: WagtailImage, info: GraphQLResolveInfo, **kwargs
+    ) -> str:
         return f"(max-width: {instance.width}px) 100vw, {instance.width}px"
 
-    def resolve_tags(instance, info, **kwargs):
+    def resolve_tags(instance: WagtailImage, info: GraphQLResolveInfo, **kwargs):
         return instance.tags.all()
 
-    def resolve_src_set(instance, info, sizes, format=None, **kwargs):
+    def resolve_src_set(
+        instance: WagtailImage,
+        info: GraphQLResolveInfo,
+        sizes: list[int],
+        format: str | None = None,
+        **kwargs,
+    ) -> str:
         """
         Generate src set of renditions.
         """
@@ -152,6 +206,13 @@ class ImageObjectType(DjangoObjectType):
             )
 
         return ""
+
+    if WAGTAIL_VERSION > (5, 0):
+
+        def resolve_is_svg(
+            instance: WagtailImage, info: GraphQLResolveInfo, **kwargs
+        ) -> bool:
+            return instance.is_svg()
 
 
 def ImagesQuery():

@@ -63,27 +63,31 @@ class AdvertTest(BaseGrappleTestWithIntrospection):
 
     def test_advert_all_query_required(self):
         adverts_query = list(
-            filter(lambda x: x["name"] == "adverts", self.available_queries)
+            filter(
+                lambda x: x["name"] == "adverts",
+                self.introspect_schema_for_available_queries(),
+            )
         )[0]
-        adverts_query_kind = adverts_query["type"]["kind"]
         adverts_query_type = adverts_query["type"]["ofType"]
 
-        self.assertTrue(adverts_query_kind == "NON_NULL")
-        self.assertTrue(adverts_query_type["kind"] == "LIST")
-        self.assertTrue(adverts_query_type["ofType"]["kind"] == "NON_NULL")
-        self.assertTrue(adverts_query_type["ofType"]["ofType"]["kind"] == "OBJECT")
-        self.assertTrue(adverts_query_type["ofType"]["ofType"]["name"] == "Advert")
+        self.assertEqual(adverts_query["type"]["kind"], "NON_NULL")
+        self.assertEqual(adverts_query_type["kind"], "LIST")
+        self.assertEqual(adverts_query_type["ofType"]["kind"], "NON_NULL")
+        self.assertEqual(adverts_query_type["ofType"]["ofType"]["kind"], "OBJECT")
+        self.assertEqual(adverts_query_type["ofType"]["ofType"]["name"], "Advert")
 
     def test_advert_single_query_required(self):
         advert_query = list(
-            filter(lambda x: x["name"] == "advert", self.available_queries)
+            filter(
+                lambda x: x["name"] == "advert",
+                self.introspect_schema_for_available_queries(),
+            )
         )[0]
-        advert_query_kind = advert_query["type"]["kind"]
         advert_query_type = advert_query["type"]["ofType"]
 
-        self.assertTrue(advert_query_kind == "NON_NULL")
-        self.assertTrue(advert_query_type["kind"] == "OBJECT")
-        self.assertTrue(advert_query_type["name"] == "Advert")
+        self.assertEqual(advert_query["type"]["kind"], "NON_NULL")
+        self.assertEqual(advert_query_type["kind"], "OBJECT")
+        self.assertEqual(advert_query_type["name"], "Advert")
 
     def test_advert_single_query_rich_text(self):
         query = """

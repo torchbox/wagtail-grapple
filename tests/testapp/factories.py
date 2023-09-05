@@ -11,6 +11,7 @@ from testapp.blocks import (
     ImageGalleryImage,
     ImageGalleryImages,
     TextWithCallableBlock,
+    BlockWithCustomInterface,
 )
 from testapp.models import (
     Advert,
@@ -83,6 +84,13 @@ class TextWithCallableBlockFactory(wagtail_factories.StructBlockFactory):
 
     class Meta:
         model = TextWithCallableBlock
+
+
+class BlockWithCustomInterfaceFactory(wagtail_factories.StructBlockFactory):
+    custom_text = factory.Sequence(lambda n: f"Block with custom interface {n}")
+
+    class Meta:
+        model = BlockWithCustomInterface
 
 
 class BlogPageRelatedLinkFactory(factory.django.DjangoModelFactory):

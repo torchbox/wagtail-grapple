@@ -19,6 +19,7 @@ from testapp.blocks import (
 )
 from testapp.factories import (
     AdvertFactory,
+    BlockWithCustomInterfaceFactory,
     BlogPageFactory,
     PersonFactory,
     TextWithCallableBlockFactory,
@@ -128,6 +129,7 @@ class BlogTest(BaseGrappleTest):
                     },
                 ),
                 ("text_with_callable", TextWithCallableBlockFactory()),
+                ("block_with_custom_interface", BlockWithCustomInterfaceFactory()),
             ],
             parent=self.home,
             summary=self.richtext_sample,
@@ -1202,3 +1204,28 @@ class BlogTest(BaseGrappleTest):
         """
         response = self.client.execute(query)
         self.assertIsNone(response["data"]["__type"]["description"])
+
+    def test_block_with_custom_interface(self):
+        query = """
+        query($id: ID) {
+            page(id: $id) {
+                ... on BlogPage {
+                    body {
+                        blockType
+                        ...on CustomInterfaceForBlock {
+                            customText
+                        }
+                    }
+                }
+            }
+        }
+        """
+        executed = self.client.execute(query, variables={"id": self.blog_page.id})
+        body = executed["data"]["page"]["body"]
+
+        for block in body:
+            if block["blockType"] == "BlockWithCustomInterface":
+                self.assertEqual(block["customText"], "Block with custom interface 1")
+                return
+
+        self.fail("Query by interface didn't match anything")

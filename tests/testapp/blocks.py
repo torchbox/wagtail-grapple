@@ -291,6 +291,23 @@ class TextWithCallableBlock(blocks.StructBlock):
         return ""
 
 
+class CustomInterfaceForBlock(graphene.Interface):
+    custom_text = graphene.String()
+
+
+@register_streamfield_block(extra_interfaces=(CustomInterfaceForBlock,))
+class BlockWithCustomInterface(blocks.StructBlock):
+    """
+    Specify a custom GraphQL interface for our block.
+    """
+
+    custom_text = blocks.TextBlock()
+
+    graphql_fields = [
+        GraphQLString("custom_text"),
+    ]
+
+
 class StreamFieldBlock(blocks.StreamBlock):
     heading = blocks.CharBlock(classname="full title")
     paragraph = blocks.RichTextBlock()
@@ -309,3 +326,4 @@ class StreamFieldBlock(blocks.StreamBlock):
     block_with_name = BlockWithName()
     advert = SnippetChooserBlock("testapp.Advert")
     person = SnippetChooserBlock("testapp.Person")
+    block_with_custom_interface = BlockWithCustomInterface()

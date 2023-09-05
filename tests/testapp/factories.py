@@ -7,11 +7,11 @@ from factory import fuzzy
 from wagtail import blocks
 
 from testapp.blocks import (
+    BlockWithCustomInterface,
     ImageGalleryBlock,
     ImageGalleryImage,
     ImageGalleryImages,
     TextWithCallableBlock,
-    BlockWithCustomInterface,
 )
 from testapp.models import (
     Advert,

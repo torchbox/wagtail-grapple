@@ -27,7 +27,7 @@ def register_streamfield_block(cls):
         {
             "cls": cls,
             "type_prefix": "",
-            "interface": StreamFieldInterface,
+            "interfaces": (StreamFieldInterface,),
             "base_type": base_block,
         }
     )

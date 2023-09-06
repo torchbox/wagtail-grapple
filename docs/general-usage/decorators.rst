@@ -422,3 +422,18 @@ To extend the schema with custom StreamField block types, the ``register_streamf
             graphql_description = "This is a streamblock with a textblock child"
 
 If a block's ``Meta`` class has a ``graphql_description`` attribute, this value will be exposed as the ``description`` in introspection queries.
+
+To register additional interfaces for the block, add them with the ``interfaces`` argument:
+
+.. code-block:: python
+
+    import graphene
+
+
+    class CustomBlockInterface(graphene.Interface):
+        text = graphene.String()
+
+
+    @register_streamfield_block(interfaces=(CustomBlockInterface,))
+    class BlockWithCustomInterface(blocks.StructBlock):
+        text = blocks.TextBlock()

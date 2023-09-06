@@ -430,10 +430,10 @@ To register additional interfaces for the block, add them with the ``interfaces`
     import graphene
 
 
-    class CustomBlockInterface(graphene.Interface):
+    class CustomInterface(graphene.Interface):
         text = graphene.String()
 
 
-    @register_streamfield_block(interfaces=(CustomBlockInterface,))
-    class BlockWithCustomInterface(blocks.StructBlock):
+    @register_streamfield_block(interfaces=(CustomInterface,))
+    class CustomInterfaceBlock(blocks.StructBlock):
         text = blocks.TextBlock()

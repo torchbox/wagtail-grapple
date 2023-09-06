@@ -7,7 +7,7 @@ from factory import fuzzy
 from wagtail import blocks
 
 from testapp.blocks import (
-    BlockWithCustomInterface,
+    CustomInterfaceBlock,
     ImageGalleryBlock,
     ImageGalleryImage,
     ImageGalleryImages,
@@ -86,11 +86,11 @@ class TextWithCallableBlockFactory(wagtail_factories.StructBlockFactory):
         model = TextWithCallableBlock
 
 
-class BlockWithCustomInterfaceFactory(wagtail_factories.StructBlockFactory):
+class CustomInterfaceBlockFactory(wagtail_factories.StructBlockFactory):
     custom_text = factory.Sequence(lambda n: f"Block with custom interface {n}")
 
     class Meta:
-        model = BlockWithCustomInterface
+        model = CustomInterfaceBlock
 
 
 class BlogPageRelatedLinkFactory(factory.django.DjangoModelFactory):

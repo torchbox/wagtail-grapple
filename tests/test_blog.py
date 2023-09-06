@@ -19,8 +19,8 @@ from testapp.blocks import (
 )
 from testapp.factories import (
     AdvertFactory,
-    BlockWithCustomInterfaceFactory,
     BlogPageFactory,
+    CustomInterfaceBlockFactory,
     PersonFactory,
     TextWithCallableBlockFactory,
 )
@@ -129,7 +129,7 @@ class BlogTest(BaseGrappleTest):
                     },
                 ),
                 ("text_with_callable", TextWithCallableBlockFactory()),
-                ("block_with_custom_interface", BlockWithCustomInterfaceFactory()),
+                ("custom_interface_block", CustomInterfaceBlockFactory()),
             ],
             parent=self.home,
             summary=self.richtext_sample,
@@ -1205,14 +1205,14 @@ class BlogTest(BaseGrappleTest):
         response = self.client.execute(query)
         self.assertIsNone(response["data"]["__type"]["description"])
 
-    def test_block_with_custom_interface(self):
+    def test_custom_interface_block(self):
         query = """
         query($id: ID) {
             page(id: $id) {
                 ... on BlogPage {
                     body {
                         blockType
-                        ...on CustomBlockInterface {
+                        ...on CustomInterface {
                             customText
                         }
                     }
@@ -1224,8 +1224,8 @@ class BlogTest(BaseGrappleTest):
         body = executed["data"]["page"]["body"]
 
         for block in body:
-            if block["blockType"] == "BlockWithCustomInterface":
-                self.assertEqual(block["customText"], "Block with custom interface 1")
+            if block["blockType"] == "CustomInterfaceBlock":
+                self.assertRegex(block["customText"], r"^Block with custom interface \d+$")
                 return
 
         self.fail("Query by interface didn't match anything")

@@ -12,7 +12,7 @@
 
 -   Use consistent ID type for pages and page queries ([#350](https://github.com/torchbox/wagtail-grapple/pull/350)) @estyxx
     ⚠️ Warning note: if your query looked like `query($id: Int) { page(id: $id) { ... } }`, it must now be `query($id: ID) { page(id: $id) { ... } }`
--   Pass the `GraphQLResolveInfo` object to the StreamField callables ([#356](https://github.com/torchbox/wagtail-grapple/pull/)) @zerolab
+-   Pass the `GraphQLResolveInfo` object to the StreamField callables ([#356](https://github.com/torchbox/wagtail-grapple/pull/356)) @zerolab
     This is passed as the `info` kwarg.
 -   The image rendition query will now surface any errors when:
   -   using filters not present in the `ALLOWED_IMAGE_FILTERS` Grapple setting,

@@ -291,11 +291,11 @@ class TextWithCallableBlock(blocks.StructBlock):
         return ""
 
 
-class CustomInterfaceForBlock(graphene.Interface):
+class CustomBlockInterface(graphene.Interface):
     custom_text = graphene.String()
 
 
-@register_streamfield_block(extra_interfaces=(CustomInterfaceForBlock,))
+@register_streamfield_block(interfaces=(CustomBlockInterface,))
 class BlockWithCustomInterface(blocks.StructBlock):
     """
     Specify a custom GraphQL interface for our block.

@@ -17,7 +17,7 @@ streamfield_types = []
 field_middlewares = {}
 
 
-def register_streamfield_block(cls=None, extra_interfaces=()):
+def register_streamfield_block(klass=None, interfaces=()):
     def decorator(cls):
         base_block = None
         for block_class in inspect.getmro(cls):
@@ -28,15 +28,15 @@ def register_streamfield_block(cls=None, extra_interfaces=()):
             {
                 "cls": cls,
                 "type_prefix": "",
-                "interfaces": (StreamFieldInterface, *extra_interfaces),
+                "interfaces": tuple({StreamFieldInterface, *interfaces}),
                 "base_type": base_block,
             }
         )
 
         return cls
 
-    if isinstance(cls, type) and not extra_interfaces:
-        return decorator(cls)
+    if isinstance(klass, type) and not interfaces:
+        return decorator(klass)
 
     return decorator
 

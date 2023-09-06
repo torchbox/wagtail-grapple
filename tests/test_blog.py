@@ -1212,7 +1212,7 @@ class BlogTest(BaseGrappleTest):
                 ... on BlogPage {
                     body {
                         blockType
-                        ...on CustomInterfaceForBlock {
+                        ...on CustomBlockInterface {
                             customText
                         }
                     }

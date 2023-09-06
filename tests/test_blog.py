@@ -1225,7 +1225,9 @@ class BlogTest(BaseGrappleTest):
 
         for block in body:
             if block["blockType"] == "CustomInterfaceBlock":
-                self.assertRegex(block["customText"], r"^Block with custom interface \d+$")
+                self.assertRegex(
+                    block["customText"], r"^Block with custom interface \d+$"
+                )
                 return
 
         self.fail("Query by interface didn't match anything")

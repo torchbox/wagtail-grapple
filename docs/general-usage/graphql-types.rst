@@ -12,15 +12,11 @@ An existing understanding of GraphQL types will help here.
 PageInterface
 ^^^^^^^^^^^^^
 
-One of the things you'll do most when using Grapple is querying pages and to
-do that you'll have to use the ``PageInterface``. This is accessible through
-the ``pages`` or ``page`` field on the root query type.
+The default GraphQL interface for all Wagtail Page-derived models.
 
+This is accessible through the ``pages`` or ``page`` field on the root query type.
 
-
-The interface itself has the following fields (you'll notice a similarity to
-the fields on a Wagtail Page model). As such with GraphQL interfaces, your page
-models inherit these fields also:
+The interface exposes the following fields, following the Wagtail Page model fields and properties:
 
 .. code-block:: graphql
 
@@ -43,19 +39,21 @@ models inherit these fields also:
     ancestors(limit: PositiveInt, offset: PositiveInt, order: String, searchQuery: String, id: ID): [PageInterface]
 
 
-Also, each of your Page models that you have appended ``graphql_fields`` to will be
-available here by using a 'on' spread operator and the name of the model like so:
+Any custom ``graphql_fields`` added to your specific Page models will be available here via the 'on' spread operator and
+the name of the model:
 
 .. code-block:: graphql
 
     {
         pages {
             ...on BlogPage {
-                title
+                the_custom_field
             }
         }
     }
 
+You can change the default ``PageInterface`` to your own interface by changing the
+:ref:`PAGE_INTERFACE<page interface settings>` setting.
 
 As mentioned above there is both a plural ``pages`` and singular ``page``
 field on the root Query type that returns a ``PageInterface``.

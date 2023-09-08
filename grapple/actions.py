@@ -2,7 +2,7 @@ import inspect
 
 from collections.abc import Iterable
 from types import MethodType
-from typing import Any, Dict, Type, Union
+from typing import Any, Dict, Tuple, Type, Union
 
 import graphene
 
@@ -80,7 +80,7 @@ def import_apps():
         node_type = build_streamfield_type(
             cls,
             streamfield_type["type_prefix"],
-            streamfield_type["interface"],
+            streamfield_type["interfaces"],
             base_type,
         )
 
@@ -448,13 +448,16 @@ def custom_cls_resolver(*, cls, graphql_field):
 def build_streamfield_type(
     cls: type,
     type_prefix: str,
-    interface: graphene.Interface,
+    interfaces: Tuple[graphene.Interface],
     base_type=graphene.ObjectType,
 ):
     """
     Build a graphql type for a StreamBlock or StructBlock class
     If it has custom fields then implement them.
     """
+
+    # Alias the argument name so we can use it in the class block
+    interfaces_ = interfaces
 
     # Create a new blank node type
     class Meta:
@@ -463,7 +466,7 @@ def build_streamfield_type(
                 registry.streamfield_blocks.get(block) for block in cls.graphql_types
             ]
         else:
-            interfaces = (interface,) if interface is not None else ()
+            interfaces = interfaces_ if interfaces_ is not None else ()
         # Add description to type if the Meta class declares it
         description = getattr(cls._meta_class, "graphql_description", None)
 

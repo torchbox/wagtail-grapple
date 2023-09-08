@@ -2,7 +2,6 @@ import graphene
 
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import Q
-from django.conf import settings
 from django.utils.module_loading import import_string
 from django.utils.translation import gettext_lazy as _
 from graphene_django.types import DjangoObjectType
@@ -11,15 +10,13 @@ from wagtail.models import Page as WagtailPage
 from wagtail.models import Site
 
 from ..registry import registry
+from ..settings import grapple_settings
 from ..utils import resolve_queryset, resolve_site_by_hostname
 from .structures import QuerySetList
 
 
 def get_page_interface():
-    path = getattr(
-        settings, "GRAPPLE_PAGE_INTERFACE", "grapple.types.pages.PageInterface"
-    )
-    return import_string(path)
+    return import_string(grapple_settings.PAGE_INTERFACE)
 
 
 class PageInterface(graphene.Interface):

@@ -24,6 +24,7 @@ from grapple.models import (
     GraphQLStreamfield,
     GraphQLString,
 )
+from testapp.interfaces import CustomInterface
 
 
 if TYPE_CHECKING:
@@ -289,10 +290,6 @@ class TextWithCallableBlock(blocks.StructBlock):
                 return str(page_url)
 
         return ""
-
-
-class CustomInterface(graphene.Interface):
-    custom_text = graphene.String()
 
 
 @register_streamfield_block(interfaces=(CustomInterface,))

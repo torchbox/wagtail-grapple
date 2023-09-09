@@ -88,6 +88,9 @@ class BaseGrappleTestWithIntrospection(BaseGrappleTest):
                         description
                     }
                 }
+                interfaces {
+                    name
+                }
             }
         }
         """

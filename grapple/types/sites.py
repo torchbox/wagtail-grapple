@@ -10,13 +10,13 @@ from wagtail.models import Page as WagtailPage
 from wagtail.models import Site
 
 from ..utils import resolve_queryset, resolve_site_by_hostname, resolve_site_by_id
-from .pages import PageInterface, get_specific_page
+from .pages import get_page_interface, get_specific_page
 from .structures import QuerySetList
 
 
 class SiteObjectType(DjangoObjectType):
     pages = QuerySetList(
-        graphene.NonNull(lambda: PageInterface),
+        graphene.NonNull(get_page_interface),
         content_type=graphene.Argument(
             graphene.String,
             description=_("Filter by content type. Uses the `app.Model` notation."),
@@ -25,7 +25,7 @@ class SiteObjectType(DjangoObjectType):
         required=True,
     )
     page = graphene.Field(
-        PageInterface,
+        get_page_interface(),
         id=graphene.ID(),
         slug=graphene.String(),
         url_path=graphene.String(),

@@ -25,7 +25,7 @@ from .registry import registry
 from .settings import grapple_settings
 from .types.documents import DocumentObjectType
 from .types.images import ImageObjectType, ImageRenditionObjectType
-from .types.pages import Page, PageInterface
+from .types.pages import Page, get_page_interface
 from .types.rich_text import RichText as RichTextType
 from .types.streamfield import generate_streamfield_union
 
@@ -511,7 +511,7 @@ def register_page_model(cls: Type[WagtailPage], type_prefix: str):
         return
 
     # Create a GQL type derived from the page model.
-    if page_node_type := build_node_type(cls, type_prefix, PageInterface, Page):
+    if page_node_type := build_node_type(cls, type_prefix, get_page_interface(), Page):
         # Add page type to registry.
         registry.pages[cls] = page_node_type
 

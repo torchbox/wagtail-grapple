@@ -432,11 +432,11 @@ registry.streamfield_blocks.update(
 def register_streamfield_blocks():
     from .documents import get_document_type
     from .images import get_image_type
-    from .pages import PageInterface
+    from .pages import get_page_interface
     from .snippets import SnippetTypes
 
     class PageChooserBlock(graphene.ObjectType):
-        page = graphene.Field(PageInterface, required=True)
+        page = graphene.Field(get_page_interface(), required=True)
 
         class Meta:
             interfaces = (StreamFieldInterface,)

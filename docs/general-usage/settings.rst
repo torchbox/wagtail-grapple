@@ -11,6 +11,7 @@ For example, your project's ``settings.py`` file might include something like th
     GRAPPLE = {
         "APPS": ["home"],
         "ADD_SEARCH_HIT": True,
+        # ...
     }
 
 
@@ -36,16 +37,16 @@ API Reference
 Grapple settings
 ^^^^^^^^^^^^^^^^
 
-APPS
-****
+``APPS``
+********
 
 A list/tuple of the apps that Grapple will scan for models to generate GraphQL types that adopt their structure.
 
 Default: ``[]``
 
 
-AUTO_CAMELCASE
-**************
+``AUTO_CAMELCASE``
+******************
 
 By default, all field and argument names will be converted from `snake_case` to `camelCase`.
 To disable this behavior, set the ``GRAPPLE['AUTO_CAMELCASE']`` setting to `False`.
@@ -53,12 +54,12 @@ To disable this behavior, set the ``GRAPPLE['AUTO_CAMELCASE']`` setting to `Fals
 Default: ``True``
 
 
-EXPOSE_GRAPHIQL
-***************
+``EXPOSE_GRAPHIQL``
+*******************
 
 By default, Grapple will add ``/graphql`` URL to where you can make GET/POST GraphQL requests.
-When setting ``GRAPPLE['EXPOSE_GRAPHIQL']`` to ``True``, the ``/graphiql`` URL is also added to
-provide access to GraphiQL.
+When ``GRAPPLE['EXPOSE_GRAPHIQL']`` is set to ``True``, the ``/graphiql`` URL is also added to
+provide access to the GraphiQL user interface.
 
 Default: ``False``
 
@@ -66,8 +67,8 @@ Default: ``False``
 Renditions settings
 ^^^^^^^^^^^^^^^^^^^
 
-ALLOWED_IMAGE_FILTERS
-*********************
+``ALLOWED_IMAGE_FILTERS``
+*************************
 
 To prevent arbitrary renditions from being generated, set ``GRAPPLE['ALLOWED_IMAGE_FILTERS']`` in
 your settings to a `list` or `tuple` of allowed filters. Read more about generating renditions in the Wagtail docs
@@ -99,8 +100,8 @@ consider adding the relevant filters to the allowed list.
 Rich text settings
 ^^^^^^^^^^^^^^^^^^
 
-RICHTEXT_FORMAT
-***************
+``RICHTEXT_FORMAT``
+*****************
 
 Controls the ``RichText`` field and the ``RichTextBlock`` StreamField block output. Read more about the Wagtail
 rich text data format in the Wagtail docs (`Rich text internals <https://docs.wagtail.io/en/stable/extending/rich_text_internals.html#data-format>`_).
@@ -113,10 +114,10 @@ Default: ``html``
 Search settings
 ^^^^^^^^^^^^^^^
 
-ADD_SEARCH_HIT
-**************
+``ADD_SEARCH_HIT``
+******************
 
-Setting this to ``True`` will log search queries so Wagtail can suggest promoted results.
+When set to ``True``, Grapple will log search queries so that Wagtail can suggest promoted results.
 
 Default: ``False``
 
@@ -124,17 +125,31 @@ Default: ``False``
 Pagination settings
 ^^^^^^^^^^^^^^^^^^^
 
-PAGE_SIZE
-*********
+``PAGE_SIZE``
+************
 
-Value used as default for both ``QuerySetList``' ``limit`` and ``PaginatedQuerySet``' ``perPage`` arguments.
+Used as default for both the ``limit`` argument for ``QuerySetList`` and the ``perPage`` argument for ``PaginatedQuerySet``.
 
 Default: ``10``
 
 
-MAX_PAGE_SIZE
-*************
+``MAX_PAGE_SIZE``
+*****************
 
-Value used to limit the maximum of items to be returned for both ``QuerySetList`` and ``PaginatedQuerySet`` types.
+Limit the maximum number of items that ``QuerySetList`` and ``PaginatedQuerySet`` types return.
 
 Default: ``100``
+
+
+.. _page interface settings:
+
+Wagtail Page interface
+^^^^^^^^^^^^^^^^^^^^^^
+
+``PAGE_INTERFACE``
+******************
+
+Used to construct the schema for Wagtail Page-derived models. It can be overridden to provide a custom interface for all
+page models.
+
+Default: ``grapple.types.pages.PageInterface``

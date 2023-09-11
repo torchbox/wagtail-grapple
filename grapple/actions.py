@@ -333,7 +333,7 @@ def load_type_fields():
                             exclude_fields.remove(field.field_name)
 
                         # Add a custom resolver for each field
-                        methods["resolve_" + field.field_name] = model_resolver(field)
+                        methods[f"resolve_{field.field_name}"] = model_resolver(field)
 
                 # Replace stud node with real thing
                 type_meta["Meta"].exclude_fields = exclude_fields
@@ -484,7 +484,7 @@ def build_streamfield_type(
             field, field_type = get_field_type(item)
 
             # Add support for `graphql_fields`
-            methods["resolve_" + field.field_name] = (
+            methods[f"resolve_{field.field_name}"] = (
                 custom_cls_resolver(cls=cls, graphql_field=field)
                 or streamfield_resolver
             )

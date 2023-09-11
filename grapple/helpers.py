@@ -160,12 +160,12 @@ def register_query_field(
             )
 
             setattr(
-                schema, "resolve_" + field_name, MethodType(resolve_singular, schema)
+                schema, f"resolve_{field_name}", MethodType(resolve_singular, schema)
             )
 
             setattr(
                 schema,
-                "resolve_" + plural_field_name,
+                f"resolve_{plural_field_name}",
                 MethodType(resolve_plural, schema),
             )
             return schema
@@ -279,11 +279,11 @@ def register_paginated_query_field(
             )
 
             setattr(
-                schema, "resolve_" + field_name, MethodType(resolve_singular, schema)
+                schema, f"resolve_{field_name}", MethodType(resolve_singular, schema)
             )
             setattr(
                 schema,
-                "resolve_" + plural_field_name,
+                f"resolve_{plural_field_name}",
                 MethodType(resolve_plural, schema),
             )
             return schema
@@ -352,7 +352,7 @@ def register_singular_query_field(
             )
 
             setattr(
-                schema, "resolve_" + field_name, MethodType(resolve_singular, schema)
+                schema, f"resolve_{field_name}", MethodType(resolve_singular, schema)
             )
             return schema
 

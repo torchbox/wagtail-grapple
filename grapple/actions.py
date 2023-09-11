@@ -189,21 +189,21 @@ def model_resolver(field):
                     return getattr(cls, extract_key[0])
 
                 # Get data from nested field
-                field = getattr(cls, extract_key[0])
-                if field is None:
+                nested_field = getattr(cls, extract_key[0])
+                if nested_field is None:
                     return None
-                if issubclass(type(field), models.Manager):
-                    field = field.all()
+                if issubclass(type(nested_field), models.Manager):
+                    nested_field = nested_field.all()
 
                 # If field data is a list then iterate over it
-                if isinstance(field, Iterable):
+                if isinstance(nested_field, Iterable):
                     return [
                         get_nested_field(nested_cls, extract_key[1:])
-                        for nested_cls in field
+                        for nested_cls in nested_field
                     ]
 
                 # If single value then return it.
-                return get_nested_field(field, extract_key[1:])
+                return get_nested_field(nested_field, extract_key[1:])
 
             if field.extract_key:
                 return [
@@ -266,6 +266,10 @@ def build_node_type(
     class StubMeta:
         model = stub_model
 
+    # Gather any interfaces, and discard None values
+    interfaces = {interface, *getattr(cls, "graphql_interfaces", ())}
+    interfaces.discard(None)
+
     type_meta = {
         "Meta": StubMeta,
         "type": lambda: {
@@ -273,11 +277,11 @@ def build_node_type(
             "lazy": True,
             "name": type_name,
             "base_type": base_type,
-            "interface": interface,
+            "interfaces": tuple(interfaces),
         },
     }
 
-    return type("Stub" + type_name, (DjangoObjectType,), type_meta)
+    return type(f"Stub{type_name}", (base_type,), type_meta)
 
 
 def load_type_fields():
@@ -290,13 +294,13 @@ def load_type_fields():
                 # Get the original django model data
                 cls = type_definition.get("cls")
                 base_type = type_definition.get("base_type")
-                interface = type_definition.get("interface")
                 type_name = type_definition.get("name")
+                _interfaces = type_definition.get("interfaces")
 
                 # Recreate the graphene type with the fields set
                 class Meta:
                     model = cls
-                    interfaces = (interface,) if interface is not None else ()
+                    interfaces = _interfaces if _interfaces is not None else ()
 
                 type_meta = {"Meta": Meta, "id": graphene.ID(), "name": type_name}
 
@@ -310,8 +314,8 @@ def load_type_fields():
                     # Either remove the custom field or remove the field from the "exclude" list.' warning
                     if (
                         field == "id"
-                        or hasattr(interface, field)
                         or hasattr(base_type_for_exclusion_checks, field)
+                        or any(hasattr(interface, field) for interface in _interfaces)
                     ):
                         continue
 
@@ -457,7 +461,7 @@ def build_streamfield_type(
     """
 
     # Alias the argument name so we can use it in the class block
-    interfaces_ = interfaces
+    _interfaces = interfaces
 
     # Create a new blank node type
     class Meta:
@@ -466,7 +470,7 @@ def build_streamfield_type(
                 registry.streamfield_blocks.get(block) for block in cls.graphql_types
             ]
         else:
-            interfaces = interfaces_ if interfaces_ is not None else ()
+            interfaces = _interfaces if _interfaces is not None else ()
         # Add description to type if the Meta class declares it
         description = getattr(cls._meta_class, "graphql_description", None)
 

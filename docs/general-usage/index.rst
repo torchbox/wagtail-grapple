@@ -6,6 +6,7 @@ General Usage
 
     graphql-types
     model-types
+    interfaces
     decorators
     hooks
     middleware

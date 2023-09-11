@@ -430,6 +430,8 @@ To register additional interfaces for the block, add them with your block's ``gr
     import graphene
     from wagtail import blocks
 
+    from grapple.helpers import register_streamfield_block
+
 
     class CustomInterface(graphene.Interface):
         text = graphene.String()

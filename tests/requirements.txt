@@ -1,6 +1,6 @@
 # Test requirements.
-black>=23.7.0
-ruff==0.0.285
+black>=23.9.1
+ruff==0.0.287
 
 # Runtime requirements
 Django>=3.2,<5.0

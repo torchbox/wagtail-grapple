@@ -44,7 +44,7 @@ the name of the model:
 
 .. code-block:: graphql
 
-    {
+    query {
         pages {
             ...on BlogPage {
                 the_custom_field
@@ -96,7 +96,7 @@ the root query type like so:
 
 .. code-block:: graphql
 
-    {
+    query {
         images {
             src
         }
@@ -146,7 +146,7 @@ the root query type like so:
 
 ``ImageRenditionObjectType`` describes a Wagtail image rendition and provides the following fields:
 
-::
+.. code-block:: graphql
 
     id: ID!
     filter_spec = String!
@@ -169,7 +169,7 @@ or by a StreamField block.
 
 The following fields are returned:
 
-::
+.. code-block:: graphql
 
     id: ID
     title: String
@@ -195,7 +195,7 @@ An example of querying all snippets:
 
 .. code-block:: graphql
 
-    {
+    query {
         snippets {
             ...on Advert {
                 id
@@ -229,7 +229,7 @@ You can also query a setting by model name:
 
 .. code-block:: graphql
 
-    {
+    query {
         setting(name: "SocialMediaSettings") {
             ...on SocialMediaSettings {
                 facebook
@@ -263,7 +263,7 @@ The plural ``sites`` field can be queried like so:
 
 .. code-block:: graphql
 
-    {
+    query {
         sites {
             port
             hostname
@@ -282,7 +282,7 @@ and can be queried like so:
 
 .. code-block:: graphql
 
-    {
+    query {
         site(hostname: "my.domain") {
             pages {
                 title
@@ -298,7 +298,7 @@ You can also simply search all models via GraphQL like so:
 
 .. code-block:: graphql
 
-    {
+    query {
         search(query:"blog") {
             ...on BlogPage {
                 title

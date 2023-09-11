@@ -101,7 +101,7 @@ Rich text settings
 ^^^^^^^^^^^^^^^^^^
 
 ``RICHTEXT_FORMAT``
-*****************
+*******************
 
 Controls the ``RichText`` field and the ``RichTextBlock`` StreamField block output. Read more about the Wagtail
 rich text data format in the Wagtail docs (`Rich text internals <https://docs.wagtail.io/en/stable/extending/rich_text_internals.html#data-format>`_).
@@ -126,7 +126,7 @@ Pagination settings
 ^^^^^^^^^^^^^^^^^^^
 
 ``PAGE_SIZE``
-************
+**************
 
 Used as default for both the ``limit`` argument for ``QuerySetList`` and the ``perPage`` argument for ``PaginatedQuerySet``.
 

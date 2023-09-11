@@ -51,7 +51,7 @@ Wagtail docs:
 The following field can then be queries at http://localhost:8000/graphql using
 something like:
 
-::
+.. code-block:: graphql
 
     {
         pages {
@@ -75,5 +75,6 @@ something like:
 
 **Next Steps**
 
+  * :doc:`settings`
   * :doc:`../general-usage/graphql-types`
   * :doc:`../general-usage/preview`

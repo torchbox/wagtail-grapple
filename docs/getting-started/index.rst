@@ -6,3 +6,4 @@ Getting Started
 
     installation
     examples
+    settings

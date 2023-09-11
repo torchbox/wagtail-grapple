@@ -406,7 +406,7 @@ More information can be found on :doc:`middleware docs <middleware>`.
 .. module:noindex: grapple.helpers
 .. class:: register_streamfield_block(cls)
 
-To extend the schema with custom StreamField block types, the ``register_streamfield_block`` decorator can be used.
+The ``register_streamfield_block`` decorator can be used to extend the schema with custom StreamField block types.
 
 .. code-block:: python
 
@@ -423,17 +423,20 @@ To extend the schema with custom StreamField block types, the ``register_streamf
 
 If a block's ``Meta`` class has a ``graphql_description`` attribute, this value will be exposed as the ``description`` in introspection queries.
 
-To register additional interfaces for the block, add them with the ``interfaces`` argument:
+To register additional interfaces for the block, add them with your block's ``graphql_interfaces`` attribute:
 
 .. code-block:: python
 
     import graphene
+    from wagtail import blocks
 
 
     class CustomInterface(graphene.Interface):
         text = graphene.String()
 
 
-    @register_streamfield_block(interfaces=(CustomInterface,))
+    @register_streamfield_block
     class CustomInterfaceBlock(blocks.StructBlock):
         text = blocks.TextBlock()
+
+        graphql_interfaces = (CustomInterface,)

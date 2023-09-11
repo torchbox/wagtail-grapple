@@ -17,28 +17,28 @@ streamfield_types = []
 field_middlewares = {}
 
 
-def register_streamfield_block(klass=None, interfaces=()):
-    def decorator(cls):
-        base_block = None
-        for block_class in inspect.getmro(cls):
-            if block_class in registry.streamfield_blocks:
-                base_block = registry.streamfield_blocks[block_class]
+def register_streamfield_block(cls):
+    base_block = None
+    for block_class in inspect.getmro(cls):
+        if block_class in registry.streamfield_blocks:
+            base_block = registry.streamfield_blocks[block_class]
 
-        streamfield_types.append(
-            {
-                "cls": cls,
-                "type_prefix": "",
-                "interfaces": tuple({StreamFieldInterface, *interfaces}),
-                "base_type": base_block,
-            }
-        )
+    interfaces = tuple(
+        {
+            StreamFieldInterface,
+            *getattr(cls, "graphql_interfaces", ()),
+        }
+    )
+    streamfield_types.append(
+        {
+            "cls": cls,
+            "type_prefix": "",
+            "interfaces": interfaces,
+            "base_type": base_block,
+        }
+    )
 
-        return cls
-
-    if isinstance(klass, type) and not interfaces:
-        return decorator(klass)
-
-    return decorator
+    return cls
 
 
 def register_graphql_schema(schema_cls):

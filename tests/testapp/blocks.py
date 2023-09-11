@@ -292,7 +292,7 @@ class TextWithCallableBlock(blocks.StructBlock):
         return ""
 
 
-@register_streamfield_block(interfaces=(CustomInterface,))
+@register_streamfield_block
 class CustomInterfaceBlock(blocks.StructBlock):
     """
     Specify a custom GraphQL interface for our block.
@@ -303,6 +303,7 @@ class CustomInterfaceBlock(blocks.StructBlock):
     graphql_fields = [
         GraphQLString("custom_text"),
     ]
+    graphql_interfaces = (CustomInterface,)
 
 
 class StreamFieldBlock(blocks.StreamBlock):

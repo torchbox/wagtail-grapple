@@ -16,7 +16,7 @@ Any image-based field type (whether ``GraphQLImage`` or StreamField block) will
 return a ``ImageObjectType``. Images can be queried via the ``images`` field on
 the root query type like so:
 
-.. code-block:: graphql
+::
 
     query {
         images {
@@ -27,7 +27,7 @@ the root query type like so:
 
 ``ImageObjectType`` describes a Wagtail image and provides the following fields:
 
-.. code-block:: graphql
+::
 
     id: ID!
     collection: CollectionObjectType!
@@ -68,7 +68,7 @@ the root query type like so:
 
 ``ImageRenditionObjectType`` describes a Wagtail image rendition and provides the following fields:
 
-.. code-block:: graphql
+::
 
     id: ID!
     filter_spec = String!
@@ -91,7 +91,7 @@ or by a StreamField block.
 
 The following fields are returned:
 
-.. code-block:: graphql
+::
 
     id: ID
     title: String
@@ -115,7 +115,7 @@ as opposed to an interface or base type.
 
 An example of querying all snippets:
 
-.. code-block:: graphql
+::
 
     query {
         snippets {
@@ -135,9 +135,9 @@ Similar to ``SnippetObjectType``, Settings are grouped together under the
 ``SettingObjectType`` union. You can then query any settings that you have
 appended a ``graphql_fields`` list to like so:
 
-.. code-block:: graphql
+::
 
-    {
+    query {
         settings {
             ...on SocialMediaSettings {
                 facebook
@@ -149,7 +149,7 @@ appended a ``graphql_fields`` list to like so:
 
 You can also query a setting by model name:
 
-.. code-block:: graphql
+::
 
     query {
         setting(name: "SocialMediaSettings") {
@@ -169,7 +169,7 @@ Field type based on the Wagtail's ``Site`` model. This is accessible through
 the ``sites`` or ``site`` field on the root query type. Available fields for the
 ``SiteObjectType`` are:
 
-.. code-block:: graphql
+::
 
     id: ID
     port: Int
@@ -183,7 +183,7 @@ the ``sites`` or ``site`` field on the root query type. Available fields for the
 
 The plural ``sites`` field can be queried like so:
 
-.. code-block:: graphql
+::
 
     query {
         sites {
@@ -194,7 +194,7 @@ The plural ``sites`` field can be queried like so:
 
 The singular ``site`` field accepts the following arguments:
 
-.. code-block:: graphql
+::
 
     # Either the `id` or `hostname` must be provided.
     id: ID
@@ -202,7 +202,7 @@ The singular ``site`` field accepts the following arguments:
 
 and can be queried like so:
 
-.. code-block:: graphql
+::
 
     query {
         site(hostname: "my.domain") {
@@ -218,7 +218,7 @@ Search
 
 You can also simply search all models via GraphQL like so:
 
-.. code-block:: graphql
+::
 
     query {
         search(query:"blog") {

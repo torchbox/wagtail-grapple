@@ -15,7 +15,7 @@ This is accessible through the ``pages`` or ``page`` field on the root query typ
 
 The interface exposes the following fields, following the Wagtail Page model fields and properties:
 
-.. code-block:: graphql
+::
 
     id: ID
     url: String
@@ -39,7 +39,7 @@ The interface exposes the following fields, following the Wagtail Page model fie
 Any custom ``graphql_fields`` added to your specific Page models will be available here via the 'on' spread operator and
 the name of the model:
 
-.. code-block:: graphql
+::
 
     query {
         pages {
@@ -58,7 +58,7 @@ field on the root Query type that returns a ``PageInterface``.
 The plural ``pages`` field (as do all plural fields)
 accepts the following arguments:
 
-.. code-block:: graphql
+::
 
     id: ID
     limit: PositiveInt
@@ -73,7 +73,7 @@ accepts the following arguments:
 
 The singular ``page`` field accepts the following arguments:
 
-.. code-block:: graphql
+::
 
     id: ID                        # Can be used on it's own
     slug: String                  # Can be used on it's own
@@ -90,7 +90,7 @@ The singular ``page`` field accepts the following arguments:
 ``StreamFieldInterface`` is the default interface for all Wagtail StreamField block models. It exposes the following
 fields, following the base fields and properties available to the Wagtail StreamField blocks:
 
-.. code-block:: graphql
+::
 
     id: ID
     blockType: String!
@@ -101,7 +101,7 @@ Note that blocks subclassing `StreamBlock <https://docs.wagtail.org/en/stable/to
 and `StructBlock <https://docs.wagtail.org/en/stable/topics/streamfield.html#structblock>`_ have an additional property
 in the interface:
 
-.. code-block:: graphql
+::
 
     blocks: [StreamFieldInterface!]!  # a list of blocks in the StreamBlock or StructBlock
 

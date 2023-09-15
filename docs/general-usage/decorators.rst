@@ -36,9 +36,9 @@ You can easily expose any Django model from your codebase by adding the ``@regis
 
 You can now query your adverts with the following query:
 
-.. code-block:: graphql
+::
 
-    {
+    query {
         # Get all adverts
         adverts {
             url
@@ -64,9 +64,9 @@ You can add custom query parameters like so:
 
 and then use it in your queries:
 
-.. code-block:: graphql
+::
 
-    {
+    query {
         # Get a specific advert
         advert(url: "some-unique-url") {
             url
@@ -84,13 +84,13 @@ You can make the singular query return type required like so:
 
 and then should look like this on your schema:
 
-.. code-block:: graphql
+::
 
     advert(id: Int): Advert!
 
 instead of:
 
-.. code-block:: graphql
+::
 
     advert(id: Int): Advert
 
@@ -104,13 +104,13 @@ You can can also make the plural query return list type required:
 
 making the plural query look like this on your schema:
 
-.. code-block:: graphql
+::
 
     adverts(id: Int, ...): [Advert]!
 
 instead of the default:
 
-.. code-block:: graphql
+::
 
     adverts(id: Int, ...): [Advert]
 
@@ -124,13 +124,13 @@ If you want to make the plural query return list item type required:
 
 making the plural query look like this:
 
-.. code-block:: graphql
+::
 
     adverts(id: Int, ...): [Advert!]
 
 instead of the default:
 
-.. code-block:: graphql
+::
 
     adverts(id: Int, ...): [Advert]
 
@@ -175,9 +175,9 @@ You can easily expose any Django model from your codebase by adding the ``@regis
 
 You can now query your adverts with the following query:
 
-.. code-block:: graphql
+::
 
-    {
+    query {
         # Get adverts paginated
         adverts(page: 1, perPage: 10) {
             items {
@@ -231,9 +231,9 @@ You can add custom query parameters like so:
 
 and then use it in your queries:
 
-.. code-block:: graphql
+::
 
-    {
+    query {
         # Get a specific advert
         advert(url: "some-unique-url") {
             url
@@ -251,13 +251,13 @@ You can make the singular query return type required like so:
 
 and then should look like this on your schema:
 
-.. code-block:: graphql
+::
 
     advert(id: Int): Advert!
 
 instead of:
 
-.. code-block:: graphql
+::
 
     advert(id: Int): Advert
 
@@ -271,7 +271,7 @@ You can can also make the plural query return list type required:
 
 making the plural query look like this on your schema:
 
-.. code-block:: graphql
+::
 
     adverts(page: Int, perPage: Int, ...): AdvertPaginatedType!
 
@@ -282,7 +282,7 @@ making the plural query look like this on your schema:
 
 instead of the default:
 
-.. code-block:: graphql
+::
 
     adverts(page: Int, perPage: Int, ...): AdvertPaginatedType
 
@@ -301,7 +301,7 @@ If you want to make the plural query return list item type required:
 
 making the plural query look like this:
 
-.. code-block:: graphql
+::
 
     adverts(page: Int, perPage: Int, ...): AdvertPaginatedType
 
@@ -312,7 +312,7 @@ making the plural query look like this:
 
 instead of the default:
 
-.. code-block:: graphql
+::
 
     adverts(page: Int, perPage: Int, ...): AdvertPaginatedType
 
@@ -366,9 +366,9 @@ thus there is no need to query by id.
 
 and then use it in your queries:
 
-.. code-block:: graphql
+::
 
-    {
+    query {
         # Get the first advert
         firstAdvert {
             url
@@ -378,9 +378,9 @@ and then use it in your queries:
 
 If you have multiple items, you could change the order:
 
-.. code-block:: graphql
+::
 
-    {
+    query {
         # Get the first advert
         firstAdvert(order: "-id") {
             url

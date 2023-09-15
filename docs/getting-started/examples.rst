@@ -51,9 +51,9 @@ Wagtail docs:
 The following field can then be queries at http://localhost:8000/graphql using
 something like:
 
-.. code-block:: graphql
+::
 
-    {
+    query {
         pages {
             ...on BlogPage {
                 heading

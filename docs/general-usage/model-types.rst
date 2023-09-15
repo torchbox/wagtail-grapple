@@ -126,9 +126,9 @@ GraphQLString
 
     Example query:
 
-    .. code-block:: graphql
+    ::
 
-        {
+        query {
             page(slug: "example-blog-page") {
                 author
             }
@@ -211,9 +211,9 @@ GraphQLCollection
 
     Example query:
 
-    .. code-block:: graphql
+    ::
 
-        {
+        query {
             page(slug: "example-blog-page") {
                 relatedUrls
                 relatedLinks {
@@ -444,7 +444,7 @@ GraphQLStreamfield
 
             graphql_fields = [GraphQLStreamfield("body")]
 
-    .. code-block:: graphql
+    ::
 
         # Example query, based on the above
         {
@@ -535,7 +535,7 @@ GraphQLSnippet
                 return self.text
 
 
-    .. code-block:: graphql
+    ::
 
         # Example query
         {

@@ -4,9 +4,9 @@ General Usage
 .. toctree::
     :maxdepth: 1
 
-    settings
-    model-types
     graphql-types
+    model-types
+    interfaces
     decorators
     hooks
     middleware

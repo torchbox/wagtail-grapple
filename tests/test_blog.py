@@ -922,7 +922,7 @@ class BlogTest(BaseGrappleTest):
         self.assertEqual(len(tags), 3)
         for idx, tag in enumerate(tags, start=1):
             self.assertTrue(isinstance(tag["name"], str))
-            self.assertEqual(tag["name"], "Tag " + str(idx))
+            self.assertEqual(tag["name"], f"Tag {idx}")
 
     def test_graphqlstring_property_in_structblock(self):
         block_type = "TextWithCallableBlock"

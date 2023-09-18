@@ -3,9 +3,6 @@ import sys
 
 import sphinx_wagtail_theme
 
-from pygments_graphql import GraphqlLexer
-from sphinx.highlighting import lexers
-
 from grapple import __version__
 
 
@@ -47,7 +44,6 @@ html_last_updated_fmt = "%b %d, %Y"
 
 html_static_path = ["_static"]
 pygments_style = None  # covered by sphinx_wagtail_theme
-lexers["graphql"] = GraphqlLexer()
 
 master_doc = "index"
 

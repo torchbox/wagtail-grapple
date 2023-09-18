@@ -53,7 +53,7 @@ something like:
 
 ::
 
-    {
+    query {
         pages {
             ...on BlogPage {
                 heading
@@ -75,5 +75,6 @@ something like:
 
 **Next Steps**
 
+  * :doc:`settings`
   * :doc:`../general-usage/graphql-types`
   * :doc:`../general-usage/preview`

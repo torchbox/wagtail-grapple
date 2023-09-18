@@ -73,7 +73,7 @@ class PageInterface(graphene.Interface):
     def resolve_content_type(self, info, **kwargs):
         self.content_type = ContentType.objects.get_for_model(self)
         return (
-            self.content_type.app_label + "." + self.content_type.model_class().__name__
+            f"{self.content_type.app_label}.{self.content_type.model_class().__name__}"
         )
 
     def resolve_page_type(self, info, **kwargs):

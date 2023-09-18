@@ -36,9 +36,9 @@ You can easily expose any Django model from your codebase by adding the ``@regis
 
 You can now query your adverts with the following query:
 
-.. code-block:: graphql
+::
 
-    {
+    query {
         # Get all adverts
         adverts {
             url
@@ -64,9 +64,9 @@ You can add custom query parameters like so:
 
 and then use it in your queries:
 
-.. code-block:: graphql
+::
 
-    {
+    query {
         # Get a specific advert
         advert(url: "some-unique-url") {
             url
@@ -84,13 +84,13 @@ You can make the singular query return type required like so:
 
 and then should look like this on your schema:
 
-.. code-block:: graphql
+::
 
     advert(id: Int): Advert!
 
 instead of:
 
-.. code-block:: graphql
+::
 
     advert(id: Int): Advert
 
@@ -104,13 +104,13 @@ You can can also make the plural query return list type required:
 
 making the plural query look like this on your schema:
 
-.. code-block:: graphql
+::
 
     adverts(id: Int, ...): [Advert]!
 
 instead of the default:
 
-.. code-block:: graphql
+::
 
     adverts(id: Int, ...): [Advert]
 
@@ -124,13 +124,13 @@ If you want to make the plural query return list item type required:
 
 making the plural query look like this:
 
-.. code-block:: graphql
+::
 
     adverts(id: Int, ...): [Advert!]
 
 instead of the default:
 
-.. code-block:: graphql
+::
 
     adverts(id: Int, ...): [Advert]
 
@@ -175,9 +175,9 @@ You can easily expose any Django model from your codebase by adding the ``@regis
 
 You can now query your adverts with the following query:
 
-.. code-block:: graphql
+::
 
-    {
+    query {
         # Get adverts paginated
         adverts(page: 1, perPage: 10) {
             items {
@@ -231,9 +231,9 @@ You can add custom query parameters like so:
 
 and then use it in your queries:
 
-.. code-block:: graphql
+::
 
-    {
+    query {
         # Get a specific advert
         advert(url: "some-unique-url") {
             url
@@ -251,13 +251,13 @@ You can make the singular query return type required like so:
 
 and then should look like this on your schema:
 
-.. code-block:: graphql
+::
 
     advert(id: Int): Advert!
 
 instead of:
 
-.. code-block:: graphql
+::
 
     advert(id: Int): Advert
 
@@ -271,7 +271,7 @@ You can can also make the plural query return list type required:
 
 making the plural query look like this on your schema:
 
-.. code-block:: graphql
+::
 
     adverts(page: Int, perPage: Int, ...): AdvertPaginatedType!
 
@@ -282,7 +282,7 @@ making the plural query look like this on your schema:
 
 instead of the default:
 
-.. code-block:: graphql
+::
 
     adverts(page: Int, perPage: Int, ...): AdvertPaginatedType
 
@@ -301,7 +301,7 @@ If you want to make the plural query return list item type required:
 
 making the plural query look like this:
 
-.. code-block:: graphql
+::
 
     adverts(page: Int, perPage: Int, ...): AdvertPaginatedType
 
@@ -312,7 +312,7 @@ making the plural query look like this:
 
 instead of the default:
 
-.. code-block:: graphql
+::
 
     adverts(page: Int, perPage: Int, ...): AdvertPaginatedType
 
@@ -366,9 +366,9 @@ thus there is no need to query by id.
 
 and then use it in your queries:
 
-.. code-block:: graphql
+::
 
-    {
+    query {
         # Get the first advert
         firstAdvert {
             url
@@ -378,9 +378,9 @@ and then use it in your queries:
 
 If you have multiple items, you could change the order:
 
-.. code-block:: graphql
+::
 
-    {
+    query {
         # Get the first advert
         firstAdvert(order: "-id") {
             url
@@ -406,7 +406,7 @@ More information can be found on :doc:`middleware docs <middleware>`.
 .. module:noindex: grapple.helpers
 .. class:: register_streamfield_block(cls)
 
-To extend the schema with custom StreamField block types, the ``register_streamfield_block`` decorator can be used.
+The ``register_streamfield_block`` decorator can be used to extend the schema with custom StreamField block types.
 
 .. code-block:: python
 
@@ -423,17 +423,22 @@ To extend the schema with custom StreamField block types, the ``register_streamf
 
 If a block's ``Meta`` class has a ``graphql_description`` attribute, this value will be exposed as the ``description`` in introspection queries.
 
-To register additional interfaces for the block, add them with the ``interfaces`` argument:
+To register additional interfaces for the block, add them with your block's ``graphql_interfaces`` attribute:
 
 .. code-block:: python
 
     import graphene
+    from wagtail import blocks
+
+    from grapple.helpers import register_streamfield_block
 
 
     class CustomInterface(graphene.Interface):
         text = graphene.String()
 
 
-    @register_streamfield_block(interfaces=(CustomInterface,))
+    @register_streamfield_block
     class CustomInterfaceBlock(blocks.StructBlock):
         text = blocks.TextBlock()
+
+        graphql_interfaces = (CustomInterface,)

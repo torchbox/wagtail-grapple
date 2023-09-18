@@ -73,6 +73,27 @@ class InterfacesTestCase(BaseGrappleTestWithIntrospection):
             [{"name": "CustomInterface"}, {"name": "StreamFieldInterface"}],
         )
 
+    def test_schema_for_page_with_graphql_interface(self):
+        results = self.introspect_schema_by_type("AuthorPage")
+        self.assertListEqual(
+            sorted(results["data"]["__type"]["interfaces"], key=lambda x: x["name"]),
+            [{"name": "CustomInterface"}, {"name": "PageInterface"}],
+        )
+
+    def test_schem_for_snippet_with_graphql_interface(self):
+        results = self.introspect_schema_by_type("Advert")
+        self.assertListEqual(
+            sorted(results["data"]["__type"]["interfaces"], key=lambda x: x["name"]),
+            [{"name": "CustomInterface"}],
+        )
+
+    def test_schema_for_django_model_with_graphql_interfaces(self):
+        results = self.introspect_schema_by_type("SimpleModel")
+        self.assertListEqual(
+            sorted(results["data"]["__type"]["interfaces"], key=lambda x: x["name"]),
+            [{"name": "CustomInterface"}],
+        )
+
 
 @tag("needs-custom-settings")
 @skipUnless(

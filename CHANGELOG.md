@@ -1,5 +1,14 @@
 ## Unreleased
 
+## [0.22.0] - 2023-09-18
+
+### Added
+
+-   Add global mechanism for overriding the base `PageInterface` (#325) @dopry
+-   Allow defining additional interfaces via `graphql_interfaces` (#366) @zerolab @mgax
+    This applies to all models, including StreamField blocks
+
+
 ## [0.21.0] - 2023-09-04
 
 ### Added
@@ -333,7 +342,9 @@
 -   Improve field definition and under-the-hood implementation ([#28](https://github.com/torchbox/wagtail-grapple/pull/28))
 -   Add conditional checks when resolving streamfield type ([#29](https://github.com/torchbox/wagtail-grapple/pull/29))
 
-[unreleased]: https://github.com/torchbox/wagtail-grapple/compare/v0.20.0...HEAD
+[unreleased]: https://github.com/torchbox/wagtail-grapple/compare/v0.22.0...HEAD
+[0.21.0]: https://github.com/torchbox/wagtail-grapple/compare/v0.21.0...v0.22.0
+[0.21.0]: https://github.com/torchbox/wagtail-grapple/compare/v0.20.0...v0.21.0
 [0.20.0]: https://github.com/torchbox/wagtail-grapple/compare/v0.19.2...v0.20.0
 [0.19.2]: https://github.com/torchbox/wagtail-grapple/compare/v0.19.1...v0.19.2
 [0.19.1]: https://github.com/torchbox/wagtail-grapple/compare/v0.19.0...v0.19.1

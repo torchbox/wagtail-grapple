@@ -22,26 +22,12 @@ env:
   PYTHON_LATEST: "3.11"
 
 jobs:
-  tests:
+  tests-sqlite:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
-      max-parallel: 4
       matrix:
         python-version: ['3.8', '3.9', '3.10', '3.11']
-        DATABASE_URL: ['sqlite:///db.sqlite3', 'postgres://postgres:postgres@localhost/postgres']
-
-    env:
-      DATABASE_URL: ${{matrix.DATABASE_URL}}
-
-    services:
-      postgres:
-        image: postgres:14
-        env:
-          POSTGRES_PASSWORD: postgres
-        ports:
-          - 5432:5432
-        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
     steps:
       - uses: actions/checkout@v3
@@ -60,6 +46,57 @@ jobs:
         run: python -Im flit build --format wheel
 
       - name: 🧪 Run tox targets for Python ${{ matrix.python-version }}
+        env:
+          DB: sqlite
+        run: tox --installpkg ./dist/*.whl
+
+      - name: ⬆️ Upload coverage data
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-data
+          path: tests/.coverage*
+          if-no-files-found: ignore
+          retention-days: 1
+
+  tests-postgres:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.8', '3.9', '3.10', '3.11']
+
+    services:
+      postgres:
+        image: bitnami/postgresql:14
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRESQL_PASSWORD: postgres
+          POSTGRESQL_FSYNC: "off"
+          POSTGRESQL_DATA_DIR: /dev/shm/pgdata
+        ports:
+          - 5432:5432
+        options: --health-cmd "pg_isready -d postgres -U postgres -p 5432" --health-interval 10s --health-timeout 5s --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: ⬇️ Install dependencies
+        run: |
+          python -Im pip install --upgrade pip
+          python -Im pip install flit tox tox-gh-actions
+          python -Im flit install --symlink
+
+      - name: 🏗️ Build wheel
+        run: python -Im flit build --format wheel
+
+      - name: 🧪 Run tox targets for Python ${{ matrix.python-version }}
+        env:
+          DB: sqlite
+          DATABASE_URL: 'postgres://postgres:postgres@localhost:5432/postgres'
         run: tox --installpkg ./dist/*.whl
 
       - name: ⬆️ Upload coverage data
@@ -72,7 +109,7 @@ jobs:
 
   coverage:
     runs-on: ubuntu-latest
-    needs: tests
+    needs: [tests-sqlite, tests-postgres]
 
     steps:
       - uses: actions/checkout@v3

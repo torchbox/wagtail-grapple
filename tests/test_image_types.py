@@ -230,9 +230,11 @@ class ImageTypesTest(BaseGrappleTestWithIntrospection):
             field["name"]: field for field in results["data"]["__type"]["fields"]
         }
         rendition_args = {arg["name"]: arg for arg in mapping["rendition"]["args"]}
+        src_set_args = {arg["name"]: arg for arg in mapping["srcSet"]["args"]}
 
         self.assertNotIn("isSvg", mapping)
         self.assertNotIn("preserveSvg", rendition_args)
+        self.assertNotIn("preserveSvg", src_set_args)
 
 
 if WAGTAIL_VERSION >= (5, 0):
@@ -262,12 +264,19 @@ if WAGTAIL_VERSION >= (5, 0):
                 field["name"]: field for field in results["data"]["__type"]["fields"]
             }
             rendition_args = {arg["name"]: arg for arg in mapping["rendition"]["args"]}
+            src_set_args = {arg["name"]: arg for arg in mapping["srcSet"]["args"]}
 
             self.assertIn("isSvg", mapping)
             self.assertEqual(mapping["isSvg"]["type"]["kind"], "NON_NULL")
             self.assertEqual(rendition_args["preserveSvg"]["type"]["name"], "Boolean")
             self.assertEqual(
                 rendition_args["preserveSvg"]["description"],
+                "Prevents raster image operations (e.g. `format-webp`, `bgcolor`, etc.) being applied to SVGs. "
+                "More info: https://docs.wagtail.org/en/stable/topics/images.html#svg-images",
+            )
+            self.assertEqual(src_set_args["preserveSvg"]["type"]["name"], "Boolean")
+            self.assertEqual(
+                src_set_args["preserveSvg"]["description"],
                 "Prevents raster image operations (e.g. `format-webp`, `bgcolor`, etc.) being applied to SVGs. "
                 "More info: https://docs.wagtail.org/en/stable/topics/images.html#svg-images",
             )
@@ -310,6 +319,24 @@ if WAGTAIL_VERSION >= (5, 0):
                 )
             )
 
+        def test_svg_src_set_with_raster_format_with_preserve_svg(self):
+            query = """
+            query ($id: ID!) {
+                image(id: $id) {
+                    srcSet(sizes: [100], format: "webp", preserveSvg: true)
+                }
+            }
+            """
+
+            results = self.client.execute(
+                query, variables={"id": self.example_svg_image.id}
+            )
+            self.assertTrue(
+                results["data"]["image"]["srcSet"]
+                .split()[0]
+                .endswith("test.width-100.svg")
+            )
+
         def test_svg_rendition_with_raster_format_without_preserve_svg(self):
             query = """
             query ($id: ID!) {
@@ -317,6 +344,23 @@ if WAGTAIL_VERSION >= (5, 0):
                     rendition(width: 200, format: "webp") {
                         url
                     }
+                }
+            }
+            """
+
+            results = self.client.execute(
+                query, variables={"id": self.example_svg_image.id}
+            )
+            self.assertEqual(
+                results["errors"][0]["message"],
+                "'SvgImage' object has no attribute 'save_as_webp'",
+            )
+
+        def test_svg_src_set_with_raster_format_without_preserve_svg(self):
+            query = """
+            query ($id: ID!) {
+                image(id: $id) {
+                    srcSet(sizes: [100], format: "webp")
                 }
             }
             """

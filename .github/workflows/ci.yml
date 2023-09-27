@@ -28,6 +28,7 @@ jobs:
       fail-fast: false
       matrix:
         python-version: ['3.8', '3.9', '3.10', '3.11']
+        db: ['sqlite']
 
     steps:
       - uses: actions/checkout@v3
@@ -46,8 +47,6 @@ jobs:
         run: python -Im flit build --format wheel
 
       - name: 🧪 Run tox targets for Python ${{ matrix.python-version }}
-        env:
-          DB: sqlite
         run: tox --installpkg ./dist/*.whl
 
       - name: ⬆️ Upload coverage data
@@ -64,6 +63,7 @@ jobs:
       fail-fast: false
       matrix:
         python-version: ['3.8', '3.9', '3.10', '3.11']
+        db: ['postgres']
 
     services:
       postgres:
@@ -95,7 +95,6 @@ jobs:
 
       - name: 🧪 Run tox targets for Python ${{ matrix.python-version }}
         env:
-          DB: sqlite
           DATABASE_URL: 'postgres://postgres:postgres@localhost:5432/postgres'
         run: tox --installpkg ./dist/*.whl
 

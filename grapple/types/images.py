@@ -141,7 +141,7 @@ class ImageObjectType(DjangoObjectType):
         """
         Render a custom rendition of the current image.
         """
-        preserve_svg = kwargs.pop("preserve_svg", False)
+        preserve_svg = kwargs.pop("preserve_svg", True)
         filter_specs = "|".join([f"{key}-{val}" for key, val in kwargs.items()])
 
         # Only allow the defined filters (thus renditions)
@@ -150,7 +150,7 @@ class ImageObjectType(DjangoObjectType):
                 "Invalid filter specs. Check the `ALLOWED_IMAGE_FILTERS` setting."
             )
 
-        if instance.is_svg() and preserve_svg:
+        if WAGTAIL_VERSION > (5, 0) and instance.is_svg() and preserve_svg:
             # when dealing with SVGs, we want to limit the filter specs to those that are safe
             filter_specs = to_svg_safe_spec(filter_specs)
 
@@ -197,7 +197,7 @@ class ImageObjectType(DjangoObjectType):
         info: GraphQLResolveInfo,
         sizes: list[int],
         format: str | None = None,
-        preserve_svg: bool = False,
+        preserve_svg: bool = True,
         **kwargs,
     ) -> str:
         """

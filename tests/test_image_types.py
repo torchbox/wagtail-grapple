@@ -303,7 +303,7 @@ if WAGTAIL_VERSION >= (5, 0):
             query = """
             query ($id: ID!) {
                 image(id: $id) {
-                    rendition(width: 150, format: "webp", preserveSvg: true) {
+                    rendition(width: 150, format: "webp") {
                         url
                     }
                 }
@@ -323,7 +323,7 @@ if WAGTAIL_VERSION >= (5, 0):
             query = """
             query ($id: ID!) {
                 image(id: $id) {
-                    srcSet(sizes: [100], format: "webp", preserveSvg: true)
+                    srcSet(sizes: [100], format: "webp")
                 }
             }
             """
@@ -341,7 +341,7 @@ if WAGTAIL_VERSION >= (5, 0):
             query = """
             query ($id: ID!) {
                 image(id: $id) {
-                    rendition(width: 200, format: "webp") {
+                    rendition(width: 200, format: "webp", preserveSvg: false) {
                         url
                     }
                 }
@@ -360,7 +360,7 @@ if WAGTAIL_VERSION >= (5, 0):
             query = """
             query ($id: ID!) {
                 image(id: $id) {
-                    srcSet(sizes: [100], format: "webp")
+                    srcSet(sizes: [100], format: "webp", preserveSvg: false)
                 }
             }
             """
@@ -378,7 +378,7 @@ if WAGTAIL_VERSION >= (5, 0):
             query = """
             query ($id: ID!) {
                 image(id: $id) {
-                    rendition(bgcolor: "fff", format: "webp", preserveSvg: true) {
+                    rendition(bgcolor: "fff", format: "webp") {
                         url
                     }
                 }

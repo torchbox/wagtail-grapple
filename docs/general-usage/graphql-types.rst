@@ -61,6 +61,7 @@ the root query type like so:
     srcSet(
         sizes: [Int]
         format: String
+        preserveSvg: Boolean
     ): String
     isSvg: Boolean!
 

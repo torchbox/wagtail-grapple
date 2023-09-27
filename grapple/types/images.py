@@ -59,6 +59,24 @@ def get_rendition_field_kwargs() -> dict[str, graphene.Scalar]:
     return kwargs
 
 
+def get_src_set_field_kwargs() -> dict[str, graphene.Scalar]:
+    """
+    Returns a list of kwargs for the srcSet field.
+    Extracted for convenience, to accommodate for the conditional logic needed for various Wagtail versions.
+    """
+    kwargs = {
+        "sizes": graphene.List(graphene.Int),
+        "format": graphene.String(),
+    }
+    if WAGTAIL_VERSION > (5, 0):
+        kwargs["preserve_svg"] = graphene.Boolean(
+            description="Prevents raster image operations (e.g. `format-webp`, `bgcolor`, etc.) being applied to SVGs. "
+            "More info: https://docs.wagtail.org/en/stable/topics/images.html#svg-images"
+        )
+
+    return kwargs
+
+
 def rendition_allowed(filter_specs: str) -> bool:
     """Checks a given rendition filter is allowed"""
     allowed_filters = grapple_settings.ALLOWED_IMAGE_FILTERS
@@ -110,9 +128,7 @@ class ImageObjectType(DjangoObjectType):
     collection = graphene.Field(lambda: CollectionObjectType, required=True)
     tags = graphene.List(graphene.NonNull(lambda: TagObjectType), required=True)
     rendition = graphene.Field(get_rendition_type, **get_rendition_field_kwargs())
-    src_set = graphene.String(
-        sizes=graphene.List(graphene.Int), format=graphene.String()
-    )
+    src_set = graphene.String(**get_src_set_field_kwargs())
     if WAGTAIL_VERSION > (5, 0):
         is_svg = graphene.Boolean(required=True)
 
@@ -181,6 +197,7 @@ class ImageObjectType(DjangoObjectType):
         info: GraphQLResolveInfo,
         sizes: list[int],
         format: str | None = None,
+        preserve_svg: bool = False,
         **kwargs,
     ) -> str:
         """
@@ -191,7 +208,11 @@ class ImageObjectType(DjangoObjectType):
         if instance.file.name is not None:
             rendition_list = [
                 ImageObjectType.resolve_rendition(
-                    instance, info, width=width, **format_kwarg
+                    instance,
+                    info,
+                    width=width,
+                    preserve_svg=preserve_svg,
+                    **format_kwarg,
                 )
                 for width in sizes
                 if rendition_allowed(f"width-{width}{filter_suffix}")

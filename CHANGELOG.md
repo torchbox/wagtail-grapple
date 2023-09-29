@@ -1,11 +1,23 @@
 ## Unreleased
 
+## [0.23.0] - 2023-09-29
+
+### Added
+
+-   Implement `preserveSvg` flag for `srcSet` ([#370](https://github.com/torchbox/wagtail-grapple/pull/370)) @mgax
+
+### Changed
+
+-   `preserveSVG` is true by default ([#371](https://github.com/torchbox/wagtail-grapple/pull/371)) @mgax
+-   Improvements to the CI pipelines
+
+
 ## [0.22.0] - 2023-09-18
 
 ### Added
 
--   Add global mechanism for overriding the base `PageInterface` (#325) @dopry
--   Allow defining additional interfaces via `graphql_interfaces` (#366) @zerolab @mgax
+-   Add global mechanism for overriding the base `PageInterface` ([#325](https://github.com/torchbox/wagtail-grapple/pull/325)) @Leden, @dopry, @zerolab
+-   Allow defining additional interfaces via `graphql_interfaces` ([#366](https://github.com/torchbox/wagtail-grapple/pull/366)) @mgax, @zerolab
     This applies to all models, including StreamField blocks
 
 
@@ -342,8 +354,9 @@
 -   Improve field definition and under-the-hood implementation ([#28](https://github.com/torchbox/wagtail-grapple/pull/28))
 -   Add conditional checks when resolving streamfield type ([#29](https://github.com/torchbox/wagtail-grapple/pull/29))
 
-[unreleased]: https://github.com/torchbox/wagtail-grapple/compare/v0.22.0...HEAD
-[0.21.0]: https://github.com/torchbox/wagtail-grapple/compare/v0.21.0...v0.22.0
+[unreleased]: https://github.com/torchbox/wagtail-grapple/compare/v0.23.0...HEAD
+[0.23.0]: https://github.com/torchbox/wagtail-grapple/compare/v0.22.0...v0.23.0
+[0.22.0]: https://github.com/torchbox/wagtail-grapple/compare/v0.21.0...v0.22.0
 [0.21.0]: https://github.com/torchbox/wagtail-grapple/compare/v0.20.0...v0.21.0
 [0.20.0]: https://github.com/torchbox/wagtail-grapple/compare/v0.19.2...v0.20.0
 [0.19.2]: https://github.com/torchbox/wagtail-grapple/compare/v0.19.1...v0.19.2

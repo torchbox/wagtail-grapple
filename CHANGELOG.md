@@ -1,5 +1,9 @@
 ## Unreleased
 
+### Fixed
+
+- Fixed `test_src_set_invalid_format` not working with Wagtail 5.2 and above. @JakubMastalerz
+
 ## [0.23.0] - 2023-09-29
 
 ### Added

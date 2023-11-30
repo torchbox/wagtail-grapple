@@ -152,6 +152,10 @@ class ImageTypesTest(BaseGrappleTestWithIntrospection):
         self.assertIn("width-100.format-webp.webp", data["srcSet"])
         self.assertIn("width-300.format-webp.webp", data["srcSet"])
 
+    @skipIf(
+        WAGTAIL_VERSION >= (5, 2),
+        "Wagtail 5.2 introduced changes to this error message.",
+    )
     def test_src_set_invalid_format(self):
         query = """
         query ($id: ID!) {
@@ -164,6 +168,23 @@ class ImageTypesTest(BaseGrappleTestWithIntrospection):
         results = self.client.execute(query, variables={"id": self.example_image.id})
         self.assertEqual(len(results["errors"]), 1)
         self.assertIn("Format must be either 'jpeg'", results["errors"][0]["message"])
+
+    @skipIf(
+        WAGTAIL_VERSION < (5, 2),
+        "Wagtail 5.2 introduced changes to this error message.",
+    )
+    def test_src_set_invalid_format_wagtail_5(self):
+        query = """
+        query ($id: ID!) {
+            image(id: $id) {
+                srcSet(sizes: [100, 300], format: "foobar")
+            }
+        }
+        """
+
+        results = self.client.execute(query, variables={"id": self.example_image.id})
+        self.assertEqual(len(results["errors"]), 1)
+        self.assertIn("Format must be one of: jpeg", results["errors"][0]["message"])
 
     @override_settings(GRAPPLE={"ALLOWED_IMAGE_FILTERS": ["width-200"]})
     def test_src_set_disallowed_filter(self):

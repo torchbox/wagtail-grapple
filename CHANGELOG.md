@@ -2,7 +2,7 @@
 
 ### Fixed
 
-- Fixed `test_src_set_invalid_format` not working with Wagtail 5.2 and above. ([#378](https://github.com/torchbox/wagtail-grapple/pull/378)) @JakubMastalerz
+- `test_src_set_invalid_format` not working with Wagtail 5.2 and above. ([#378](https://github.com/torchbox/wagtail-grapple/pull/378)) @JakubMastalerz
 
 ## [0.23.0] - 2023-09-29
 

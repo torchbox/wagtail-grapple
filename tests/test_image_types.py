@@ -154,9 +154,15 @@ class ImageTypesTest(BaseGrappleTestWithIntrospection):
 
     @skipIf(
         WAGTAIL_VERSION >= (5, 2),
-        "Wagtail 5.2 introduced changes to this error message.",
+        "Exception message is different in Wagtail 5.2+",
     )
     def test_src_set_invalid_format_wagtail_below_5_2(self):
+        """
+        Ensure that an exception is raised when image format is not of valid type.
+        Works with Wagtail versions below 5.2. For versions 5.2 and above see:
+        `test_src_set_invalid_format_wagtail_above_5_2`.
+        """
+
         query = """
         query ($id: ID!) {
             image(id: $id) {
@@ -171,9 +177,15 @@ class ImageTypesTest(BaseGrappleTestWithIntrospection):
 
     @skipIf(
         WAGTAIL_VERSION < (5, 2),
-        "Wagtail 5.2 introduced changes to this error message.",
+        "Exception message is different in Wagtail verions below 5.2",
     )
     def test_src_set_invalid_format_wagtail_above_5_2(self):
+        """
+        Ensure that an exception is raised when image format is not of valid type.
+        Works with Wagtail versions 5.2 and above. For versions below 5.2 see:
+        `test_src_set_invalid_format_wagtail_below_5_2`.
+        """
+
         query = """
         query ($id: ID!) {
             image(id: $id) {

@@ -156,7 +156,7 @@ class ImageTypesTest(BaseGrappleTestWithIntrospection):
         WAGTAIL_VERSION >= (5, 2),
         "Wagtail 5.2 introduced changes to this error message.",
     )
-    def test_src_set_invalid_format(self):
+    def test_src_set_invalid_format_wagtail_below_5_2(self):
         query = """
         query ($id: ID!) {
             image(id: $id) {
@@ -173,7 +173,7 @@ class ImageTypesTest(BaseGrappleTestWithIntrospection):
         WAGTAIL_VERSION < (5, 2),
         "Wagtail 5.2 introduced changes to this error message.",
     )
-    def test_src_set_invalid_format_wagtail_5(self):
+    def test_src_set_invalid_format_wagtail_above_5_2(self):
         query = """
         query ($id: ID!) {
             image(id: $id) {

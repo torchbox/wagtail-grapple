@@ -2,7 +2,10 @@
 
 ### Added
 
--   Factory for `Redirect` model in test app ([tba](https://github.com/torchbox/wagtail-grapple/pull/tba)) @jakubmastalerz
+-   Factory for `Redirect` model in test app ([tba](https://github.com/torchbox/wagtail-grapple/pull/tba)) @JakubMastalerz
+-   Test suite for `Redirect` behaviour ([tba](https://github.com/torchbox/wagtail-grapple/pull/tba)) @JakubMastalerz
+
+
 
 ### Fixed
 

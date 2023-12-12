@@ -1,6 +1,9 @@
+import json
+
 from test_grapple import BaseGrappleTest
 from testapp.factories import RedirectFactory
 from testapp.models import BlogPage
+from wagtail_factories import SiteFactory
 
 
 class TestRedirectQueries(BaseGrappleTest):
@@ -15,17 +18,17 @@ class TestRedirectQueries(BaseGrappleTest):
         """
 
         self.redirect = RedirectFactory(
-            old_path="/test/old",
+            old_path="test/old",
             redirect_link="http://localhost:8000/test/new",
             is_permanent=True,
             redirect_page=None,
+            site=None,
         )
 
         query = """
         {
             redirects {
                 oldPath
-                oldUrl
                 newUrl
                 isPermanent
             }
@@ -40,8 +43,7 @@ class TestRedirectQueries(BaseGrappleTest):
 
         result_data = result["data"]["redirects"][0]
 
-        self.assertEqual(result_data["oldPath"], "/test/old")
-        self.assertEqual(result_data["oldUrl"], "http://localhost:8000/test/old")
+        self.assertEqual(result_data["oldPath"], "test/old")
         self.assertEqual(result_data["newUrl"], "http://localhost:8000/test/new")
         self.assertEqual(result_data["isPermanent"], True)
 
@@ -100,3 +102,55 @@ class TestRedirectQueries(BaseGrappleTest):
         result = self.client.execute(query)["data"]["redirects"][0]["newUrl"]
 
         self.assertEqual(result, None)
+
+    def test_specified_site_url(self):
+        """
+        Test that a redirect with a specified site returns the correct `old_url`.
+        """
+        self.redirect = RedirectFactory(
+            old_path="old-path",
+            site=SiteFactory(
+                hostname="test-site",
+                port=8000,
+            ),
+        )
+
+        query = """
+        {
+            redirects {
+                oldUrl
+            }
+        }
+        """
+
+        result = self.client.execute(query)["data"]["redirects"][0]["oldUrl"]
+
+        self.assertEqual(result, "http://test-site:8000/old-path")
+
+    def test_all_sites_url(self):
+        """
+        Test that a redirect with no specified site return the desired result
+        for "all sites".
+        """
+        self.site1 = SiteFactory(hostname="test-site", port=8000)
+        self.site2 = SiteFactory(hostname="another-test-site", port=8001)
+
+        self.redirect = RedirectFactory(
+            old_path="old-path",
+            site=None,
+        )
+
+        query = """
+        {
+            redirects {
+                oldUrl
+            }
+        }
+        """
+
+        result = self.client.execute(query)["data"]["redirects"][0]["oldUrl"]
+        result = json.loads(result)
+
+        self.assertIn("http://localhost:80/old-path", result)
+        self.assertIn("http://test-site:8000/old-path", result)
+        self.assertIn("http://another-test-site:8001/old-path", result)

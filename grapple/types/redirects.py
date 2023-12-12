@@ -1,10 +1,11 @@
+import json
+
 from typing import Optional
 
 import graphene
 
-from django.conf import settings
 from wagtail.contrib.redirects.models import Redirect
-from wagtail.models import Page
+from wagtail.models import Page, Site
 
 from .pages import get_page_interface
 
@@ -16,9 +17,23 @@ class RedirectType(graphene.ObjectType):
     page = graphene.Field(get_page_interface())
     is_permanent = graphene.Boolean(required=True)
 
-    # Give old_path with BASE_URL attached.
     def resolve_old_url(self, info, **kwargs) -> str:
-        return settings.BASE_URL + self.old_path
+        """
+        If the redirect is for a specific site, append hostname and port to path.
+        Otherwise, return a JSON string representing a list of all site urls.
+        """
+        if self.site:
+            return f"http://{self.site.hostname}:{self.site.port}/{self.old_path}"
+
+        if self.site is None:
+            sites_QS = Site.objects.all()
+            old_url_list = []
+            for site in sites_QS:
+                url = f"http://{site.hostname}:{site.port}/{self.old_path}"
+                old_url_list.append(url)
+
+            json_string = json.dumps(old_url_list)
+            return json_string
 
     # Get new url
     def resolve_new_url(self, info, **kwargs) -> Optional[str]:

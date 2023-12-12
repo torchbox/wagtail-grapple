@@ -185,6 +185,10 @@ class MiddlewareModelFactory(factory.django.DjangoModelFactory):
 
 
 class RedirectFactory(factory.django.DjangoModelFactory):
+    """
+    TODO: Consider moving to wagtail factories?
+    """
+
     old_path = factory.Faker("slug")
     # Note: Site needs `hostname` and `port` to be a unique combination,
     # so this seems like the best option:

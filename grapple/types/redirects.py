@@ -10,7 +10,7 @@ from wagtail.models import Page, Site
 from .pages import get_page_interface
 
 
-class RedirectType(graphene.ObjectType):
+class RedirectObjectType(graphene.ObjectType):
     old_path = graphene.String(required=True)
     old_url = graphene.String(required=True)
     new_url = graphene.String(required=False)
@@ -50,9 +50,12 @@ class RedirectType(graphene.ObjectType):
         if self.redirect_page is not None:
             return self.redirect_page.specific
 
+    class Meta:
+        name = "Redirect"
+
 
 class RedirectsQuery:
-    redirects = graphene.List(graphene.NonNull(RedirectType), required=True)
+    redirects = graphene.List(graphene.NonNull(RedirectObjectType), required=True)
 
     # Return all redirects.
     def resolve_redirects(self, info, **kwargs):

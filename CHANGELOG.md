@@ -7,8 +7,9 @@
 
 ### Changed
 
--   `new_url` field on `RedirectType` is no longer required ([#380](https://github.com/torchbox/wagtail-grapple/pull/380)) @JakubMastalerz
--   `old_url` field on `RedirectType` now returns url if site is specified and list of urls for all sites if not. ([#380](https://github.com/torchbox/wagtail-grapple/pull/380)) @JakubMastalerz
+-   Renamed `RedirectType` to `RedirectObjectType` for clarity ([#380](https://github.com/torchbox/wagtail-grapple/pull/380)) @JakubMastalerz
+-   `new_url` field on `RedirectObjectType` is no longer required ([#380](https://github.com/torchbox/wagtail-grapple/pull/380)) @JakubMastalerz
+-   `old_url` field on `RedirectObjectType` now returns url if site is specified and list of urls for all sites if not. ([#380](https://github.com/torchbox/wagtail-grapple/pull/380)) @JakubMastalerz
 
 
 ### Fixed

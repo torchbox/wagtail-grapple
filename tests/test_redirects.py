@@ -1,5 +1,3 @@
-import json
-
 from test_grapple import BaseGrappleTest
 from testapp.factories import RedirectFactory
 from testapp.models import BlogPage
@@ -187,11 +185,11 @@ class TestRedirectQueries(BaseGrappleTest):
 
     def test_all_sites_url(self):
         """
-        Test that a redirect with no specified site return the desired result
-        for "all sites".
+        Test that when no site is specified on a redirect, that redirect is
+        shown for each existing site.
         """
-        self.site1 = SiteFactory(hostname="test-site", port=8000)
-        self.site2 = SiteFactory(hostname="another-test-site", port=8001)
+        self.site1 = SiteFactory(hostname="test-site", port=81)
+        self.site2 = SiteFactory(hostname="another-test-site", port=82)
 
         self.redirect = RedirectFactory(
             old_path="old-path",
@@ -206,9 +204,8 @@ class TestRedirectQueries(BaseGrappleTest):
         }
         """
 
-        result = self.client.execute(query)["data"]["redirects"][0]["oldUrl"]
-        result = json.loads(result)
+        result = self.client.execute(query)["data"]["redirects"]
 
-        self.assertIn("http://localhost:80/old-path", result)
-        self.assertIn("http://test-site:8000/old-path", result)
-        self.assertIn("http://another-test-site:8001/old-path", result)
+        self.assertEqual(result[0]["oldUrl"], "http://another-test-site:82/old-path")
+        self.assertEqual(result[1]["oldUrl"], "http://localhost/old-path")
+        self.assertEqual(result[2]["oldUrl"], "http://test-site:81/old-path")

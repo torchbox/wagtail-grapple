@@ -4,12 +4,13 @@
 
 -   Factory for `Redirect` model in test app ([#380](https://github.com/torchbox/wagtail-grapple/pull/380)) @JakubMastalerz
 -   Test suite for `Redirect` behaviour ([#380](https://github.com/torchbox/wagtail-grapple/pull/380)) @JakubMastalerz
+-   `site` field on `RedirectObjectType` ([#380](https://github.com/torchbox/wagtail-grapple/pull/380)) @JakubMastalerz
 
 ### Changed
 
 -   Renamed `RedirectType` to `RedirectObjectType` for clarity ([#380](https://github.com/torchbox/wagtail-grapple/pull/380)) @JakubMastalerz
 -   `new_url` field on `RedirectObjectType` is no longer required ([#380](https://github.com/torchbox/wagtail-grapple/pull/380)) @JakubMastalerz
--   `old_url` field on `RedirectObjectType` now returns url if site is specified and list of urls for all sites if not. ([#380](https://github.com/torchbox/wagtail-grapple/pull/380)) @JakubMastalerz
+-   `RedirectsQuery` now returns a separate redirect object for each existing site when `site=None` ([#380](https://github.com/torchbox/wagtail-grapple/pull/380)) @JakubMastalerz
 
 
 ### Fixed

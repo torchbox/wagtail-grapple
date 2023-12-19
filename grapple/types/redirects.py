@@ -1,4 +1,4 @@
-import json
+import copy
 
 from typing import Optional
 
@@ -22,22 +22,15 @@ class RedirectObjectType(graphene.ObjectType):
 
     def resolve_old_url(self, info, **kwargs) -> str:
         """
-        If the redirect is for a specific site, append hostname and port to path.
-        Otherwise, return a JSON string representing a list of all site urls.
+        Resolve the value of `old_url` using the `root_url` of the associated
+        site and `old_path`.
+        Note: `self.site` should never be none because of `resolve_redirects`.
         """
         if self.site:
             return f"{self.site.root_url}/{self.old_path}"
 
-        # TODO: Remove after making site required
         if self.site is None:
-            sites_QS = Site.objects.all()
-            old_url_list = []
-            for site in sites_QS:
-                url = f"http://{site.hostname}:{site.port}/{self.old_path}"
-                old_url_list.append(url)
-
-            json_string = json.dumps(old_url_list)
-            return json_string
+            return None
 
     # Get new url
     def resolve_new_url(self, info, **kwargs) -> Optional[str]:
@@ -63,4 +56,21 @@ class RedirectsQuery:
 
     # Return all redirects.
     def resolve_redirects(self, info, **kwargs):
-        return Redirect.objects.select_related("redirect_page")
+        """
+        Resolve the query set of redirects. If `site` is None, a redirect works
+        for all sites. To show this, a new redirect object is created for each
+        of the sites.
+        """
+        redirects_QS = Redirect.objects.select_related("redirect_page")
+        redirect_list = list(redirects_QS)
+        sites_QS = Site.objects.all()
+        for redirect in redirect_list:
+            if redirect.site is None:
+                for site in sites_QS:
+                    new_redirect = copy.copy(redirect)
+                    new_redirect.site = site
+                    redirect_list.append(new_redirect)
+
+        redirect_list = filter(lambda x: (x.site is not None), redirect_list)
+
+        return redirect_list

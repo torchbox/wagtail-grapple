@@ -7,10 +7,11 @@ from wagtail_factories import SiteFactory
 
 
 class TestRedirectQueries(BaseGrappleTest):
-    def setUp(self) -> None:
-        super().setUp()
-        self.page = BlogPage(title="Test page", slug="test-page-url", date="2020-01-01")
-        self.home.add_child(instance=self.page)
+    @classmethod
+    def setUpTestData(cls) -> None:
+        super().setUpTestData()
+        cls.page = BlogPage(title="Test page", slug="test-page-url", date="2020-01-01")
+        cls.home.add_child(instance=cls.page)
 
     def test_basic_query(self):
         """
@@ -46,6 +47,47 @@ class TestRedirectQueries(BaseGrappleTest):
         self.assertEqual(result_data["oldPath"], "test/old")
         self.assertEqual(result_data["newUrl"], "http://localhost:8000/test/new")
         self.assertEqual(result_data["isPermanent"], True)
+
+    def test_sub_type_query(self):
+        """
+        Test that `Page` and `Site` fields on Redirects can be queried through graphql.
+        """
+
+        self.redirect = RedirectFactory(
+            redirect_page=self.page,
+            site=SiteFactory(
+                hostname="test-site",
+                port=81,
+            ),
+        )
+
+        query = """
+        {
+            redirects {
+                page {
+                    title
+                    url
+                }
+                site {
+                    hostname
+                    port
+                }
+            }
+        }
+        """
+
+        result = self.client.execute(query)
+
+        self.assertEqual(type(result["data"]["redirects"][0]), dict)
+        self.assertEqual(type(result["data"]["redirects"][0]["page"]), dict)
+        self.assertEqual(type(result["data"]["redirects"][0]["site"]), dict)
+
+        result_data = result["data"]["redirects"][0]
+
+        self.assertEqual(result_data["page"]["title"], "Test page")
+        self.assertEqual(result_data["page"]["url"], "http://localhost/test-page-url/")
+        self.assertEqual(result_data["site"]["hostname"], "test-site")
+        self.assertEqual(result_data["site"]["port"], 81)
 
     def test_new_url_sources(self):
         """
@@ -111,7 +153,21 @@ class TestRedirectQueries(BaseGrappleTest):
             old_path="old-path",
             site=SiteFactory(
                 hostname="test-site",
-                port=8000,
+                port=81,
+            ),
+        )
+        self.redirect = RedirectFactory(
+            old_path="old-path",
+            site=SiteFactory(
+                hostname="test-site-default-port",
+                port=80,
+            ),
+        )
+        self.redirect = RedirectFactory(
+            old_path="old-path",
+            site=SiteFactory(
+                hostname="test-site-secure",
+                port=443,
             ),
         )
 
@@ -123,9 +179,11 @@ class TestRedirectQueries(BaseGrappleTest):
         }
         """
 
-        result = self.client.execute(query)["data"]["redirects"][0]["oldUrl"]
+        result = self.client.execute(query)["data"]["redirects"]
 
-        self.assertEqual(result, "http://test-site:8000/old-path")
+        self.assertEqual(result[0]["oldUrl"], "http://test-site:81/old-path")
+        self.assertEqual(result[1]["oldUrl"], "http://test-site-default-port/old-path")
+        self.assertEqual(result[2]["oldUrl"], "https://test-site-secure/old-path")
 
     def test_all_sites_url(self):
         """

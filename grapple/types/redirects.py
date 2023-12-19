@@ -7,6 +7,8 @@ import graphene
 from wagtail.contrib.redirects.models import Redirect
 from wagtail.models import Page, Site
 
+from grapple.types.sites import SiteObjectType
+
 from .pages import get_page_interface
 
 
@@ -15,6 +17,7 @@ class RedirectObjectType(graphene.ObjectType):
     old_url = graphene.String(required=True)
     new_url = graphene.String(required=False)
     page = graphene.Field(get_page_interface())
+    site = graphene.Field(SiteObjectType, required=False)
     is_permanent = graphene.Boolean(required=True)
 
     def resolve_old_url(self, info, **kwargs) -> str:
@@ -23,8 +26,9 @@ class RedirectObjectType(graphene.ObjectType):
         Otherwise, return a JSON string representing a list of all site urls.
         """
         if self.site:
-            return f"http://{self.site.hostname}:{self.site.port}/{self.old_path}"
+            return f"{self.site.root_url}/{self.old_path}"
 
+        # TODO: Remove after making site required
         if self.site is None:
             sites_QS = Site.objects.all()
             old_url_list = []

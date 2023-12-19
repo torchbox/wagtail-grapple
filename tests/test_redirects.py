@@ -63,7 +63,7 @@ class TestRedirectQueries(BaseGrappleTest):
             redirect_page=self.page,
         )
         self.redirect_just_link = RedirectFactory(
-            redirect_link="/test/just-link", redirect_page=None
+            redirect_link="http://test/just-link", redirect_page=None
         )
 
         query = """
@@ -76,9 +76,9 @@ class TestRedirectQueries(BaseGrappleTest):
 
         result = self.client.execute(query)["data"]["redirects"]
 
-        self.assertEqual(result[0]["newUrl"], "/test-page-url/")
-        self.assertEqual(result[1]["newUrl"], "/test-page-url/")
-        self.assertEqual(result[2]["newUrl"], "/test/just-link")
+        self.assertEqual(result[0]["newUrl"], "http://localhost/test-page-url/")
+        self.assertEqual(result[1]["newUrl"], "http://localhost/test-page-url/")
+        self.assertEqual(result[2]["newUrl"], "http://test/just-link")
 
     def test_no_new_url_query(self):
         """

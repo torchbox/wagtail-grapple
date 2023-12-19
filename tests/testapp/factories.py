@@ -6,7 +6,6 @@ import wagtail_factories
 from factory import fuzzy
 from wagtail import blocks
 from wagtail.contrib.redirects.models import Redirect
-from wagtail.models import Site
 
 from testapp.blocks import (
     CustomInterfaceBlock,
@@ -190,9 +189,7 @@ class RedirectFactory(factory.django.DjangoModelFactory):
     """
 
     old_path = factory.Faker("slug")
-    # Note: Site needs `hostname` and `port` to be a unique combination,
-    # so this seems like the best option:
-    site = factory.Iterator(Site.objects.all())
+    site = factory.SubFactory(wagtail_factories.SiteFactory)
     redirect_page = factory.SubFactory(wagtail_factories.PageFactory)
     redirect_link = factory.Faker("url")
     is_permanent = factory.Faker("boolean")

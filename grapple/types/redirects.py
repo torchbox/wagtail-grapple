@@ -1,6 +1,6 @@
 import copy
 
-from typing import Optional
+from typing import List, Optional
 
 import graphene
 
@@ -19,6 +19,9 @@ class RedirectObjectType(graphene.ObjectType):
     page = graphene.Field(get_page_interface())
     site = graphene.Field(SiteObjectType, required=True)
     is_permanent = graphene.Boolean(required=True)
+
+    class Meta:
+        name = "Redirect"
 
     def resolve_old_url(self, info, **kwargs) -> str:
         """
@@ -41,22 +44,23 @@ class RedirectObjectType(graphene.ObjectType):
         if self.redirect_page is not None:
             return self.redirect_page.specific
 
-    class Meta:
-        name = "Redirect"
-
 
 class RedirectsQuery:
     redirects = graphene.List(graphene.NonNull(RedirectObjectType), required=True)
 
     # Return all redirects.
-    def resolve_redirects(self, info, **kwargs) -> list[Redirect]:
+    def resolve_redirects(self, info, **kwargs) -> List[Redirect]:
         """
         Resolve the query set of redirects. If `site` is None, a redirect works
         for all sites. To show this, a new redirect object is created for each
         of the sites.
         """
 
-        redirects_qs = Redirect.objects.select_related("redirect_page").all()
+        redirects_qs = (
+            Redirect.objects.select_related("redirect_page")
+            .select_related("site")
+            .all()
+        )
         finalised_redirects: list[
             Redirect
         ] = []  # Redirects to return within API response.

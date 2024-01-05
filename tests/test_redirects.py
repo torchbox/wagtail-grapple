@@ -244,3 +244,36 @@ class TestRedirectQueries(BaseGrappleTest):
         self.assertEqual(result[0]["oldUrl"], "http://another-test-site:82/old-path")
         self.assertEqual(result[1]["oldUrl"], "http://localhost/old-path")
         self.assertEqual(result[2]["oldUrl"], "http://test-site:81/old-path")
+
+    def test_query_efficiency(self):
+        """
+        Verify the number of queries when querying Redirects is constant to
+        prevent n+1 queries.
+        """
+
+        # Number of queries should remain constant for any N of redirects.
+        RedirectFactory()
+        RedirectFactory()
+        RedirectFactory()
+
+        query = """
+        {
+            redirects {
+                oldPath
+                newUrl
+                isPermanent
+                page {
+                    title
+                    url
+                }
+                site {
+                    hostname
+                    port
+                }
+            }
+        }
+        """
+
+        # There should be one SELECT query for Redirects and one for Sites.
+        with self.assertNumQueries(2):
+            self.client.execute(query)

@@ -20,7 +20,7 @@ class TestRedirectQueries(BaseGrappleTest):
 
         # Create a basic redirect without a specified `redirect_page` or `site`.
         RedirectFactory(
-            old_path="test/old",
+            old_path="/test/old",
             redirect_link="http://localhost:8000/test/new",
             is_permanent=True,
             redirect_page=None,
@@ -46,7 +46,7 @@ class TestRedirectQueries(BaseGrappleTest):
 
         result_data = result["data"]["redirects"][0]
 
-        self.assertEqual(result_data["oldPath"], "test/old")
+        self.assertEqual(result_data["oldPath"], "/test/old")
         self.assertEqual(result_data["newUrl"], "http://localhost:8000/test/new")
         self.assertEqual(result_data["isPermanent"], True)
 

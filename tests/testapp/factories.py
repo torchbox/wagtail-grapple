@@ -3,6 +3,7 @@ import datetime
 import factory
 import wagtail_factories
 
+from django.core.exceptions import ValidationError
 from factory import fuzzy
 from wagtail import blocks
 from wagtail.contrib.redirects.models import Redirect
@@ -196,3 +197,25 @@ class RedirectFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = Redirect
+
+    @classmethod
+    def _create(cls, model_class, *args, **kwargs):
+        """
+        Override _create() to ensure that Redirect.clean() is run
+        in order to normalise `old_path`.
+        """
+        obj = model_class(*args, **kwargs)
+        try:
+            obj.clean()
+        except ValidationError as ve:
+            message = (
+                f"Error building {model_class} with {cls.__name__}.\nBad values:\n"
+            )
+            for field in ve.error_dict.keys():
+                if field == "__all__":
+                    message += "  __all__: obj.clean() failed\n"
+                else:
+                    message += f'  {field}: "{getattr(obj, field)}"\n'
+            raise RuntimeError(message) from ve
+        obj.save()
+        return obj

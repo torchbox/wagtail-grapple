@@ -29,7 +29,7 @@ class RedirectObjectType(graphene.ObjectType):
         site and `old_path`.
         """
 
-        return f"{self.site.root_url}/{self.old_path}"
+        return self.site.root_url + self.old_path
 
     def resolve_new_url(self, info, **kwargs) -> Optional[str]:
         """

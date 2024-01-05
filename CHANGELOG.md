@@ -1,5 +1,8 @@
 ## Unreleased
 
+
+## [0.24.0] - 2024-01-05
+
 ### Changed
 
 -   Renamed `RedirectType` to `RedirectObjectType` ([#380](https://github.com/torchbox/wagtail-grapple/pull/380)) @JakubMastalerz
@@ -366,7 +369,8 @@
 -   Improve field definition and under-the-hood implementation ([#28](https://github.com/torchbox/wagtail-grapple/pull/28))
 -   Add conditional checks when resolving streamfield type ([#29](https://github.com/torchbox/wagtail-grapple/pull/29))
 
-[unreleased]: https://github.com/torchbox/wagtail-grapple/compare/v0.23.0...HEAD
+[unreleased]: https://github.com/torchbox/wagtail-grapple/compare/v0.24.0...HEAD
+[0.24.0]: https://github.com/torchbox/wagtail-grapple/compare/v0.23.0...v0.24.0
 [0.23.0]: https://github.com/torchbox/wagtail-grapple/compare/v0.22.0...v0.23.0
 [0.22.0]: https://github.com/torchbox/wagtail-grapple/compare/v0.21.0...v0.22.0
 [0.21.0]: https://github.com/torchbox/wagtail-grapple/compare/v0.20.0...v0.21.0

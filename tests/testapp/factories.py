@@ -186,7 +186,8 @@ class MiddlewareModelFactory(factory.django.DjangoModelFactory):
 
 class RedirectFactory(factory.django.DjangoModelFactory):
     """
-    TODO: Consider moving to wagtail factories?
+    TODO: Replace with RedirectFactory from wagtail-factories once it exists
+    @see https://github.com/wagtail/wagtail-factories/issues/82
     """
 
     old_path = factory.Faker("slug")
@@ -201,8 +202,9 @@ class RedirectFactory(factory.django.DjangoModelFactory):
     @classmethod
     def _create(cls, model_class, *args, **kwargs):
         """
-        Override _create() to ensure that Redirect.clean() is run
-        in order to normalise `old_path`.
+        Override _create() to ensure that Redirect.clean() is run in order to
+        normalise `old_path`.
+        @see https://github.com/wagtail/wagtail/blob/main/wagtail/contrib/redirects/models.py#L191
         """
         obj = model_class(*args, **kwargs)
         try:

@@ -17,7 +17,9 @@ class RedirectObjectType(graphene.ObjectType):
     old_url = graphene.String(required=True)
     new_url = graphene.String(required=False)
     page = graphene.Field(get_page_interface())
-    site = graphene.Field(SiteObjectType, required=True)
+    site = graphene.Field(
+        SiteObjectType, required=True
+    )  # Required because `RedirectsQuery` always adds a value.
     is_permanent = graphene.Boolean(required=True)
 
     class Meta:
@@ -33,8 +35,8 @@ class RedirectObjectType(graphene.ObjectType):
 
     def resolve_new_url(self, info, **kwargs) -> Optional[str]:
         """
-        Resolve the value of `new_url`. If `redirect_page` is specified then it's
-        url is prioritised.
+        Resolve the value of `new_url`. If `redirect_page` is specified then its
+        URL is prioritised.
         """
 
         return self.link
@@ -61,14 +63,13 @@ class RedirectsQuery:
             .select_related("site")
             .all()
         )
-        finalised_redirects: list[
-            Redirect
-        ] = []  # Redirects to return within API response.
+        finalised_redirects: list[Redirect] = []  # Redirects to return in API.
+
         for redirect in redirects_qs:
             if redirect.site is None:
                 # Duplicate Redirect for each Site as it applies to all Sites.
                 for site in Site.objects.all():
-                    _new_redirect = copy.copy(redirect)
+                    _new_redirect = copy.deepcopy(redirect)
                     _new_redirect.site = site
                     finalised_redirects.append(_new_redirect)
             else:

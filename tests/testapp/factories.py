@@ -3,8 +3,10 @@ import datetime
 import factory
 import wagtail_factories
 
+from django.core.exceptions import ValidationError
 from factory import fuzzy
 from wagtail import blocks
+from wagtail.contrib.redirects.models import Redirect
 
 from testapp.blocks import (
     CustomInterfaceBlock,
@@ -180,3 +182,42 @@ class SimpleModelFactory(factory.django.DjangoModelFactory):
 class MiddlewareModelFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = MiddlewareModel
+
+
+class RedirectFactory(factory.django.DjangoModelFactory):
+    """
+    TODO: Replace with RedirectFactory from wagtail-factories once it exists
+    @see https://github.com/wagtail/wagtail-factories/issues/82
+    """
+
+    old_path = factory.Faker("slug")
+    site = factory.SubFactory(wagtail_factories.SiteFactory)
+    redirect_page = factory.SubFactory(wagtail_factories.PageFactory)
+    redirect_link = factory.Faker("url")
+    is_permanent = factory.Faker("boolean")
+
+    class Meta:
+        model = Redirect
+
+    @classmethod
+    def _create(cls, model_class, *args, **kwargs):
+        """
+        Override _create() to ensure that Redirect.clean() is run in order to
+        normalise `old_path`.
+        @see https://github.com/wagtail/wagtail/blob/main/wagtail/contrib/redirects/models.py#L191
+        """
+        obj = model_class(*args, **kwargs)
+        try:
+            obj.clean()
+        except ValidationError as ve:
+            message = (
+                f"Error building {model_class} with {cls.__name__}.\nBad values:\n"
+            )
+            for field in ve.error_dict.keys():
+                if field == "__all__":
+                    message += "  __all__: obj.clean() failed\n"
+                else:
+                    message += f'  {field}: "{getattr(obj, field)}"\n'
+            raise RuntimeError(message) from ve
+        obj.save()
+        return obj

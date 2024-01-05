@@ -1,8 +1,16 @@
 ## Unreleased
 
+### Changed
+
+-   Renamed `RedirectType` to `RedirectObjectType` ([#380](https://github.com/torchbox/wagtail-grapple/pull/380)) @JakubMastalerz
+-   `RedirectsQuery` now returns a `Redirect` for each associated `Site` ([#380](https://github.com/torchbox/wagtail-grapple/pull/380)) @JakubMastalerz
+    -   Added `site` field on `RedirectObjectType`
+    -   Changed `new_url` field on `RedirectObjectType` to be optional
+
 ### Fixed
 
 - `test_src_set_invalid_format` not working with Wagtail 5.2 and above. ([#378](https://github.com/torchbox/wagtail-grapple/pull/378)) @JakubMastalerz
+
 
 ## [0.23.0] - 2023-09-29
 

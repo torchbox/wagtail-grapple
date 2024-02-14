@@ -1,5 +1,8 @@
+from __future__ import annotations
+
 import graphene
 
+from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import Q
 from django.utils.module_loading import import_string
@@ -303,41 +306,51 @@ def PagesQuery():
     registry.pages[type(WagtailPage)] = Page
 
     class Mixin:
-        pages = QuerySetList(
-            graphene.NonNull(get_page_interface),
-            content_type=graphene.Argument(
+        pages_kwargs: dict[str, graphene.Argument | bool] = {
+            "content_type": graphene.Argument(
                 graphene.String,
                 description=_(
-                    "Filter by content type. Uses the `app.Model` notation. Accepts a comma separated list of content types."
+                    "Filter by content type. Uses the `app.Model` notation. "
+                    "Accepts a comma separated list of content types."
                 ),
             ),
-            in_site=graphene.Argument(
+            "in_site": graphene.Argument(
                 graphene.Boolean,
                 description=_("Filter to pages in the current site only."),
                 default_value=False,
             ),
-            site=graphene.Argument(
+            "site": graphene.Argument(
                 graphene.String,
-                description=_("Filter to pages in the give site."),
+                description=_("Filter to pages in the given site."),
             ),
-            ancestor=graphene.Argument(
+            "ancestor": graphene.Argument(
                 graphene.ID,
                 description=_(
                     "Filter to pages that are descendants of the given page."
                 ),
                 required=False,
             ),
-            parent=graphene.Argument(
+            "parent": graphene.Argument(
                 graphene.ID,
                 description=_(
                     "Filter to pages that are children of the given page. "
-                    "When using both `parent` and `ancestor`, then `parent` will take precendence."
+                    "When using both `parent` and `ancestor`, then `parent` will take precedence."
                 ),
                 required=False,
             ),
-            enable_search=True,
-            required=True,
-        )
+            "enable_search": True,
+            "required": True,
+        }
+        if getattr(settings, "WAGTAIL_I18N_ENABLED", False):
+            pages_kwargs["locale"] = graphene.Argument(
+                graphene.String,
+                description=_(
+                    "Filter to pages with the given locale code as defined in `WAGTAIL_CONTENT_LANGUAGES`."
+                ),
+            )
+
+        pages = QuerySetList(graphene.NonNull(get_page_interface), **pages_kwargs)
+
         page = graphene.Field(
             get_page_interface(),
             id=graphene.ID(),
@@ -412,6 +425,10 @@ def PagesQuery():
                         content_type__app_label=app_label, content_type__model=model
                     )
                 pages = pages.filter(filters)
+
+            locale = kwargs.pop("locale", "")
+            if locale and getattr(settings, "WAGTAIL_I18N_ENABLED", False):
+                pages = pages.filter(locale__language_code=locale)
 
             return resolve_queryset(pages, info, **kwargs)
 

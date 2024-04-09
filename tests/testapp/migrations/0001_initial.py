@@ -327,7 +327,6 @@ class Migration(migrations.Migration):
                     models.ImageField(
                         height_field="height",
                         upload_to=wagtail.images.models.get_upload_to,
-                        verbose_name="file",
                         width_field="width",
                     ),
                 ),

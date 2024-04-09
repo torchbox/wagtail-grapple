@@ -4,12 +4,24 @@ from django.conf import settings
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db import connection
 from graphql import GraphQLError
+from wagtail import VERSION as WAGTAIL_VERSION
 from wagtail.models import Site
 from wagtail.search.index import class_is_indexed
-from wagtail.search.models import Query
 
 from .settings import grapple_settings
 from .types.structures import BasePaginatedType, PaginationType
+
+
+if grapple_settings.ADD_SEARCH_HIT:
+    if WAGTAIL_VERSION >= (6, 0):
+        try:
+            from wagtail.contrib.search_promotions import Query
+        except ImportError as e:
+            raise ImportError(
+                "wagtail.contrib.search_promotions app is required for Wagtail 6.0+"
+            ) from e
+    else:
+        from wagtail.search.models import Query
 
 
 def resolve_site_by_id(

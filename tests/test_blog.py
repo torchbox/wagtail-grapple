@@ -500,7 +500,8 @@ class BlogTest(BaseGrappleTest):
             "height": 113,
             "html": '<iframe width="200" height="113" src="https://www.youtube.com/embed/_U79Wc965vw?feature=oembed" '
             'frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; '
-            'picture-in-picture; web-share" allowfullscreen title="Wagtail Space 2018"></iframe>',
+            'picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen '
+            'title="Wagtail Space 2018"></iframe>',
         }
         for block in body:
             if block["blockType"] == "VideoBlock":

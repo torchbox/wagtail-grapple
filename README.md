@@ -180,7 +180,7 @@ Any contributions [you make](https://github.com/torchbox/wagtail-grapple/graphs/
 
 Wagtail Grapple supports:
 
--   Python 3.8, 3.9, 3.10 and 3.11
+-   Python 3.8, 3.9, 3.10 3.11 and 3.12
 -   Wagtail >= 4.1
 
 ## License

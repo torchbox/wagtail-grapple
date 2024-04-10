@@ -15,7 +15,7 @@ from .types.structures import BasePaginatedType, PaginationType
 if grapple_settings.ADD_SEARCH_HIT:
     if WAGTAIL_VERSION >= (6, 0):
         try:
-            from wagtail.contrib.search_promotions import Query
+            from wagtail.contrib.search_promotions.models import Query
         except ImportError as e:
             raise ImportError(
                 "wagtail.contrib.search_promotions app is required for Wagtail 6.0+"

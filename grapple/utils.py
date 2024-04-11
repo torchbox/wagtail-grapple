@@ -1,6 +1,7 @@
 from typing import Literal, Optional
 
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db import connection
 from graphql import GraphQLError
@@ -17,8 +18,8 @@ if grapple_settings.ADD_SEARCH_HIT:
         try:
             from wagtail.contrib.search_promotions.models import Query
         except ImportError as e:
-            raise ImportError(
-                "wagtail.contrib.search_promotions app is required for Wagtail 6.0+"
+            raise ImproperlyConfigured(
+                "wagtail.contrib.search_promotions must be installed if grapple_settings.ADD_SEARCH_HIT=True and using Wagtail >= 6.0"
             ) from e
     else:
         from wagtail.search.models import Query

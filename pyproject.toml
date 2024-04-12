@@ -26,14 +26,13 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Framework :: Wagtail",
-    "Framework :: Wagtail :: 4",
     "Framework :: Wagtail :: 5",
     "Framework :: Wagtail :: 6",
 ]
 dynamic = ["version"]
 requires-python = ">=3.8"
 dependencies = [
-    "Wagtail>=4.1",
+    "Wagtail>=5.2",
     "graphene-django>=3,<4",
     "wagtail-headless-preview"
 ]

@@ -22,12 +22,12 @@ class ImageTypesTest(BaseGrappleTestWithIntrospection):
 
     def tearDown(self) -> None:
         for rendition in self.example_image.renditions.all():
-            rendition.file.delete(False)
+            rendition.file.delete(save=False)
 
     @classmethod
     def tearDownClass(cls):
         super().tearDownClass()
-        cls.example_image.file.delete(False)
+        cls.example_image.file.delete(save=False)
 
     def test_query_url_field(self):
         query = """
@@ -284,12 +284,12 @@ if WAGTAIL_VERSION >= (5, 0):
 
         def tearDown(self) -> None:
             for rendition in self.example_svg_image.renditions.all():
-                rendition.file.delete(False)
+                rendition.file.delete(save=False)
 
         @classmethod
         def tearDownClass(cls):
             super().tearDownClass()
-            cls.example_svg_image.file.delete(False)
+            cls.example_svg_image.file.delete(save=False)
 
         def test_schema_for_svg_related_fields_and_arguments(self):
             results = self.introspect_schema_by_type(Image.__name__)

@@ -172,11 +172,11 @@ class StructBlock(graphene.ObjectType):
 
         for field, value in stream_data.items():
             block = dict(child_blocks)[field]
-            if issubclass(type(block), blocks.ChooserBlock) or not issubclass(
-                type(block), blocks.StructBlock
+            if isinstance(value, int) and (
+                issubclass(type(block), blocks.ChooserBlock)
+                or not issubclass(type(block), blocks.StructBlock)
             ):
-                if isinstance(value, int):
-                    value = block.to_python(value)
+                value = block.to_python(value)
 
             stream_blocks.append(StructBlockItem(field, block, value))
 

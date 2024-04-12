@@ -570,7 +570,7 @@ class PagesSearchTest(BaseGrappleTest):
 
 
 class PageUrlPathTest(BaseGrappleTest):
-    def _query_by_path(self, path, in_site=False):
+    def _query_by_path(self, path, *, in_site=False):
         query = """
         query($urlPath: String, $inSite: Boolean) {
             page(urlPath: $urlPath, inSite: $inSite) {

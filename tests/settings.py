@@ -15,6 +15,8 @@ import pathlib
 
 import dj_database_url
 
+from wagtail import VERSION as WAGTAIL_VERSION
+
 
 BASE_DIR = pathlib.Path(__file__).parents[0]
 
@@ -53,6 +55,9 @@ INSTALLED_APPS = [
     "grapple",
     "graphene_django",
 ]
+
+if WAGTAIL_VERSION >= (6, 0):
+    INSTALLED_APPS.append("wagtail.contrib.search_promotions")
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",

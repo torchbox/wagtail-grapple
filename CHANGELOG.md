@@ -1,5 +1,15 @@
 ## Unreleased
 
+## [0.25.0] - 2024-04-12
+
+### Changed
+
+-   Add support for Wagtail 6, Django 5 ([#387](https://github.com/torchbox/wagtail-grapple/pull/387)) @Morsey187
+
+### Removed
+
+-   Support for Django < 4.2, Wagtail < 5.2
+
 
 ## [0.24.0] - 2024-01-05
 
@@ -369,7 +379,8 @@
 -   Improve field definition and under-the-hood implementation ([#28](https://github.com/torchbox/wagtail-grapple/pull/28))
 -   Add conditional checks when resolving streamfield type ([#29](https://github.com/torchbox/wagtail-grapple/pull/29))
 
-[unreleased]: https://github.com/torchbox/wagtail-grapple/compare/v0.24.0...HEAD
+[unreleased]: https://github.com/torchbox/wagtail-grapple/compare/v0.25.0...HEAD
+[0.25.0]: https://github.com/torchbox/wagtail-grapple/compare/v0.24.0...v0.25.0
 [0.24.0]: https://github.com/torchbox/wagtail-grapple/compare/v0.23.0...v0.24.0
 [0.23.0]: https://github.com/torchbox/wagtail-grapple/compare/v0.22.0...v0.23.0
 [0.22.0]: https://github.com/torchbox/wagtail-grapple/compare/v0.21.0...v0.22.0

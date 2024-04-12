@@ -197,6 +197,7 @@ class ImageObjectType(DjangoObjectType):
         info: GraphQLResolveInfo,
         sizes: list[int],
         format: str | None = None,
+        *,
         preserve_svg: bool = True,
         **kwargs,
     ) -> str:

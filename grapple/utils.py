@@ -123,10 +123,7 @@ def resolve_queryset(
     :type collection: int
     """
 
-    if id is not None:
-        qs = qs.filter(pk=id)
-    else:
-        qs = qs.all()
+    qs = qs.all() if id is None else qs.filter(pk=id)
 
     order_by_relevance = True
     if order is not None:
@@ -216,10 +213,7 @@ def resolve_paginated_queryset(
         int(per_page or grapple_settings.PAGE_SIZE), grapple_settings.MAX_PAGE_SIZE
     )
 
-    if id is not None:
-        qs = qs.filter(pk=id)
-    else:
-        qs = qs.all()
+    qs = qs.all() if id is None else qs.filter(pk=id)
 
     # order_by_relevance will always take precedence over an existing order_by in the Postgres backend
     # we need to set it to False if we want to specify our own order_by.

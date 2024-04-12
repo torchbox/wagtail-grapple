@@ -17,7 +17,12 @@ class GraphQLField:
     deprecation_reason: Optional[str]
 
     def __init__(
-        self, field_name: str, field_type: type = None, required: bool = None, **kwargs
+        self,
+        field_name: str,
+        field_type: type = None,
+        *,
+        required: bool = None,
+        **kwargs,
     ):
         # Initiate and get specific field info.
         self.field_name = field_name
@@ -81,17 +86,14 @@ def GraphQLSnippet(field_name: str, snippet_model: str, **kwargs):
         (app_label, model) = snippet_model.lower().split(".")
         mdl = apps.get_model(app_label, model)
 
-        if mdl:
-            field_type = lambda: registry.snippets[mdl]  # noqa: E731
-        else:
-            field_type = graphene.String
+        field_type = (lambda: registry.snippets[mdl]) if mdl else graphene.String
 
         return GraphQLField(field_name, field_type, **kwargs)
 
     return Mixin
 
 
-def GraphQLForeignKey(field_name, content_type, is_list=False, **kwargs):
+def GraphQLForeignKey(field_name, content_type, **kwargs):
     def Mixin():
         field_type = None
         if isinstance(content_type, str):

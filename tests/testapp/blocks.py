@@ -285,9 +285,10 @@ class TextWithCallableBlock(blocks.StructBlock):
         """
         Returns the page URL.
         """
-        if page := values.get("page"):
-            if page_url := page.get_url(request=info.context):
-                return str(page_url)
+        if (page := values.get("page")) and (
+            page_url := page.get_url(request=info.context)
+        ):
+            return str(page_url)
 
         return ""
 

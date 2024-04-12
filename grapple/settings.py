@@ -9,6 +9,7 @@ This module provides the `grapple_settings` object, that is used to access
 Wagtail Grapple settings, checking for user settings first, then falling
 back to the defaults.
 """
+
 import logging
 
 from django.conf import settings as django_settings

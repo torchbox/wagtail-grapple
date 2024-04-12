@@ -213,7 +213,7 @@ class RedirectFactory(factory.django.DjangoModelFactory):
             message = (
                 f"Error building {model_class} with {cls.__name__}.\nBad values:\n"
             )
-            for field in ve.error_dict.keys():
+            for field in ve.error_dict:
                 if field == "__all__":
                     message += "  __all__: obj.clean() failed\n"
                 else:

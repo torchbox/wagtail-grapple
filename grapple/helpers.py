@@ -64,6 +64,7 @@ def register_field_middleware(field_name: str, middleware_list: list):
 def register_query_field(
     field_name,
     plural_field_name=None,
+    *,
     query_params=None,
     required=False,
     plural_required=False,
@@ -184,6 +185,7 @@ def register_query_field(
 def register_paginated_query_field(
     field_name,
     plural_field_name=None,
+    *,
     query_params=None,
     required=False,
     plural_required=False,
@@ -300,7 +302,7 @@ def register_paginated_query_field(
 
 
 def register_singular_query_field(
-    field_name, query_params=None, required=False, middleware=None
+    field_name, *, query_params=None, required=False, middleware=None
 ):
     def inner(cls):
         field_type = lambda: registry.models[cls]  # noqa: E731

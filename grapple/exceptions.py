@@ -4,5 +4,3 @@ class IllegalDeprecation(Exception):
 
     This is invalid - a deprecated entity must be nullable.
     """
-
-    pass

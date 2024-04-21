@@ -5,14 +5,15 @@ from typing import TYPE_CHECKING
 import graphene
 
 from graphene_django import DjangoObjectType
-from wagtail import VERSION as WAGTAIL_VERSION
 from wagtail.images import get_image_model
 from wagtail.images.models import Image as WagtailImage
 from wagtail.images.models import Rendition as WagtailImageRendition
+from wagtail.images.utils import to_svg_safe_spec
 
-from ..registry import registry
-from ..settings import grapple_settings
-from ..utils import get_media_item_url, resolve_queryset
+from grapple.registry import registry
+from grapple.settings import grapple_settings
+from grapple.utils import get_media_item_url, resolve_queryset
+
 from .collections import CollectionObjectType
 from .structures import QuerySetList
 from .tags import TagObjectType
@@ -20,9 +21,6 @@ from .tags import TagObjectType
 
 if TYPE_CHECKING:
     from graphql import GraphQLResolveInfo
-
-if WAGTAIL_VERSION > (5, 0):
-    from wagtail.images.utils import to_svg_safe_spec
 
 
 def get_image_type():
@@ -39,7 +37,7 @@ def get_rendition_field_kwargs() -> dict[str, graphene.Scalar]:
     Returns a list of kwargs for the rendition field.
     Extracted for convenience, to accommodate for the conditional logic needed for various Wagtail versions.
     """
-    kwargs = {
+    return {
         "max": graphene.String(),
         "min": graphene.String(),
         "width": graphene.Int(),
@@ -49,14 +47,11 @@ def get_rendition_field_kwargs() -> dict[str, graphene.Scalar]:
         "bgcolor": graphene.String(),
         "jpegquality": graphene.Int(),
         "webpquality": graphene.Int(),
-    }
-    if WAGTAIL_VERSION > (5, 0):
-        kwargs["preserve_svg"] = graphene.Boolean(
+        "preserve_svg": graphene.Boolean(
             description="Prevents raster image operations (e.g. `format-webp`, `bgcolor`, etc.) being applied to SVGs. "
             "More info: https://docs.wagtail.org/en/stable/topics/images.html#svg-images"
-        )
-
-    return kwargs
+        ),
+    }
 
 
 def get_src_set_field_kwargs() -> dict[str, graphene.Scalar]:
@@ -67,12 +62,11 @@ def get_src_set_field_kwargs() -> dict[str, graphene.Scalar]:
     kwargs = {
         "sizes": graphene.List(graphene.Int),
         "format": graphene.String(),
-    }
-    if WAGTAIL_VERSION > (5, 0):
-        kwargs["preserve_svg"] = graphene.Boolean(
+        "preserve_svg": graphene.Boolean(
             description="Prevents raster image operations (e.g. `format-webp`, `bgcolor`, etc.) being applied to SVGs. "
             "More info: https://docs.wagtail.org/en/stable/topics/images.html#svg-images"
-        )
+        ),
+    }
 
     return kwargs
 
@@ -129,8 +123,7 @@ class ImageObjectType(DjangoObjectType):
     tags = graphene.List(graphene.NonNull(lambda: TagObjectType), required=True)
     rendition = graphene.Field(get_rendition_type, **get_rendition_field_kwargs())
     src_set = graphene.String(**get_src_set_field_kwargs())
-    if WAGTAIL_VERSION > (5, 0):
-        is_svg = graphene.Boolean(required=True)
+    is_svg = graphene.Boolean(required=True)
 
     class Meta:
         model = WagtailImage
@@ -150,7 +143,7 @@ class ImageObjectType(DjangoObjectType):
                 "Invalid filter specs. Check the `ALLOWED_IMAGE_FILTERS` setting."
             )
 
-        if WAGTAIL_VERSION > (5, 0) and instance.is_svg() and preserve_svg:
+        if instance.is_svg() and preserve_svg:
             # when dealing with SVGs, we want to limit the filter specs to those that are safe
             filter_specs = to_svg_safe_spec(filter_specs)
 
@@ -229,12 +222,10 @@ class ImageObjectType(DjangoObjectType):
 
         return ""
 
-    if WAGTAIL_VERSION > (5, 0):
-
-        def resolve_is_svg(
-            instance: WagtailImage, info: GraphQLResolveInfo, **kwargs
-        ) -> bool:
-            return instance.is_svg()
+    def resolve_is_svg(
+        instance: WagtailImage, info: GraphQLResolveInfo, **kwargs
+    ) -> bool:
+        return instance.is_svg()
 
 
 def ImagesQuery():

@@ -1,5 +1,12 @@
 ## Unreleased
 
+## [0.25.1] - 2024-04-21
+
+### Changed
+
+-   Remove pre-Wagtail 5.2 conditional code
+-   Ensure renditions with `preserveSVG` return the original if no valid filters are passed ([#390](https://github.com/torchbox/wagtail-grapple/pull/390))
+
 ## [0.25.0] - 2024-04-12
 
 ### Changed
@@ -379,7 +386,8 @@
 -   Improve field definition and under-the-hood implementation ([#28](https://github.com/torchbox/wagtail-grapple/pull/28))
 -   Add conditional checks when resolving streamfield type ([#29](https://github.com/torchbox/wagtail-grapple/pull/29))
 
-[unreleased]: https://github.com/torchbox/wagtail-grapple/compare/v0.25.0...HEAD
+[unreleased]: https://github.com/torchbox/wagtail-grapple/compare/v0.25.1...HEAD
+[0.25.1]: https://github.com/torchbox/wagtail-grapple/compare/v0.25.0...v0.25.1
 [0.25.0]: https://github.com/torchbox/wagtail-grapple/compare/v0.24.0...v0.25.0
 [0.24.0]: https://github.com/torchbox/wagtail-grapple/compare/v0.23.0...v0.24.0
 [0.23.0]: https://github.com/torchbox/wagtail-grapple/compare/v0.22.0...v0.23.0

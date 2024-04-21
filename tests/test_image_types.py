@@ -302,7 +302,9 @@ class ImageTypesTestWithSVG(BaseGrappleTestWithIntrospection):
             query, variables={"id": self.example_svg_image.id}
         )
         self.assertTrue(
-            results["data"]["image"]["rendition"]["url"].endswith("test.width-150.svg")
+            results["data"]["image"]["rendition"]["url"].endswith(
+                "grapple-test.width-150.svg"
+            )
         )
 
     def test_svg_src_set_with_raster_format_with_preserve_svg(self):
@@ -318,7 +320,9 @@ class ImageTypesTestWithSVG(BaseGrappleTestWithIntrospection):
             query, variables={"id": self.example_svg_image.id}
         )
         self.assertTrue(
-            results["data"]["image"]["srcSet"].split()[0].endswith("test.width-100.svg")
+            results["data"]["image"]["srcSet"]
+            .split()[0]
+            .endswith("grapple-test.width-100.svg")
         )
 
     def test_svg_rendition_with_raster_format_without_preserve_svg(self):
@@ -372,8 +376,8 @@ class ImageTypesTestWithSVG(BaseGrappleTestWithIntrospection):
         results = self.client.execute(
             query, variables={"id": self.example_svg_image.id}
         )
-        self.assertIsNone(results["data"]["image"]["rendition"])
-        self.assertEqual(
-            results["errors"][0]["message"],
-            "No valid filter specs for SVG. See https://docs.wagtail.org/en/stable/topics/images.html#svg-images for details.",
+        self.assertTrue(
+            results["data"]["image"]["rendition"]["url"].endswith(
+                "grapple-test.original.svg"
+            )
         )

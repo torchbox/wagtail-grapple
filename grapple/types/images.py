@@ -146,6 +146,9 @@ class ImageObjectType(DjangoObjectType):
         if instance.is_svg() and preserve_svg:
             # when dealing with SVGs, we want to limit the filter specs to those that are safe
             filter_specs = to_svg_safe_spec(filter_specs)
+            if not filter_specs:
+                # if there are no valid filters, fall back to the original
+                filter_specs = "original"
 
             if not filter_specs:
                 raise TypeError(

@@ -277,3 +277,42 @@ class TestRedirectQueries(BaseGrappleTest):
         # There should be one SELECT query for Redirects and one for Sites.
         with self.assertNumQueries(2):
             self.client.execute(query)
+
+    def test_new_url_is_absolute(self):
+        """Test that the `new url` is always an absolute url."""
+
+        # Create a redirect with just `redirect_page`.
+        RedirectFactory(
+            redirect_link="",
+            redirect_page=self.page,
+        )
+        # Create a redirect with absolute url in `redirect_link`.
+        RedirectFactory(
+            redirect_link="http://test.com/",
+            redirect_page=None,
+        )
+
+        # Create a redirect with relative url in `redirect_link`.
+        RedirectFactory(
+            redirect_link="/test",
+            redirect_page=None,
+            site=SiteFactory(
+                hostname="test-site",
+                port=81,
+            ),
+        )
+
+        query = """
+        {
+            redirects {
+                newUrl
+            }
+        }
+        """
+
+        result = self.client.execute(query)["data"]["redirects"]
+
+        # assert all urls are absolute
+        self.assertEqual(result[0]["newUrl"], "http://localhost/test-page-url/")
+        self.assertEqual(result[1]["newUrl"], "http://test.com/")
+        self.assertEqual(result[2]["newUrl"], "http://test-site:81/test")

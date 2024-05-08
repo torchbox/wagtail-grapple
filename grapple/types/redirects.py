@@ -1,6 +1,7 @@
 import copy
 
 from typing import List, Optional
+from urllib.parse import urlparse
 
 import graphene
 
@@ -35,11 +36,26 @@ class RedirectObjectType(graphene.ObjectType):
 
     def resolve_new_url(self, info, **kwargs) -> Optional[str]:
         """
-        Resolve the value of `new_url`. If `redirect_page` is specified then its
-        URL is prioritised.
+        Resolve the value of `new_url`. If `redirect_page` is specified then
+        `link` is used. Otherwise, ensure that the redirect link is absolute.
         """
+        if self.redirect_page:
+            return self.link  # Handled by the `Redirect` model
 
-        return self.link
+        elif self.redirect_link:
+            parsed_url = urlparse(self.redirect_link)
+
+            if not parsed_url.scheme:  # url without scheme is not absolute
+                return (
+                    self.site.root_url.rstrip("/")
+                    + "/"
+                    + self.redirect_link.lstrip("/")
+                )
+            else:
+                return self.redirect_link
+
+        else:
+            return None
 
     # Return the page that's being redirected to, if at all.
     def resolve_page(self, info, **kwargs) -> Optional[Page]:

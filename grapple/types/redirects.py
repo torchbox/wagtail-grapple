@@ -26,7 +26,7 @@ class RedirectObjectType(graphene.ObjectType):
     class Meta:
         name = "Redirect"
 
-    def resolve_old_url(self, info, **kwargs) -> str:
+    def resolve_old_url(self: Redirect, info, **kwargs) -> str:
         """
         Resolve the value of `old_url` using the `root_url` of the associated
         site and `old_path`.
@@ -34,7 +34,7 @@ class RedirectObjectType(graphene.ObjectType):
 
         return self.site.root_url + self.old_path
 
-    def resolve_new_url(self, info, **kwargs) -> Optional[str]:
+    def resolve_new_url(self: Redirect, info, **kwargs) -> Optional[str]:
         """
         Resolve the value of `new_url`. If `redirect_page` is specified then
         `link` is used. Otherwise, ensure that the redirect link is absolute.
@@ -58,7 +58,7 @@ class RedirectObjectType(graphene.ObjectType):
             return None
 
     # Return the page that's being redirected to, if at all.
-    def resolve_page(self, info, **kwargs) -> Optional[Page]:
+    def resolve_page(self: Redirect, info, **kwargs) -> Optional[Page]:
         if self.redirect_page is not None:
             return self.redirect_page.specific
 

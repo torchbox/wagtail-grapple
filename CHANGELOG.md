@@ -1,7 +1,7 @@
 ## Unreleased
 
 ### Changed
-- Handling of `new_url` on `RedirectObjectType` to always return absolute URLs ([#380](https://github.com/torchbox/wagtail-grapple/pull/391)) @JakubMastalerz
+- Handling of `new_url` on `RedirectObjectType` to always return absolute URLs ([#391](https://github.com/torchbox/wagtail-grapple/pull/391)) @JakubMastalerz
 
 ## [0.25.1] - 2024-04-21
 

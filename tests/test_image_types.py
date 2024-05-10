@@ -90,18 +90,15 @@ class ImageTypesTest(BaseGrappleTestWithIntrospection):
     def test_renditions_with_allowed_image_filters_restrictions(self):
         def get_query(**kwargs):
             params = ",".join([f"{key}: {value}" for key, value in kwargs.items()])
-            return (
-                """
-            query ($id: ID!) {
-                image(id: $id) {
-                    rendition(%s) {
+            return f"""
+            query ($id: ID!) {{
+                image(id: $id) {{
+                    rendition({params}) {{
                         url
-                    }
-                }
-            }
+                    }}
+                }}
+            }}
             """
-                % params
-            )
 
         results = self.client.execute(
             get_query(width=100), variables={"id": self.example_image.id}

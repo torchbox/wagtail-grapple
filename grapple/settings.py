@@ -72,7 +72,7 @@ class GrappleSettings:
 
     def __getattr__(self, attr):
         if attr not in self.defaults:
-            raise AttributeError("Invalid Grapple setting: '%s'" % attr)
+            raise AttributeError(f"Invalid Grapple setting: '{attr}'")
 
         try:
             # Check if present in user settings

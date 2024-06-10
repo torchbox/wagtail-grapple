@@ -1,7 +1,12 @@
 import graphene
 
 from django.test import TestCase
+from wagtail.blocks.field_block import PageChooserBlock
+from wagtail.documents.blocks import DocumentChooserBlock
+from wagtail.images.blocks import ImageChooserBlock
+from wagtail.snippets.blocks import SnippetChooserBlock
 
+from grapple import registry
 from grapple.actions import get_field_type
 from grapple.exceptions import IllegalDeprecation
 from grapple.models import (
@@ -183,3 +188,54 @@ class FieldTest(TestCase):
                 required=True,
                 deprecation_reason=self.deprecation_reason,
             )()
+
+
+class ChooserBlocksTest(TestCase):
+    """
+    Test that "Chooser" blocks take null values to ensure correct handling
+    of deleted objects referenced in these blocks.
+    """
+
+    def test_snippet_chooser_block_value_field_not_required(self):
+        """
+        Test the SnippetChooserBlock snippet field.
+        """
+        block = registry.registry.streamfield_blocks[SnippetChooserBlock]
+        field = block.snippet
+
+        # Check that field is not required by asserting type isn't `NonNull`
+        self.assertIsInstance(field, graphene.types.field.Field)
+        self.assertNotIsInstance(field, graphene.NonNull)
+
+    def test_document_chooser_block_value_field_not_required(self):
+        """
+        Test the DocumentChooserBlock document field.
+        """
+        block = registry.registry.streamfield_blocks[DocumentChooserBlock]
+        field = block.document
+
+        # Check that field is not required by asserting type isn't `NonNull`
+        self.assertIsInstance(field, graphene.types.field.Field)
+        self.assertNotIsInstance(field, graphene.NonNull)
+
+    def test_image_chooser_block_value_field_not_required(self):
+        """
+        Test the ImageChooserBlock image field.
+        """
+        block = registry.registry.streamfield_blocks[ImageChooserBlock]
+        field = block.image
+
+        # Check that field is not required by asserting type isn't `NonNull`
+        self.assertIsInstance(field, graphene.types.field.Field)
+        self.assertNotIsInstance(field, graphene.NonNull)
+
+    def test_page_chooser_block_value_field_not_required(self):
+        """
+        Test the PageChooserBlock page field.
+        """
+        block = registry.registry.streamfield_blocks[PageChooserBlock]
+        field = block.page
+
+        # Check that field is not required by asserting type isn't `NonNull`
+        self.assertIsInstance(field, graphene.types.field.Field)
+        self.assertNotIsInstance(field, graphene.NonNull)

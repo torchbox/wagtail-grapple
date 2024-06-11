@@ -205,7 +205,7 @@ class ChooserBlocksTest(TestCase):
 
         # Check that field is not required by asserting type isn't `NonNull`
         self.assertIsInstance(field, graphene.types.field.Field)
-        self.assertNotIsInstance(field, graphene.NonNull)
+        self.assertNotIsInstance(field.type, graphene.NonNull)
 
     def test_document_chooser_block_value_field_not_required(self):
         """
@@ -216,7 +216,7 @@ class ChooserBlocksTest(TestCase):
 
         # Check that field is not required by asserting type isn't `NonNull`
         self.assertIsInstance(field, graphene.types.field.Field)
-        self.assertNotIsInstance(field, graphene.NonNull)
+        self.assertNotIsInstance(field.type, graphene.NonNull)
 
     def test_image_chooser_block_value_field_not_required(self):
         """
@@ -227,7 +227,7 @@ class ChooserBlocksTest(TestCase):
 
         # Check that field is not required by asserting type isn't `NonNull`
         self.assertIsInstance(field, graphene.types.field.Field)
-        self.assertNotIsInstance(field, graphene.NonNull)
+        self.assertNotIsInstance(field.type, graphene.NonNull)
 
     def test_page_chooser_block_value_field_not_required(self):
         """
@@ -238,4 +238,4 @@ class ChooserBlocksTest(TestCase):
 
         # Check that field is not required by asserting type isn't `NonNull`
         self.assertIsInstance(field, graphene.types.field.Field)
-        self.assertNotIsInstance(field, graphene.NonNull)
+        self.assertNotIsInstance(field.type, graphene.NonNull)

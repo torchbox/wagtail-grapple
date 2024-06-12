@@ -198,7 +198,8 @@ class ChooserBlocksTest(TestCase):
 
     def test_snippet_chooser_block_value_field_not_required(self):
         """
-        Test the SnippetChooserBlock snippet field.
+        Test that the SnippetChooserBlock snippet field is nullable in the
+        GraphQL schema.
         """
         block = registry.registry.streamfield_blocks[SnippetChooserBlock]
         field = block.snippet
@@ -209,7 +210,8 @@ class ChooserBlocksTest(TestCase):
 
     def test_document_chooser_block_value_field_not_required(self):
         """
-        Test the DocumentChooserBlock document field.
+        Test that the DocumentChooserBlock document field is nullable in the
+        GraphQL schema.
         """
         block = registry.registry.streamfield_blocks[DocumentChooserBlock]
         field = block.document
@@ -220,7 +222,8 @@ class ChooserBlocksTest(TestCase):
 
     def test_image_chooser_block_value_field_not_required(self):
         """
-        Test the ImageChooserBlock image field.
+        Test that the ImageChooserBlock image field is nullable in the GraphQL
+        schema.
         """
         block = registry.registry.streamfield_blocks[ImageChooserBlock]
         field = block.image
@@ -231,7 +234,8 @@ class ChooserBlocksTest(TestCase):
 
     def test_page_chooser_block_value_field_not_required(self):
         """
-        Test the PageChooserBlock page field.
+        Test that the PageChooserBlock page field is nullable in the GraphQL
+        schema.
         """
         block = registry.registry.streamfield_blocks[PageChooserBlock]
         field = block.page

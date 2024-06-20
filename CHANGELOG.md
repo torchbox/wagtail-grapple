@@ -1,5 +1,9 @@
 ## Unreleased
 
+### Changed
+
+-   Make value fields nullable on `PageChooserBlock`, `SnippetChooserBlock`, `DocumentChooserBlock` and `ImageChooserBlock` ([#396](https://github.com/torchbox/wagtail-grapple/pull/396))
+
 ## [0.25.1] - 2024-04-21
 
 ### Changed

@@ -436,7 +436,7 @@ def register_streamfield_blocks():
     from .snippets import SnippetTypes
 
     class PageChooserBlock(graphene.ObjectType):
-        page = graphene.Field(get_page_interface(), required=True)
+        page = graphene.Field(get_page_interface(), required=False)
 
         class Meta:
             interfaces = (StreamFieldInterface,)
@@ -445,7 +445,7 @@ def register_streamfield_blocks():
             return self.value.specific
 
     class DocumentChooserBlock(graphene.ObjectType):
-        document = graphene.Field(get_document_type(), required=True)
+        document = graphene.Field(get_document_type(), required=False)
 
         class Meta:
             interfaces = (StreamFieldInterface,)
@@ -454,7 +454,7 @@ def register_streamfield_blocks():
             return self.value
 
     class ImageChooserBlock(graphene.ObjectType):
-        image = graphene.Field(get_image_type(), required=True)
+        image = graphene.Field(get_image_type(), required=False)
 
         class Meta:
             interfaces = (StreamFieldInterface,)
@@ -474,7 +474,7 @@ def register_streamfield_blocks():
     if SnippetObjectType is not None:
 
         class SnippetChooserBlock(graphene.ObjectType):
-            snippet = graphene.Field(SnippetObjectType, required=True)
+            snippet = graphene.Field(SnippetObjectType, required=False)
 
             class Meta:
                 interfaces = (StreamFieldInterface,)

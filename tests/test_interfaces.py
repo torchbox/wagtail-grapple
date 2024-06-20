@@ -80,7 +80,7 @@ class InterfacesTestCase(BaseGrappleTestWithIntrospection):
             [{"name": "CustomInterface"}, {"name": "PageInterface"}],
         )
 
-    def test_schem_for_snippet_with_graphql_interface(self):
+    def test_schema_for_snippet_with_graphql_interface(self):
         results = self.introspect_schema_by_type("Advert")
         self.assertListEqual(
             sorted(results["data"]["__type"]["interfaces"], key=lambda x: x["name"]),

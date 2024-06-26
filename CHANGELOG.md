@@ -1,5 +1,7 @@
 ## Unreleased
 
+## [0.26.0] - 2024-06-26
+
 ### Changed
 
 -   Make value fields nullable on `PageChooserBlock`, `SnippetChooserBlock`, `DocumentChooserBlock` and `ImageChooserBlock` ([#396](https://github.com/torchbox/wagtail-grapple/pull/396))
@@ -390,7 +392,8 @@
 -   Improve field definition and under-the-hood implementation ([#28](https://github.com/torchbox/wagtail-grapple/pull/28))
 -   Add conditional checks when resolving streamfield type ([#29](https://github.com/torchbox/wagtail-grapple/pull/29))
 
-[unreleased]: https://github.com/torchbox/wagtail-grapple/compare/v0.25.1...HEAD
+[unreleased]: https://github.com/torchbox/wagtail-grapple/compare/v0.26.0...HEAD
+[0.26.0]: https://github.com/torchbox/wagtail-grapple/compare/v0.25.1...v0.26.0
 [0.25.1]: https://github.com/torchbox/wagtail-grapple/compare/v0.25.0...v0.25.1
 [0.25.0]: https://github.com/torchbox/wagtail-grapple/compare/v0.24.0...v0.25.0
 [0.24.0]: https://github.com/torchbox/wagtail-grapple/compare/v0.23.0...v0.24.0

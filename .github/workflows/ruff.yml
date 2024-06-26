@@ -16,7 +16,7 @@ jobs:
     - uses: actions/checkout@v4
 
     # keep in sync with .pre-commit-config.yaml
-    - run: python -Im pip install --user ruff==0.4.4
+    - run: python -Im pip install --user ruff==0.4.10
 
     - name: Run ruff
       run: ruff --output-format=github grapple

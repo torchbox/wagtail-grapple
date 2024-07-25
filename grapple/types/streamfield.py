@@ -358,7 +358,7 @@ class EmbedBlock(graphene.ObjectType):
     def resolve_url(self, info, **kwargs):
         return get_embed_url(self)
 
-    def resolve_raw_value(self, info, **kwargs):
+    def resolve_value(self, info, **kwargs):
         if isinstance(self, EmbedValue):
             return self
         return StreamFieldInterface.resolve_raw_value(info, **kwargs)

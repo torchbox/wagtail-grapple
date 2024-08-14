@@ -1,5 +1,9 @@
 ## Unreleased
 
+### Fixed
+
+-   `value` not being queryable on `EmbedBlock` ([#399](https://github.com/torchbox/wagtail-grapple/pull/399))@JakubMastalerz
+
 ## [0.26.0] - 2024-06-26
 
 ### Changed
@@ -23,7 +27,6 @@
 
 -   Support for Django < 4.2, Wagtail < 5.2
 
-
 ## [0.24.0] - 2024-01-05
 
 ### Changed
@@ -35,8 +38,7 @@
 
 ### Fixed
 
-- `test_src_set_invalid_format` not working with Wagtail 5.2 and above. ([#378](https://github.com/torchbox/wagtail-grapple/pull/378)) @JakubMastalerz
-
+-   `test_src_set_invalid_format` not working with Wagtail 5.2 and above. ([#378](https://github.com/torchbox/wagtail-grapple/pull/378)) @JakubMastalerz
 
 ## [0.23.0] - 2023-09-29
 
@@ -49,7 +51,6 @@
 -   `preserveSVG` is true by default ([#371](https://github.com/torchbox/wagtail-grapple/pull/371)) @mgax
 -   Improvements to the CI pipelines
 
-
 ## [0.22.0] - 2023-09-18
 
 ### Added
@@ -57,7 +58,6 @@
 -   Add global mechanism for overriding the base `PageInterface` ([#325](https://github.com/torchbox/wagtail-grapple/pull/325)) @Leden, @dopry, @zerolab
 -   Allow defining additional interfaces via `graphql_interfaces` ([#366](https://github.com/torchbox/wagtail-grapple/pull/366)) @mgax, @zerolab
     This applies to all models, including StreamField blocks
-
 
 ## [0.21.0] - 2023-09-04
 
@@ -74,10 +74,9 @@
 -   Pass the `GraphQLResolveInfo` object to the StreamField callables ([#356](https://github.com/torchbox/wagtail-grapple/pull/356)) @zerolab
     This is passed as the `info` kwarg.
 -   The image rendition query will now surface any errors when:
-  -   using filters not present in the `ALLOWED_IMAGE_FILTERS` Grapple setting,
-  -   there are no filters to apply (for example you are requesting an SVG rendition but supply raster image operations)
-  -   the source image is not present
-
+-   using filters not present in the `ALLOWED_IMAGE_FILTERS` Grapple setting,
+-   there are no filters to apply (for example you are requesting an SVG rendition but supply raster image operations)
+-   the source image is not present
 
 ## [0.20.0] - 2023-07-10
 

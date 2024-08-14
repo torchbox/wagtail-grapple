@@ -482,6 +482,7 @@ class BlogTest(BaseGrappleTest):
                                 embed
                                 rawEmbed
                                 value
+                                rawValue
                             }
                         }
                     }
@@ -511,6 +512,9 @@ class BlogTest(BaseGrappleTest):
                 self.assertEqual(embed["embed"], raw_embed["html"])
                 self.assertEqual(embed["rawEmbed"], json.dumps(raw_embed))
                 self.assertEqual(embed["value"], expected_value)
+                # For now, both `value` and `raw_value` resolve to the same HTML
+                # See discussion @ https://github.com/torchbox/wagtail-grapple/pull/399#discussion_r1714917129
+                self.assertEqual(embed["rawValue"], expected_value)
                 return
 
         self.fail("VideoBlock type not instantiated in Streamfield")

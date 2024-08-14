@@ -1,5 +1,7 @@
 import inspect
 
+from typing import Optional
+
 import graphene
 
 # TODO: use specific imports
@@ -355,25 +357,23 @@ class EmbedBlock(graphene.ObjectType):
     class Meta:
         interfaces = (StreamFieldInterface,)
 
-    def resolve_url(self, info, **kwargs):
+    def resolve_url(self: EmbedValue, info, **kwargs) -> str:
         return get_embed_url(self)
 
-    def resolve_value(self, info, **kwargs):
+    def resolve_raw_value(self: EmbedValue, info, **kwargs) -> str:
         if isinstance(self, EmbedValue):
             return self
         return StreamFieldInterface.resolve_raw_value(info, **kwargs)
 
-    def resolve_raw_value(self, info, **kwargs):
-        if isinstance(self, EmbedValue):
-            return self
-        return StreamFieldInterface.resolve_raw_value(info, **kwargs)
+    def resolve_value(self: EmbedValue, info, **kwargs) -> str:
+        return EmbedBlock.resolve_raw_value(self, info, **kwargs)
 
-    def resolve_embed(self, info, **kwargs):
+    def resolve_embed(self: EmbedValue, info, **kwargs) -> Optional[str]:
         embed = get_embed_object(self)
         if embed:
             return embed.html
 
-    def resolve_raw_embed(self, info, **kwargs):
+    def resolve_raw_embed(self: EmbedValue, info, **kwargs) -> Optional[str]:
         embed = get_embed_object(self)
         if embed:
             return {

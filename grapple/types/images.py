@@ -99,7 +99,7 @@ class ImageRenditionObjectType(DjangoObjectType):
     def resolve_url(
         instance: WagtailImageRendition, info: GraphQLResolveInfo, **kwargs
     ):
-        return instance.full_url
+        return get_media_item_url(instance)
 
 
 class ImageObjectType(DjangoObjectType):

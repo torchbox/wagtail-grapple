@@ -188,6 +188,7 @@ def PagesQuery():
                 required=False,
             ),
             enable_search=True,
+            enable_in_menu=True,
             required=True,
         )
         page = graphene.Field(

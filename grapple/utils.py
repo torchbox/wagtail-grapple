@@ -100,6 +100,7 @@ def resolve_queryset(
     id=None,
     order=None,
     collection=None,
+    in_menu=None,
     **kwargs,
 ):
     """
@@ -124,6 +125,10 @@ def resolve_queryset(
     """
 
     qs = qs.all() if id is None else qs.filter(pk=id)
+
+    # filter by in_menu
+    if in_menu is not None:
+        qs = qs.in_menu() if in_menu else qs.not_in_menu()
 
     order_by_relevance = True
     if order is not None:

@@ -474,7 +474,7 @@ class PagesSearchTest(BaseGrappleTest):
     @classmethod
     def setUpTestData(cls):
         cls.home = HomePage.objects.first()
-        BlogPageFactory(title="Alpha", parent=cls.home)
+        BlogPageFactory(title="Alpha", parent=cls.home, show_in_menus=True)
         BlogPageFactory(title="Alpha Alpha", parent=cls.home)
         BlogPageFactory(title="Alpha Beta", parent=cls.home)
         BlogPageFactory(title="Alpha Gamma", parent=cls.home)
@@ -567,6 +567,31 @@ class PagesSearchTest(BaseGrappleTest):
         self.assertEqual(page_data[3]["title"], "Gamma")
         self.assertEqual(page_data[4]["title"], "Beta Gamma")
         self.assertEqual(page_data[5]["title"], "Alpha Gamma")
+
+    def test_search_in_menus(self):
+        query = """
+        query($searchQuery: String, $inMenu: Boolean) {
+            pages(searchQuery: $searchQuery, inMenu: $inMenu) {
+                title
+            }
+        }
+        """
+        executed = self.client.execute(query, variables={"inMenu": True})
+        page_data = executed["data"].get("pages")
+        self.assertEqual(len(page_data), 1)
+        self.assertEqual(page_data[0]["title"], "Alpha")
+
+    def test_search_not_in_menus(self):
+        query = """
+        query($searchQuery: String, $inMenu: Boolean) {
+            pages(searchQuery: $searchQuery, inMenu: $inMenu, limit: 100) {
+                title
+            }
+        }
+        """
+        executed = self.client.execute(query, variables={"inMenu": False})
+        page_data = executed["data"].get("pages")
+        self.assertEqual(len(page_data), 12)  # 11 blog pages + home page
 
 
 class PageUrlPathTest(BaseGrappleTest):

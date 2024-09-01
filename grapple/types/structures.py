@@ -28,11 +28,14 @@ class QuerySetList(graphene.List):
     This list setts the following arguments on itself:
 
     * ``id``
+    * ``in_menu``
     * ``limit``
     * ``offset``
     * ``search_query``
     * ``order``
 
+    :param enable_in_menu: Enable in_menu filter.
+    :type enable_in_menu: bool
     :param enable_limit: Enable limit argument.
     :type enable_limit: bool
     :param enable_offset: Enable offset argument.
@@ -44,6 +47,7 @@ class QuerySetList(graphene.List):
     """
 
     def __init__(self, of_type, *args, **kwargs):
+        enable_in_menu = kwargs.pop("enable_in_menu", False)
         enable_limit = kwargs.pop("enable_limit", True)
         enable_offset = kwargs.pop("enable_offset", True)
         enable_search = kwargs.pop("enable_search", True)
@@ -57,6 +61,16 @@ class QuerySetList(graphene.List):
             raise TypeError(
                 f"{of_type} is not a subclass of DjangoObjectType and it "
                 "cannot be used with QuerySetList."
+            )
+
+        # Enable in_menu for Page models.
+        if enable_in_menu is True and "in_menu" not in kwargs:
+            kwargs["in_menu"] = graphene.Argument(
+                graphene.Boolean,
+                description=_(
+                    "Filter pages by Page.show_in_menus property. ie) The "
+                    "'show in menus' checkbox in the page editor is checked."
+                ),
             )
         # Enable limiting on the queryset.
         if enable_limit is True and "limit" not in kwargs:
@@ -141,6 +155,7 @@ def PaginatedQuerySet(of_type, type_class, **kwargs):
     This type setts the following arguments on itself:
 
     * ``id``
+    * ``in_menu``
     * ``page``
     * ``per_page``
     * ``search_query``
@@ -152,6 +167,7 @@ def PaginatedQuerySet(of_type, type_class, **kwargs):
     :type enable_order: bool
     """
 
+    enable_in_menu = kwargs.pop("enable_in_menu", False)
     enable_search = kwargs.pop("enable_search", True)
     enable_order = kwargs.pop("enable_order", True)
     required = kwargs.get("required", False)
@@ -166,6 +182,12 @@ def PaginatedQuerySet(of_type, type_class, **kwargs):
         raise TypeError(
             f"{of_type} is not a subclass of DjangoObjectType and it "
             "cannot be used with QuerySetList."
+        )
+
+    # Enable in_menu for Page models.
+    if enable_in_menu is True and "in_menu" not in kwargs:
+        kwargs["in_menu"] = graphene.Argument(
+            graphene.Boolean, description=_("Filter by in menu.")
         )
 
     # Enable page for Django Paginator.

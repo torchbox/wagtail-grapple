@@ -19,7 +19,7 @@ repos:
       - id: check-added-large-files
   - repo: https://github.com/astral-sh/ruff-pre-commit
     # keep in sync with .github/workflows/ruff.yml
-    rev: 'v0.4.10'
+    rev: 'v0.6.3'
     hooks:
       - id: ruff
         args: [--fix, --exit-non-zero-on-fix]
@@ -29,6 +29,6 @@ repos:
     hooks:
       - id: djhtml
   - repo: https://github.com/PyCQA/doc8
-    rev: v1.1.1
+    rev: v1.1.2
     hooks:
       - id: doc8

@@ -3,6 +3,7 @@
 ### Fixed
 
 -   `value` not being queryable on `EmbedBlock` ([#399](https://github.com/torchbox/wagtail-grapple/pull/399))@JakubMastalerz
+-   Circular import when defining custom `PageInterface` ([#404](https://github.com/torchbox/wagtail-grapple/pull/404)) @mgax
 
 ## [0.26.0] - 2024-06-26
 

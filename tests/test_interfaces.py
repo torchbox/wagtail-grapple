@@ -7,7 +7,7 @@ from test_grapple import BaseGrappleTestWithIntrospection
 from testapp.factories import BlogPageFactory, CustomInterfaceBlockFactory
 from testapp.interfaces import CustomInterface
 
-from grapple.types.pages import PageInterface, get_page_interface
+from grapple.types.interfaces import PageInterface, get_page_interface
 
 
 @skipIf(

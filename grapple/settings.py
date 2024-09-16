@@ -28,7 +28,7 @@ DEFAULTS = {
     "PAGE_SIZE": 10,
     "MAX_PAGE_SIZE": 100,
     "RICHTEXT_FORMAT": "html",
-    "PAGE_INTERFACE": "grapple.types.pages.PageInterface",
+    "PAGE_INTERFACE": "grapple.types.interfaces.PageInterface",
 }
 
 # List of settings that have been deprecated

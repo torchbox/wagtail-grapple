@@ -106,6 +106,7 @@ jobs:
           path: tests/.coverage*
           if-no-files-found: ignore
           retention-days: 1
+          include-hidden-files: true
 
   coverage:
     runs-on: ubuntu-latest

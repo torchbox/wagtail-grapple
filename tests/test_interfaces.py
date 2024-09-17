@@ -5,7 +5,7 @@ from unittest import skipIf, skipUnless
 from django.test import override_settings, tag
 from test_grapple import BaseGrappleTestWithIntrospection
 from testapp.factories import BlogPageFactory, CustomInterfaceBlockFactory
-from testapp.interfaces import CustomInterface
+from testapp.interfaces import CustomPageInterface
 
 from grapple.types.interfaces import PageInterface, get_page_interface
 
@@ -35,9 +35,9 @@ class InterfacesTestCase(BaseGrappleTestWithIntrospection):
             results["data"]["__type"]["interfaces"], [{"name": "PageInterface"}]
         )
 
-    @override_settings(GRAPPLE={"PAGE_INTERFACE": "testapp.interfaces.CustomInterface"})
+    @override_settings(GRAPPLE={"PAGE_INTERFACE": "testapp.interfaces.CustomPageInterface"})
     def test_get_page_interface_with_custom_page_interface(self):
-        self.assertIs(get_page_interface(), CustomInterface)
+        self.assertIs(get_page_interface(), CustomPageInterface)
 
     def test_streamfield_block_with_custom_interface(self):
         query = """
@@ -104,5 +104,5 @@ class CustomPageInterfaceTestCase(BaseGrappleTestWithIntrospection):
     def test_schema_with_custom_page_interface(self):
         results = self.introspect_schema_by_type("BlogPage")
         self.assertListEqual(
-            results["data"]["__type"]["interfaces"], [{"name": "CustomInterface"}]
+            results["data"]["__type"]["interfaces"], [{"name": "CustomPageInterface"}]
         )

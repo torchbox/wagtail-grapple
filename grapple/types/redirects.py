@@ -9,7 +9,7 @@ from wagtail.models import Page, Site
 
 from grapple.types.sites import SiteObjectType
 
-from .pages import get_page_interface
+from .interfaces import get_page_interface
 
 
 class RedirectObjectType(graphene.ObjectType):

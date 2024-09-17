@@ -152,4 +152,4 @@ Wagtail Page interface
 Used to construct the schema for Wagtail Page-derived models. It can be overridden to provide a custom interface for all
 page models.
 
-Default: ``grapple.types.pages.PageInterface``
+Default: ``grapple.types.interfaces.PageInterface``

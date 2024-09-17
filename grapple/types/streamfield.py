@@ -1,5 +1,3 @@
-import inspect
-
 from typing import Optional
 
 import graphene
@@ -18,9 +16,9 @@ from wagtail.embeds.blocks import EmbedValue
 from wagtail.embeds.embeds import get_embed
 from wagtail.embeds.exceptions import EmbedException
 from wagtail.fields import StreamField
-from wagtail.rich_text import RichText
 
 from ..registry import registry
+from .interfaces import StreamFieldInterface
 from .rich_text import RichText as RichTextType
 
 
@@ -38,53 +36,6 @@ def convert_stream_field(field, registry=None):
     return GenericStreamFieldInterface(
         description=field.help_text, required=not field.null
     )
-
-
-class StreamFieldInterface(graphene.Interface):
-    id = graphene.String()
-    block_type = graphene.String(required=True)
-    field = graphene.String(required=True)
-    raw_value = graphene.String(required=True)
-
-    @classmethod
-    def resolve_type(cls, instance, info):
-        """
-        If block has a custom Graphene Node type in registry then use it,
-        otherwise use generic block type.
-        """
-        if hasattr(instance, "block"):
-            mdl = type(instance.block)
-            if mdl in registry.streamfield_blocks:
-                return registry.streamfield_blocks[mdl]
-
-            for block_class in inspect.getmro(mdl):
-                if block_class in registry.streamfield_blocks:
-                    return registry.streamfield_blocks[block_class]
-
-        return registry.streamfield_blocks["generic-block"]
-
-    def resolve_id(self, info, **kwargs):
-        return self.id
-
-    def resolve_block_type(self, info, **kwargs):
-        return type(self.block).__name__
-
-    def resolve_field(self, info, **kwargs):
-        return self.block.name
-
-    def resolve_raw_value(self, info, **kwargs):
-        if isinstance(self, blocks.StructValue):
-            # This is the value for a nested StructBlock defined via GraphQLStreamfield
-            return serialize_struct_obj(self)
-        elif isinstance(self.value, dict):
-            return serialize_struct_obj(self.value)
-        elif isinstance(self.value, RichText):
-            # Ensure RichTextBlock raw value always returns the "internal format", rather than the conterted value
-            # as per https://docs.wagtail.io/en/stable/extending/rich_text_internals.html#data-format.
-            # Note that RichTextBlock.value will be rendered HTML by default.
-            return self.value.source
-
-        return self.value
 
 
 def generate_streamfield_union(graphql_types):
@@ -116,41 +67,6 @@ class StructBlockItem:
         self.id = id
         self.block = block
         self.value = value
-
-
-def serialize_struct_obj(obj):
-    rtn_obj = {}
-
-    if hasattr(obj, "raw_data"):
-        rtn_obj = []
-        for field in obj[0]:
-            rtn_obj.append(serialize_struct_obj(field.value))
-    # This conditionnal and below support both Wagtail >= 2.13 and <2.12 versions.
-    # The "stream_data" check can be dropped once 2.11 is not supported anymore.
-    # Cf: https://docs.wagtail.io/en/stable/releases/2.12.html#stream-data-on-streamfield-values-is-deprecated
-    elif hasattr(obj, "stream_data"):
-        rtn_obj = []
-        for field in obj.stream_data:
-            rtn_obj.append(serialize_struct_obj(field["value"]))
-    else:
-        for field in obj:
-            value = obj[field]
-            if hasattr(value, "raw_data"):
-                rtn_obj[field] = [serialize_struct_obj(data.value) for data in value[0]]
-            elif hasattr(obj, "stream_data"):
-                rtn_obj[field] = [
-                    serialize_struct_obj(data["value"]) for data in value.stream_data
-                ]
-            elif hasattr(value, "value"):
-                rtn_obj[field] = value.value
-            elif hasattr(value, "src"):
-                rtn_obj[field] = value.src
-            elif hasattr(value, "file"):
-                rtn_obj[field] = value.file.url
-            else:
-                rtn_obj[field] = value
-
-    return rtn_obj
 
 
 class StructBlock(graphene.ObjectType):
@@ -437,7 +353,7 @@ registry.streamfield_blocks.update(
 def register_streamfield_blocks():
     from .documents import get_document_type
     from .images import get_image_type
-    from .pages import get_page_interface
+    from .interfaces import get_page_interface
     from .snippets import SnippetTypes
 
     class PageChooserBlock(graphene.ObjectType):

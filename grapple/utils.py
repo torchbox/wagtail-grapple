@@ -248,3 +248,38 @@ def get_media_item_url(cls):
     if url[0] == "/":
         return settings.BASE_URL + url
     return url
+
+
+def serialize_struct_obj(obj):
+    rtn_obj = {}
+
+    if hasattr(obj, "raw_data"):
+        rtn_obj = []
+        for field in obj[0]:
+            rtn_obj.append(serialize_struct_obj(field.value))
+    # This conditionnal and below support both Wagtail >= 2.13 and <2.12 versions.
+    # The "stream_data" check can be dropped once 2.11 is not supported anymore.
+    # Cf: https://docs.wagtail.io/en/stable/releases/2.12.html#stream-data-on-streamfield-values-is-deprecated
+    elif hasattr(obj, "stream_data"):
+        rtn_obj = []
+        for field in obj.stream_data:
+            rtn_obj.append(serialize_struct_obj(field["value"]))
+    else:
+        for field in obj:
+            value = obj[field]
+            if hasattr(value, "raw_data"):
+                rtn_obj[field] = [serialize_struct_obj(data.value) for data in value[0]]
+            elif hasattr(obj, "stream_data"):
+                rtn_obj[field] = [
+                    serialize_struct_obj(data["value"]) for data in value.stream_data
+                ]
+            elif hasattr(value, "value"):
+                rtn_obj[field] = value.value
+            elif hasattr(value, "src"):
+                rtn_obj[field] = value.src
+            elif hasattr(value, "file"):
+                rtn_obj[field] = value.file.url
+            else:
+                rtn_obj[field] = value
+
+    return rtn_obj

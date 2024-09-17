@@ -151,7 +151,7 @@ def GraphQLDocument(field_name: str, **kwargs):
 
 def GraphQLPage(field_name: str, **kwargs):
     def Mixin():
-        from .types.pages import get_page_interface
+        from .types.interfaces import get_page_interface
 
         return GraphQLField(field_name, get_page_interface(), **kwargs)
 

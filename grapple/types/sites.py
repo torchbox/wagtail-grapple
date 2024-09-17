@@ -10,7 +10,8 @@ from wagtail.models import Page as WagtailPage
 from wagtail.models import Site
 
 from ..utils import resolve_queryset, resolve_site_by_hostname, resolve_site_by_id
-from .pages import get_page_interface, get_specific_page
+from .interfaces import get_page_interface
+from .pages import get_specific_page
 from .structures import QuerySetList
 
 

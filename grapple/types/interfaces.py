@@ -1,13 +1,17 @@
+import inspect
+
 import graphene
 
 from django.contrib.contenttypes.models import ContentType
 from django.utils.module_loading import import_string
 from graphql import GraphQLError
+from wagtail import blocks
 from wagtail.models import Page as WagtailPage
+from wagtail.rich_text import RichText
 
 from ..registry import registry
 from ..settings import grapple_settings
-from ..utils import resolve_queryset
+from ..utils import resolve_queryset, serialize_struct_obj
 from .structures import QuerySetList
 
 
@@ -158,3 +162,50 @@ class PageInterface(graphene.Interface):
         Get page's search score, will be None if not in a search context.
         """
         return getattr(self, "search_score", None)
+
+
+class StreamFieldInterface(graphene.Interface):
+    id = graphene.String()
+    block_type = graphene.String(required=True)
+    field = graphene.String(required=True)
+    raw_value = graphene.String(required=True)
+
+    @classmethod
+    def resolve_type(cls, instance, info):
+        """
+        If block has a custom Graphene Node type in registry then use it,
+        otherwise use generic block type.
+        """
+        if hasattr(instance, "block"):
+            mdl = type(instance.block)
+            if mdl in registry.streamfield_blocks:
+                return registry.streamfield_blocks[mdl]
+
+            for block_class in inspect.getmro(mdl):
+                if block_class in registry.streamfield_blocks:
+                    return registry.streamfield_blocks[block_class]
+
+        return registry.streamfield_blocks["generic-block"]
+
+    def resolve_id(self, info, **kwargs):
+        return self.id
+
+    def resolve_block_type(self, info, **kwargs):
+        return type(self.block).__name__
+
+    def resolve_field(self, info, **kwargs):
+        return self.block.name
+
+    def resolve_raw_value(self, info, **kwargs):
+        if isinstance(self, blocks.StructValue):
+            # This is the value for a nested StructBlock defined via GraphQLStreamfield
+            return serialize_struct_obj(self)
+        elif isinstance(self.value, dict):
+            return serialize_struct_obj(self.value)
+        elif isinstance(self.value, RichText):
+            # Ensure RichTextBlock raw value always returns the "internal format", rather than the conterted value
+            # as per https://docs.wagtail.io/en/stable/extending/rich_text_internals.html#data-format.
+            # Note that RichTextBlock.value will be rendered HTML by default.
+            return self.value.source
+
+        return self.value

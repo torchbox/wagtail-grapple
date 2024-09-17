@@ -35,7 +35,9 @@ class InterfacesTestCase(BaseGrappleTestWithIntrospection):
             results["data"]["__type"]["interfaces"], [{"name": "PageInterface"}]
         )
 
-    @override_settings(GRAPPLE={"PAGE_INTERFACE": "testapp.interfaces.CustomPageInterface"})
+    @override_settings(
+        GRAPPLE={"PAGE_INTERFACE": "testapp.interfaces.CustomPageInterface"}
+    )
     def test_get_page_interface_with_custom_page_interface(self):
         self.assertIs(get_page_interface(), CustomPageInterface)
 

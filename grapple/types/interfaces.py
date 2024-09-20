@@ -209,3 +209,18 @@ class StreamFieldInterface(graphene.Interface):
             return self.value.source
 
         return self.value
+
+
+def get_snippet_interface():
+    return import_string(grapple_settings.SNIPPET_INTERFACE)
+
+
+class SnippetInterface(graphene.Interface):
+    snippet_type = graphene.String(required=True)
+
+    @classmethod
+    def resolve_type(cls, instance, info, **kwargs):
+        return registry.snippets[type(instance)]
+
+    def resolve_snippet_type(self, info, **kwargs):
+        return self.__class__.__name__

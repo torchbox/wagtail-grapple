@@ -50,7 +50,7 @@ the name of the model:
     }
 
 You can change the default ``PageInterface`` to your own interface by changing the
-:ref:`PAGE_INTERFACE<page interface settings>` setting.
+:ref:`PAGE_INTERFACE<page interface setting>` setting.
 
 As mentioned above there is both a plural ``pages`` and singular ``page``
 field on the root Query type that returns a ``PageInterface``.
@@ -105,6 +105,35 @@ in the interface:
 
     blocks: [StreamFieldInterface!]!  # a list of blocks in the StreamBlock or StructBlock
 
+
+
+``SnippetInterface``
+--------------------
+
+``SnippetInterface`` is the default interface for all Wagtail snippet models. It is accessible throught the
+``snippets`` field on the root query type. It exposes the following fields:
+
+::
+
+    snipeptType: String!
+
+An example of querying all snippets:
+
+::
+
+    query {
+        snippets {
+            snippetType
+            ...on Advert {
+                id
+                url
+                text
+            }
+        }
+    }
+
+You can change the default ``SnippetInterface`` to your own interface by changing the
+:ref:`SNIPPET_INTERFACE<snippet interface setting>` setting.
 
 
 Adding your own interfaces

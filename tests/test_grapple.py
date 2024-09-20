@@ -10,7 +10,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import connection
 from django.test import RequestFactory, TestCase, override_settings
 from graphene.test import Client
-from testapp.factories import BlogPageFactory
+from testapp.factories import AdvertFactory, BlogPageFactory
 from testapp.models import GlobalSocialMediaSettings, HomePage, SocialMediaSettings
 from wagtail.documents import get_document_model
 from wagtail.models import Page, Site
@@ -1579,3 +1579,28 @@ class SettingsTest(BaseGrappleTest):
                 "data": {"setting": None},
             },
         )
+
+
+class SnippetsTest(BaseGrappleTest):
+    def setUp(self):
+        super().setUp()
+        self.factory = RequestFactory()
+        self.advert = AdvertFactory()
+
+    def test_snippets(self):
+        query = """
+        {
+            snippets {
+                snippetType
+            }
+        }
+        """
+
+        executed = self.client.execute(query)
+
+        self.assertEqual(type(executed["data"]), dict)
+        self.assertEqual(type(executed["data"]["snippets"]), list)
+        self.assertEqual(type(executed["data"]["snippets"][0]), dict)
+
+        snippets_data = executed["data"]["snippets"]
+        self.assertEqual(snippets_data[0]["snippetType"], "Advert")

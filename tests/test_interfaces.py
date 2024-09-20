@@ -5,9 +5,13 @@ from unittest import skipIf, skipUnless
 from django.test import override_settings, tag
 from test_grapple import BaseGrappleTestWithIntrospection
 from testapp.factories import AdditionalInterfaceBlockFactory, BlogPageFactory
-from testapp.interfaces import CustomPageInterface
+from testapp.interfaces import CustomPageInterface, CustomSnippetInterface
 
-from grapple.types.interfaces import PageInterface, get_page_interface
+from grapple.types.interfaces import (
+    PageInterface,
+    get_page_interface,
+    get_snippet_interface,
+)
 
 
 @skipIf(
@@ -40,6 +44,12 @@ class InterfacesTestCase(BaseGrappleTestWithIntrospection):
     )
     def test_get_page_interface_with_custom_page_interface(self):
         self.assertIs(get_page_interface(), CustomPageInterface)
+
+    @override_settings(
+        GRAPPLE={"SNIPPET_INTERFACE": "testapp.interfaces.CustomSnippetInterface"}
+    )
+    def test_get_snippet_interface_with_custom_page_interface(self):
+        self.assertIs(get_snippet_interface(), CustomSnippetInterface)
 
     def test_streamfield_block_with_additional_interface(self):
         query = """
@@ -86,7 +96,7 @@ class InterfacesTestCase(BaseGrappleTestWithIntrospection):
         results = self.introspect_schema_by_type("Advert")
         self.assertListEqual(
             sorted(results["data"]["__type"]["interfaces"], key=lambda x: x["name"]),
-            [{"name": "AdditionalInterface"}],
+            [{"name": "AdditionalInterface"}, {"name": "SnippetInterface"}],
         )
 
     def test_schema_for_django_model_with_graphql_interfaces(self):
@@ -107,4 +117,11 @@ class CustomInterfacesTestCase(BaseGrappleTestWithIntrospection):
         results = self.introspect_schema_by_type("BlogPage")
         self.assertListEqual(
             results["data"]["__type"]["interfaces"], [{"name": "CustomPageInterface"}]
+        )
+
+    def test_schema_with_custom_snippet_interface(self):
+        results = self.introspect_schema_by_type("Person")
+        self.assertListEqual(
+            results["data"]["__type"]["interfaces"],
+            [{"name": "CustomSnippetInterface"}],
         )

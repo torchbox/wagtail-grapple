@@ -141,10 +141,10 @@ Limit the maximum number of items that ``QuerySetList`` and ``PaginatedQuerySet`
 Default: ``100``
 
 
-.. _page interface settings:
+Wagtail model interfaces
+^^^^^^^^^^^^^^^^^^^^^^^^
 
-Wagtail Page interface
-^^^^^^^^^^^^^^^^^^^^^^
+.. _page interface setting:
 
 ``PAGE_INTERFACE``
 ******************
@@ -153,3 +153,14 @@ Used to construct the schema for Wagtail Page-derived models. It can be overridd
 page models.
 
 Default: ``grapple.types.interfaces.PageInterface``
+
+
+.. _snippet interface setting:
+
+``SNIPPET_INTERFACE``
+*********************
+
+Used to construct the schema for Wagtail snippet models. It can be overridden to provide a custom interface for all
+snippet models.
+
+Default: ``grapple.types.interfaces.SnippetInterface``

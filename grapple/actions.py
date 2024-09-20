@@ -27,6 +27,7 @@ from .types.documents import DocumentObjectType
 from .types.images import ImageObjectType, ImageRenditionObjectType
 from .types.pages import Page, get_page_interface
 from .types.rich_text import RichText as RichTextType
+from .types.snippets import get_snippet_interface
 from .types.streamfield import generate_streamfield_union
 
 
@@ -612,7 +613,7 @@ def register_snippet_model(cls: Type[models.Model], type_prefix: str):
         return
 
     # Create a GQL type that implements Snippet Interface
-    snippet_node_type = build_node_type(cls, type_prefix, None)
+    snippet_node_type = build_node_type(cls, type_prefix, get_snippet_interface())
 
     if snippet_node_type:
         registry.snippets[cls] = snippet_node_type

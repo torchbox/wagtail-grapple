@@ -102,33 +102,6 @@ The following fields are returned:
     fileHash: String
 
 
-
-SnippetObjectType
-^^^^^^^^^^^^^^^^^
-
-You won't see much of ``SnippetObjectType`` as it's only a Union type that
-groups all your Snippet models together. You can query all the available snippets
-under the ``snippets`` field under the root Query, The query is similar to
-an interface but ``SnippetObjectType`` doesn't provide any fields itself.
-
-When snippets are attached to Pages you interact with your generated type itself
-as opposed to an interface or base type.
-
-An example of querying all snippets:
-
-::
-
-    query {
-        snippets {
-            ...on Advert {
-                id
-                url
-                text
-            }
-        }
-    }
-
-
 SettingObjectType
 ^^^^^^^^^^^^^^^^^
 

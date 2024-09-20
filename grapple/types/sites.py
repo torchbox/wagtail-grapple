@@ -23,6 +23,7 @@ class SiteObjectType(DjangoObjectType):
             description=_("Filter by content type. Uses the `app.Model` notation."),
         ),
         enable_search=True,
+        enable_in_menu=True,
         required=True,
     )
     page = graphene.Field(

@@ -42,22 +42,40 @@ class PageInterface(graphene.Interface):
 
     parent = graphene.Field(get_page_interface)
     children = QuerySetList(
-        graphene.NonNull(get_page_interface), enable_search=True, required=True
+        graphene.NonNull(get_page_interface),
+        enable_search=True,
+        required=True,
+        enable_in_menu=True,
     )
     siblings = QuerySetList(
-        graphene.NonNull(get_page_interface), enable_search=True, required=True
+        graphene.NonNull(get_page_interface),
+        enable_search=True,
+        required=True,
+        enable_in_menu=True,
     )
     next_siblings = QuerySetList(
-        graphene.NonNull(get_page_interface), enable_search=True, required=True
+        graphene.NonNull(get_page_interface),
+        enable_search=True,
+        required=True,
+        enable_in_menu=True,
     )
     previous_siblings = QuerySetList(
-        graphene.NonNull(get_page_interface), enable_search=True, required=True
+        graphene.NonNull(get_page_interface),
+        enable_search=True,
+        required=True,
+        enable_in_menu=True,
     )
     descendants = QuerySetList(
-        graphene.NonNull(get_page_interface), enable_search=True, required=True
+        graphene.NonNull(get_page_interface),
+        enable_search=True,
+        required=True,
+        enable_in_menu=True,
     )
     ancestors = QuerySetList(
-        graphene.NonNull(get_page_interface), enable_search=True, required=True
+        graphene.NonNull(get_page_interface),
+        enable_search=True,
+        required=True,
+        enable_in_menu=True,
     )
 
     search_score = graphene.Float()

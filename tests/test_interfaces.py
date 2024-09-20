@@ -4,7 +4,7 @@ from unittest import skipIf, skipUnless
 
 from django.test import override_settings, tag
 from test_grapple import BaseGrappleTestWithIntrospection
-from testapp.factories import BlogPageFactory, CustomInterfaceBlockFactory
+from testapp.factories import AdditionalInterfaceBlockFactory, BlogPageFactory
 from testapp.interfaces import CustomPageInterface
 
 from grapple.types.interfaces import PageInterface, get_page_interface
@@ -21,7 +21,7 @@ class InterfacesTestCase(BaseGrappleTestWithIntrospection):
 
         cls.blog_page = BlogPageFactory(
             body=[
-                ("custom_interface_block", CustomInterfaceBlockFactory()),
+                ("additional_interface_block", AdditionalInterfaceBlockFactory()),
             ],
             parent=cls.home,
         )
@@ -41,15 +41,15 @@ class InterfacesTestCase(BaseGrappleTestWithIntrospection):
     def test_get_page_interface_with_custom_page_interface(self):
         self.assertIs(get_page_interface(), CustomPageInterface)
 
-    def test_streamfield_block_with_custom_interface(self):
+    def test_streamfield_block_with_additional_interface(self):
         query = """
         query($id: ID) {
             page(id: $id) {
                 ... on BlogPage {
                     body {
                         blockType
-                        ...on CustomInterface {
-                            customText
+                        ...on AdditionalInterface {
+                            additionalText
                         }
                     }
                 }
@@ -60,40 +60,40 @@ class InterfacesTestCase(BaseGrappleTestWithIntrospection):
         body = results["data"]["page"]["body"]
 
         for block in body:
-            if block["blockType"] == "CustomInterfaceBlock":
+            if block["blockType"] == "AdditionalInterfaceBlock":
                 self.assertRegex(
-                    block["customText"], r"^Block with custom interface \d+$"
+                    block["additionalText"], r"^Block with additional interface \d+$"
                 )
                 return
 
         self.fail("Query by interface didn't match anything")
 
-    def test_schema_for_streamfield_block_with_custom_interface(self):
-        results = self.introspect_schema_by_type("CustomInterfaceBlock")
+    def test_schema_for_streamfield_block_with_additional_interface(self):
+        results = self.introspect_schema_by_type("AdditionalInterfaceBlock")
         self.assertListEqual(
             sorted(results["data"]["__type"]["interfaces"], key=lambda x: x["name"]),
-            [{"name": "CustomInterface"}, {"name": "StreamFieldInterface"}],
+            [{"name": "AdditionalInterface"}, {"name": "StreamFieldInterface"}],
         )
 
     def test_schema_for_page_with_graphql_interface(self):
         results = self.introspect_schema_by_type("AuthorPage")
         self.assertListEqual(
             sorted(results["data"]["__type"]["interfaces"], key=lambda x: x["name"]),
-            [{"name": "CustomInterface"}, {"name": "PageInterface"}],
+            [{"name": "AdditionalInterface"}, {"name": "PageInterface"}],
         )
 
     def test_schema_for_snippet_with_graphql_interface(self):
         results = self.introspect_schema_by_type("Advert")
         self.assertListEqual(
             sorted(results["data"]["__type"]["interfaces"], key=lambda x: x["name"]),
-            [{"name": "CustomInterface"}],
+            [{"name": "AdditionalInterface"}],
         )
 
     def test_schema_for_django_model_with_graphql_interfaces(self):
         results = self.introspect_schema_by_type("SimpleModel")
         self.assertListEqual(
             sorted(results["data"]["__type"]["interfaces"], key=lambda x: x["name"]),
-            [{"name": "CustomInterface"}],
+            [{"name": "AdditionalInterface"}],
         )
 
 

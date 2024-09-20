@@ -433,12 +433,12 @@ To register additional interfaces for the block, add them with your block's ``gr
     from grapple.helpers import register_streamfield_block
 
 
-    class CustomInterface(graphene.Interface):
+    class MyInterface(graphene.Interface):
         text = graphene.String()
 
 
     @register_streamfield_block
-    class CustomInterfaceBlock(blocks.StructBlock):
+    class MyInterfaceBlock(blocks.StructBlock):
         text = blocks.TextBlock()
 
-        graphql_interfaces = (CustomInterface,)
+        graphql_interfaces = (MyInterface,)

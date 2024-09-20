@@ -3,8 +3,8 @@ import graphene
 from grapple.types.interfaces import PageInterface
 
 
-class CustomInterface(graphene.Interface):
-    custom_text = graphene.String()
+class AdditionalInterface(graphene.Interface):
+    additional_text = graphene.String()
 
 
 class CustomPageInterface(PageInterface):

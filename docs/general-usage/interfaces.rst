@@ -118,10 +118,7 @@ Given the following example interface:
 .. code-block:: python
 
     # interfaces.py
-    from .interfaces import CustomInterface
-
-
-    class CustomInterface(graphene.Interface):
+    class MyInterface(graphene.Interface):
         custom_field = graphene.String()
 
 you could add it to your Page model like so:
@@ -129,12 +126,13 @@ you could add it to your Page model like so:
 .. code-block:: python
 
     from wagtail.models import Page
+    from .interfaces import MyInterface
 
 
     class MyPage(Page):
         # ...
 
-        graphql_interfaces = (CustomInterface,)
+        graphql_interfaces = (MyInterface,)
 
 or any Django model:
 
@@ -142,13 +140,13 @@ or any Django model:
 
     # models.py
     from django.db import models
+    from .interfaces import MyInterface
 
 
     class MyModel(models.Model):
         # ...
 
-        graphql_interfaces = (CustomInterface,)
-
+        graphql_interfaces = (MyInterface,)
 
 or a ``StreamField`` block:
 
@@ -156,11 +154,12 @@ or a ``StreamField`` block:
 
     # blocks.py
     from wagtail.core import blocks
+    from .interfaces import MyInterface
 
 
     class MyStructBlock(blocks.StructBlock):
         # ...
 
-        graphql_interfaces = (CustomInterface,)
+        graphql_interfaces = (MyInterface,)
 
 The provided interfaces will be added to the base interfaces for the model.

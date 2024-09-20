@@ -14,6 +14,7 @@ from wagtail.contrib.settings.models import (
 )
 from wagtail.fields import RichTextField, StreamField
 from wagtail.models import Orderable, Page
+from wagtail.search import index
 from wagtail.snippets.models import register_snippet
 from wagtail_headless_preview.models import HeadlessPreviewMixin
 from wagtailmedia.edit_handlers import MediaChooserPanel
@@ -162,6 +163,8 @@ class BlogPage(HeadlessPreviewMixin, Page):
             "path": self.url,
             "author": self.author.name if self.author else "Unknown",
         }
+
+    search_fields = Page.search_fields + [index.SearchField("body")]
 
     graphql_fields = [
         GraphQLString("date", required=True),

@@ -68,8 +68,8 @@ class QuerySetList(graphene.List):
             kwargs["in_menu"] = graphene.Argument(
                 graphene.Boolean,
                 description=_(
-                    "Filter pages by Page.show_in_menus property. ie) The "
-                    "'show in menus' checkbox in the page editor is checked."
+                    "Filter pages by Page.show_in_menus property. That is, the "
+                    "'show in menus' checkbox is checked in the page editor."
                 ),
             )
         # Enable limiting on the queryset.

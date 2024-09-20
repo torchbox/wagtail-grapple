@@ -11,8 +11,8 @@ from grapple.types.interfaces import PageInterface, get_page_interface
 
 
 @skipIf(
-    os.getenv("DJANGO_SETTINGS_MODULE") == "settings_custom_page_interface",
-    "Cannot run with settings_custom_page_interface",
+    os.getenv("DJANGO_SETTINGS_MODULE") == "settings_custom_interfaces",
+    "Cannot run with settings_custom_interfaces",
 )
 class InterfacesTestCase(BaseGrappleTestWithIntrospection):
     @classmethod
@@ -99,10 +99,10 @@ class InterfacesTestCase(BaseGrappleTestWithIntrospection):
 
 @tag("needs-custom-settings")
 @skipUnless(
-    os.getenv("DJANGO_SETTINGS_MODULE") == "settings_custom_page_interface",
-    "Needs settings_custom_page_interface",
+    os.getenv("DJANGO_SETTINGS_MODULE") == "settings_custom_interfaces",
+    "Needs settings_custom_interfaces",
 )
-class CustomPageInterfaceTestCase(BaseGrappleTestWithIntrospection):
+class CustomInterfacesTestCase(BaseGrappleTestWithIntrospection):
     def test_schema_with_custom_page_interface(self):
         results = self.introspect_schema_by_type("BlogPage")
         self.assertListEqual(

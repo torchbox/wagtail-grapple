@@ -187,7 +187,10 @@ def PaginatedQuerySet(of_type, type_class, **kwargs):
     # Enable in_menu for Page models.
     if enable_in_menu is True and "in_menu" not in kwargs:
         kwargs["in_menu"] = graphene.Argument(
-            graphene.Boolean, description=_("Filter by in menu.")
+            graphene.Boolean, description=_(
+                "Filter pages by Page.show_in_menus property. That is, the "
+                "'show in menus' checkbox is checked in the page editor."
+            )
         )
 
     # Enable page for Django Paginator.

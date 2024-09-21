@@ -21,6 +21,21 @@ class PositiveInt(Int):
             return return_value
 
 
+class SearchOperatorEnum(graphene.Enum):
+    """
+    Enum for search operator.
+    """
+
+    AND = "and"
+    OR = "or"
+
+    def __str__(self):
+        # the core search parser expects the operator to be a string.
+        # the default __str__ returns SearchOperatorEnum.AND/OR,
+        # this __str__ returns the value and/or for compatibility.
+        return self.value
+
+
 class QuerySetList(graphene.List):
     """
     List type with arguments used by Django's query sets.
@@ -32,6 +47,7 @@ class QuerySetList(graphene.List):
     * ``limit``
     * ``offset``
     * ``search_query``
+    * ``search_operator``
     * ``order``
 
     :param enable_in_menu: Enable in_menu filter.
@@ -42,6 +58,8 @@ class QuerySetList(graphene.List):
     :type enable_offset: bool
     :param enable_search: Enable search query argument.
     :type enable_search: bool
+    :param enable_search_operator: Enable search operator argument, enable_search must also be True
+    :type enable_search_operator: bool
     :param enable_order: Enable ordering via query argument.
     :type enable_order: bool
     """
@@ -50,8 +68,9 @@ class QuerySetList(graphene.List):
         enable_in_menu = kwargs.pop("enable_in_menu", False)
         enable_limit = kwargs.pop("enable_limit", True)
         enable_offset = kwargs.pop("enable_offset", True)
-        enable_search = kwargs.pop("enable_search", True)
         enable_order = kwargs.pop("enable_order", True)
+        enable_search = kwargs.pop("enable_search", True)
+        enable_search_operator = kwargs.pop("enable_search_operator", True)
 
         # Check if the type is a Django model type. Do not perform the
         # check if value is lazy.
@@ -106,6 +125,14 @@ class QuerySetList(graphene.List):
                 graphene.String,
                 description=_("Filter the results using Wagtail's search."),
             )
+            if enable_search_operator:
+                kwargs["search_operator"] = graphene.Argument(
+                    SearchOperatorEnum,
+                    description=_(
+                        "Specify search operator (and/or), see: https://docs.wagtail.org/en/stable/topics/search/searching.html#search-operator"
+                    ),
+                    default_value="and",
+                )
 
         if "id" not in kwargs:
             kwargs["id"] = graphene.Argument(graphene.ID, description=_("Filter by ID"))
@@ -152,23 +179,27 @@ def PaginatedQuerySet(of_type, type_class, **kwargs):
     """
     Paginated QuerySet type with arguments used by Django's query sets.
 
-    This type setts the following arguments on itself:
+    This type sets the following arguments on itself:
 
     * ``id``
     * ``in_menu``
     * ``page``
     * ``per_page``
     * ``search_query``
+    * ``search_operator``
     * ``order``
 
     :param enable_search: Enable search query argument.
     :type enable_search: bool
+    :param enable_search_operator: Enable search operator argument, enable_search must also be True
+    :type enable_search_operator: bool
     :param enable_order: Enable ordering via query argument.
     :type enable_order: bool
     """
 
     enable_in_menu = kwargs.pop("enable_in_menu", False)
     enable_search = kwargs.pop("enable_search", True)
+    enable_search_operator = kwargs.pop("enable_search_operator", True)
     enable_order = kwargs.pop("enable_order", True)
     required = kwargs.get("required", False)
     type_name = type_class if isinstance(type_class, str) else type_class.__name__
@@ -225,6 +256,14 @@ def PaginatedQuerySet(of_type, type_class, **kwargs):
         kwargs["search_query"] = graphene.Argument(
             graphene.String, description=_("Filter the results using Wagtail's search.")
         )
+        if enable_search_operator:
+            kwargs["search_operator"] = graphene.Argument(
+                SearchOperatorEnum,
+                description=_(
+                    "Specify search operator (and/or), see: https://docs.wagtail.org/en/stable/topics/search/searching.html#search-operator"
+                ),
+                default_value="and",
+            )
 
     if "id" not in kwargs:
         kwargs["id"] = graphene.Argument(graphene.ID, description=_("Filter by ID"))

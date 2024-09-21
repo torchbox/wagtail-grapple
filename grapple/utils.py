@@ -8,6 +8,7 @@ from graphql import GraphQLError
 from wagtail import VERSION as WAGTAIL_VERSION
 from wagtail.models import Site
 from wagtail.search.index import class_is_indexed
+from wagtail.search.utils import parse_query_string
 
 from .settings import grapple_settings
 from .types.structures import BasePaginatedType, PaginationType
@@ -101,6 +102,7 @@ def resolve_queryset(
     order=None,
     collection=None,
     in_menu=None,
+    search_operator="and",
     **kwargs,
 ):
     """
@@ -122,6 +124,9 @@ def resolve_queryset(
     :type order: str
     :param collection: Use Wagtail's collection id to filter images or documents
     :type collection: int
+    :param search_operator: The operator to use when combining search terms.
+                            Defaults to "and".
+    :type search_operator: "and" | "or"
     """
 
     qs = qs.all() if id is None else qs.filter(pk=id)
@@ -152,7 +157,13 @@ def resolve_queryset(
             query = Query.get(search_query)
             query.add_hit()
 
-        qs = qs.search(search_query, order_by_relevance=order_by_relevance)
+        filters, parsed_query = parse_query_string(search_query, str(search_operator))
+
+        qs = qs.search(
+            parsed_query,
+            order_by_relevance=order_by_relevance,
+            operator=search_operator,
+        )
         if connection.vendor != "sqlite":
             qs = qs.annotate_score("search_score")
 
@@ -183,9 +194,9 @@ def get_paginated_result(qs, page, per_page):
             count=len(page_obj.object_list),
             per_page=per_page,
             current_page=page_obj.number,
-            prev_page=page_obj.previous_page_number()
-            if page_obj.has_previous()
-            else None,
+            prev_page=(
+                page_obj.previous_page_number() if page_obj.has_previous() else None
+            ),
             next_page=page_obj.next_page_number() if page_obj.has_next() else None,
             total_pages=paginator.num_pages,
         ),
@@ -193,7 +204,15 @@ def get_paginated_result(qs, page, per_page):
 
 
 def resolve_paginated_queryset(
-    qs, info, page=None, per_page=None, search_query=None, id=None, order=None, **kwargs
+    qs,
+    info,
+    page=None,
+    per_page=None,
+    id=None,
+    order=None,
+    search_query=None,
+    search_operator="and",
+    **kwargs,
 ):
     """
     Add page, per_page and search capabilities to the query. This contains
@@ -207,11 +226,14 @@ def resolve_paginated_queryset(
     :type id: int
     :param per_page: The maximum number of items to include on a page.
     :type per_page: int
+    :param order: Order the query set using the Django QuerySet order_by format.
+    :type order: str
     :param search_query: Using Wagtail search, exclude objects that do not match
                          the search query.
     :type search_query: str
-    :param order: Order the query set using the Django QuerySet order_by format.
-    :type order: str
+    :param search_operator: The operator to use when combining search terms.
+                            Defaults to "and".
+    :type search_operator: "and" | "or"
     """
     page = int(page or 1)
     per_page = min(
@@ -236,7 +258,13 @@ def resolve_paginated_queryset(
             query = Query.get(search_query)
             query.add_hit()
 
-        qs = qs.search(search_query, order_by_relevance=order_by_relevance)
+        filters, parsed_query = parse_query_string(search_query, search_operator)
+
+        qs = qs.search(
+            parsed_query,
+            order_by_relevance=order_by_relevance,
+            operator=search_operator,
+        )
         if connection.vendor != "sqlite":
             qs = qs.annotate_score("search_score")
 

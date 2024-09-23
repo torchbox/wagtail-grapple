@@ -110,7 +110,7 @@ in the interface:
 ``SnippetInterface``
 --------------------
 
-``SnippetInterface`` is the default interface for all Wagtail snippet models. It is accessible throught the
+``SnippetInterface`` is the default interface for all Wagtail snippet models. It is accessible through the
 ``snippets`` field on the root query type. It exposes the following fields:
 
 ::

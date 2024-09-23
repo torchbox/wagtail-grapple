@@ -1592,6 +1592,7 @@ class SnippetsTest(BaseGrappleTest):
         {
             snippets {
                 snippetType
+                contentType
             }
         }
         """
@@ -1604,3 +1605,4 @@ class SnippetsTest(BaseGrappleTest):
 
         snippets_data = executed["data"]["snippets"]
         self.assertEqual(snippets_data[0]["snippetType"], "Advert")
+        self.assertEqual(snippets_data[0]["contentType"], "testapp.Advert")

@@ -217,6 +217,7 @@ def get_snippet_interface():
 
 class SnippetInterface(graphene.Interface):
     snippet_type = graphene.String(required=True)
+    content_type = graphene.String(required=True)
 
     @classmethod
     def resolve_type(cls, instance, info, **kwargs):
@@ -224,3 +225,9 @@ class SnippetInterface(graphene.Interface):
 
     def resolve_snippet_type(self, info, **kwargs):
         return self.__class__.__name__
+
+    def resolve_content_type(self, info, **kwargs):
+        self.content_type = ContentType.objects.get_for_model(self)
+        return (
+            f"{self.content_type.app_label}.{self.content_type.model_class().__name__}"
+        )

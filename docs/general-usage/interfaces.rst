@@ -115,7 +115,8 @@ in the interface:
 
 ::
 
-    snipeptType: String!
+    snippetType: String!
+    contentType: String!
 
 An example of querying all snippets:
 
@@ -124,6 +125,7 @@ An example of querying all snippets:
     query {
         snippets {
             snippetType
+            contentType
             ...on Advert {
                 id
                 url

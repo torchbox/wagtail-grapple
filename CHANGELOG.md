@@ -1,8 +1,15 @@
 ## Unreleased
 
+## [0.27.0] - 2024-09-24
+
+### Added
+
+-   Add an `in_menu` filter ([#402](https://github.com/torchbox/wagtail-grapple/pull/402)) @dopry
+-   Add ability to speficy the search operator ([#406](https://github.com/torchbox/wagtail-grapple/pull/406)) @dopry
+
 ### Changed
 
--   `SnippetObjectType` is replaced with `SnippetInterface` ([405](https://github.com/torchbox/wagtail-grapple/pull/405)) @mgax
+-   `SnippetObjectType` is replaced with `SnippetInterface` ([#405](https://github.com/torchbox/wagtail-grapple/pull/405)) @mgax
 
 ### Fixed
 
@@ -396,7 +403,8 @@
 -   Improve field definition and under-the-hood implementation ([#28](https://github.com/torchbox/wagtail-grapple/pull/28))
 -   Add conditional checks when resolving streamfield type ([#29](https://github.com/torchbox/wagtail-grapple/pull/29))
 
-[unreleased]: https://github.com/torchbox/wagtail-grapple/compare/v0.26.0...HEAD
+[unreleased]: https://github.com/torchbox/wagtail-grapple/compare/v0.27.0...HEAD
+[0.27.0]: https://github.com/torchbox/wagtail-grapple/compare/v0.26.0...v0.27.0
 [0.26.0]: https://github.com/torchbox/wagtail-grapple/compare/v0.25.1...v0.26.0
 [0.25.1]: https://github.com/torchbox/wagtail-grapple/compare/v0.25.0...v0.25.1
 [0.25.0]: https://github.com/torchbox/wagtail-grapple/compare/v0.24.0...v0.25.0

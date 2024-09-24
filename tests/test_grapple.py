@@ -16,6 +16,7 @@ from wagtail.documents import get_document_model
 from wagtail.models import Page, Site
 from wagtailmedia.models import get_media_model
 
+from grapple.registry import RegistryItem
 from grapple.schema import create_schema
 
 
@@ -1606,3 +1607,25 @@ class SnippetsTest(BaseGrappleTest):
         snippets_data = executed["data"]["snippets"]
         self.assertEqual(snippets_data[0]["snippetType"], "Advert")
         self.assertEqual(snippets_data[0]["contentType"], "testapp.Advert")
+
+    def test_no_snippet_classes_registered(self):
+        """
+        If there are no registered snippet classes, the snippets query should
+        still work, and return nothing.
+        """
+
+        query = """
+        {
+            snippets {
+                snippetType
+                contentType
+            }
+        }
+        """
+
+        with patch("grapple.registry.registry.snippets", RegistryItem()):
+            executed = self.client.execute(query)
+
+        self.assertEqual(type(executed["data"]), dict)
+        self.assertEqual(type(executed["data"]["snippets"]), list)
+        self.assertEqual(len(executed["data"]["snippets"]), 0)

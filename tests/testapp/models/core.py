@@ -40,7 +40,7 @@ from grapple.models import (
 )
 from grapple.utils import resolve_paginated_queryset
 from testapp.blocks import StreamFieldBlock
-from testapp.interfaces import CustomInterface
+from testapp.interfaces import AdditionalInterface
 
 
 document_model_string = getattr(
@@ -50,7 +50,7 @@ document_model_string = getattr(
 
 @register_singular_query_field("simpleModel")
 class SimpleModel(models.Model):
-    graphql_interfaces = (CustomInterface,)
+    graphql_interfaces = (AdditionalInterface,)
 
 
 def custom_middleware_one(next, root, info, **args):
@@ -83,7 +83,7 @@ class AuthorPage(Page):
     content_panels = Page.content_panels + [FieldPanel("name")]
 
     graphql_fields = [GraphQLString("name")]
-    graphql_interfaces = (CustomInterface,)
+    graphql_interfaces = (AdditionalInterface,)
 
 
 class BlogPageTag(TaggedItemBase):
@@ -264,7 +264,7 @@ class Advert(models.Model):
         GraphQLString("string_rich_text", source="rich_text"),
         GraphQLString("extra_rich_text", deprecation_reason="Use rich_text instead"),
     ]
-    graphql_interfaces = (CustomInterface,)
+    graphql_interfaces = (AdditionalInterface,)
 
     def __str__(self):
         return self.text

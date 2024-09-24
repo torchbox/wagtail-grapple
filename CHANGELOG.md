@@ -1,5 +1,9 @@
 ## Unreleased
 
+### Changed
+
+-   `SnippetObjectType` is replaced with `SnippetInterface` ([405](https://github.com/torchbox/wagtail-grapple/pull/405)) @mgax
+
 ### Fixed
 
 -   `value` not being queryable on `EmbedBlock` ([#399](https://github.com/torchbox/wagtail-grapple/pull/399))@JakubMastalerz

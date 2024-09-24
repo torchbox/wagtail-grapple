@@ -24,7 +24,7 @@ from grapple.models import (
     GraphQLStreamfield,
     GraphQLString,
 )
-from testapp.interfaces import CustomInterface
+from testapp.interfaces import AdditionalInterface
 
 
 if TYPE_CHECKING:
@@ -294,17 +294,17 @@ class TextWithCallableBlock(blocks.StructBlock):
 
 
 @register_streamfield_block
-class CustomInterfaceBlock(blocks.StructBlock):
+class AdditionalInterfaceBlock(blocks.StructBlock):
     """
-    Specify a custom GraphQL interface for our block.
+    Specify an additional GraphQL interface for our block.
     """
 
-    custom_text = blocks.TextBlock()
+    additional_text = blocks.TextBlock()
 
     graphql_fields = [
-        GraphQLString("custom_text"),
+        GraphQLString("additional_text"),
     ]
-    graphql_interfaces = (CustomInterface,)
+    graphql_interfaces = (AdditionalInterface,)
 
 
 class StreamFieldBlock(blocks.StreamBlock):
@@ -325,4 +325,4 @@ class StreamFieldBlock(blocks.StreamBlock):
     block_with_name = BlockWithName()
     advert = SnippetChooserBlock("testapp.Advert")
     person = SnippetChooserBlock("testapp.Person")
-    custom_interface_block = CustomInterfaceBlock()
+    additional_interface_block = AdditionalInterfaceBlock()

@@ -10,12 +10,13 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import connection
 from django.test import RequestFactory, TestCase, override_settings
 from graphene.test import Client
-from testapp.factories import BlogPageFactory
+from testapp.factories import AdvertFactory, BlogPageFactory, PersonFactory
 from testapp.models import GlobalSocialMediaSettings, HomePage, SocialMediaSettings
 from wagtail.documents import get_document_model
 from wagtail.models import Page, Site
 from wagtailmedia.models import get_media_model
 
+from grapple.registry import RegistryItem
 from grapple.schema import create_schema
 
 
@@ -1683,3 +1684,63 @@ class SettingsTest(BaseGrappleTest):
                 "data": {"setting": None},
             },
         )
+
+
+class SnippetsTest(BaseGrappleTest):
+    def setUp(self):
+        super().setUp()
+        self.factory = RequestFactory()
+        self.advert = AdvertFactory()
+        self.person = PersonFactory()
+
+    def test_snippets(self):
+        """
+        Query for snippets of different types, they should all be returned in
+        the same response.
+        """
+
+        query = """
+        {
+            snippets {
+                snippetType
+                contentType
+            }
+        }
+        """
+
+        executed = self.client.execute(query)
+
+        self.assertEqual(type(executed["data"]), dict)
+        self.assertEqual(type(executed["data"]["snippets"]), list)
+        self.assertEqual(len(executed["data"]["snippets"]), 2)
+        self.assertEqual(type(executed["data"]["snippets"][0]), dict)
+
+        snippets_data = sorted(
+            executed["data"]["snippets"], key=lambda s: s["snippetType"]
+        )
+        self.assertEqual(snippets_data[0]["snippetType"], "Advert")
+        self.assertEqual(snippets_data[0]["contentType"], "testapp.Advert")
+        self.assertEqual(snippets_data[1]["snippetType"], "Person")
+        self.assertEqual(snippets_data[1]["contentType"], "testapp.Person")
+
+    def test_no_snippet_classes_registered(self):
+        """
+        If there are no registered snippet classes, the snippets query should
+        still work, and return nothing.
+        """
+
+        query = """
+        {
+            snippets {
+                snippetType
+                contentType
+            }
+        }
+        """
+
+        with patch("grapple.registry.registry.snippets", RegistryItem()):
+            executed = self.client.execute(query)
+
+        self.assertEqual(type(executed["data"]), dict)
+        self.assertEqual(type(executed["data"]["snippets"]), list)
+        self.assertEqual(len(executed["data"]["snippets"]), 0)

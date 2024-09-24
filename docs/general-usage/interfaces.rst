@@ -50,7 +50,7 @@ the name of the model:
     }
 
 You can change the default ``PageInterface`` to your own interface by changing the
-:ref:`PAGE_INTERFACE<page interface settings>` setting.
+:ref:`PAGE_INTERFACE<page interface setting>` setting.
 
 As mentioned above there is both a plural ``pages`` and singular ``page``
 field on the root Query type that returns a ``PageInterface``.
@@ -108,6 +108,37 @@ in the interface:
 
 
 
+``SnippetInterface``
+--------------------
+
+``SnippetInterface`` is the default interface for all Wagtail snippet models. It is accessible through the
+``snippets`` field on the root query type. It exposes the following fields:
+
+::
+
+    snippetType: String!
+    contentType: String!
+
+An example of querying all snippets:
+
+::
+
+    query {
+        snippets {
+            snippetType
+            contentType
+            ...on Advert {
+                id
+                url
+                text
+            }
+        }
+    }
+
+You can change the default ``SnippetInterface`` to your own interface by changing the
+:ref:`SNIPPET_INTERFACE<snippet interface setting>` setting.
+
+
 Adding your own interfaces
 --------------------------
 
@@ -119,10 +150,7 @@ Given the following example interface:
 .. code-block:: python
 
     # interfaces.py
-    from .interfaces import CustomInterface
-
-
-    class CustomInterface(graphene.Interface):
+    class MyInterface(graphene.Interface):
         custom_field = graphene.String()
 
 you could add it to your Page model like so:
@@ -130,12 +158,13 @@ you could add it to your Page model like so:
 .. code-block:: python
 
     from wagtail.models import Page
+    from .interfaces import MyInterface
 
 
     class MyPage(Page):
         # ...
 
-        graphql_interfaces = (CustomInterface,)
+        graphql_interfaces = (MyInterface,)
 
 or any Django model:
 
@@ -143,13 +172,13 @@ or any Django model:
 
     # models.py
     from django.db import models
+    from .interfaces import MyInterface
 
 
     class MyModel(models.Model):
         # ...
 
-        graphql_interfaces = (CustomInterface,)
-
+        graphql_interfaces = (MyInterface,)
 
 or a ``StreamField`` block:
 
@@ -157,11 +186,12 @@ or a ``StreamField`` block:
 
     # blocks.py
     from wagtail.core import blocks
+    from .interfaces import MyInterface
 
 
     class MyStructBlock(blocks.StructBlock):
         # ...
 
-        graphql_interfaces = (CustomInterface,)
+        graphql_interfaces = (MyInterface,)
 
 The provided interfaces will be added to the base interfaces for the model.

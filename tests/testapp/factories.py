@@ -9,7 +9,7 @@ from wagtail import blocks
 from wagtail.contrib.redirects.models import Redirect
 
 from testapp.blocks import (
-    CustomInterfaceBlock,
+    AdditionalInterfaceBlock,
     ImageGalleryBlock,
     ImageGalleryImage,
     ImageGalleryImages,
@@ -88,11 +88,11 @@ class TextWithCallableBlockFactory(wagtail_factories.StructBlockFactory):
         model = TextWithCallableBlock
 
 
-class CustomInterfaceBlockFactory(wagtail_factories.StructBlockFactory):
-    custom_text = factory.Sequence(lambda n: f"Block with custom interface {n}")
+class AdditionalInterfaceBlockFactory(wagtail_factories.StructBlockFactory):
+    additional_text = factory.Sequence(lambda n: f"Block with additional interface {n}")
 
     class Meta:
-        model = CustomInterfaceBlock
+        model = AdditionalInterfaceBlock
 
 
 class BlogPageRelatedLinkFactory(factory.django.DjangoModelFactory):

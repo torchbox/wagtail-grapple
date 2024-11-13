@@ -381,12 +381,22 @@ def register_streamfield_blocks():
 
         def resolve_image(self, info, **kwargs):
             return self.value
+        
+    class ImageBlock(graphene.ObjectType):
+        image = graphene.Field(get_image_type, required=False)
+
+        class Meta:
+            interfaces = (StreamFieldInterface,)
+
+        def resolve_image(self, info, **kwargs):
+            return self.value
 
     registry.streamfield_blocks.update(
         {
             blocks.PageChooserBlock: PageChooserBlock,
             wagtail.documents.blocks.DocumentChooserBlock: DocumentChooserBlock,
             wagtail.images.blocks.ImageChooserBlock: ImageChooserBlock,
+            wagtail.images.blocks.ImageBlock: ImageBlock,
         }
     )
 

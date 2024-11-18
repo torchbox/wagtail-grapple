@@ -7,7 +7,10 @@ import graphene
 from django.utils.text import slugify
 from wagtail import blocks
 from wagtail.embeds.blocks import EmbedBlock
-from wagtail.images.blocks import ImageChooserBlock
+from wagtail.images.blocks import (
+    ImageChooserBlock, 
+    ImageBlock,
+)
 from wagtail.snippets.blocks import SnippetChooserBlock
 
 from grapple.helpers import register_streamfield_block
@@ -311,6 +314,7 @@ class StreamFieldBlock(blocks.StreamBlock):
     heading = blocks.CharBlock(classname="full title")
     paragraph = blocks.RichTextBlock()
     image = ImageChooserBlock()
+    image_with_alt = ImageBlock()
     decimal = blocks.DecimalBlock()
     date = blocks.DateBlock()
     datetime = blocks.DateTimeBlock()

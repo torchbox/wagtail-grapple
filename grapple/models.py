@@ -28,8 +28,8 @@ class GraphQLField:
         self.field_name = field_name
         self.field_type = field_type
         self.field_source = kwargs.get("source", field_name)
-        self.description = kwargs.get("description", None)
-        self.deprecation_reason = kwargs.get("deprecation_reason", None)
+        self.description = kwargs.get("description")
+        self.deprecation_reason = kwargs.get("deprecation_reason")
 
         # Add support for NonNull/required fields
         if required:
@@ -40,7 +40,7 @@ class GraphQLField:
             self.field_type = graphene.NonNull(field_type, description=self.description)
 
         # Legacy collection API (Allow lists):
-        self.extract_key = kwargs.get("key", None)
+        self.extract_key = kwargs.get("key")
         is_list = kwargs.get("is_list", False)
         if is_list:
             self.field_type = graphene.List(
@@ -174,7 +174,7 @@ def GraphQLCollection(
         from .types.structures import PaginatedQuerySet, QuerySetList
 
         # Check if using nested field extraction:
-        source = kwargs.get("source", None)
+        source = kwargs.get("source")
         if source and "." in source:
             source, *key = source.split(".")
             if key:

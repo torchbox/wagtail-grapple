@@ -4,7 +4,7 @@ ci:
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.6.0
+    rev: v5.0.0
     hooks:
       - id: check-yaml
       - id: check-toml
@@ -19,16 +19,16 @@ repos:
       - id: check-added-large-files
   - repo: https://github.com/astral-sh/ruff-pre-commit
     # keep in sync with .github/workflows/ruff.yml
-    rev: 'v0.4.10'
+    rev: 'v0.9.4'
     hooks:
       - id: ruff
         args: [--fix, --exit-non-zero-on-fix]
       - id: ruff-format
   - repo: https://github.com/rtts/djhtml
-    rev: 3.0.6
+    rev: 3.0.7
     hooks:
       - id: djhtml
   - repo: https://github.com/PyCQA/doc8
-    rev: v1.1.1
+    rev: v1.1.2
     hooks:
       - id: doc8

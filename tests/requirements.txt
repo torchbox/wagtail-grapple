@@ -4,7 +4,7 @@ ruff==0.0.287
 
 # Runtime requirements
 Django>=4.2,<5.1
-wagtail>=4.1
+wagtail>=5.2,<6.3
 graphene-django>=3.0.0
 factory-boy==3.2.1
 wagtail-factories>=4.1.0

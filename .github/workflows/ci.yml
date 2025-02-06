@@ -27,7 +27,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12']
+        python-version: ['3.9', '3.10', '3.11', '3.12']
         db: ['sqlite']
 
     steps:
@@ -50,9 +50,9 @@ jobs:
         run: tox --installpkg ./dist/*.whl
 
       - name: ⬆️ Upload coverage data
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: coverage-data
+          name: coverage-data-${{ matrix.python-version }}-${{ matrix.db }}
           path: tests/.coverage*
           if-no-files-found: ignore
           retention-days: 1
@@ -63,7 +63,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12']
+        python-version: ['3.9', '3.10', '3.11', '3.12']
         db: ['postgres']
 
     services:
@@ -100,9 +100,9 @@ jobs:
         run: tox --installpkg ./dist/*.whl
 
       - name: ⬆️ Upload coverage data
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: coverage-data
+          name: coverage-data-${{ matrix.python-version }}-${{ matrix.db }}
           path: tests/.coverage*
           if-no-files-found: ignore
           retention-days: 1
@@ -122,9 +122,10 @@ jobs:
       - run: python -Im pip install --upgrade coverage[toml]
 
       - name: ⬇️ Download coverage data
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
-          name: coverage-data
+          pattern: coverage-data-*
+          merge-multiple: true
 
       - name: ＋ Generate report
         run: |
@@ -133,7 +134,7 @@ jobs:
           echo "## Coverage summary" >> $GITHUB_STEP_SUMMARY
           python -Im coverage report --format=markdown >> $GITHUB_STEP_SUMMARY
       - name: 📈 Upload HTML report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: html-report
           path: htmlcov

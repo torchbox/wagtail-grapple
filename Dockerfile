@@ -2,7 +2,7 @@
 # WARNING: THIS IS NOT FOR USE IN PRODUCTION IN ANY SHAPE OR FORM.
 
 # Use an official Python runtime as a parent image
-FROM python:3.8
+FROM python:3.9
 LABEL maintainer="hello@wagtail.io"
 
 # Set environment varibles

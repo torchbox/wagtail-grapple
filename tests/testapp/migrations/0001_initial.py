@@ -726,4 +726,16 @@ class Migration(migrations.Migration):
             },
             bases=(wagtail.images.models.ImageFileMixin, models.Model),
         ),
+        migrations.AddField(
+            model_name="customimage",
+            name="description",
+            field=models.CharField(
+                blank=True, default="", max_length=255, verbose_name="description"
+            ),
+        ),
+        migrations.AlterField(
+            model_name="customdocument",
+            name="file_size",
+            field=models.PositiveBigIntegerField(editable=False, null=True),
+        ),
     ]

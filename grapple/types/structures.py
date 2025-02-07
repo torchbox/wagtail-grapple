@@ -102,8 +102,7 @@ class QuerySetList(graphene.List):
             kwargs["offset"] = graphene.Argument(
                 PositiveInt,
                 description=_(
-                    "Number of records skipped from the beginning of the "
-                    "results set."
+                    "Number of records skipped from the beginning of the results set."
                 ),
             )
 

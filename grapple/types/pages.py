@@ -243,7 +243,7 @@ def PagesQuery():
             pages = qs.live().public().filter(depth__gt=1).specific()
 
             site = get_site_filter(info, **kwargs)
-            site_hostname = kwargs.get("site", None)
+            site_hostname = kwargs.get("site")
             in_current_site = kwargs.get("in_site", False)
 
             if site is not None:

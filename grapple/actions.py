@@ -2,7 +2,7 @@ import inspect
 
 from collections.abc import Iterable
 from types import MethodType
-from typing import Any, Dict, Tuple, Type, Union
+from typing import Any, Union
 
 import graphene
 
@@ -247,7 +247,7 @@ def build_node_type(
     cls: type,
     type_prefix: str,
     interface: graphene.Interface,
-    base_type: Type[DjangoObjectType] = DjangoObjectType,
+    base_type: type[DjangoObjectType] = DjangoObjectType,
 ):
     """
     Build a graphene node type from a model class and associate
@@ -376,13 +376,13 @@ def get_field_value(instance, field_name: str):
         return instance.value[field_name]
 
 
-def get_all_field_values(*, instance, cls) -> Dict[str, Any]:
+def get_all_field_values(*, instance, cls) -> dict[str, Any]:
     """
     Returns a dictionary of all fields and their values within a given stream
     block instance.
     """
 
-    values: Dict[str, Any] = {}
+    values: dict[str, Any] = {}
     for item in cls.base_blocks.items():
         field_name: str = item[0]
         values[field_name] = get_field_value(
@@ -453,7 +453,7 @@ def custom_cls_resolver(*, cls, graphql_field):
 def build_streamfield_type(
     cls: type,
     type_prefix: str,
-    interfaces: Tuple[graphene.Interface],
+    interfaces: tuple[graphene.Interface],
     base_type=graphene.ObjectType,
 ):
     """
@@ -506,7 +506,7 @@ def build_streamfield_type(
     return graphql_node
 
 
-def register_page_model(cls: Type[WagtailPage], type_prefix: str):
+def register_page_model(cls: type[WagtailPage], type_prefix: str):
     """
     Create graphene node type for models than inherit from Wagtail Page model.
     """
@@ -521,7 +521,7 @@ def register_page_model(cls: Type[WagtailPage], type_prefix: str):
         registry.pages[cls] = page_node_type
 
 
-def register_document_model(cls: Type[AbstractDocument], type_prefix: str):
+def register_document_model(cls: type[AbstractDocument], type_prefix: str):
     """
     Create graphene node type for a model than inherits from AbstractDocument.
     Only one model will actually be generated because a default document model
@@ -540,7 +540,7 @@ def register_document_model(cls: Type[AbstractDocument], type_prefix: str):
         registry.documents[cls] = document_node_type
 
 
-def register_image_model(cls: Type[AbstractImage], type_prefix: str):
+def register_image_model(cls: type[AbstractImage], type_prefix: str):
     """
     Create a graphene node type for a model than inherits from AbstractImage.
     Only one type will actually be generated because a default image model
@@ -557,7 +557,7 @@ def register_image_model(cls: Type[AbstractImage], type_prefix: str):
         registry.images[cls] = image_node_type
 
 
-def register_image_rendition_model(cls: Type[AbstractRendition], type_prefix: str):
+def register_image_rendition_model(cls: type[AbstractRendition], type_prefix: str):
     """
     Create a graphene node type for a model than inherits from AbstractImageRendition.
     Only one type will actually be generated because a default image model
@@ -574,7 +574,7 @@ def register_image_rendition_model(cls: Type[AbstractRendition], type_prefix: st
         registry.images[cls] = rendition_type
 
 
-def register_media_model(cls: Type[AbstractMedia], type_prefix: str):
+def register_media_model(cls: type[AbstractMedia], type_prefix: str):
     """
     Create graphene node type for a model than inherits from AbstractDocument.
     Only one model will actually be generated because a default document model
@@ -590,7 +590,7 @@ def register_media_model(cls: Type[AbstractMedia], type_prefix: str):
 
 
 def register_settings_model(
-    cls: Union[Type[BaseSiteSetting], Type[BaseGenericSetting]], type_prefix: str
+    cls: Union[type[BaseSiteSetting], type[BaseGenericSetting]], type_prefix: str
 ):
     """
     Create a graphene node type for a settings page.
@@ -604,7 +604,7 @@ def register_settings_model(
         registry.settings[cls] = settings_node_type
 
 
-def register_snippet_model(cls: Type[models.Model], type_prefix: str):
+def register_snippet_model(cls: type[models.Model], type_prefix: str):
     """
     Create a graphene type for a snippet model.
     """
@@ -619,7 +619,7 @@ def register_snippet_model(cls: Type[models.Model], type_prefix: str):
         registry.snippets[cls] = snippet_node_type
 
 
-def register_django_model(cls: Type[models.Model], type_prefix: str):
+def register_django_model(cls: type[models.Model], type_prefix: str):
     """
     Create a graphene type for (non-specific) Django model.
     Used for Orderables and other foreign keys.

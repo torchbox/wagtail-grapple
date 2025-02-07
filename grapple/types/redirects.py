@@ -1,6 +1,6 @@
 import copy
 
-from typing import List, Optional
+from typing import Optional
 
 import graphene
 
@@ -51,7 +51,7 @@ class RedirectsQuery:
     redirects = graphene.List(graphene.NonNull(RedirectObjectType), required=True)
 
     # Return all redirects.
-    def resolve_redirects(self, info, **kwargs) -> List[Redirect]:
+    def resolve_redirects(self, info, **kwargs) -> list[Redirect]:
         """
         Resolve the query set of redirects. If `site` is None, a redirect works
         for all sites. To show this, a new redirect object is created for each

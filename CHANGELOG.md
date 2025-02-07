@@ -1,5 +1,13 @@
 ## Unreleased
 
+### Added
+
+-   Support for Wagtail 6.3 and 6.4 and Python 3.13 ([#416](https://github.com/torchbox/wagtail-grapple/pull/416)) @mgax
+
+### Removed
+
+-   Support for Wagtail < 6.3 and Python 3.8 ([#416](https://github.com/torchbox/wagtail-grapple/pull/416)) @mgax
+
 ## [0.27.0] - 2024-09-24
 
 ### Added

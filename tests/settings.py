@@ -189,3 +189,10 @@ EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 with contextlib.suppress(ImportError):
     from .local import *  # noqa: F403
+
+TASKS = {
+    "default": {
+        "BACKEND": "django_tasks.backends.immediate.ImmediateBackend",
+        "ENQUEUE_ON_COMMIT": False,
+    }
+}

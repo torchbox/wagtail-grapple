@@ -1,6 +1,7 @@
 import datetime
 
 import factory
+import wagtail.images.blocks as image_blocks
 import wagtail_factories
 
 from django.core.exceptions import ValidationError
@@ -28,6 +29,18 @@ from testapp.models import (
 
 
 # START: Block Factories
+
+
+# TODO: Contribute upstream to wagtail-factories
+class ImageBlockFactory(wagtail_factories.StructBlockFactory):
+    image = factory.SubFactory(wagtail_factories.ImageChooserBlockFactory)
+    decorative = factory.Faker("boolean")
+    alt_text = factory.Sequence(lambda n: f"Alt text {n}")
+
+    class Meta:
+        model = image_blocks.ImageBlock
+
+
 class DateBlockFactory(wagtail_factories.blocks.BlockFactory):
     class Meta:
         model = blocks.DateBlock
@@ -130,6 +143,7 @@ class BlogPageFactory(wagtail_factories.PageFactory):
             "heading": wagtail_factories.CharBlockFactory,
             "paragraph": RichTextBlockFactory,
             "image": wagtail_factories.ImageChooserBlockFactory,
+            "image_with_alt": ImageBlockFactory,
             "decimal": DecimalBlockFactory,
             "date": DateBlockFactory,
             "datetime": DateTimeBlockFactory,

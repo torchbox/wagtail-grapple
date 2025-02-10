@@ -20,6 +20,7 @@ from testapp.blocks import (
 from testapp.factories import (
     AdvertFactory,
     BlogPageFactory,
+    ImageBlockFactory,
     PersonFactory,
     TextWithCallableBlockFactory,
 )
@@ -64,6 +65,7 @@ class BlogTest(BaseGrappleTest):
                 ),
                 ("heading", "Test heading 2"),
                 ("image", wagtail_factories.ImageFactory()),
+                ("image_with_alt", ImageBlockFactory(is_decorative=False)),
                 ("decimal", decimal.Decimal(1.2)),
                 ("date", datetime.date.today()),
                 ("datetime", datetime.datetime.now()),
@@ -339,6 +341,43 @@ class BlogTest(BaseGrappleTest):
             validator(url)
         except ValidationError:
             self.fail(f"{url} is not a valid url")
+
+    def test_blog_body_imageblock(self):
+        block_type = "ImageBlock"
+        query_blocks = self.get_blocks_from_body(
+            block_type,
+            block_query="""
+            image {
+                id
+                src
+            }
+            decorative
+            altText
+            """,
+        )
+
+        # Check output.
+        count = 0
+        for block in self.blog_page.body:
+            if type(block.block).__name__ == block_type:
+                # Test the values
+                self.assertEqual(
+                    query_blocks[count]["image"]["id"], str(block.value.id)
+                )
+                self.assertEqual(
+                    query_blocks[count]["image"]["src"],
+                    settings.BASE_URL + block.value.file.url,
+                )
+                self.assertEqual(
+                    query_blocks[count]["decorative"], block.value.decorative
+                )
+                self.assertEqual(
+                    query_blocks[count]["altText"], block.value.contextual_alt_text
+                )
+                # Increment the count
+                count += 1
+        # Check that we test all blocks that were returned.
+        self.assertEqual(len(query_blocks), count)
 
     def test_blog_body_calloutblock(self):
         block_type = "CalloutBlock"

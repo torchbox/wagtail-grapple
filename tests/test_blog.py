@@ -204,6 +204,7 @@ class BlogTest(BaseGrappleTest):
     def test_blog_body_charblock(self):
         block_type = "CharBlock"
         query_blocks = self.get_blocks_from_body(block_type)
+        self.assertEqual(len(query_blocks), 2)
 
         # Check output.
         count = 0
@@ -219,6 +220,7 @@ class BlogTest(BaseGrappleTest):
     def test_streamfield_richtextblock(self):
         block_type = "RichTextBlock"
         query_blocks = self.get_blocks_from_body(block_type)
+        self.assertEqual(len(query_blocks), 1)
 
         # Check the raw value.
         count = 0
@@ -298,6 +300,7 @@ class BlogTest(BaseGrappleTest):
             }
             """,
         )
+        self.assertEqual(len(query_blocks), 1)
 
         # Check output.
         count = 0
@@ -355,6 +358,7 @@ class BlogTest(BaseGrappleTest):
             altText
             """,
         )
+        self.assertEqual(len(query_blocks), 1)
 
         # Check output.
         count = 0
@@ -400,6 +404,7 @@ class BlogTest(BaseGrappleTest):
     def test_blog_body_decimalblock(self):
         block_type = "DecimalBlock"
         query_blocks = self.get_blocks_from_body(block_type)
+        self.assertEqual(len(query_blocks), 1)
 
         # Check output.
         count = 0
@@ -415,6 +420,7 @@ class BlogTest(BaseGrappleTest):
     def test_blog_body_dateblock(self):
         block_type = "DateBlock"
         query_blocks = self.get_blocks_from_body(block_type)
+        self.assertEqual(len(query_blocks), 1)
 
         # Check output.
         count = 0
@@ -434,6 +440,7 @@ class BlogTest(BaseGrappleTest):
             block_type,
             block_query=f'value(format: "{date_format_string}")',
         )
+        self.assertEqual(len(query_blocks), 1)
 
         # Check output.
         count = 0
@@ -463,6 +470,7 @@ class BlogTest(BaseGrappleTest):
             }
             """,
         )
+        self.assertEqual(len(query_blocks), 1)
 
         # Check output.
         count = 0
@@ -574,6 +582,7 @@ class BlogTest(BaseGrappleTest):
         query_blocks = self.get_blocks_from_body(
             block_type, block_query=block_query, page_id=another_blog_post.id
         )
+        self.assertEqual(len(query_blocks), 1)
 
         # Check output.
         count = 0

@@ -384,12 +384,20 @@ def register_streamfield_blocks():
 
     class ImageBlock(graphene.ObjectType):
         image = graphene.Field(get_image_type, required=False)
+        decorative = graphene.Boolean(required=False)
+        alt_text = graphene.String(required=False)
 
         class Meta:
             interfaces = (StreamFieldInterface,)
 
         def resolve_image(self, info, **kwargs):
             return self.value
+
+        def resolve_decorative(self, info, **kwargs):
+            return self.value.decorative
+
+        def resolve_alt_text(self, info, **kwargs):
+            return self.value.contextual_alt_text
 
     registry.streamfield_blocks.update(
         {

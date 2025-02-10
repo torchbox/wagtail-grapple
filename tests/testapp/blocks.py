@@ -8,8 +8,8 @@ from django.utils.text import slugify
 from wagtail import blocks
 from wagtail.embeds.blocks import EmbedBlock
 from wagtail.images.blocks import (
-    ImageChooserBlock, 
     ImageBlock,
+    ImageChooserBlock,
 )
 from wagtail.snippets.blocks import SnippetChooserBlock
 

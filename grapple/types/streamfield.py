@@ -381,7 +381,7 @@ def register_streamfield_blocks():
 
         def resolve_image(self, info, **kwargs):
             return self.value
-        
+
     class ImageBlock(graphene.ObjectType):
         image = graphene.Field(get_image_type, required=False)
 

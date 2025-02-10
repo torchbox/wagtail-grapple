@@ -31,7 +31,7 @@ from testapp.models import (
 # START: Block Factories
 
 
-# TODO: Contribute upstream to wagtail-factories
+# TODO: Contribute upstream: https://github.com/wagtail/wagtail-factories/issues/97
 class ImageBlockFactory(wagtail_factories.StructBlockFactory):
     image = factory.SubFactory(wagtail_factories.ImageChooserBlockFactory)
     decorative = factory.Faker("boolean")

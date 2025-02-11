@@ -13,11 +13,13 @@ Wagtail docs:
 
 .. code-block:: python
 
-    from grapple.models import (
-        GraphQLRichText,
-        GraphQLString,
-        GraphQLStreamfield,
-    )
+    from django.db import models
+    from grapple.models import GraphQLRichText, GraphQLStreamfield, GraphQLString
+    from wagtail import blocks
+    from wagtail.models import Page
+    from wagtail.images.blocks import ImageBlock
+    from wagtail.fields import RichTextField, StreamField
+    from wagtail.admin.edit_handlers import FieldPanel
 
 
     class BlogPage(Page):
@@ -28,7 +30,7 @@ Wagtail docs:
             [
                 ("heading", blocks.CharBlock(classname="full title")),
                 ("paragraph", blocks.RichTextBlock()),
-                ("image", ImageChooserBlock()),
+                ("image", ImageBlock()),
             ]
         )
 
@@ -62,10 +64,12 @@ something like:
                 summary
                 body {
                     rawValue
-                    ...on ImageChooserBlock {
+                    ...on ImageBlock {
                         image {
                             src
                         }
+                        decorative
+                        altText
                     }
                 }
             }

@@ -44,7 +44,7 @@ jobs:
         run: uvx flit build --format wheel
 
       - name: 🧪 Run tox targets for Python ${{ matrix.python-version }}
-        run: uvx --with tox-uv tox-gh-actions tox --installpkg ./dist/*.whl
+        run: uvx --with tox-uv,tox-gh-actions tox --installpkg ./dist/*.whl
 
       - name: ⬆️ Upload coverage data
         uses: actions/upload-artifact@v4
@@ -91,7 +91,7 @@ jobs:
       - name: 🧪 Run tox targets for Python ${{ matrix.python-version }}
         env:
           DATABASE_URL: 'postgres://postgres:postgres@localhost:5432/postgres'
-        run: uvx --with tox-uv tox-gh-actions tox --installpkg ./dist/*.whl
+        run: uvx --with tox-uv,tox-gh-actions tox --installpkg ./dist/*.whl
 
       - name: ⬆️ Upload coverage data
         uses: actions/upload-artifact@v4

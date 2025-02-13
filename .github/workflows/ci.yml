@@ -37,17 +37,14 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: ⬇️ Install dependencies
-        run: |
-          python -Im pip install --upgrade pip
-          python -Im pip install flit tox tox-gh-actions
-          python -Im flit install --symlink
+      - name: Install uv
+        uses: hynek/setup-cached-uv@v2
 
       - name: 🏗️ Build wheel
-        run: python -Im flit build --format wheel
+        run: uvx flit build --format wheel
 
       - name: 🧪 Run tox targets for Python ${{ matrix.python-version }}
-        run: tox --installpkg ./dist/*.whl
+        run: uvx --with tox-uv,tox-gh-actions tox --installpkg ./dist/*.whl
 
       - name: ⬆️ Upload coverage data
         uses: actions/upload-artifact@v4
@@ -85,19 +82,16 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: ⬇️ Install dependencies
-        run: |
-          python -Im pip install --upgrade pip
-          python -Im pip install flit tox tox-gh-actions
-          python -Im flit install --symlink
+      - name: Install uv
+        uses: hynek/setup-cached-uv@v2
 
       - name: 🏗️ Build wheel
-        run: python -Im flit build --format wheel
+        run: uvx flit build --format wheel
 
       - name: 🧪 Run tox targets for Python ${{ matrix.python-version }}
         env:
           DATABASE_URL: 'postgres://postgres:postgres@localhost:5432/postgres'
-        run: tox --installpkg ./dist/*.whl
+        run: uvx --with tox-uv,tox-gh-actions tox --installpkg ./dist/*.whl
 
       - name: ⬆️ Upload coverage data
         uses: actions/upload-artifact@v4

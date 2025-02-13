@@ -19,4 +19,4 @@ jobs:
     - run: python -Im pip install --user ruff==0.9.4
 
     - name: Run ruff
-      run: ruff --output-format=github grapple
+      run: ruff check --output-format=github grapple

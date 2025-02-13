@@ -1,6 +1,6 @@
 # Test requirements.
 black>=23.9.1
-# keep in sync with .pre-commit-config.yaml
+# keep in sync with .github/workflows/ruff.yml and .pre-commit-config.yaml
 ruff==0.9.4
 
 # Runtime requirements

@@ -16,17 +16,15 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
+          python-version: '3.13'
           cache: 'pip'
           cache-dependency-path: '**/pyproject.toml'
 
-      - name: ⬇️ Install dependencies
-        run: |
-          python -Im pip install --upgrade pip
-          python -Im pip install "flit>=3.8.0"
-          python -Im flit install --symlink
+      - name: Install uv
+        uses: hynek/setup-cached-uv@v2
+
       - name: Build
-        run: python -Im flit build
+        run: uvx flit build
 
       - uses: actions/upload-artifact@v4
         with:

@@ -127,7 +127,7 @@ jobs:
           uvx coverage html --skip-covered --skip-empty
           uvx coverage report
           echo "## Coverage summary" >> $GITHUB_STEP_SUMMARY
-          python -Im coverage report --format=markdown >> $GITHUB_STEP_SUMMARY
+          uvx coverage report --format=markdown >> $GITHUB_STEP_SUMMARY
       - name: 📈 Upload HTML report
         uses: actions/upload-artifact@v4
         with:

@@ -40,6 +40,18 @@ class ImageBlockFactory(wagtail_factories.StructBlockFactory):
     class Meta:
         model = image_blocks.ImageBlock
 
+    @classmethod
+    def _construct_struct_value(cls, block_class, params):
+        if image := params["image"]:
+            decorative = params["decorative"]
+            alt_text = params["alt_text"]
+
+            # If the image is decorative, set alt_text to an empty string
+            image.contextual_alt_text = "" if decorative else alt_text
+            image.decorative = decorative
+
+        return image
+
 
 class DateBlockFactory(wagtail_factories.blocks.BlockFactory):
     class Meta:

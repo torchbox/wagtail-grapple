@@ -39,7 +39,7 @@ dependencies = [
 
 [project.optional-dependencies]
 testing = [
-    "coverage[toml]>=7.2.7,<8.0",
+    "coverage>=7.2.7,<8.0",
 ]
 
 docs = [

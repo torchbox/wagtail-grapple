@@ -18,8 +18,7 @@ env:
   TOX_TESTENV_PASSENV: FORCE_COLOR
   PIP_DISABLE_PIP_VERSION_CHECK: "1"
   PIP_NO_PYTHON_VERSION_WARNING: "1"
-  # Keep in sync with .pre-commit-config.yaml/default_language_version/python.
-  PYTHON_LATEST: "3.11"
+  PYTHON_LATEST: "3.13"
 
 jobs:
   tests-sqlite:
@@ -27,13 +26,15 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ['3.9', '3.10', '3.11', '3.12']
+        python-version: ["3.13"]
         db: ['sqlite']
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -44,7 +45,7 @@ jobs:
         run: uvx flit build --format wheel
 
       - name: 🧪 Run tox targets for Python ${{ matrix.python-version }}
-        run: uvx --with tox-uv,tox-gh-actions tox --installpkg ./dist/*.whl
+        run: uvx --with tox-uv --with tox-gh-actions tox --installpkg ./dist/*.whl
 
       - name: ⬆️ Upload coverage data
         uses: actions/upload-artifact@v4
@@ -60,7 +61,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ['3.9', '3.10', '3.11', '3.12']
+        python-version: ['3.9', '3.10', '3.11', '3.12', '3.13']
         db: ['postgres']
 
     services:
@@ -76,9 +77,11 @@ jobs:
         options: --health-cmd "pg_isready -d postgres -U postgres -p 5432" --health-interval 10s --health-timeout 5s --health-retries 5
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -91,7 +94,7 @@ jobs:
       - name: 🧪 Run tox targets for Python ${{ matrix.python-version }}
         env:
           DATABASE_URL: 'postgres://postgres:postgres@localhost:5432/postgres'
-        run: uvx --with tox-uv,tox-gh-actions tox --installpkg ./dist/*.whl
+        run: uvx --with tox-uv --with tox-gh-actions tox --installpkg ./dist/*.whl
 
       - name: ⬆️ Upload coverage data
         uses: actions/upload-artifact@v4
@@ -107,13 +110,16 @@ jobs:
     needs: [tests-sqlite, tests-postgres]
 
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
         with:
           # Use latest Python, so it understands all syntax.
           python-version: ${{env.PYTHON_LATEST}}
 
-      - run: python -Im pip install --upgrade coverage[toml]
+      - name: Install uv
+        uses: hynek/setup-cached-uv@v2
 
       - name: ⬇️ Download coverage data
         uses: actions/download-artifact@v4
@@ -123,10 +129,10 @@ jobs:
 
       - name: ＋ Generate report
         run: |
-          python -Im coverage html --skip-covered --skip-empty
-          python -Im coverage report
+          uvx coverage html --skip-covered --skip-empty
+          uvx coverage report
           echo "## Coverage summary" >> $GITHUB_STEP_SUMMARY
-          python -Im coverage report --format=markdown >> $GITHUB_STEP_SUMMARY
+          uvx coverage report --format=markdown >> $GITHUB_STEP_SUMMARY
       - name: 📈 Upload HTML report
         uses: actions/upload-artifact@v4
         with:

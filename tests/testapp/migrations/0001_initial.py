@@ -95,21 +95,22 @@ class Migration(migrations.Migration):
                             ("heading", 0),
                             ("paragraph", 1),
                             ("image", 2),
-                            ("decimal", 3),
-                            ("date", 4),
-                            ("datetime", 5),
-                            ("gallery", 8),
-                            ("video", 10),
-                            ("objectives", 12),
-                            ("carousel", 13),
-                            ("callout", 14),
-                            ("text_and_buttons", 20),
-                            ("page", 21),
-                            ("text_with_callable", 24),
-                            ("block_with_name", 25),
-                            ("advert", 26),
-                            ("person", 27),
-                            ("additional_interface_block", 28),
+                            ("image_with_alt", 3),
+                            ("decimal", 4),
+                            ("date", 5),
+                            ("datetime", 6),
+                            ("gallery", 9),
+                            ("video", 11),
+                            ("objectives", 13),
+                            ("carousel", 14),
+                            ("callout", 15),
+                            ("text_and_buttons", 21),
+                            ("page", 22),
+                            ("text_with_callable", 25),
+                            ("block_with_name", 26),
+                            ("advert", 27),
+                            ("person", 28),
+                            ("additional_interface_block", 29),
                         ],
                         block_lookup={
                             0: (
@@ -119,93 +120,94 @@ class Migration(migrations.Migration):
                             ),
                             1: ("wagtail.blocks.RichTextBlock", (), {}),
                             2: ("wagtail.images.blocks.ImageChooserBlock", (), {}),
-                            3: ("wagtail.blocks.DecimalBlock", (), {}),
-                            4: ("wagtail.blocks.DateBlock", (), {}),
-                            5: ("wagtail.blocks.DateTimeBlock", (), {}),
-                            6: (
+                            3: ("wagtail.images.blocks.ImageBlock", [], {}),
+                            4: ("wagtail.blocks.DecimalBlock", (), {}),
+                            5: ("wagtail.blocks.DateBlock", (), {}),
+                            6: ("wagtail.blocks.DateTimeBlock", (), {}),
+                            7: (
                                 "wagtail.blocks.StructBlock",
                                 [[("caption", 0), ("image", 2)]],
                                 {},
                             ),
-                            7: ("wagtail.blocks.StreamBlock", [[("image", 6)]], {}),
-                            8: (
+                            8: ("wagtail.blocks.StreamBlock", [[("image", 7)]], {}),
+                            9: (
                                 "wagtail.blocks.StructBlock",
-                                [[("title", 0), ("images", 7)]],
+                                [[("title", 0), ("images", 8)]],
                                 {},
                             ),
-                            9: (
+                            10: (
                                 "wagtail.embeds.blocks.EmbedBlock",
                                 (),
                                 {"required": False},
                             ),
-                            10: (
+                            11: (
                                 "wagtail.blocks.StructBlock",
-                                [[("youtube_link", 9)]],
+                                [[("youtube_link", 10)]],
                                 {},
                             ),
-                            11: ("wagtail.blocks.CharBlock", (), {}),
-                            12: ("wagtail.blocks.ListBlock", (11,), {}),
-                            13: (
+                            12: ("wagtail.blocks.CharBlock", (), {}),
+                            13: ("wagtail.blocks.ListBlock", (12,), {}),
+                            14: (
                                 "wagtail.blocks.StreamBlock",
                                 [[("text", 0), ("image", 2), ("markup", 1)]],
                                 {},
                             ),
-                            14: (
+                            15: (
                                 "wagtail.blocks.StructBlock",
                                 [[("text", 1), ("image", 2)]],
                                 {},
                             ),
-                            15: ("wagtail.blocks.TextBlock", (), {}),
-                            16: (
+                            16: ("wagtail.blocks.TextBlock", (), {}),
+                            17: (
                                 "wagtail.blocks.CharBlock",
                                 (),
                                 {"label": "Text", "max_length": 50, "required": True},
                             ),
-                            17: (
+                            18: (
                                 "wagtail.blocks.CharBlock",
                                 (),
                                 {"label": "Link", "max_length": 255, "required": True},
                             ),
-                            18: (
+                            19: (
                                 "wagtail.blocks.StructBlock",
-                                [[("button_text", 16), ("button_link", 17)]],
+                                [[("button_text", 17), ("button_link", 18)]],
                                 {},
                             ),
-                            19: ("wagtail.blocks.ListBlock", (18,), {}),
-                            20: (
+                            20: ("wagtail.blocks.ListBlock", (19,), {}),
+                            21: (
                                 "wagtail.blocks.StructBlock",
-                                [[("text", 15), ("buttons", 19), ("mainbutton", 18)]],
+                                [[("text", 16), ("buttons", 20), ("mainbutton", 19)]],
                                 {},
                             ),
-                            21: ("wagtail.blocks.PageChooserBlock", (), {}),
-                            22: ("wagtail.blocks.IntegerBlock", (), {}),
-                            23: ("wagtail.blocks.FloatBlock", (), {}),
-                            24: (
+                            22: ("wagtail.blocks.PageChooserBlock", (), {}),
+                            23: ("wagtail.blocks.IntegerBlock", (), {}),
+                            24: ("wagtail.blocks.FloatBlock", (), {}),
+                            25: (
                                 "wagtail.blocks.StructBlock",
                                 [
                                     [
-                                        ("text", 11),
-                                        ("integer", 22),
-                                        ("decimal", 23),
-                                        ("page", 21),
+                                        ("text", 12),
+                                        ("integer", 23),
+                                        ("decimal", 24),
+                                        ("page", 22),
                                     ]
                                 ],
                                 {},
                             ),
-                            25: ("wagtail.blocks.StructBlock", [[("name", 15)]], {}),
-                            26: (
+                            26: ("wagtail.blocks.StructBlock", [[("name", 16)]], {}),
+                            27: (
                                 "wagtail.snippets.blocks.SnippetChooserBlock",
                                 ("testapp.Advert",),
                                 {},
                             ),
-                            27: (
+                            28: (
                                 "wagtail.snippets.blocks.SnippetChooserBlock",
                                 ("testapp.Person",),
                                 {},
                             ),
-                            28: (
+                            29: (
                                 "wagtail.blocks.StructBlock",
-                                [[("additional_text", 15)]],
+                                [[("additional_text", 16)]],
                                 {},
                             ),
                         },

@@ -3,7 +3,7 @@ import graphene
 from django.test import TestCase
 from wagtail.blocks.field_block import PageChooserBlock
 from wagtail.documents.blocks import DocumentChooserBlock
-from wagtail.images.blocks import ImageChooserBlock
+from wagtail.images.blocks import ImageBlock, ImageChooserBlock
 from wagtail.snippets.blocks import SnippetChooserBlock
 
 from grapple import registry
@@ -226,6 +226,18 @@ class ChooserBlocksTest(TestCase):
         schema.
         """
         block = registry.registry.streamfield_blocks[ImageChooserBlock]
+        field = block.image
+
+        # Check that field is not required by asserting type isn't `NonNull`
+        self.assertIsInstance(field, graphene.types.field.Field)
+        self.assertNotIsInstance(field.type, graphene.NonNull)
+
+    def test_image_block_value_field_not_required(self):
+        """
+        Test that the ImageBlock image field is nullable in the GraphQL
+        schema.
+        """
+        block = registry.registry.streamfield_blocks[ImageBlock]
         field = block.image
 
         # Check that field is not required by asserting type isn't `NonNull`

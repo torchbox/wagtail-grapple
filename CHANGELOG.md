@@ -3,6 +3,7 @@
 ### Added
 
 -   Support for Wagtail 6.3 and 6.4 and Python 3.13 ([#416](https://github.com/torchbox/wagtail-grapple/pull/416)) @mgax
+-   Support for `ImageBlock` ([#419](https://github.com/torchbox/wagtail-grapple/pull/419)) @mgax
 
 ### Removed
 

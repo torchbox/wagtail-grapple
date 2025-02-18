@@ -20,6 +20,7 @@ from testapp.blocks import (
 from testapp.factories import (
     AdvertFactory,
     BlogPageFactory,
+    ImageBlockFactory,
     PersonFactory,
     TextWithCallableBlockFactory,
 )
@@ -64,6 +65,7 @@ class BlogTest(BaseGrappleTest):
                 ),
                 ("heading", "Test heading 2"),
                 ("image", wagtail_factories.ImageFactory()),
+                ("image_with_alt", ImageBlockFactory(is_decorative=False)),
                 ("decimal", decimal.Decimal(1.2)),
                 ("date", datetime.date.today()),
                 ("datetime", datetime.datetime.now()),
@@ -202,6 +204,7 @@ class BlogTest(BaseGrappleTest):
     def test_blog_body_charblock(self):
         block_type = "CharBlock"
         query_blocks = self.get_blocks_from_body(block_type)
+        self.assertEqual(len(query_blocks), 2)
 
         # Check output.
         count = 0
@@ -217,6 +220,7 @@ class BlogTest(BaseGrappleTest):
     def test_streamfield_richtextblock(self):
         block_type = "RichTextBlock"
         query_blocks = self.get_blocks_from_body(block_type)
+        self.assertEqual(len(query_blocks), 1)
 
         # Check the raw value.
         count = 0
@@ -296,6 +300,7 @@ class BlogTest(BaseGrappleTest):
             }
             """,
         )
+        self.assertEqual(len(query_blocks), 1)
 
         # Check output.
         count = 0
@@ -340,6 +345,44 @@ class BlogTest(BaseGrappleTest):
         except ValidationError:
             self.fail(f"{url} is not a valid url")
 
+    def test_blog_body_imageblock(self):
+        block_type = "ImageBlock"
+        query_blocks = self.get_blocks_from_body(
+            block_type,
+            block_query="""
+            image {
+                id
+                src
+            }
+            decorative
+            altText
+            """,
+        )
+        self.assertEqual(len(query_blocks), 1)
+
+        # Check output.
+        count = 0
+        for block in self.blog_page.body:
+            if type(block.block).__name__ == block_type:
+                # Test the values
+                self.assertEqual(
+                    query_blocks[count]["image"]["id"], str(block.value.id)
+                )
+                self.assertEqual(
+                    query_blocks[count]["image"]["src"],
+                    settings.BASE_URL + block.value.file.url,
+                )
+                self.assertEqual(
+                    query_blocks[count]["decorative"], block.value.decorative
+                )
+                self.assertEqual(
+                    query_blocks[count]["altText"], block.value.contextual_alt_text
+                )
+                # Increment the count
+                count += 1
+        # Check that we test all blocks that were returned.
+        self.assertEqual(len(query_blocks), count)
+
     def test_blog_body_calloutblock(self):
         block_type = "CalloutBlock"
         query_blocks = self.get_blocks_from_body(block_type, block_query="text")
@@ -361,6 +404,7 @@ class BlogTest(BaseGrappleTest):
     def test_blog_body_decimalblock(self):
         block_type = "DecimalBlock"
         query_blocks = self.get_blocks_from_body(block_type)
+        self.assertEqual(len(query_blocks), 1)
 
         # Check output.
         count = 0
@@ -376,6 +420,7 @@ class BlogTest(BaseGrappleTest):
     def test_blog_body_dateblock(self):
         block_type = "DateBlock"
         query_blocks = self.get_blocks_from_body(block_type)
+        self.assertEqual(len(query_blocks), 1)
 
         # Check output.
         count = 0
@@ -395,6 +440,7 @@ class BlogTest(BaseGrappleTest):
             block_type,
             block_query=f'value(format: "{date_format_string}")',
         )
+        self.assertEqual(len(query_blocks), 1)
 
         # Check output.
         count = 0
@@ -424,6 +470,7 @@ class BlogTest(BaseGrappleTest):
             }
             """,
         )
+        self.assertEqual(len(query_blocks), 1)
 
         # Check output.
         count = 0
@@ -535,6 +582,7 @@ class BlogTest(BaseGrappleTest):
         query_blocks = self.get_blocks_from_body(
             block_type, block_query=block_query, page_id=another_blog_post.id
         )
+        self.assertEqual(len(query_blocks), 1)
 
         # Check output.
         count = 0

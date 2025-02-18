@@ -1,9 +1,11 @@
 ## Unreleased
 
+## [0.28.0] - 2025-02-18
+
 ### Added
 
 -   Support for Wagtail 6.3 and 6.4 and Python 3.13 ([#416](https://github.com/torchbox/wagtail-grapple/pull/416)) @mgax
--   Support for `ImageBlock` ([#419](https://github.com/torchbox/wagtail-grapple/pull/419)) @mgax
+-   Support for [`ImageBlock`](https://docs.wagtail.org/en/stable/releases/6.3.html#imageblock-with-alt-text-support) ([#419](https://github.com/torchbox/wagtail-grapple/pull/419)) @mgax
 
 ### Removed
 
@@ -412,7 +414,8 @@
 -   Improve field definition and under-the-hood implementation ([#28](https://github.com/torchbox/wagtail-grapple/pull/28))
 -   Add conditional checks when resolving streamfield type ([#29](https://github.com/torchbox/wagtail-grapple/pull/29))
 
-[unreleased]: https://github.com/torchbox/wagtail-grapple/compare/v0.27.0...HEAD
+[unreleased]: https://github.com/torchbox/wagtail-grapple/compare/v0.28.0...HEAD
+[0.28.0]: https://github.com/torchbox/wagtail-grapple/compare/v0.27.0...v0.28.0
 [0.27.0]: https://github.com/torchbox/wagtail-grapple/compare/v0.26.0...v0.27.0
 [0.26.0]: https://github.com/torchbox/wagtail-grapple/compare/v0.25.1...v0.26.0
 [0.25.1]: https://github.com/torchbox/wagtail-grapple/compare/v0.25.0...v0.25.1

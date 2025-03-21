@@ -279,7 +279,10 @@ def get_media_item_url(cls):
         url = cls.file.url
 
     if url[0] == "/":
-        return settings.BASE_URL + url
+        if hasattr(settings, "WAGTAILADMIN_BASE_URL"):
+            return settings.WAGTAILADMIN_BASE_URL + url
+        elif hasattr(settings, "BASE_URL"):
+            return settings.BASE_URL + url
     return url
 
 

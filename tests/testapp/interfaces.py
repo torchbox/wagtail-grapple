@@ -7,6 +7,10 @@ class AdditionalInterface(graphene.Interface):
     additional_text = graphene.String()
 
 
+class AlternativeInterface(graphene.Interface):
+    alternative_text = graphene.String()
+
+
 class CustomPageInterface(PageInterface):
     custom_text = graphene.String()
 

@@ -89,21 +89,29 @@ class InterfacesTestCase(BaseGrappleTestWithIntrospection):
         results = self.introspect_schema_by_type("AuthorPage")
         self.assertListEqual(
             sorted(results["data"]["__type"]["interfaces"], key=lambda x: x["name"]),
-            [{"name": "AdditionalInterface"}, {"name": "PageInterface"}],
+            [
+                {"name": "AdditionalInterface"},
+                {"name": "AlternativeInterface"},
+                {"name": "PageInterface"},
+            ],
         )
 
     def test_schema_for_snippet_with_graphql_interface(self):
         results = self.introspect_schema_by_type("Advert")
         self.assertListEqual(
             sorted(results["data"]["__type"]["interfaces"], key=lambda x: x["name"]),
-            [{"name": "AdditionalInterface"}, {"name": "SnippetInterface"}],
+            [
+                {"name": "AdditionalInterface"},
+                {"name": "AlternativeInterface"},
+                {"name": "SnippetInterface"},
+            ],
         )
 
     def test_schema_for_django_model_with_graphql_interfaces(self):
         results = self.introspect_schema_by_type("SimpleModel")
         self.assertListEqual(
             sorted(results["data"]["__type"]["interfaces"], key=lambda x: x["name"]),
-            [{"name": "AdditionalInterface"}],
+            [{"name": "AdditionalInterface"}, {"name": "AlternativeInterface"}],
         )
 
 

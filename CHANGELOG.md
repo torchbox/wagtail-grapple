@@ -1,6 +1,6 @@
 ## Unreleased
 
-## Added 
+## Added
 
 - Support for Wagtail 7+ ([#425](https://github.com/torchbox/wagtail-grapple/pull/425)) @rachelhsmith
 

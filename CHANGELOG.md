@@ -1,5 +1,11 @@
 ## Unreleased
 
+## [0.29.0] - 2025-07-02
+
+### Added
+
+- Support for Wagtail 7+ ([#425](https://github.com/torchbox/wagtail-grapple/pull/425)) @rachelhsmith
+
 ## [0.28.0] - 2025-02-18
 
 ### Added
@@ -414,7 +420,8 @@
 -   Improve field definition and under-the-hood implementation ([#28](https://github.com/torchbox/wagtail-grapple/pull/28))
 -   Add conditional checks when resolving streamfield type ([#29](https://github.com/torchbox/wagtail-grapple/pull/29))
 
-[unreleased]: https://github.com/torchbox/wagtail-grapple/compare/v0.28.0...HEAD
+[unreleased]: https://github.com/torchbox/wagtail-grapple/compare/v0.29.0...HEAD
+[0.29.0]: https://github.com/torchbox/wagtail-grapple/compare/v0.28.0...v0.29.0
 [0.28.0]: https://github.com/torchbox/wagtail-grapple/compare/v0.27.0...v0.28.0
 [0.27.0]: https://github.com/torchbox/wagtail-grapple/compare/v0.26.0...v0.27.0
 [0.26.0]: https://github.com/torchbox/wagtail-grapple/compare/v0.25.1...v0.26.0

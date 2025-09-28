@@ -89,26 +89,25 @@ class InterfacesTestCase(BaseGrappleTestWithIntrospection):
         results = self.introspect_schema_by_type("AuthorPage")
         self.assertListEqual(
             sorted(results["data"]["__type"]["interfaces"], key=lambda x: x["name"]),
-            [
-                {"name": "AdditionalInterface"},
-                {"name": "AlternativeInterface"},
-                {"name": "PageInterface"},
-            ],
+            [{"name": "AdditionalInterface"}, {"name": "PageInterface"}],
         )
 
     def test_schema_for_snippet_with_graphql_interface(self):
         results = self.introspect_schema_by_type("Advert")
         self.assertListEqual(
             sorted(results["data"]["__type"]["interfaces"], key=lambda x: x["name"]),
-            [
-                {"name": "AdditionalInterface"},
-                {"name": "AlternativeInterface"},
-                {"name": "SnippetInterface"},
-            ],
+            [{"name": "AdditionalInterface"}, {"name": "SnippetInterface"}],
         )
 
     def test_schema_for_django_model_with_graphql_interfaces(self):
         results = self.introspect_schema_by_type("SimpleModel")
+        self.assertListEqual(
+            sorted(results["data"]["__type"]["interfaces"], key=lambda x: x["name"]),
+            [{"name": "AdditionalInterface"}],
+        )
+
+    def test_imports_graphql_interfaces_defined_by_str(self):
+        results = self.introspect_schema_by_type("SimpleModelWithAlternativeInterface")
         self.assertListEqual(
             sorted(results["data"]["__type"]["interfaces"], key=lambda x: x["name"]),
             [{"name": "AdditionalInterface"}, {"name": "AlternativeInterface"}],

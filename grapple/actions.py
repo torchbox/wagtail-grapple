@@ -269,11 +269,11 @@ def build_node_type(
         model = stub_model
 
     # Gather any interfaces, and discard None values
-    interface_classes = list(getattr(cls, "graphql_interfaces", ()))
-    for i, interface_class in enumerate(interface_classes):
-        if isinstance(interface_class, str):
-            interface_classes[i] = import_string(interface_class)
-    interface_classes = tuple(interface_classes)
+    interface_classes = getattr(cls, "graphql_interfaces", ())
+    interface_classes = tuple(
+        import_string(i) if isinstance(i, str) else i
+        for i in interface_classes
+    )
 
     interfaces = {interface, *interface_classes}
     interfaces.discard(None)

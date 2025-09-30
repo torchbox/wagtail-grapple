@@ -271,8 +271,7 @@ def build_node_type(
     # Gather any interfaces, and discard None values
     interface_classes = getattr(cls, "graphql_interfaces", ())
     interface_classes = tuple(
-        import_string(i) if isinstance(i, str) else i
-        for i in interface_classes
+        import_string(i) if isinstance(i, str) else i for i in interface_classes
     )
 
     interfaces = {interface, *interface_classes}

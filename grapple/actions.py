@@ -9,6 +9,7 @@ import graphene
 from django.apps import apps
 from django.core.exceptions import FieldDoesNotExist
 from django.db import models
+from django.utils.module_loading import import_string
 from graphene_django.types import DjangoObjectType
 from wagtail.blocks import StructValue, stream_block
 from wagtail.contrib.settings.models import BaseGenericSetting, BaseSiteSetting
@@ -268,7 +269,12 @@ def build_node_type(
         model = stub_model
 
     # Gather any interfaces, and discard None values
-    interfaces = {interface, *getattr(cls, "graphql_interfaces", ())}
+    interface_classes = getattr(cls, "graphql_interfaces", ())
+    interface_classes = tuple(
+        import_string(i) if isinstance(i, str) else i for i in interface_classes
+    )
+
+    interfaces = {interface, *interface_classes}
     interfaces.discard(None)
 
     type_meta = {

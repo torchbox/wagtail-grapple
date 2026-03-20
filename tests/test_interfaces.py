@@ -106,6 +106,13 @@ class InterfacesTestCase(BaseGrappleTestWithIntrospection):
             [{"name": "AdditionalInterface"}],
         )
 
+    def test_imports_graphql_interfaces_defined_by_str(self):
+        results = self.introspect_schema_by_type("SimpleModelWithAlternativeInterface")
+        self.assertListEqual(
+            sorted(results["data"]["__type"]["interfaces"], key=lambda x: x["name"]),
+            [{"name": "AdditionalInterface"}, {"name": "AlternativeInterface"}],
+        )
+
 
 @tag("needs-custom-settings")
 @skipUnless(

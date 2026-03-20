@@ -53,6 +53,14 @@ class SimpleModel(models.Model):
     graphql_interfaces = (AdditionalInterface,)
 
 
+@register_singular_query_field("simpleModelWithAlternativeInterface")
+class SimpleModelWithAlternativeInterface(models.Model):
+    graphql_interfaces = (
+        AdditionalInterface,
+        "testapp.interfaces.AlternativeInterface",
+    )
+
+
 def custom_middleware_one(next, root, info, **args):
     info.context.custom_middleware_one = True
     return next(root, info, **args)

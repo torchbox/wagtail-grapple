@@ -10,7 +10,7 @@ repos:
       - id: check-toml
       - id: trailing-whitespace
       - id: check-merge-conflict
-      - id: check-byte-order-marker
+      - id: fix-byte-order-marker
       - id: check-case-conflict
       - id: check-json
       - id: debug-statements

@@ -1,5 +1,15 @@
 ## Unreleased
 
+## [0.30.0] - 2026-03-20
+
+### Added
+
+- Support for declaring interfaces as strings ([#423](https://github.com/torchbox/wagtail-grapple/pull/423)) @Hercilio1
+
+### Removed
+
+- Support for obsolete Wagtail `BASE_URL` setting (replaced by `WAGTAILADMIN_BASE_URL`) ([#422](https://github.com/torchbox/wagtail-grapple/pull/422)) @Hercilio1
+
 ## [0.29.0] - 2025-07-02
 
 ### Added
@@ -22,7 +32,7 @@
 ### Added
 
 -   Add an `in_menu` filter ([#402](https://github.com/torchbox/wagtail-grapple/pull/402)) @dopry
--   Add ability to speficy the search operator ([#406](https://github.com/torchbox/wagtail-grapple/pull/406)) @dopry
+-   Add ability to specify the search operator ([#406](https://github.com/torchbox/wagtail-grapple/pull/406)) @dopry
 
 ### Changed
 
@@ -420,7 +430,8 @@
 -   Improve field definition and under-the-hood implementation ([#28](https://github.com/torchbox/wagtail-grapple/pull/28))
 -   Add conditional checks when resolving streamfield type ([#29](https://github.com/torchbox/wagtail-grapple/pull/29))
 
-[unreleased]: https://github.com/torchbox/wagtail-grapple/compare/v0.29.0...HEAD
+[unreleased]: https://github.com/torchbox/wagtail-grapple/compare/v0.30.0...HEAD
+[0.30.0]: https://github.com/torchbox/wagtail-grapple/compare/v0.29.0...v0.30.0
 [0.29.0]: https://github.com/torchbox/wagtail-grapple/compare/v0.28.0...v0.29.0
 [0.28.0]: https://github.com/torchbox/wagtail-grapple/compare/v0.27.0...v0.28.0
 [0.27.0]: https://github.com/torchbox/wagtail-grapple/compare/v0.26.0...v0.27.0

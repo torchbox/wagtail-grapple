@@ -312,7 +312,7 @@ class BlogTest(BaseGrappleTest):
                 )
                 self.assertEqual(
                     query_blocks[count]["image"]["src"],
-                    settings.BASE_URL + block.value.file.url,
+                    settings.WAGTAILADMIN_BASE_URL + block.value.file.url,
                 )
                 # Increment the count
                 count += 1
@@ -370,7 +370,7 @@ class BlogTest(BaseGrappleTest):
                 )
                 self.assertEqual(
                     query_blocks[count]["image"]["src"],
-                    settings.BASE_URL + block.value.file.url,
+                    settings.WAGTAILADMIN_BASE_URL + block.value.file.url,
                 )
                 self.assertEqual(
                     query_blocks[count]["decorative"], block.value.decorative
@@ -487,7 +487,7 @@ class BlogTest(BaseGrappleTest):
                     )
                     self.assertEqual(
                         image["image"]["src"],
-                        settings.BASE_URL
+                        settings.WAGTAILADMIN_BASE_URL
                         + str(block.value["images"][key].value["image"].file.url),
                     )
                 # Increment the count

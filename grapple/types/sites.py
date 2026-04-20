@@ -72,15 +72,24 @@ def SitesQuery():
             SiteObjectType, hostname=graphene.String(), id=graphene.ID()
         )
         sites = QuerySetList(
-            graphene.NonNull(SiteObjectType), enable_search=True, required=True
+            graphene.NonNull(SiteObjectType),
+            enable_search=True,
+            required=True,
+            is_default_site=graphene.Argument(graphene.Boolean),
         )
 
         def resolve_sites(self, info, **kwargs) -> QuerySet[Site]:
             """
-            Return all `Site` objects.
+            Return all `Site` objects, optionally filtered to those where
+            `is_default_site` matches the provided value.
             """
 
-            return resolve_queryset(Site.objects.all(), info, **kwargs)
+            qs = Site.objects.all()
+
+            if (is_default := kwargs.get("is_default_site")) is not None:
+                qs = qs.filter(is_default_site=is_default)
+
+            return resolve_queryset(qs, info, **kwargs)
 
         def resolve_site(self, info, **kwargs) -> Optional[Site]:
             """

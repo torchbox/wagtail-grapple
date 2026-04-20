@@ -167,7 +167,7 @@ and can be queried like so:
 ::
 
     query {
-        sites (isDefaultSite: True) {
+        sites (isDefaultSite: true) {
             port
             hostname
         }

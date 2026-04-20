@@ -1,5 +1,9 @@
 ## Unreleased
 
+## Added
+
+- Add an `is_default_site` filter to the sites query ([#429](https://github.com/torchbox/wagtail-grapple/pull/429)) @ianmeigh
+
 ## [0.30.0] - 2026-03-20
 
 ### Added

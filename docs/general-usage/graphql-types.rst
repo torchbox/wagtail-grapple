@@ -155,12 +155,19 @@ the ``sites`` or ``site`` field on the root query type. Available fields for the
     pages(limit: PositiveInt, offset: PositiveInt, order: String, searchQuery: String, id: ID): [PageInterface]
 
 
-The plural ``sites`` field can be queried like so:
+The plural ``sites`` field accepts the following arguments:
+
+::
+
+    # Optionally filters sites by their default site status. Omitting this returns all sites.
+    is_default_site: Boolean
+
+and can be queried like so:
 
 ::
 
     query {
-        sites {
+        sites (isDefaultSite: True) {
             port
             hostname
         }

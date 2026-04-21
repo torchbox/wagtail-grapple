@@ -742,6 +742,8 @@ class PageUrlPathTest(BaseGrappleTest):
 
 class SitesTest(TestCase):
     def setUp(self):
+        # Default site is created in testapp migration (002_create_homepage.py)
+
         self.site = wagtail_factories.SiteFactory(
             hostname="grapple.localhost", site_name="Grapple test site"
         )
@@ -783,6 +785,28 @@ class SitesTest(TestCase):
         self.assertEqual(type(executed["data"]), dict)
         self.assertEqual(type(executed["data"]["sites"]), list)
         self.assertEqual(len(executed["data"]["sites"]), Site.objects.count())
+
+    def test_sites_is_default_site_filter(self):
+        query = """
+        query($isDefaultSite: Boolean) {
+            sites(isDefaultSite: $isDefaultSite) {
+                isDefaultSite
+            }
+        }
+        """
+        total_non_default_sites = Site.objects.filter(is_default_site=False).count()
+        cases = [
+            (True, 1),
+            (False, total_non_default_sites),
+        ]
+
+        for value, expected_count in cases:
+            with self.subTest(isDefaultSite=value):
+                results = self.client.execute(
+                    query,
+                    variables={"isDefaultSite": value},
+                )
+                self.assertEqual(len(results["data"]["sites"]), expected_count)
 
     def test_site(self):
         query = """

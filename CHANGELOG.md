@@ -1,6 +1,8 @@
 ## Unreleased
 
-## Added
+## [0.31.0] - 2026-04-21
+
+### Added
 
 - Add an `is_default_site` filter to the sites query ([#429](https://github.com/torchbox/wagtail-grapple/pull/429)) @ianmeigh
 
@@ -434,7 +436,8 @@
 -   Improve field definition and under-the-hood implementation ([#28](https://github.com/torchbox/wagtail-grapple/pull/28))
 -   Add conditional checks when resolving streamfield type ([#29](https://github.com/torchbox/wagtail-grapple/pull/29))
 
-[unreleased]: https://github.com/torchbox/wagtail-grapple/compare/v0.30.0...HEAD
+[unreleased]: https://github.com/torchbox/wagtail-grapple/compare/v0.31.0...HEAD
+[0.31.0]: https://github.com/torchbox/wagtail-grapple/compare/v0.30.0...v0.31.0
 [0.30.0]: https://github.com/torchbox/wagtail-grapple/compare/v0.29.0...v0.30.0
 [0.29.0]: https://github.com/torchbox/wagtail-grapple/compare/v0.28.0...v0.29.0
 [0.28.0]: https://github.com/torchbox/wagtail-grapple/compare/v0.27.0...v0.28.0

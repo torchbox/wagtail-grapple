@@ -1,0 +1,79 @@
+name: 🐞 Bug report
+description: Found a bug? Let us know so we can fix it 👍
+labels: ['bug']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report!
+
+        Before submitting, please search the [existing issues](https://github.com/torchbox/wagtail-grapple/issues) to check it hasn't already been reported.
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Issue summary
+      description: A clear and concise summary of the bug.
+      placeholder: Tell us what you see!
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Detailed steps to reproduce the behaviour. Where possible, include the relevant model / `graphql_fields` definitions and the GraphQL query.
+      value: |
+        1. ...
+        2. ...
+        3. ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect to happen?
+      description: Tell us what you expected, and why you consider the current behaviour a bug.
+    validations:
+      required: false
+
+  - type: input
+    id: grapple-version
+    attributes:
+      label: wagtail-grapple version
+      description: Run `pip show wagtail-grapple | grep Version`.
+    validations:
+      required: true
+
+  - type: input
+    id: wagtail-version
+    attributes:
+      label: Wagtail version
+      description: Run `pip show wagtail | grep Version`.
+    validations:
+      required: true
+
+  - type: input
+    id: django-version
+    attributes:
+      label: Django version
+      description: Run `pip show django | grep Version`.
+    validations:
+      required: true
+
+  - type: input
+    id: python-version
+    attributes:
+      label: Python version
+      description: Run `python --version`.
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional information
+      description: Any other relevant information — `graphene` / `graphene-django` versions, tracebacks, screenshots, etc.
+    validations:
+      required: false
